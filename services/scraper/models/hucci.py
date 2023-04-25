@@ -1,21 +1,22 @@
 import json
 
 from Crawler import Crawler
+from Basic import Basic
 
 seeds = {
     "women-handbags": "Handbags",
-    "women-accessories-lifestyle-bags-and-luggage": "Accessories",
-    "women-readytowear": "Ready To Wear",
+    # "women-accessories-lifestyle-bags-and-luggage": "Accessories",
+    # "women-readytowear": "Ready To Wear",
     "women-shoes": "Shoes",
-    "women-accessories-wallets": "Accessories",
-    "women-accessories-belts": "Accessories",
-    "jewelry-watches-watches-women": "Watches",
-    "men-bags": "Bags",
-    "men-bags-trolleys": "Bags",
-    "men-readytowear": "Ready To Wear",
-    "men-shoes": "Shoes",
-    "men-accessories-wallets": "Accessories",
-    "jewelry-watches-watches-men": "Watches",
+    # "women-accessories-wallets": "Accessories",
+    # "women-accessories-belts": "Accessories",
+    # "jewelry-watches-watches-women": "Watches",
+    # "men-bags": "Bags",
+    # "men-bags-trolleys": "Bags",
+    # "men-readytowear": "Ready To Wear",
+    # "men-shoes": "Shoes",
+    # "men-accessories-wallets": "Accessories",
+    # "jewelry-watches-watches-men": "Watches",
 }
 
 headers = {
@@ -33,15 +34,53 @@ headers = {
 }
 
 urls = {
-    'us': 'https://www.gucci.com/us/en/',
-    'uk': 'https://www.gucci.com/uk/en_gb/',
-    'se': 'https://www.gucci.com/se/en_gb/',
+    'us': 'https://www.gucci.com/us/en',
+    'uk': 'https://www.gucci.com/uk/en_gb',
+    'se': 'https://www.gucci.com/se/en_gb',
 }
 
 # type: API
 
-class Gucci(Crawler):
+class Hucci(Basic):
     model_id = "gucci"
+
+    def __init__(self, country: str):
+        self.country = country
+        self.base_url = urls[country]
+
+    def get_primitive_items(self):
+        primitive_items_by_seed = {}
+        for seed, _ in seeds.items():
+            # print("scraping with seed", seed)
+            api_url = f"{self.base_url}/c/productgrid?categoryCode={seed}&show=Page"
+            primitive_items = []
+            for page in range(self.max_page):
+                page_url = f"{api_url}&page={page}"
+                res = self.get_json(page_url, headers=headers)
+                if not res:
+                    break
+                items = res["products"]["items"]
+                if not items:
+                    # we have gone through all the pages
+                    break
+                
+                for item in items:
+                    item_url = f"{self.base_url}{item['productLink']}"
+                    primitive_item = {
+                        "item_id": item["productCode"],
+                        "item_url": item_url,
+                    }
+                    primitive_items.append(primitive_item)
+                # print("finished scraping page", page, ", primitive_items", primitive_items)
+            
+            primitive_items_by_seed[seed] = primitive_items
+        
+        return primitive_items_by_seed
+                
+
+
+
+            
 
     def process_listing(self):
         for seed, category in seeds.items():
