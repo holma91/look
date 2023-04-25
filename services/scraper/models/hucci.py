@@ -1,13 +1,14 @@
 import json
 
 from Crawler import Crawler
+from Scraper import Scraper
 from Basic import Basic
 
 seeds = {
     "women-handbags": "Handbags",
     # "women-accessories-lifestyle-bags-and-luggage": "Accessories",
     # "women-readytowear": "Ready To Wear",
-    "women-shoes": "Shoes",
+    # "women-shoes": "Shoes",
     # "women-accessories-wallets": "Accessories",
     # "women-accessories-belts": "Accessories",
     # "jewelry-watches-watches-women": "Watches",
@@ -44,9 +45,17 @@ urls = {
 class Hucci(Basic):
     model_id = "gucci"
 
-    def __init__(self, country: str):
+    def __init__(self, country: str, scraper: Scraper):
+        self.scraper = scraper
         self.country = country
         self.base_url = urls[country]
+        
+    def start(self):
+        primitive_items_by_seed = self.get_primitive_items()
+        print("pi:",primitive_items_by_seed)
+        processed_items = self.get_processed_items(primitive_items_by_seed)
+        print(json.dumps(processed_items))
+        pass
 
     def get_primitive_items(self):
         primitive_items_by_seed = {}
@@ -54,9 +63,10 @@ class Hucci(Basic):
             # print("scraping with seed", seed)
             api_url = f"{self.base_url}/c/productgrid?categoryCode={seed}&show=Page"
             primitive_items = []
-            for page in range(self.max_page):
+            # for page in range(self.max_page):
+            for page in range(1):
                 page_url = f"{api_url}&page={page}"
-                res = self.get_json(page_url, headers=headers)
+                res = self.scraper.get_json(page_url, headers=headers, model_id=self.model_id)
                 if not res:
                     break
                 items = res["products"]["items"]
@@ -66,67 +76,38 @@ class Hucci(Basic):
                 
                 for item in items:
                     item_url = f"{self.base_url}{item['productLink']}"
+                    # it's possible to do a gender play in the seeds and add to primitive_item
                     primitive_item = {
                         "item_id": item["productCode"],
                         "item_url": item_url,
                     }
                     primitive_items.append(primitive_item)
+                    if (len(primitive_items) == 3):
+                        break
                 # print("finished scraping page", page, ", primitive_items", primitive_items)
             
             primitive_items_by_seed[seed] = primitive_items
         
         return primitive_items_by_seed
-                
-
-
-
-            
-
-    def process_listing(self):
-        for seed, category in seeds.items():
-            print("seed", seed, "category", category)
-            api_url = f"https://www.gucci.com/fi/en_gb/c/productgrid?categoryCode={seed}&show=Page"
-            for page in range(self.max_page):
-                page_url = f"{api_url}&page={page}"
-                print(f"Process listing {page_url}")
-
-                res = self.get_json(page_url, headers=headers)
-                if not res:
-                    break
-                items = res["products"]["items"]
-                if not items:
-                    break
-
-                for item in items:
-                    item_url = f"https://www.gucci.com/fi/en_gb{item['productLink']}"
-                    yield {
-                        "item_id": item["productCode"],
-                        "item_url": item_url,
-                        "category": category,
-                    }
-
-    def process_item(self, data):
-        # data is of type {item_id: string, item_url: string, category: string}
-        print("data", data)
-        item_url = data["item_url"]
-        item_id = data["item_id"]
-        category = data["category"]
-        doc = self.get_html(item_url, headers=headers)
-        if doc is None:
-            return
+    
+    def get_processed_items(self, primitive_items_by_seed):
+        for seed, primitive_items in primitive_items_by_seed.items():
+            for primitive_item in primitive_items:
+              print("seed", seed, "primitive_item", primitive_item)
+              item_url = primitive_item["item_url"]
+              item_id = primitive_item["item_id"]
+              doc = self.scraper.get_html(item_url, headers=headers, model_id=self.model_id)
+              if doc is None:
+                  continue
+              
+              item = self.process_doc(doc, item_url, item_id)
+              print(json.dumps(item))
+              self.add_to_database(item)
+    
+    def process_doc(self, doc, item_url, item_id):
+        product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
+        breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
         
-        # so, he only uses the api for item_id, item_url, category
-
-        product_data = json.loads(
-            doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False
-        )
-        breadcrumb_data = json.loads(
-            doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False
-        )
-
-        # print("product_data", product_data)
-        # print("breadcrumb_data", breadcrumb_data)
-
         brand = product_data["brand"]["name"]
         name = product_data["name"]
         description = product_data["description"]
@@ -139,7 +120,7 @@ class Hucci(Basic):
         in_stock = product_data["offers"][0]["availability"] == 'InStock'
         breadcrumb = [b["item"]["name"] for b in breadcrumb_data["itemListElement"]]
 
-        response = {
+        item = {
             "item_id": item_id,
             "item_url": item_url,
             "brand": brand,
@@ -152,7 +133,11 @@ class Hucci(Basic):
             "price": price,
             "in_stock": in_stock,
             "breadcrumb": breadcrumb,
-            "category": category,
         }
 
-        return response
+        return item
+            
+    def add_to_database(self, item):
+        # verify that no field is None
+        # get the item from the database by the item_id
+        pass

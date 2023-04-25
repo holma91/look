@@ -11,7 +11,7 @@ from pymongo import MongoClient
 from requests.adapters import HTTPAdapter, Retry
 
 
-class Basic:
+class Scraper:
     model_id = ""
     proxies = {}
     max_workers = 10
@@ -31,12 +31,6 @@ class Basic:
         print(json.dumps(processed_items))
         pass
     
-    def get_primitive_items(self):
-        pass
-    
-    def get_processed_items(self, primitive_items):
-        pass 
-    
     def http_session(self, session=None, retries=3, max_redirects=10):
         session = session or requests.Session()
         if retries > 0:
@@ -47,7 +41,7 @@ class Basic:
         session.max_redirects = max_redirects
         return session
     
-    def get_json(self, url, headers=None, params=None, cookies=None, method="get", json=None):
+    def get_json(self, url, headers=None, params=None, cookies=None, method="get", json=None, model_id=""):
         if not headers:
             headers = self.headers
         if not cookies:
@@ -67,11 +61,11 @@ class Basic:
                 )
                 if response.status_code == 200:
                     return response.json()
-                print(f"{self.model_id} - Error {response.status_code}")
+                print(f"{model_id} - Error {response.status_code}")
             except Exception as e:
-                print(f"{self.model_id} - Exception get_json: {e}")  
+                print(f"{model_id} - Exception get_json: {e}")  
 
-    def get_html(self, url, headers=None, params=None, cookies=None, method="get"):
+    def get_html(self, url, headers=None, params=None, cookies=None, method="get", model_id=""):
         """will load a url and get the raw page source using http requests"""
         if not headers:
             headers = self.headers
@@ -95,8 +89,8 @@ class Basic:
                     except:
                         doc = html.document_fromstring(response.content)
                     return doc
-                print(f"{self.model_id} - Error {response.status_code}")
+                print(f"{model_id} - Error {response.status_code}")
             except etree.ParserError:
                 return
             except Exception as e:
-                print(f"{self.model_id} - Error get_html: {e}")
+                print(f"{model_id} - Error get_html: {e}")
