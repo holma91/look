@@ -1,8 +1,26 @@
 import json
-
+from pydantic import BaseModel
 from Crawler import Crawler
 from Scraper import Scraper
+from Database import Database
 from Basic import Basic
+
+class Primitive_Item(BaseModel):
+    item_id: str
+    item_url: str
+
+class Item(Primitive_Item):
+    brand: str
+    name: str
+    description: str
+    images: list
+    sizes: list
+    colors: list
+    currency: str
+    price: str
+    in_stock: bool
+    breadcrumb: list  
+
 
 seeds = {
     "women-handbags": "Handbags",
@@ -45,19 +63,18 @@ urls = {
 class Hucci(Basic):
     model_id = "gucci"
 
-    def __init__(self, country: str, scraper: Scraper):
-        self.scraper = scraper
+    def __init__(self, country: str, scraper: Scraper, database: Database):
         self.country = country
+        self.scraper = scraper
+        self.database = database
         self.base_url = urls[country]
         
     def start(self):
         primitive_items_by_seed = self.get_primitive_items()
         print("pi:",primitive_items_by_seed)
-        processed_items = self.get_processed_items(primitive_items_by_seed)
-        print(json.dumps(processed_items))
-        pass
+        self.process_items(primitive_items_by_seed)
 
-    def get_primitive_items(self):
+    def get_primitive_items(self) -> dict[str, list[Primitive_Item]]:
         primitive_items_by_seed = {}
         for seed, _ in seeds.items():
             # print("scraping with seed", seed)
@@ -77,10 +94,7 @@ class Hucci(Basic):
                 for item in items:
                     item_url = f"{self.base_url}{item['productLink']}"
                     # it's possible to do a gender play in the seeds and add to primitive_item
-                    primitive_item = {
-                        "item_id": item["productCode"],
-                        "item_url": item_url,
-                    }
+                    primitive_item = Primitive_Item(item_id=item["productCode"], item_url=item_url)
                     primitive_items.append(primitive_item)
                     if (len(primitive_items) == 3):
                         break
@@ -90,19 +104,19 @@ class Hucci(Basic):
         
         return primitive_items_by_seed
     
-    def get_processed_items(self, primitive_items_by_seed):
+    def process_items(self, primitive_items_by_seed: dict[str, list[Primitive_Item]]):
         for seed, primitive_items in primitive_items_by_seed.items():
             for primitive_item in primitive_items:
               print("seed", seed, "primitive_item", primitive_item)
-              item_url = primitive_item["item_url"]
-              item_id = primitive_item["item_id"]
+              item_url = primitive_item.item_url
+              item_id = primitive_item.item_id
               doc = self.scraper.get_html(item_url, headers=headers, model_id=self.model_id)
               if doc is None:
                   continue
               
               item = self.process_doc(doc, item_url, item_id)
-              print(json.dumps(item))
-              self.add_to_database(item)
+              print(item.json(indent=2))
+              # self.database.add(item)
     
     def process_doc(self, doc, item_url, item_id):
         product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
@@ -120,24 +134,8 @@ class Hucci(Basic):
         in_stock = product_data["offers"][0]["availability"] == 'InStock'
         breadcrumb = [b["item"]["name"] for b in breadcrumb_data["itemListElement"]]
 
-        item = {
-            "item_id": item_id,
-            "item_url": item_url,
-            "brand": brand,
-            "name": name,
-            "description": description,
-            "images": images,
-            "sizes": sizes,
-            "colors": colors,
-            "currency": currency,
-            "price": price,
-            "in_stock": in_stock,
-            "breadcrumb": breadcrumb,
-        }
+        item = Item(item_id=item_id, item_url=item_url, brand=brand, name=name, description=description, images=images, sizes=sizes, colors=colors, currency=currency, price=price, in_stock=in_stock, breadcrumb=breadcrumb)
 
         return item
-            
-    def add_to_database(self, item):
-        # verify that no field is None
-        # get the item from the database by the item_id
-        pass
+          
+    
