@@ -1,5 +1,5 @@
 abstract_item.id: brand:product_id
-item.id: website:brand:product_id
+item.id: domain:brand:product_id
 
 for currency codes, follow: ISO 4217
 for country codes, follow: ISO 3166-1 alpha-2
