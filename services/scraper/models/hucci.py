@@ -8,6 +8,7 @@ from Basic import Basic
 class Primitive_Item(BaseModel):
     item_id: str
     item_url: str
+    audience: str
 
 class Item(Primitive_Item):
     brand: str
@@ -23,7 +24,7 @@ class Item(Primitive_Item):
 
 
 seeds = {
-    "women-handbags": "Handbags",
+    # "women-handbags": "women",
     # "women-accessories-lifestyle-bags-and-luggage": "Accessories",
     # "women-readytowear": "Ready To Wear",
     # "women-shoes": "Shoes",
@@ -32,7 +33,7 @@ seeds = {
     # "jewelry-watches-watches-women": "Watches",
     # "men-bags": "Bags",
     # "men-bags-trolleys": "Bags",
-    # "men-readytowear": "Ready To Wear",
+    "men-readytowear": "men",
     # "men-shoes": "Shoes",
     # "men-accessories-wallets": "Accessories",
     # "jewelry-watches-watches-men": "Watches",
@@ -76,7 +77,7 @@ class Hucci(Basic):
 
     def get_primitive_items(self) -> dict[str, list[Primitive_Item]]:
         primitive_items_by_seed = {}
-        for seed, _ in seeds.items():
+        for seed, audience in seeds.items():
             # print("scraping with seed", seed)
             api_url = f"{self.base_url}/c/productgrid?categoryCode={seed}&show=Page"
             primitive_items = []
@@ -94,7 +95,7 @@ class Hucci(Basic):
                 for item in items:
                     item_url = f"{self.base_url}{item['productLink']}"
                     # it's possible to do a gender play in the seeds and add to primitive_item
-                    primitive_item = Primitive_Item(item_id=item["productCode"], item_url=item_url)
+                    primitive_item = Primitive_Item(item_id=item["productCode"], item_url=item_url, audience=audience)
                     primitive_items.append(primitive_item)
                     if (len(primitive_items) == 3):
                         break
@@ -110,15 +111,16 @@ class Hucci(Basic):
               print("seed", seed, "primitive_item", primitive_item)
               item_url = primitive_item.item_url
               item_id = primitive_item.item_id
+              audience = primitive_item.audience
               doc = self.scraper.get_html(item_url, headers=headers, model_id=self.model_id)
               if doc is None:
                   continue
               
-              item = self.process_doc(doc, item_url, item_id)
+              item = self.process_doc(doc, item_url, item_id, audience)
               print(item.json(indent=2))
               # self.database.add(item)
     
-    def process_doc(self, doc, item_url, item_id):
+    def process_doc(self, doc: str, item_url: str, item_id: str, audience: str):
         product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
         breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
         
@@ -126,15 +128,19 @@ class Hucci(Basic):
         name = product_data["name"]
         description = product_data["description"]
         images = product_data["image"]
+
         sizes = doc.xpath('//select[@name="size"]/option[@data-available="true"]/text()')
         sizes = list(set([s.strip() for s in sizes]))
+
+        # write sizing code.
+
         colors = list(set(doc.xpath('//span[@class="color-material-name"]/text()')))
         currency = product_data["offers"][0]["priceCurrency"]
         price = product_data["offers"][0]["price"]
         in_stock = product_data["offers"][0]["availability"] == 'InStock'
         breadcrumb = [b["item"]["name"] for b in breadcrumb_data["itemListElement"]]
 
-        item = Item(item_id=item_id, item_url=item_url, brand=brand, name=name, description=description, images=images, sizes=sizes, colors=colors, currency=currency, price=price, in_stock=in_stock, breadcrumb=breadcrumb)
+        item = Item(item_id=item_id, item_url=item_url, audience=audience, brand=brand, name=name, description=description, images=images, sizes=sizes, colors=colors, currency=currency, price=price, in_stock=in_stock, breadcrumb=breadcrumb)
 
         return item
           

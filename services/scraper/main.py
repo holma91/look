@@ -20,8 +20,6 @@ def connect_db():
         for row in result:
             print(f"x: {row.x}  y: {row.y}")
 
-# Base = declarative_base()
-
 def main():
     scraper = Scraper()
     database = Database("dev")
