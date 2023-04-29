@@ -105,6 +105,8 @@ def upgrade() -> None:
 
         CREATE UNIQUE INDEX ON "item_size" ("item_id", "size_id");
 
+        CREATE UNIQUE INDEX ON "category" ("name", "audience");
+
         ALTER TABLE "abstract_item" ADD FOREIGN KEY ("brand") REFERENCES "brand" ("id");
 
         ALTER TABLE "item" ADD FOREIGN KEY ("abstract_item_id") REFERENCES "abstract_item" ("id");
