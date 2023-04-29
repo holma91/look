@@ -15,7 +15,7 @@ class Item(Primitive_Item):
     name: str
     description: str
     images: list
-    sizes: list
+    sizes: dict
     colors: list
     currency: str
     price: str
@@ -129,10 +129,7 @@ class Hucci(Basic):
         description = product_data["description"]
         images = product_data["image"]
 
-        sizes = doc.xpath('//select[@name="size"]/option[@data-available="true"]/text()')
-        sizes = list(set([s.strip() for s in sizes]))
-
-        # write sizing code.
+        sizes = self.get_size_data(product_data)
 
         colors = list(set(doc.xpath('//span[@class="color-material-name"]/text()')))
         currency = product_data["offers"][0]["priceCurrency"]
@@ -143,5 +140,18 @@ class Hucci(Basic):
         item = Item(item_id=item_id, item_url=item_url, audience=audience, brand=brand, name=name, description=description, images=images, sizes=sizes, colors=colors, currency=currency, price=price, in_stock=in_stock, breadcrumb=breadcrumb)
 
         return item
+    
+    def get_size_data(self, product_data: dict) -> list[str]:
+        # sizes = doc.xpath('//select[@name="size"]/option[@data-available="true"]/text()')
+        # sizes = list(set([s.strip() for s in sizes]))
+        # some sites have size data in schema
+
+        sizes = {}
+        for offer in product_data["offers"]:
+            size = offer["sku"].split("_")[-1]
+            in_stock = offer["availability"] == 'InStock'
+            sizes[size] = in_stock
+        
+        return sizes
           
     

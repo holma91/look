@@ -6,3 +6,19 @@ item_id: brand:item_id
    Does it by getting the html, extracting the schema.org stuff and maybe something else.
 3. insert into database
    if something has changed since the last insert (compare by item_id), insert into the database
+
+```js
+// Find all <script> elements with type="application/ld+json"
+const scriptElements = document.querySelectorAll(
+  'script[type="application/ld+json"]'
+);
+
+// Iterate over the NodeList and process each matching element
+scriptElements.forEach((scriptElement) => {
+  // Extract the JSON content and parse it into a JavaScript object
+  const data = JSON.parse(scriptElement.textContent);
+
+  // Log the data to the console
+  console.log(data);
+});
+```
