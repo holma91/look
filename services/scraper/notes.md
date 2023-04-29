@@ -7,6 +7,8 @@ item_id: brand:item_id
 3. insert into database
    if something has changed since the last insert (compare by item_id), insert into the database
 
+### Dev Console Scripts
+
 ```js
 // Find all <script> elements with type="application/ld+json"
 const scriptElements = document.querySelectorAll(
@@ -21,4 +23,18 @@ scriptElements.forEach((scriptElement) => {
   // Log the data to the console
   console.log(data);
 });
+```
+
+```js
+let xpathExpression = '//*[@id="select2-size-4f-results"]';
+let xpathResult = document.evaluate(
+  xpathExpression,
+  document,
+  null,
+  XPathResult.FIRST_ORDERED_NODE_TYPE,
+  null
+);
+let targetElement = xpathResult.singleNodeValue;
+
+console.log(targetElement);
 ```

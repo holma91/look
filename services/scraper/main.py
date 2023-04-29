@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, text
 
 from Scraper import Scraper
 from Database import Database
-from models import Gucci, Hucci
+from models import Gucci
 starters = ['gucci', 'tomford', 'moncler', 'loropiana','burberry']
 
 # SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
@@ -23,8 +23,8 @@ def connect_db():
 def main():
     scraper = Scraper()
     database = Database("dev")
-    model = Hucci(country='us', scraper=scraper, database=database)
-    print("model:", model)
+    model = Gucci(country='us', scraper=scraper, database=database)
+    # print("model:", model)
     model.start()
 
 if __name__ == '__main__':
