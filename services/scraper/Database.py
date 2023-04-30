@@ -21,7 +21,7 @@ class Database:
                         """
                         INSERT INTO category (name, audience)
                         VALUES (:name, :audience)
-                        ON CONFLICT (name) DO NOTHING
+                        ON CONFLICT (name, audience) DO NOTHING
                         """
                     ),
                     {"name": category["name"], "audience": item.audience},

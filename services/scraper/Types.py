@@ -16,4 +16,4 @@ class Item(Primitive_Item):
     colors: list
     currency: str
     price: str
-    categories: list
+    breadcrumbs: list

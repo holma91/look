@@ -1,27 +1,26 @@
 import json
 import re
+from datetime import datetime
 from pydantic import BaseModel
-from Crawler import Crawler
 from Scraper import Scraper
-from Database import Database
 
 from Types import Primitive_Item, Item
 
 
 seeds = {
-    # "women-handbags": "women",
+    "women-handbags": "women",
     "women-accessories-lifestyle-bags-and-luggage": "women",
-    # "women-readytowear": "women",
-    # "women-shoes": "Shoes",
-    # "women-accessories-wallets": "Accessories",
-    # "women-accessories-belts": "Accessories",
-    # "jewelry-watches-watches-women": "Watches",
-    # "men-bags": "Bags",
-    # "men-bags-trolleys": "Bags",
-    # "men-readytowear": "men",
-    # "men-shoes": "Shoes",
-    # "men-accessories-wallets": "Accessories",
-    # "jewelry-watches-watches-men": "Watches",
+    "women-readytowear": "women",
+    "women-shoes": "women",
+    "women-accessories-wallets": "women",
+    "women-accessories-belts": "women",
+    "jewelry-watches-watches-women": "women",
+    "men-bags": "men",
+    "men-bags-trolleys": "men",
+    "men-readytowear": "men",
+    "men-shoes": "men",
+    "men-accessories-wallets": "men",
+    "jewelry-watches-watches-men": "men",
 }
 
 headers = {
@@ -50,10 +49,9 @@ class Gucci:
     brand = "gucci"
     domain = "gucci.com"
 
-    def __init__(self, country: str, scraper: Scraper, database: Database):
+    def __init__(self, country: str, scraper: Scraper):
         self.country = country
         self.scraper = scraper
-        self.database = database
         self.base_url = urls[country]
         
     def start(self):
@@ -65,8 +63,8 @@ class Gucci:
         for seed, audience in seeds.items():
             api_url = f"{self.base_url}/c/productgrid?categoryCode={seed}&show=Page"
             primitive_items = []
-            # for page in range(self.max_page):
-            for page in range(1):
+            # for page in range(1):
+            for page in range(self.scraper.max_page):
                 page_url = f"{api_url}&page={page}"
                 res = self.scraper.get_json(page_url, headers=headers, model_id=self.domain)
                 if not res:
@@ -80,8 +78,8 @@ class Gucci:
                     item_url = f"{self.base_url}{item['productLink']}"
                     primitive_item = Primitive_Item(item_id=item["productCode"], item_url=item_url, audience=audience)
                     primitive_items.append(primitive_item)
-                    if (len(primitive_items) == 5):
-                        break
+                    # if (len(primitive_items) == 5):
+                    #     break
                 # print("finished scraping page", page, ", primitive_items", primitive_items)
             
             primitive_items_by_seed[seed] = primitive_items
@@ -90,20 +88,24 @@ class Gucci:
     
     def process_items(self, primitive_items_by_seed: dict[str, list[Primitive_Item]]):
         items = []
-        for seed, primitive_items in primitive_items_by_seed.items():
-            for primitive_item in primitive_items:
-              item_url = primitive_item.item_url
-              item_id = primitive_item.item_id
-              audience = primitive_item.audience
-              doc = self.scraper.get_html(item_url, headers=headers, model_id=self.domain)
-              if doc is None:
-                  continue
-              
-              item = self.process_doc(doc, item_url, item_id, audience)
-              items.append(item.json())
-              self.database.insert_item(item)
-        # print(json.dumps(items, indent=2))
-        # print(items)
+        today = datetime.today()
+        date_str = today.strftime('%Y-%m-%d')
+        output_file = f'./results/{self.brand}_{date_str}.jsonl'
+
+        with open(output_file, 'w') as file:
+            for seed, primitive_items in primitive_items_by_seed.items():
+                for primitive_item in primitive_items:
+                    item_url = primitive_item.item_url
+                    item_id = primitive_item.item_id
+                    audience = primitive_item.audience
+                    doc = self.scraper.get_html(item_url, headers=headers, model_id=self.domain)
+                    if doc is None:
+                        continue
+                    
+                    item = self.process_doc(doc, item_url, item_id, audience)
+                    items.append(item)
+                    file.write(item.json() + '\n')
+            
     
     def process_doc(self, doc: str, item_url: str, item_id: str, audience: str):
         product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
@@ -116,16 +118,14 @@ class Gucci:
 
         sizes = self.get_sizes(product_data)
         categories = self.get_categories(breadcrumb_data)
-        audience = self.get_audience(audience, categories)
         colors = self.get_colors(doc)
 
-        abstract_item_pk = f"{self.brand}:{item_id}".lower()
-        item_pk = f"{self.domain}:{self.brand}:{item_id}".lower()
+        breadcrumbs = breadcrumb_data["itemListElement"]
 
         currency = product_data["offers"][0]["priceCurrency"]
         price = product_data["offers"][0]["price"]
 
-        item = Item(item_id=item_id, item_url=item_url, audience=audience, brand=brand.lower(), domain=self.domain, country=self.country, name=name, description=description, images=images, sizes=sizes, colors=colors, currency=currency, price=price, categories=categories)
+        item = Item(item_id=item_id, item_url=item_url,audience=audience, brand=brand.lower(), domain=self.domain, country=self.country, name=name, description=description, images=images, sizes=sizes, colors=colors, currency=currency, price=price, breadcrumbs=breadcrumbs)
 
         return item
     

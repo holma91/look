@@ -38,3 +38,9 @@ let targetElement = xpathResult.singleNodeValue;
 
 console.log(targetElement);
 ```
+
+### high level
+
+1. scrape and put data into results
+2. take data from results, put into db
+3. do shit
