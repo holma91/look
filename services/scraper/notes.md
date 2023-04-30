@@ -39,6 +39,11 @@ let targetElement = xpathResult.singleNodeValue;
 console.log(targetElement);
 ```
 
+```sql
+insert into brand (id) values ('gucci');
+insert into website (domain, multi_brand, second_hand) values ('gucci.com', false, false);
+```
+
 ### high level
 
 1. scrape and put data into results
