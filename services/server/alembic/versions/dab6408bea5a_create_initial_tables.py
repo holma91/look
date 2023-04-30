@@ -20,81 +20,78 @@ def upgrade() -> None:
     op.execute(
         """
         CREATE TYPE "audience_type" AS ENUM (
-            'men',
-            'women',
-            'unisex'
+        'men',
+        'women',
+        'unisex'
         );
 
         CREATE TABLE "abstract_item" (
-            "id" text PRIMARY KEY,
-            "brand" text,
-            "gender" audience_type
+        "id" text PRIMARY KEY,
+        "brand" text,
+        "gender" audience_type
         );
 
         CREATE TABLE "item" (
-            "id" text PRIMARY KEY,
-            "abstract_item_id" text,
-            "website" text,
-            "country" char(2),
-            "item_url" text,
-            "currency" char(3),
-            "price" numeric(12, 2),
-            "name" text,
-            "description" text,
-            "updated_at" timestamp,
-            "removed" boolean
+        "id" text PRIMARY KEY,
+        "abstract_item_id" text,
+        "website" text,
+        "country" char(2),
+        "item_url" text,
+        "currency" char(3),
+        "price" numeric(12, 2),
+        "name" text,
+        "description" text,
+        "updated_at" timestamp,
+        "removed" boolean
         );
 
         CREATE TABLE "item_color" (
-            "item_id" text,
-            "color_id" int
+        "item_id" text,
+        "color_id" text
         );
 
         CREATE TABLE "item_category" (
-            "item_id" text,
-            "category_id" int,
-            "rank" int
+        "item_id" text,
+        "category_id" text,
+        "rank" int
         );
 
         CREATE TABLE "item_image" (
-            "item_id" text,
-            "image_id" int
+        "item_id" text,
+        "image_id" text
         );
 
         CREATE TABLE "item_size" (
-            "item_id" text,
-            "size_id" int
+        "item_id" text,
+        "size_id" text,
+        "in_stock" boolean
         );
 
         CREATE TABLE "color" (
-            "id" SERIAL PRIMARY KEY,
-            "color" text
+        "name" text PRIMARY KEY
         );
 
         CREATE TABLE "category" (
-            "id" SERIAL PRIMARY KEY,
-            "name" text,
-            "audience" audience_type
+        "name" text PRIMARY KEY,
+        "audience" audience_type
         );
 
         CREATE TABLE "image" (
-            "id" SERIAL PRIMARY KEY,
-            "url" text
+        "url" text PRIMARY KEY
         );
 
         CREATE TABLE "size" (
-            "id" SERIAL PRIMARY KEY,
-            "size" text
+        "size" text PRIMARY KEY
         );
 
         CREATE TABLE "brand" (
-            "id" text PRIMARY KEY
+        "id" text PRIMARY KEY
         );
 
         CREATE TABLE "website" (
-            "domain" text PRIMARY KEY,
-            "multi_brand" boolean,
-            "second_hand" boolean
+        "domain" text PRIMARY KEY,
+        "multi_brand" boolean,
+        "second_hand" boolean
         );
 
         CREATE UNIQUE INDEX ON "item_color" ("item_id", "color_id");
@@ -115,19 +112,19 @@ def upgrade() -> None:
 
         ALTER TABLE "item_color" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
 
-        ALTER TABLE "item_color" ADD FOREIGN KEY ("color_id") REFERENCES "color" ("id");
+        ALTER TABLE "item_color" ADD FOREIGN KEY ("color_id") REFERENCES "color" ("name");
 
         ALTER TABLE "item_category" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
 
-        ALTER TABLE "item_category" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("id");
+        ALTER TABLE "item_category" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("name");
 
         ALTER TABLE "item_image" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
 
-        ALTER TABLE "item_image" ADD FOREIGN KEY ("image_id") REFERENCES "image" ("id");
+        ALTER TABLE "item_image" ADD FOREIGN KEY ("image_id") REFERENCES "image" ("url");
 
         ALTER TABLE "item_size" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
 
-        ALTER TABLE "item_size" ADD FOREIGN KEY ("size_id") REFERENCES "size" ("id");
+        ALTER TABLE "item_size" ADD FOREIGN KEY ("size_id") REFERENCES "size" ("size");
         """
     )
 
