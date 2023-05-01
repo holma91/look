@@ -44,6 +44,20 @@ insert into brand (id) values ('gucci');
 insert into website (domain, multi_brand, second_hand) values ('gucci.com', false, false);
 ```
 
+```sql
+select i.id, i.name, ai.gender, i.price, i.item_url from abstract_item ai
+join item i on i.abstract_item_id = ai.id
+join item_color ic on ic.item_id = i.id
+join color c on c.name = ic.color_id
+join item_image ii on ii.item_id = i.id
+join image on image.url = ii.image_id
+join item_category ica on ica.item_id = i.id
+join category ca on ca.id = ica.category_id
+join item_size its on its.item_id = i.id
+join size s on s.size = its.size_id
+order by i.price desc;
+```
+
 ### high level
 
 1. scrape and put data into results

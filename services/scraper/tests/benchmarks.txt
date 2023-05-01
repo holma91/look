@@ -1,0 +1,7 @@
+sync:
+  get_primitive_items: 0.29, 2.55, 0.30
+  process_items: 14.90, 23.34, 95.29
+
+async:
+  get_primitive_items: 0.27, 2.00, 0.29
+  process_items: 5.89, 14.10, 54.68

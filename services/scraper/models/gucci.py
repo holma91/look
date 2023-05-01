@@ -1,5 +1,8 @@
 import json
 import re
+import time
+import asyncio
+
 from datetime import datetime
 from pydantic import BaseModel
 from Scraper import Scraper
@@ -11,16 +14,16 @@ seeds = {
     "women-handbags": "women",
     "women-accessories-lifestyle-bags-and-luggage": "women",
     "women-readytowear": "women",
-    "women-shoes": "women",
-    "women-accessories-wallets": "women",
-    "women-accessories-belts": "women",
-    "jewelry-watches-watches-women": "women",
-    "men-bags": "men",
-    "men-bags-trolleys": "men",
-    "men-readytowear": "men",
-    "men-shoes": "men",
-    "men-accessories-wallets": "men",
-    "jewelry-watches-watches-men": "men",
+    # "women-shoes": "women",
+    # "women-accessories-wallets": "women",
+    # "women-accessories-belts": "women",
+    # "jewelry-watches-watches-women": "women",
+    # "men-bags": "men",
+    # "men-bags-trolleys": "men",
+    # "men-readytowear": "men",
+    # "men-shoes": "men",
+    # "men-accessories-wallets": "men",
+    # "jewelry-watches-watches-men": "men",
 }
 
 headers = {
@@ -54,19 +57,25 @@ class Gucci:
         self.scraper = scraper
         self.base_url = urls[country]
         
-    def start(self):
-        primitive_items_by_seed = self.get_primitive_items()
-        self.process_items(primitive_items_by_seed)
+    async def start(self):
+        start_time = time.time()
+        primitive_items_by_seed = await self.get_primitive_items()
+        print(f'get_primitive_items time: %.2f seconds.' % (time.time() - start_time))
 
-    def get_primitive_items(self) -> dict[str, list[Primitive_Item]]:
+        start_time = time.time()
+        await self.process_items(primitive_items_by_seed)
+        print(f'process_items time: %.2f seconds.' % (time.time() - start_time))
+
+    async def get_primitive_items(self) -> dict[str, list[Primitive_Item]]:
         primitive_items_by_seed = {}
         for seed, audience in seeds.items():
             api_url = f"{self.base_url}/c/productgrid?categoryCode={seed}&show=Page"
             primitive_items = []
-            # for page in range(1):
-            for page in range(self.scraper.max_page):
+            for page in range(1):
+            # for page in range(self.scraper.max_page):
                 page_url = f"{api_url}&page={page}"
-                res = self.scraper.get_json(page_url, headers=headers, model_id=self.domain)
+                # res = self.scraper.get_json(page_url, headers=headers, model_id=self.domain)
+                res = await self.scraper.get_json_async(page_url, headers=headers, model_id=self.domain)
                 if not res:
                     break
                 items = res["products"]["items"]
@@ -78,35 +87,41 @@ class Gucci:
                     item_url = f"{self.base_url}{item['productLink']}"
                     primitive_item = Primitive_Item(item_id=item["productCode"], item_url=item_url, audience=audience)
                     primitive_items.append(primitive_item)
-                    # if (len(primitive_items) == 5):
-                    #     break
+                    # if (len(primitive_items) >= 5):
+                        # break
                 # print("finished scraping page", page, ", primitive_items", primitive_items)
             
             primitive_items_by_seed[seed] = primitive_items
         
         return primitive_items_by_seed
-    
-    def process_items(self, primitive_items_by_seed: dict[str, list[Primitive_Item]]):
-        items = []
+
+    async def process_items(self, primitive_items_by_seed: dict[str, list[Primitive_Item]]):
         today = datetime.today()
         date_str = today.strftime('%Y-%m-%d')
         output_file = f'./results/{self.brand}_{date_str}.jsonl'
 
+        tasks = []
+        for seed, primitive_items in primitive_items_by_seed.items():
+            for primitive_item in primitive_items:
+                task = asyncio.create_task(self.process_item(primitive_item, headers))
+                tasks.append(task)
+
+        items = await asyncio.gather(*tasks)
+
         with open(output_file, 'w') as file:
-            for seed, primitive_items in primitive_items_by_seed.items():
-                for primitive_item in primitive_items:
-                    item_url = primitive_item.item_url
-                    item_id = primitive_item.item_id
-                    audience = primitive_item.audience
-                    doc = self.scraper.get_html(item_url, headers=headers, model_id=self.domain)
-                    if doc is None:
-                        continue
-                    
-                    item = self.process_doc(doc, item_url, item_id, audience)
-                    items.append(item)
+            for item in items:
+                if item is not None:
                     file.write(item.json() + '\n')
-            
-    
+        
+    async def process_item(self, primitive_item, headers):
+        item_url = primitive_item.item_url
+        item_id = primitive_item.item_id
+        audience = primitive_item.audience
+        doc = await self.scraper.get_html_async(item_url, headers=headers, model_id=self.domain)
+        if doc is not None:
+            return self.process_doc(doc, item_url, item_id, audience)
+        return None
+               
     def process_doc(self, doc: str, item_url: str, item_id: str, audience: str):
         product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
         breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
