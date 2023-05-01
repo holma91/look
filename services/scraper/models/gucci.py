@@ -103,10 +103,7 @@ class Gucci:
                 task = asyncio.create_task(self.process_item(primitive_item, headers))
                 tasks.append(task)
 
-        # probably do some batching here
         items = await asyncio.gather(*tasks)
-
-        print('items:', items)
 
         with open(output_file, 'w') as file:
             for item in items:
