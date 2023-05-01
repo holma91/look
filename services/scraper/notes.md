@@ -63,3 +63,8 @@ order by i.price desc;
 1. scrape and put data into results
 2. take data from results, put into db
 3. do shit
+
+### proxies
+
+pay per ip at smartproxy
+pay per gb at the rest

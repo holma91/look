@@ -13,10 +13,10 @@ class Scraper:
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
     }
 
-    def __init__(self, session, proxy_url: str, premium_proxy_url: str):
+    def __init__(self, session, proxy_url: str, proxy_auth):
         self.session = session
         self.proxy_url = proxy_url
-        self.premium_proxy_url = premium_proxy_url
+        self.proxy_auth = proxy_auth
 
     async def get_json(self, url, headers=None, cookies=None, model_id=""):
         if not headers:
@@ -24,9 +24,9 @@ class Scraper:
         if not cookies:
             cookies = self.cookies
 
-        for _ in range(3):
+        for _ in range(5):
             try:
-                async with self.session.get(url, headers=headers, cookies=cookies, proxy=self.proxy_url, ssl=False) as response:
+                async with self.session.get(url, headers=headers, cookies=cookies, proxy=self.proxy_url, proxy_auth=self.proxy_auth, timeout=5) as response:
                     if response.status == 200:
                         return await response.json()
                     else:
@@ -41,9 +41,11 @@ class Scraper:
         if not cookies:
             cookies = self.cookies
 
-        for _ in range(3):
+        for _ in range(5):
             try:
-                async with self.session.get(url, headers=headers, proxy=self.proxy_url, cookies=cookies, ssl=False) as response:
+                print("lets")
+                async with self.session.get(url, headers=headers, cookies=cookies, proxy=self.proxy_url, proxy_auth=self.proxy_auth, timeout=5) as response:
+                    print("go")
                     if response.status == 200:
                         try:
                             text = await response.text()
