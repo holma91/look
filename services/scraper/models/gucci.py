@@ -12,8 +12,8 @@ from Types import Primitive_Item, Item
 
 seeds = {
     "women-handbags": "women",
-    "women-accessories-lifestyle-bags-and-luggage": "women",
-    "women-readytowear": "women",
+    # "women-accessories-lifestyle-bags-and-luggage": "women",
+    # "women-readytowear": "women",
     # "women-shoes": "women",
     # "women-accessories-wallets": "women",
     # "women-accessories-belts": "women",
@@ -74,22 +74,19 @@ class Gucci:
             for page in range(1):
             # for page in range(self.scraper.max_page):
                 page_url = f"{api_url}&page={page}"
-                # res = self.scraper.get_json(page_url, headers=headers, model_id=self.domain)
-                res = await self.scraper.get_json_async(page_url, headers=headers, model_id=self.domain)
+                res = await self.scraper.get_json(page_url, headers=headers, model_id=self.domain)
                 if not res:
                     break
                 items = res["products"]["items"]
-                if not items:
-                    # we have gone through all the pages
+                if not items: # we have gone through all the pages
                     break
                 
                 for item in items:
                     item_url = f"{self.base_url}{item['productLink']}"
                     primitive_item = Primitive_Item(item_id=item["productCode"], item_url=item_url, audience=audience)
                     primitive_items.append(primitive_item)
-                    # if (len(primitive_items) >= 5):
-                        # break
-                # print("finished scraping page", page, ", primitive_items", primitive_items)
+                    if (len(primitive_items) >= 10):
+                        break
             
             primitive_items_by_seed[seed] = primitive_items
         
@@ -101,12 +98,15 @@ class Gucci:
         output_file = f'./results/{self.brand}_{date_str}.jsonl'
 
         tasks = []
-        for seed, primitive_items in primitive_items_by_seed.items():
+        for _, primitive_items in primitive_items_by_seed.items():
             for primitive_item in primitive_items:
                 task = asyncio.create_task(self.process_item(primitive_item, headers))
                 tasks.append(task)
 
+        # probably do some batching here
         items = await asyncio.gather(*tasks)
+
+        print('items:', items)
 
         with open(output_file, 'w') as file:
             for item in items:
@@ -114,12 +114,9 @@ class Gucci:
                     file.write(item.json() + '\n')
         
     async def process_item(self, primitive_item, headers):
-        item_url = primitive_item.item_url
-        item_id = primitive_item.item_id
-        audience = primitive_item.audience
-        doc = await self.scraper.get_html_async(item_url, headers=headers, model_id=self.domain)
+        doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
         if doc is not None:
-            return self.process_doc(doc, item_url, item_id, audience)
+            return self.process_doc(doc, primitive_item.item_url, primitive_item.item_id, primitive_item.audience)
         return None
                
     def process_doc(self, doc: str, item_url: str, item_id: str, audience: str):
@@ -132,7 +129,6 @@ class Gucci:
         images = product_data["image"]
 
         sizes = self.get_sizes(product_data)
-        categories = self.get_categories(breadcrumb_data)
         colors = self.get_colors(doc)
 
         breadcrumbs = breadcrumb_data["itemListElement"]
@@ -156,35 +152,6 @@ class Gucci:
             sizes[size] = in_stock
         
         return sizes
-    
-    def get_categories(self, breadcrumb_data: dict) -> list[str]:
-        breadcrumbs = breadcrumb_data["itemListElement"]
-        categories = []
-        for breadcrumb in breadcrumbs:
-            name = breadcrumb["item"]["name"]
-            rank = breadcrumb["position"]
-            categories.append({"name": name, "rank": rank})
-        return categories
-    
-    def get_audience(self, audience: str, categories: list[dict]) -> str:
-        men = False
-        women = False
-        for category in categories:
-            lower = category["name"].lower()
-            if re.search(r'\bmen\b', lower):
-                men = True
-            if re.search(r'\bwomen\b', lower):
-                women = True
-
-        sex = audience
-        if men and women:
-            sex = "unisex"
-        elif men:
-            sex = "men"
-        elif women:
-            sex = "women"
-
-        return sex
     
     def get_colors(self, doc: str) -> list[str]:
         # split text by word
