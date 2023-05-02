@@ -26,7 +26,7 @@ scriptElements.forEach((scriptElement) => {
 ```
 
 ```js
-let xpathExpression = '//*[@id="select2-size-4f-results"]';
+let xpathExpression = '//*[@id="product-details"]/div[2]/ul';
 let xpathResult = document.evaluate(
   xpathExpression,
   document,

@@ -1,11 +1,10 @@
 from pydantic import BaseModel
 
-class Primitive_Item(BaseModel):
-    item_id: str
+class PrimitiveItem(BaseModel):
     item_url: str
     audience: str
 
-class Item(Primitive_Item):
+class Item(PrimitiveItem):
     brand: str
     domain: str
     country: str
@@ -17,3 +16,11 @@ class Item(Primitive_Item):
     currency: str
     price: str
     breadcrumbs: list
+
+
+class ExtractedItem(BaseModel):
+    item_url: str
+    audience: str
+    product_data: dict
+    breadcrumb_data: dict
+    other_data: dict

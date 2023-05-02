@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import aiohttp
 
 from Scraper import Scraper
-from models import Gucci
+from parsers import Gucci
 
 load_dotenv()
 
