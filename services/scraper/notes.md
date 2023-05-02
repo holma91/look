@@ -73,8 +73,25 @@ pay per gb at the rest
 
 1. create parser at parsers/brand.py with Brand class that inherits from BaseParser.
 2. add seeds, header and urls at utils/information.
-
--
-
+   go to the console and try to find an api they are calling
+   make a manual verification of if the api gets everything
 3. implement get_primitive_items.
 4. implement get_extracted_item.
+
+### Rules
+
+after parsing, the following must exist in the data:
+
+always in schema: id, url, currency, price, name, description,  
+not always in schema (read these from APIs or the HTML):
+
+- colors
+- images
+- breadcrumbs
+- sizes
+
+### thinking
+
+every article has a product code
+often something like this: product:color:size
+leave out size from the ID for an item in the db.

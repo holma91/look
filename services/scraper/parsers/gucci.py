@@ -1,8 +1,20 @@
 import json
+from typing import Optional
+from lxml import html
+
+from pydantic import BaseModel
 
 from Scraper import Scraper
-from Types import PrimitiveItem, ExtractedItem
+from Types import PrimitiveItem
 from BaseParser import BaseParser
+
+class ParsedItem(BaseModel):
+    item_url: str
+    audience: str
+    product_data: dict
+    breadcrumb_data: dict
+    colors: list
+    extra_description: str
 
 class Gucci(BaseParser):
 
@@ -37,23 +49,24 @@ class Gucci(BaseParser):
         
         return primitive_items_by_seed
         
-    async def get_extracted_item(self, primitive_item: PrimitiveItem, headers: dict) -> ExtractedItem:
+    async def get_extracted_item(self, primitive_item: PrimitiveItem, headers: dict) -> ParsedItem:
         def create_extracted_item(doc: str, primitive_item: PrimitiveItem):
             product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
             breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
             assert product_data['@type'] == 'Product'
             assert breadcrumb_data['@type'] == 'BreadcrumbList'
 
-            other_data = {}
-            other_data['colors'] = list(set(doc.xpath('//span[@class="color-material-name"]/text()')))
-            other_data['extra_description'] = str(doc.xpath('//*[@id="product-details"]/div[2]/ul'))
+            colors = list(set(doc.xpath('//span[@class="color-material-name"]/text()')))
+            extra_description = doc.xpath('//*[@id="product-details"]')
+            formatted_extra_description = html.tostring(extra_description[0], pretty_print=True, encoding='unicode')
 
-            item = ExtractedItem(
+            item = ParsedItem(
                 item_url=primitive_item.item_url,
                 audience=primitive_item.audience,
                 product_data=product_data, 
                 breadcrumb_data=breadcrumb_data, 
-                other_data=other_data
+                colors=colors,
+                extra_description=formatted_extra_description
             )
 
             return item
@@ -62,6 +75,7 @@ class Gucci(BaseParser):
             doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
             item = create_extracted_item(doc, primitive_item)
             return item
-        except Exception:
+        except Exception as e:
+            print(e)
             return None
                

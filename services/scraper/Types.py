@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 class PrimitiveItem(BaseModel):
@@ -18,9 +20,9 @@ class Item(PrimitiveItem):
     breadcrumbs: list
 
 
-class ExtractedItem(BaseModel):
+class ParsedItem(BaseModel):
     item_url: str
     audience: str
-    product_data: dict
-    breadcrumb_data: dict
-    other_data: dict
+    product_data: Optional[dict] = None
+    breadcrumb_data: Optional[dict] = None
+    other_data: Optional[dict] = None

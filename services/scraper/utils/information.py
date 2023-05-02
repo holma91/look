@@ -49,26 +49,26 @@ information = {
           'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
       },
       'urls': {
-          'us': 'https://us.loropiana.com/en/',
-          'uk': 'https://uk.loropiana.com/en/',
-          'se': 'https://se.loropiana.com/en/',
+          'us': 'https://us.loropiana.com/en',
+          'uk': 'https://uk.loropiana.com/en',
+          'se': 'https://se.loropiana.com/en',
       },
       'seeds': {
-          "https://us.loropiana.com/en/c/L1_MEN/results": "men", # ready to wear
-          "https://us.loropiana.com/en/c/L1_WOM/results": "women", # ready to wear
-          "https://us.loropiana.com/en/c/L2_WOM_LG/results": "women", # leather goods
-          "https://us.loropiana.com/en/c/L2_WOM_ACCESSORIES/results": "women", # accessories
-          "https://us.loropiana.com/en/c/L2_SHOES_WOM/results": "women", # shoes
-          "https://us.loropiana.com/en/c/L2_WOM_GOK/results": "women", # gifts of kings
-          "https://us.loropiana.com/en/c/L2_WOM_VICU%C3%91A/results": "women", # vicuna
-          "https://us.loropiana.com/en/c/L2_WOM_BABYCASH/results": "women", # baby cashmere
+          "/c/L1_MEN/results": "men", # ready to wear
+          "/c/L1_WOM/results": "women", # ready to wear
+          # "/c/L2_WOM_LG/results": "women", # leather goods
+          # "/c/L2_WOM_ACCESSORIES/results": "women", # accessories
+          # "/c/L2_SHOES_WOM/results": "women", # shoes
+          # "/c/L2_WOM_GOK/results": "women", # gifts of kings
+          # "/c/L2_WOM_VICU%C3%91A/results": "women", # vicuna
+          # "/c/L2_WOM_BABYCASH/results": "women", # baby cashmere
 
-          "https://us.loropiana.com/en/c/L1_MEN/results": "men",
-          "https://us.loropiana.com/en/c/L2_MEN_ACCESSORIES/results": "men",
-          "https://us.loropiana.com/en/c/L2_SHOES_MAN/results": "men",
-          "https://us.loropiana.com/en/c/L2_MEN_GOK/results": "men",
-          "https://us.loropiana.com/en/c/L2_MEN_VICU%C3%91A/results": "men",
-          "https://us.loropiana.com/en/c/L2_MEN_BABYCASH/results": "men"
+          # "/c/L1_MEN/results": "men",
+          # "/c/L2_MEN_ACCESSORIES/results": "men",
+          # "/c/L2_SHOES_MAN/results": "men",
+          # "/c/L2_MEN_GOK/results": "men",
+          # "/c/L2_MEN_VICU%C3%91A/results": "men",
+          # "/c/L2_MEN_BABYCASH/results": "men"
       }
     }
 }

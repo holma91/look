@@ -4,7 +4,7 @@ import asyncio
 from datetime import datetime
 from Scraper import Scraper
 
-from Types import PrimitiveItem, ExtractedItem
+from Types import PrimitiveItem
 from utils.information import information
 
 class BaseParser:
@@ -39,15 +39,15 @@ class BaseParser:
                 task = asyncio.create_task(self.get_extracted_item(primitive_item, self.headers))
                 tasks.append(task)
 
-        extracted_items: list[ExtractedItem] = await asyncio.gather(*tasks)
+        parsed_items: list = await asyncio.gather(*tasks)
 
         with open(output_file, 'w') as file:
-            for item in extracted_items:
+            for item in parsed_items:
                 if item is not None:
                     file.write(item.json() + '\n')
 
     async def get_primitive_items(self) -> dict[str, list[PrimitiveItem]]:
         raise NotImplementedError("This method should be implemented in a subclass.")
 
-    async def get_extracted_item(self, primitive_item: PrimitiveItem, headers: dict) -> ExtractedItem:
+    async def get_extracted_item(self, primitive_item: PrimitiveItem, headers: dict) -> any:
         raise NotImplementedError("This method should be implemented in a subclass.")
