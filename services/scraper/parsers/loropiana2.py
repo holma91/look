@@ -1,13 +1,25 @@
 import json
 
-from Crawler import Crawler
 
-# Loro Piana -https://us.loropiana.com/en/
+seeds = {
+    "https://us.loropiana.com/en/c/L1_MEN/results": "men", # ready to wear
+    "https://us.loropiana.com/en/c/L1_WOM/results": "women", # ready to wear
+    "https://us.loropiana.com/en/c/L2_WOM_LG/results": "women", # leather goods
+    "https://us.loropiana.com/en/c/L2_WOM_ACCESSORIES/results": "women", # accessories
+    "https://us.loropiana.com/en/c/L2_SHOES_WOM/results": "women", # shoes
+    "https://us.loropiana.com/en/c/L2_WOM_GOK/results": "women", # gifts of kings
+    "https://us.loropiana.com/en/c/L2_WOM_VICU%C3%91A/results": "women", # vicuna
+    "https://us.loropiana.com/en/c/L2_WOM_BABYCASH/results": "women", # baby cashmere
 
-seeds = [
-    "https://us.loropiana.com/en/c/L1_MEN/results",
-    "https://us.loropiana.com/en/c/L1_WOM/results",
-]
+    "https://us.loropiana.com/en/c/L1_MEN/results": "men",
+    "https://us.loropiana.com/en/c/L2_MEN_ACCESSORIES/results": "men",
+    "https://us.loropiana.com/en/c/L2_SHOES_MAN/results": "men",
+    "https://us.loropiana.com/en/c/L2_MEN_GOK/results": "men",
+    "https://us.loropiana.com/en/c/L2_MEN_VICU%C3%91A/results": "men",
+    "https://us.loropiana.com/en/c/L2_MEN_BABYCASH/results": "men"
+
+
+}
 
 headers = {
     'authority': 'us.loropiana.com',
@@ -20,6 +32,11 @@ headers = {
     'sec-fetch-mode': 'cors',
     'sec-fetch-site': 'same-origin',
     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
+}
+urls = {
+    'us': 'https://us.loropiana.com/en/',
+    'uk': 'https://uk.loropiana.com/en/',
+    'se': 'https://se.loropiana.com/en/',
 }
 
 # type: API

@@ -68,3 +68,13 @@ order by i.price desc;
 
 pay per ip at smartproxy
 pay per gb at the rest
+
+### how to add a new parser
+
+1. create parser at parsers/brand.py with Brand class that inherits from BaseParser.
+2. add seeds, header and urls at utils/information.
+
+-
+
+3. implement get_primitive_items.
+4. implement get_extracted_item.

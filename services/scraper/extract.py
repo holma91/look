@@ -21,8 +21,8 @@ async def main():
     connector = aiohttp.TCPConnector(limit=20)
     async with aiohttp.ClientSession(connector=connector) as session:
         scraper = Scraper(session=session, proxy_url=proxy_url, proxy_auth=proxy_auth)
-        model = Gucci(country='us', scraper=scraper)
-        await model.start()
+        parser = Gucci(country='us', scraper=scraper)
+        await parser.start()
 
 if __name__ == '__main__':
     asyncio.run(main())
