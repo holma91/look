@@ -1,52 +1,13 @@
 import json
-import re
 import time
 import asyncio
 
 from datetime import datetime
-from pydantic import BaseModel
 from Scraper import Scraper
 
 from Types import Primitive_Item, Item
+from utils.information import information
 
-
-seeds = {
-    "women-handbags": "women",
-    # "women-accessories-lifestyle-bags-and-luggage": "women",
-    # "women-readytowear": "women",
-    # "women-shoes": "women",
-    # "women-accessories-wallets": "women",
-    # "women-accessories-belts": "women",
-    # "jewelry-watches-watches-women": "women",
-    # "men-bags": "men",
-    # "men-bags-trolleys": "men",
-    # "men-readytowear": "men",
-    # "men-shoes": "men",
-    # "men-accessories-wallets": "men",
-    # "jewelry-watches-watches-men": "men",
-}
-
-headers = {
-    'authority': 'www.gucci.com',
-    'accept': 'application/json, text/javascript, */*; q=0.01',
-    'accept-language': 'en-US,en;q=0.9',
-    'sec-ch-ua': '"Google Chrome";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"macOS"',
-    'sec-fetch-dest': 'empty',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'same-origin',
-    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36',
-    'x-requested-with': 'XMLHttpRequest',
-}
-
-urls = {
-    'us': 'https://www.gucci.com/us/en',
-    'uk': 'https://www.gucci.com/uk/en_gb',
-    'se': 'https://www.gucci.com/se/en_gb',
-}
-
-# type: API
 
 class Gucci:
     brand = "gucci"
@@ -55,7 +16,11 @@ class Gucci:
     def __init__(self, country: str, scraper: Scraper):
         self.country = country
         self.scraper = scraper
-        self.base_url = urls[country]
+
+        info = information[self.brand]
+        self.base_url = info['urls'][country]
+        self.headers = info['headers']
+        self.seeds = info['seeds']
         
     async def start(self):
         start_time = time.time()
@@ -68,15 +33,17 @@ class Gucci:
 
     async def get_primitive_items(self) -> dict[str, list[Primitive_Item]]:
         primitive_items_by_seed = {}
-        for seed, audience in seeds.items():
+        for seed, audience in self.seeds.items():
             api_url = f"{self.base_url}/c/productgrid?categoryCode={seed}&show=Page"
             primitive_items = []
-            for page in range(1):
-            # for page in range(self.scraper.max_page):
+            # for page in range(1):
+            for page in range(self.scraper.max_page):
                 page_url = f"{api_url}&page={page}"
-                res = await self.scraper.get_json(page_url, headers=headers, model_id=self.domain)
-                if not res:
+                try:
+                    res = await self.scraper.get_json(page_url, headers=self.headers, model_id=self.domain)
+                except Exception:
                     break
+
                 items = res["products"]["items"]
                 if not items: # we have gone through all the pages
                     break
@@ -85,8 +52,8 @@ class Gucci:
                     item_url = f"{self.base_url}{item['productLink']}"
                     primitive_item = Primitive_Item(item_id=item["productCode"], item_url=item_url, audience=audience)
                     primitive_items.append(primitive_item)
-                    if (len(primitive_items) >= 10):
-                        break
+                    # if (len(primitive_items) >= 10):
+                        # break
             
             primitive_items_by_seed[seed] = primitive_items
         
@@ -100,7 +67,7 @@ class Gucci:
         tasks = []
         for _, primitive_items in primitive_items_by_seed.items():
             for primitive_item in primitive_items:
-                task = asyncio.create_task(self.process_item(primitive_item, headers))
+                task = asyncio.create_task(self.process_item(primitive_item, self.headers))
                 tasks.append(task)
 
         items = await asyncio.gather(*tasks)
@@ -111,12 +78,13 @@ class Gucci:
                     file.write(item.json() + '\n')
         
     async def process_item(self, primitive_item, headers):
-        doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
-        if doc is not None:
-            return self.process_doc(doc, primitive_item.item_url, primitive_item.item_id, primitive_item.audience)
-        return None
+        try:
+            doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
+            return self.create_item_from_doc(doc, primitive_item.item_url, primitive_item.item_id, primitive_item.audience)
+        except Exception:
+            return None
                
-    def process_doc(self, doc: str, item_url: str, item_id: str, audience: str):
+    def create_item_from_doc(self, doc: str, item_url: str, item_id: str, audience: str):
         product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
         breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
         
@@ -151,7 +119,5 @@ class Gucci:
         return sizes
     
     def get_colors(self, doc: str) -> list[str]:
-        # split text by word
-        # compare every word with a list of colors
         colors = list(set(doc.xpath('//span[@class="color-material-name"]/text()')))
         return colors

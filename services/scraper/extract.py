@@ -1,5 +1,6 @@
 import asyncio
 import os
+import logging
 
 from dotenv import load_dotenv
 import aiohttp
@@ -10,9 +11,11 @@ from models import Gucci
 load_dotenv()
 
 async def main():
-    proxy_url = os.environ.get('brightdata_datacenter_proxy')
-    proxy_username = os.environ.get('brightdata_datacenter_proxy_username')
-    proxy_password = os.environ.get('brightdata_datacenter_proxy_password')
+    logging.basicConfig(filename='scraper.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+    proxy_url = os.environ.get('brightdata_datacenter_us_proxy')
+    proxy_username = os.environ.get('brightdata_datacenter_us_proxy_username')
+    proxy_password = os.environ.get('brightdata_datacenter_us_proxy_password')
     proxy_auth = aiohttp.BasicAuth(proxy_username, proxy_password)
     
     connector = aiohttp.TCPConnector(limit=20)
