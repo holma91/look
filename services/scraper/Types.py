@@ -17,12 +17,8 @@ class Item(PrimitiveItem):
     colors: list
     currency: str
     price: str
-    breadcrumbs: list
+    categories: list
 
 
-class ParsedItem(BaseModel):
-    item_url: str
-    audience: str
-    product_data: Optional[dict] = None
-    breadcrumb_data: Optional[dict] = None
-    other_data: Optional[dict] = None
+class TransformedItem(BaseModel):
+    pass

@@ -31,7 +31,7 @@ class BaseParser:
     async def process_primitive_items(self, primitive_items_by_seed: dict[str, list[PrimitiveItem]]):
         today = datetime.today()
         date_str = today.strftime('%Y-%m-%d')
-        output_file = f'./results/{self.brand}_{date_str}.jsonl'
+        output_file = f'./results/{self.brand}/{date_str}.jsonl'
 
         tasks = []
         for _, primitive_items in primitive_items_by_seed.items():

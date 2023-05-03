@@ -95,3 +95,10 @@ not always in schema (read these from APIs or the HTML):
 every article has a product code
 often something like this: product:color:size
 leave out size from the ID for an item in the db.
+
+### possible tests
+
+for api calls:
+check that the schema of the response has not changed
+for html:
+check that the html tree is the same as before
