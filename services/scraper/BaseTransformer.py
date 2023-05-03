@@ -12,7 +12,7 @@ class BaseTransformer:
         self.model_id = model_id
         self.parsed_item_types = {
             "gucci": models.gucci.ParsedItem,
-            "loro_piana": models.loropiana.ParsedItem,
+            "loro_piana": models.loro_piana.ParsedItem,
         }
 
     def run(self, s3_path: str):

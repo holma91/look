@@ -42,6 +42,8 @@ console.log(targetElement);
 ```sql
 insert into brand (id) values ('gucci');
 insert into website (domain, multi_brand, second_hand) values ('gucci.com', false, false);
+insert into brand (id) values ('loro_piana');
+insert into website (domain, multi_brand, second_hand) values ('loropiana.com', false, false);
 ```
 
 ```sql

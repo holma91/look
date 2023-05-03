@@ -129,7 +129,7 @@ class Transformer(BaseTransformer):
                 item_url=parsed_item.item_url,
                 audience=parsed_item.audience,
                 item_id=item_id,
-                brand=brand.lower(), 
+                brand=brand.strip().lower().replace(" ", "_"), 
                 domain=parsed_item.domain,
                 country=parsed_item.country,
                 name=name,

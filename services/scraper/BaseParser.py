@@ -42,6 +42,19 @@ class BaseParser:
 
         parsed_items: list = await asyncio.gather(*tasks)
 
+        failed_tasks = []
+        for i in range(len(tasks)):
+            if parsed_items[i] is None:
+                failed_tasks.append(tasks[i])
+
+        print(failed_tasks)
+        print('len:', len(failed_tasks))
+
+        # need to recreate the tasks
+        await asyncio.sleep(10)
+        parsed_items2 = await asyncio.gather(*failed_tasks)
+        parsed_items += parsed_items2
+
         with open(output_file, 'w') as file:
             for item in parsed_items:
                 if item is not None:

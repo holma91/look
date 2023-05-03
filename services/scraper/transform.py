@@ -11,7 +11,7 @@ def main():
 
     db_url = os.environ.get('db_url_dev')
     transformer = models.gucci.Transformer(db_url=db_url, model_id="gucci")
-    transformer2 = models.loropiana.Transformer(db_url=db_url, model_id="loro_piana")
+    transformer2 = models.loro_piana.Transformer(db_url=db_url, model_id="loro_piana")
 
     # transformer.run("./results/gucci/2023-05-03.jsonl")
     transformer2.run("./results/loro_piana/2023-05-03.jsonl")

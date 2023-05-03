@@ -1,3 +1,3 @@
 from .gucci import Gucci
-from .loropiana import LoroPiana
+from .loro_piana import LoroPiana
 __all__ = ["Gucci", "LoroPiana"]

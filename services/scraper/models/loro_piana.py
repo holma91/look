@@ -27,8 +27,8 @@ class LoroPiana(BaseParser):
         for seed, audience in self.seeds.items():
             api_url = f"{self.base_url}{seed}"
             primitive_items = []
-            for page in range(1):
-            # for page in range(self.scraper.max_page):
+            # for page in range(1):
+            for page in range(self.scraper.max_page):
                 page_url = f"{api_url}?page={page}"
                 try:
                     res = await self.scraper.get_json(page_url, headers=self.headers, model_id=self.domain)
@@ -43,8 +43,8 @@ class LoroPiana(BaseParser):
                     item_url = f"{self.base_url}{item['url']}"
                     primitive_item = PrimitiveItem(item_url=item_url, audience=audience)
                     primitive_items.append(primitive_item)
-                    if (len(primitive_items) >= 10):
-                        break
+                    # if (len(primitive_items) >= 10):
+                        # break
             
             primitive_items_by_seed[seed] = primitive_items
         
@@ -136,7 +136,7 @@ class Transformer(BaseTransformer):
                 item_url=parsed_item.item_url,
                 audience=parsed_item.audience,
                 item_id=item_id,
-                brand=brand.lower(), 
+                brand=brand.strip().lower().replace(" ", "_"), 
                 domain=parsed_item.domain,
                 country=parsed_item.country,
                 name=name,
