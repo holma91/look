@@ -63,6 +63,8 @@ class Scraper:
             except Exception as e:
                 logging.exception(f"{model_id} - Exception in get_html: {e} with url: {url}")
         
+        # need to add these to failed jobs
+        
         logging.critical(f"{model_id} - Failed to get html from url: {url}")
         raise Exception(f"{model_id} - Failed to get html from url: {url}")
         # add url to failed jobs?

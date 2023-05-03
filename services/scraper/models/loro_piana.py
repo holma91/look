@@ -57,6 +57,8 @@ class LoroPiana(BaseParser):
             assert product_data['@type'] == 'Product'
             assert breadcrumb_data['@type'] == 'BreadcrumbList'
 
+            # do closer inspection on breadcrumbs here
+
             sku = product_data['sku']
             article_code, color_code = sku.rsplit("_", 1)
             product_url = f"{self.base_url}/api/pdp/product-variants?articleCode={article_code}&colorCode={color_code}"
@@ -103,6 +105,7 @@ class Transformer(BaseTransformer):
 
         def get_categories(breadcrumbs: list[dict]):
             categories = []
+            print(breadcrumbs)
             for breadcrumb in breadcrumbs:
                 name = breadcrumb["name"]
                 rank = breadcrumb["position"]
