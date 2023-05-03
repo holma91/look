@@ -7,6 +7,7 @@ class PrimitiveItem(BaseModel):
     audience: str
 
 class Item(PrimitiveItem):
+    item_id: str
     brand: str
     domain: str
     country: str

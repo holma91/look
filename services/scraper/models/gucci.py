@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from Scraper import Scraper
 from Types import PrimitiveItem, Item
 from BaseParser import BaseParser
+from BaseTransformer import BaseTransformer
 
 class ParsedItem(BaseModel):
     item_url: str
@@ -84,25 +85,10 @@ class Gucci(BaseParser):
             return None
                
 
-class Transformer():
+class Transformer(BaseTransformer):
     "reads the lightly parsed data from s3, transforms it and puts it into postgres"
-    def __init__(self, db_url: str):
-        self.engine = create_engine(db_url)
-
-    def run(self, s3_path: str):
-        parsed_items = self.read_from_s3(s3_path)
-        items = self.transform(parsed_items)
-        print(items)
-        # self.store_to_postgres(data)
-
-    def read_from_s3(self, s3_path: str):
-        parsed_items = []
-        with open(s3_path, 'r') as file:
-            for line in file:
-                parsed_item = ParsedItem(**json.loads(line))
-                parsed_items.append(parsed_item)
-
-        return parsed_items
+    def __init__(self, db_url: str, model_id: str):
+        super().__init__(db_url=db_url, model_id=model_id)
 
     def transform(self, parsed_items: list[ParsedItem]) -> list[Item]:
         def get_sizes(offers: list[dict]):
@@ -143,9 +129,9 @@ class Transformer():
             categories = get_categories(breadcrumbs)
 
             item = Item(
-                item_id=item_id,
                 item_url=parsed_item.item_url,
                 audience=parsed_item.audience,
+                item_id=item_id,
                 brand=brand.lower(), 
                 domain=parsed_item.domain,
                 country=parsed_item.country,
@@ -163,8 +149,6 @@ class Transformer():
         
         return transformed_items
 
-    def store_to_postgres(self, data):
-        # Store the transformed data into your Postgres database
-        pass
+    
 
     
