@@ -8,6 +8,7 @@ from Types import PrimitiveItem
 from utils.information import information
 
 class BaseParser:
+    "does some light parsing and puts the results into S3"
     def __init__(self, country: str, scraper: Scraper, brand: str, domain: str):
         self.country = country
         self.scraper = scraper

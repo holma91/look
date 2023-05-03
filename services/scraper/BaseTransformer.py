@@ -6,11 +6,13 @@ import models
 from Types import Item
 
 class BaseTransformer:
+    "reads the lightly parsed data from s3, transforms it and puts it into postgres"
     def __init__(self, db_url: str, model_id: str):
         self.engine = create_engine(db_url)
         self.model_id = model_id
         self.parsed_item_types = {
             "gucci": models.gucci.ParsedItem,
+            "loro_piana": models.loropiana.ParsedItem,
         }
 
     def run(self, s3_path: str):

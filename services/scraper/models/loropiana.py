@@ -4,8 +4,9 @@ from lxml import html
 from pydantic import BaseModel
 
 from Scraper import Scraper
-from Types import PrimitiveItem
+from Types import PrimitiveItem, Item
 from BaseParser import BaseParser
+from BaseTransformer import BaseTransformer
 
 class ParsedItem(BaseModel):
     item_url: str
@@ -85,3 +86,69 @@ class LoroPiana(BaseParser):
         except Exception as e:
             print(e)
             return None
+        
+
+class Transformer(BaseTransformer):
+    def __init__(self, db_url: str, model_id: str):
+        super().__init__(db_url=db_url, model_id=model_id)
+    
+    def transform(self, parsed_items: list[ParsedItem]) -> list[Item]:
+        def get_sizes(sizes_info: list) -> dict:
+            sizes = {}
+            for size_info in sizes_info:
+                size = size_info['code']
+                in_stock = size_info['stock']['stockLevelStatus']['code'] == 'inStock'
+                sizes[size] = in_stock
+            return sizes
+
+        def get_categories(breadcrumbs: list[dict]):
+            categories = []
+            for breadcrumb in breadcrumbs:
+                name = breadcrumb["name"]
+                rank = breadcrumb["position"]
+                categories.append({"name": name, "rank": rank})
+            return categories
+        
+        transformed_items = []
+        for parsed_item in parsed_items:
+            product_data = parsed_item.product_data
+            breadcrumb_data = parsed_item.breadcrumb_data
+
+            item_id = product_data["sku"]
+
+            brand = product_data["brand"]["name"]
+            name = product_data["name"]
+            description = product_data["description"]
+            images = product_data["image"]
+            if not isinstance(images, list):
+                images = [images]
+            
+            colors = [product_data["color"]]
+            currency = product_data["offers"]["priceCurrency"]
+            price = product_data["offers"]["price"]
+
+            breadcrumbs = breadcrumb_data["itemListElement"]
+
+            sizes = get_sizes(parsed_item.sizes)
+            categories = get_categories(breadcrumbs)
+
+            item = Item(
+                item_url=parsed_item.item_url,
+                audience=parsed_item.audience,
+                item_id=item_id,
+                brand=brand.lower(), 
+                domain=parsed_item.domain,
+                country=parsed_item.country,
+                name=name,
+                description=description,
+                images=images,
+                sizes=sizes,
+                colors=colors,
+                currency=currency,
+                price=price,
+                categories=categories
+            )
+
+            transformed_items.append(item)
+        
+        return transformed_items

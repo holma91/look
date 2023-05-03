@@ -1,7 +1,6 @@
 import json
 from lxml import html
 
-from sqlalchemy import create_engine, text
 from pydantic import BaseModel
 
 from Scraper import Scraper
@@ -20,7 +19,6 @@ class ParsedItem(BaseModel):
     extra_description: str
 
 class Gucci(BaseParser):
-    "does some light parsing and puts the results into S3"
     def __init__(self, country: str, scraper: Scraper):
         super().__init__(country, scraper, brand="gucci", domain="gucci.com")
 
@@ -86,7 +84,6 @@ class Gucci(BaseParser):
                
 
 class Transformer(BaseTransformer):
-    "reads the lightly parsed data from s3, transforms it and puts it into postgres"
     def __init__(self, db_url: str, model_id: str):
         super().__init__(db_url=db_url, model_id=model_id)
 
