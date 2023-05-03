@@ -21,8 +21,8 @@ information = {
       },
       'seeds': {
         "women-handbags": "women",
-        "women-accessories-lifestyle-bags-and-luggage": "women",
-        "women-readytowear": "women",
+        # "women-accessories-lifestyle-bags-and-luggage": "women",
+        # "women-readytowear": "women",
         # "women-shoes": "women",
         # "women-accessories-wallets": "women",
         # "women-accessories-belts": "women",

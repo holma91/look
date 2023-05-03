@@ -104,3 +104,15 @@ for api calls:
 check that the schema of the response has not changed
 for html:
 check that the html tree is the same as before
+
+# todo when back
+
+- stricter type checking in scraper (e.g verify that product_data looks like we want)
+- add more proxies, write infra for switching between data center and residential
+- dive into logs
+- implement a more robust logging system
+
+### when adding new site currently
+
+- Parser that implements 2 functions
+- Transformer that implements 1 function

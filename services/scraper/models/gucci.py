@@ -27,8 +27,8 @@ class Gucci(BaseParser):
         for seed, audience in self.seeds.items():
             api_url = f"{self.base_url}/c/productgrid?categoryCode={seed}&show=Page"
             primitive_items = []
-            for page in range(1):
-            # for page in range(self.scraper.max_page):
+            # for page in range(1):
+            for page in range(self.scraper.max_page):
                 page_url = f"{api_url}&page={page}"
                 try:
                     res = await self.scraper.get_json(page_url, headers=self.headers, model_id=self.domain)
@@ -43,8 +43,8 @@ class Gucci(BaseParser):
                     item_url = f"{self.base_url}{item['productLink']}"
                     primitive_item = PrimitiveItem(item_url=item_url, audience=audience)
                     primitive_items.append(primitive_item)
-                    if (len(primitive_items) >= 10):
-                        break
+                    # if (len(primitive_items) >= 10):
+                        # break
             
             primitive_items_by_seed[seed] = primitive_items
         

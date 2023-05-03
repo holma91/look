@@ -23,7 +23,7 @@ async def main():
         scraper = Scraper(session=session, proxy_url=proxy_url, proxy_auth=proxy_auth)
         parser = models.Gucci(country='us', scraper=scraper)
         parser2 = models.LoroPiana(country='us', scraper=scraper)
-        # await parser.start()
+        await parser.start()
         await parser2.start()
 
 if __name__ == '__main__':

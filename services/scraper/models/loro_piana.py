@@ -8,6 +8,7 @@ from Types import PrimitiveItem, Item
 from BaseParser import BaseParser
 from BaseTransformer import BaseTransformer
 
+# should implement harder type checking here
 class ParsedItem(BaseModel):
     item_url: str
     audience: str
@@ -105,7 +106,6 @@ class Transformer(BaseTransformer):
 
         def get_categories(breadcrumbs: list[dict]):
             categories = []
-            print(breadcrumbs)
             for breadcrumb in breadcrumbs:
                 name = breadcrumb["name"]
                 rank = breadcrumb["position"]
@@ -120,7 +120,9 @@ class Transformer(BaseTransformer):
             item_id = product_data["sku"]
 
             brand = product_data["brand"]["name"]
-            name = product_data["name"]
+
+            name = product_data.get("name", item_id) # item_id as backup
+
             description = product_data["description"]
             images = product_data["image"]
             if not isinstance(images, list):
@@ -131,6 +133,8 @@ class Transformer(BaseTransformer):
             price = product_data["offers"]["price"]
 
             breadcrumbs = breadcrumb_data["itemListElement"]
+            if not isinstance(breadcrumbs, list):
+                breadcrumbs = [breadcrumbs]
 
             sizes = get_sizes(parsed_item.sizes)
             categories = get_categories(breadcrumbs)
