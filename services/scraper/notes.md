@@ -116,3 +116,9 @@ check that the html tree is the same as before
 
 - Parser that implements 2 functions
 - Transformer that implements 1 function
+
+### TODO
+
+- write type checker
+- add 10 sites (moncler first)
+- start designing web UI

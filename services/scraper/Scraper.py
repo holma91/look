@@ -46,14 +46,9 @@ class Scraper:
             try:
                 async with self.session.get(url, headers=headers, cookies=cookies, proxy=self.proxy_url, proxy_auth=self.proxy_auth, timeout=5) as response:
                     if response.status == 200:
-                        try:
-                            text = await response.text()
-                            # probably try again when this fails?
-                            doc = html.document_fromstring(text)
-                        except:
-                            logging.warning(f"{model_id} - await response.text() failed")
-                            content = await response.content() # not sure if this ever works.
-                            doc = html.document_fromstring(content)
+                        text = await response.text()
+                        # probably try again when this fails?
+                        doc = html.document_fromstring(text)
                         return doc
                     else:
                         # try again with premium proxy?

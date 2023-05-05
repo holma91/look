@@ -55,7 +55,7 @@ information = {
       },
       'seeds': {
           "/c/L1_MEN/results": "men", # ready to wear
-          "/c/L1_WOM/results": "women", # ready to wear
+          # "/c/L1_WOM/results": "women", # ready to wear
           # "/c/L2_WOM_LG/results": "women", # leather goods
           # "/c/L2_WOM_ACCESSORIES/results": "women", # accessories
           # "/c/L2_SHOES_WOM/results": "women", # shoes

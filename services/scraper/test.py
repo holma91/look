@@ -1,12 +1,12 @@
 import asyncio
 import os
 import logging
+import json
 
 from dotenv import load_dotenv
 import aiohttp
 
 from Scraper import Scraper
-import models
 
 load_dotenv()
 
@@ -21,10 +21,10 @@ async def main():
     connector = aiohttp.TCPConnector(limit=20)
     async with aiohttp.ClientSession(connector=connector) as session:
         scraper = Scraper(session=session, proxy_url=proxy_url, proxy_auth=proxy_auth)
-        parser = models.Gucci(country='us', scraper=scraper)
-        parser2 = models.LoroPiana(country='us', scraper=scraper)
-        # await parser.start()
-        await parser2.start()
+        doc = await scraper.get_html("https://us.loropiana.com/en/p/man/outerwear-jackets/whitney-jacket-FAL7127?colorCode=W000")
+        breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
+        print(breadcrumb_data)
+
 
 if __name__ == '__main__':
     asyncio.run(main())

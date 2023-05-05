@@ -1,14 +1,55 @@
 import json
+import logging
 from lxml import html
+from typing import Optional
 
-from pydantic import BaseModel
-
+from pydantic import BaseModel, HttpUrl, ValidationError, Field
 from Scraper import Scraper
 from Types import PrimitiveItem, Item
 from BaseParser import BaseParser
 from BaseTransformer import BaseTransformer
 
-# should implement harder type checking here
+# TYPECHECKING FOR BREADCRUMBS
+class ListItem(BaseModel):
+    type: str = Field(alias="@type")
+    name: str
+    position: str
+    item: Optional[str]
+
+class BreadcrumbData(BaseModel):
+    context: list[str] = Field(alias="@context")
+    type: str = Field(alias="@type")
+    itemListElement: list[ListItem]
+
+# TYPECHECKING FOR PRODUCT
+
+class Brand(BaseModel):
+    type: str = Field(alias='@type')
+    name: str
+    url: HttpUrl
+
+class Offer(BaseModel):
+    type: str = Field(alias='@type')
+    price: str
+    priceCurrency: str
+    url: HttpUrl
+    availability: HttpUrl
+    itemCondition: HttpUrl
+
+class ProductData(BaseModel):
+    context: list[str] = Field(alias='@context')
+    type: str = Field(alias='@type')
+    name: str
+    description: str
+    color: str
+    sku: str
+    brand: Brand
+    offers: Offer
+    image: list[HttpUrl]
+
+
+
+
 class ParsedItem(BaseModel):
     item_url: str
     audience: str
@@ -22,6 +63,7 @@ class ParsedItem(BaseModel):
 class LoroPiana(BaseParser):
     def __init__(self, country: str, scraper: Scraper):
         super().__init__(country, scraper, brand="loro_piana", domain="loropiana.com")
+        self.failed_urls = []
 
     async def get_primitive_items(self) -> dict[str, list[PrimitiveItem]]:
         primitive_items_by_seed = {}
@@ -52,13 +94,20 @@ class LoroPiana(BaseParser):
         return primitive_items_by_seed
 
     async def get_extracted_item(self, primitive_item: PrimitiveItem, headers: dict) -> ParsedItem:
+        # by returning None, the BaseParser will see this as a failed job and will retry it
         async def create_extracted_item(doc: str, primitive_item: PrimitiveItem):
             product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
             breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
             assert product_data['@type'] == 'Product'
             assert breadcrumb_data['@type'] == 'BreadcrumbList'
-
-            # do closer inspection on breadcrumbs here
+            
+            # Validate breadcrumb_data
+            try:
+                _ = BreadcrumbData(**breadcrumb_data)
+            except ValidationError as e:
+                print(f"Breadcrumb validation error for url {primitive_item.item_url}: {e}")
+                logging.error(f"Breadcrumb validation error for url {primitive_item.item_url}: {e}")
+                return None
 
             sku = product_data['sku']
             article_code, color_code = sku.rsplit("_", 1)
@@ -124,6 +173,7 @@ class Transformer(BaseTransformer):
             name = product_data.get("name", item_id) # item_id as backup
 
             description = product_data["description"]
+
             images = product_data["image"]
             if not isinstance(images, list):
                 images = [images]
@@ -134,6 +184,7 @@ class Transformer(BaseTransformer):
 
             breadcrumbs = breadcrumb_data["itemListElement"]
             if not isinstance(breadcrumbs, list):
+                logging.error(f"breadcrumbs is not a list: {breadcrumbs}, url: {parsed_item.item_url}")
                 breadcrumbs = [breadcrumbs]
 
             sizes = get_sizes(parsed_item.sizes)

@@ -1,7 +1,8 @@
 import json
+import logging
 from lxml import html
 
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 from Scraper import Scraper
 from Types import PrimitiveItem, Item
@@ -56,6 +57,10 @@ class Gucci(BaseParser):
             breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
             assert product_data['@type'] == 'Product'
             assert breadcrumb_data['@type'] == 'BreadcrumbList'
+
+            if not isinstance(breadcrumb_data['itemListElement'], list):
+                logging.error(f"breadcrumb_data['itemListElement'] is not a list for url: {primitive_item.item_url}")
+                return None
 
             colors = list(set(doc.xpath('//span[@class="color-material-name"]/text()')))
             extra_description = doc.xpath('//*[@id="product-details"]')
