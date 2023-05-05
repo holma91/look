@@ -3,7 +3,7 @@ import logging
 from lxml import html
 from typing import Optional
 
-from pydantic import BaseModel, HttpUrl, ValidationError, Field
+from pydantic import BaseModel, HttpUrl, ValidationError, Field, validator
 from Scraper import Scraper
 from Types import PrimitiveItem, Item
 from BaseParser import BaseParser
@@ -14,7 +14,7 @@ class ListItem(BaseModel):
     type: str = Field(alias="@type")
     name: str
     position: str
-    item: Optional[str]
+    item: Optional[HttpUrl]
 
 class BreadcrumbData(BaseModel):
     context: list[str] = Field(alias="@context")
@@ -47,7 +47,11 @@ class ProductData(BaseModel):
     offers: Offer
     image: list[HttpUrl]
 
-
+    @validator("image", pre=True)
+    def handle_single_image(cls, value):
+        if isinstance(value, str):
+            return [value]
+        return value
 
 
 class ParsedItem(BaseModel):
@@ -101,12 +105,18 @@ class LoroPiana(BaseParser):
             assert product_data['@type'] == 'Product'
             assert breadcrumb_data['@type'] == 'BreadcrumbList'
             
-            # Validate breadcrumb_data
             try:
                 _ = BreadcrumbData(**breadcrumb_data)
             except ValidationError as e:
                 print(f"Breadcrumb validation error for url {primitive_item.item_url}: {e}")
                 logging.error(f"Breadcrumb validation error for url {primitive_item.item_url}: {e}")
+                return None
+            
+            try:
+                _ = ProductData(**product_data)
+            except ValidationError as e:
+                print(f"Product validation error for url {primitive_item.item_url}: {e}")
+                logging.error(f"Product validation error for url {primitive_item.item_url}: {e}")
                 return None
 
             sku = product_data['sku']
