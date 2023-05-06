@@ -23,3 +23,7 @@ class Item(PrimitiveItem):
 
 class TransformedItem(BaseModel):
     pass
+
+class CustomBaseModel(BaseModel):
+    class Config:
+        allow_population_by_field_name = True

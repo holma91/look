@@ -31,7 +31,7 @@ class BaseTransformer:
                     parsed_item = ParsedItem(**json.loads(line))
                     parsed_items.append(parsed_item)
                 except ValidationError as e:
-                    logging.error(f"validation error for s3_path: {s3_path} at line {line_number}: {e}")
+                    logging.error(f"validation error at line {line_number} for s3_path: {s3_path}: {e}")
 
         return parsed_items
 

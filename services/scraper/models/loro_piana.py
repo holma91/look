@@ -5,36 +5,29 @@ from typing import Optional
 
 from pydantic import BaseModel, HttpUrl, ValidationError, Field, validator
 from Scraper import Scraper
-from Types import PrimitiveItem, Item
+from Types import PrimitiveItem, Item, CustomBaseModel
 from BaseParser import BaseParser
 from BaseTransformer import BaseTransformer
 
 # TYPECHECKING FOR BREADCRUMBS
-class ListItem(BaseModel):
+class ListItem(CustomBaseModel):
     type: str = Field(alias="@type")
     name: str
     position: str
     item: Optional[HttpUrl]
-    class Config:
-        allow_population_by_field_name = True
 
-class BreadcrumbData(BaseModel):
+class BreadcrumbData(CustomBaseModel):
     context: list[str] = Field(alias="@context")
     type: str = Field(alias="@type")
     itemListElement: list[ListItem]
-    class Config:
-        allow_population_by_field_name = True
 
 # TYPECHECKING FOR PRODUCT
-
-class Brand(BaseModel):
+class Brand(CustomBaseModel):
     type: str = Field(alias='@type')
     name: str
     url: HttpUrl
-    class Config:
-        allow_population_by_field_name = True
 
-class Offer(BaseModel):
+class Offer(CustomBaseModel):
     type: str = Field(alias='@type')
     price: str
     priceCurrency: str
@@ -42,10 +35,7 @@ class Offer(BaseModel):
     availability: HttpUrl
     itemCondition: HttpUrl
 
-    class Config:
-        allow_population_by_field_name = True
-
-class ProductData(BaseModel):
+class ProductData(CustomBaseModel):
     context: list[str] = Field(alias='@context')
     type: str = Field(alias='@type')
     name: Optional[str]
@@ -62,10 +52,28 @@ class ProductData(BaseModel):
             return [value]
         return value
 
-    class Config:
-        allow_population_by_field_name = True
+# TYPECHECKING FOR SIZES
+class StockLevelStatus(BaseModel):
+    code: str
+    type: str
 
+class Stock(BaseModel):
+    stockLevelStatus: StockLevelStatus
+    stockLevel: Optional[int]
+    stockThreshold: Optional[int]
+    effectiveStock: Optional[int]
+    preorderable: Optional[bool]
+    backorderable: Optional[bool]
+    inTransit: Optional[int]
+    openOrders: Optional[int]
 
+class SizeData(BaseModel):
+    variantCode: str
+    code: str
+    stock: Stock
+    order: int
+
+# THE TYPE THAT'S SAVED TO S3
 class ParsedItem(BaseModel):
     item_url: str
     audience: str
@@ -73,13 +81,13 @@ class ParsedItem(BaseModel):
     country: str
     product_data: ProductData
     breadcrumb_data: BreadcrumbData
-    sizes: list
+    size_data: list[SizeData]
     extra_description: str
 
+# when, the parser fails, we know that page structure has changed
 class LoroPiana(BaseParser):
     def __init__(self, country: str, scraper: Scraper):
         super().__init__(country, scraper, brand="loro_piana", domain="loropiana.com")
-        self.failed_urls = []
 
     async def get_primitive_items(self) -> dict[str, list[PrimitiveItem]]:
         primitive_items_by_seed = {}
@@ -114,14 +122,12 @@ class LoroPiana(BaseParser):
         async def create_extracted_item(doc: str, primitive_item: PrimitiveItem):
             product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
             breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
-            assert product_data['@type'] == 'Product'
-            assert breadcrumb_data['@type'] == 'BreadcrumbList'
 
             sku = product_data['sku']
             article_code, color_code = sku.rsplit("_", 1)
             product_url = f"{self.base_url}/api/pdp/product-variants?articleCode={article_code}&colorCode={color_code}"
             article = await self.scraper.get_json(product_url, headers=headers, model_id=self.domain)
-            sizes = article[0]['sizes']
+            size_data = article[0]['sizes']
 
             extra_description = doc.xpath('//*[@id="productDetail"]')
             formatted_extra_description = html.tostring(extra_description[0], pretty_print=True, encoding='unicode')
@@ -133,7 +139,7 @@ class LoroPiana(BaseParser):
                 country=self.country,
                 product_data=ProductData(**product_data), 
                 breadcrumb_data=BreadcrumbData(**breadcrumb_data), 
-                sizes=sizes,
+                size_data=[SizeData(**size) for size in size_data],
                 extra_description=formatted_extra_description
             )
 
@@ -145,10 +151,10 @@ class LoroPiana(BaseParser):
             return item
         except ValidationError as e:
             logging.error(f"validation error for url {primitive_item.item_url}: {e}")
-            print(e)
+            print('validation error:', e)
             return None
         except Exception as e:
-            print(e)
+            print('exception', e)
             return None
         
 
@@ -157,15 +163,15 @@ class Transformer(BaseTransformer):
         super().__init__(db_url=db_url, model_id=model_id)
     
     def transform(self, parsed_items: list[ParsedItem]) -> list[Item]:
-        def get_sizes(sizes_info: list) -> dict:
+        def get_sizes(size_data: list[SizeData]) -> dict:
             sizes = {}
-            for size_info in sizes_info:
-                size = size_info['code']
-                in_stock = size_info['stock']['stockLevelStatus']['code'] == 'inStock'
+            for size_info in size_data:
+                size = size_info.code
+                in_stock = size_info.stock.stockLevelStatus.code == 'inStock'
                 sizes[size] = in_stock
             return sizes
 
-        def get_categories(breadcrumbs: list[dict]):
+        def get_categories(breadcrumbs: list[ListItem]) -> list:
             categories = []
             for breadcrumb in breadcrumbs:
                 name = breadcrumb.name
@@ -177,35 +183,25 @@ class Transformer(BaseTransformer):
         for parsed_item in parsed_items:
             product_data = parsed_item.product_data
             breadcrumb_data = parsed_item.breadcrumb_data
+            size_data = parsed_item.size_data
 
-            item_id = product_data.sku
-            brand = product_data.brand.name
-            name = product_data.name or item_id # item_id as backup
-            description = product_data.description
-            images = product_data.image
-
-            colors = [product_data.color]
-            currency = product_data.offers.priceCurrency
-            price = product_data.offers.price
-            breadcrumbs = breadcrumb_data.itemListElement
-
-            sizes = get_sizes(parsed_item.sizes)
-            categories = get_categories(breadcrumbs)
+            sizes = get_sizes(size_data)
+            categories = get_categories(breadcrumb_data.itemListElement)
 
             item = Item(
                 item_url=parsed_item.item_url,
                 audience=parsed_item.audience,
-                item_id=item_id,
-                brand=brand.strip().lower().replace(" ", "_"), 
+                item_id=product_data.sku,
+                brand=product_data.brand.name.strip().lower().replace(" ", "_"), 
                 domain=parsed_item.domain,
                 country=parsed_item.country,
-                name=name,
-                description=description,
-                images=images,
+                name=product_data.name or product_data.sku, # product_data.sku as backup
+                description=product_data.description,
+                images=product_data.image,
                 sizes=sizes,
-                colors=colors,
-                currency=currency,
-                price=price,
+                colors=[product_data.color],
+                currency=product_data.offers.priceCurrency,
+                price=product_data.offers.price,
                 categories=categories
             )
 

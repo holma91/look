@@ -56,12 +56,12 @@ information = {
       'seeds': {
           # "/c/L1_MEN/results": "men", # ready to wear
           # "/c/L1_WOM/results": "women", # ready to wear
-          "/c/L2_WOM_LG/results": "women", # leather goods
+          # "/c/L2_WOM_LG/results": "women", # leather goods
           # "/c/L2_WOM_ACCESSORIES/results": "women", # accessories
           # "/c/L2_SHOES_WOM/results": "women", # shoes
           # "/c/L2_WOM_GOK/results": "women", # gifts of kings
           # "/c/L2_WOM_VICU%C3%91A/results": "women", # vicuna
-          # "/c/L2_WOM_BABYCASH/results": "women", # baby cashmere
+          "/c/L2_WOM_BABYCASH/results": "women", # baby cashmere
 
           # "/c/L1_MEN/results": "men",
           # "/c/L2_MEN_ACCESSORIES/results": "men",
