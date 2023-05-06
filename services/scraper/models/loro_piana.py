@@ -15,11 +15,15 @@ class ListItem(BaseModel):
     name: str
     position: str
     item: Optional[HttpUrl]
+    class Config:
+        allow_population_by_field_name = True
 
 class BreadcrumbData(BaseModel):
     context: list[str] = Field(alias="@context")
     type: str = Field(alias="@type")
     itemListElement: list[ListItem]
+    class Config:
+        allow_population_by_field_name = True
 
 # TYPECHECKING FOR PRODUCT
 
@@ -27,6 +31,8 @@ class Brand(BaseModel):
     type: str = Field(alias='@type')
     name: str
     url: HttpUrl
+    class Config:
+        allow_population_by_field_name = True
 
 class Offer(BaseModel):
     type: str = Field(alias='@type')
@@ -36,10 +42,13 @@ class Offer(BaseModel):
     availability: HttpUrl
     itemCondition: HttpUrl
 
+    class Config:
+        allow_population_by_field_name = True
+
 class ProductData(BaseModel):
     context: list[str] = Field(alias='@context')
     type: str = Field(alias='@type')
-    name: str
+    name: Optional[str]
     description: str
     color: str
     sku: str
@@ -53,14 +62,17 @@ class ProductData(BaseModel):
             return [value]
         return value
 
+    class Config:
+        allow_population_by_field_name = True
+
 
 class ParsedItem(BaseModel):
     item_url: str
     audience: str
     domain: str
     country: str
-    product_data: dict
-    breadcrumb_data: dict
+    product_data: ProductData
+    breadcrumb_data: BreadcrumbData
     sizes: list
     extra_description: str
 
@@ -104,20 +116,6 @@ class LoroPiana(BaseParser):
             breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
             assert product_data['@type'] == 'Product'
             assert breadcrumb_data['@type'] == 'BreadcrumbList'
-            
-            try:
-                _ = BreadcrumbData(**breadcrumb_data)
-            except ValidationError as e:
-                print(f"Breadcrumb validation error for url {primitive_item.item_url}: {e}")
-                logging.error(f"Breadcrumb validation error for url {primitive_item.item_url}: {e}")
-                return None
-            
-            try:
-                _ = ProductData(**product_data)
-            except ValidationError as e:
-                print(f"Product validation error for url {primitive_item.item_url}: {e}")
-                logging.error(f"Product validation error for url {primitive_item.item_url}: {e}")
-                return None
 
             sku = product_data['sku']
             article_code, color_code = sku.rsplit("_", 1)
@@ -133,8 +131,8 @@ class LoroPiana(BaseParser):
                 audience=primitive_item.audience,
                 domain=self.domain,
                 country=self.country,
-                product_data=product_data, 
-                breadcrumb_data=breadcrumb_data, 
+                product_data=ProductData(**product_data), 
+                breadcrumb_data=BreadcrumbData(**breadcrumb_data), 
                 sizes=sizes,
                 extra_description=formatted_extra_description
             )
@@ -145,6 +143,10 @@ class LoroPiana(BaseParser):
             doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
             item = await create_extracted_item(doc, primitive_item)
             return item
+        except ValidationError as e:
+            logging.error(f"validation error for url {primitive_item.item_url}: {e}")
+            print(e)
+            return None
         except Exception as e:
             print(e)
             return None
@@ -166,8 +168,8 @@ class Transformer(BaseTransformer):
         def get_categories(breadcrumbs: list[dict]):
             categories = []
             for breadcrumb in breadcrumbs:
-                name = breadcrumb["name"]
-                rank = breadcrumb["position"]
+                name = breadcrumb.name
+                rank = breadcrumb.position
                 categories.append({"name": name, "rank": rank})
             return categories
         
@@ -176,26 +178,16 @@ class Transformer(BaseTransformer):
             product_data = parsed_item.product_data
             breadcrumb_data = parsed_item.breadcrumb_data
 
-            item_id = product_data["sku"]
+            item_id = product_data.sku
+            brand = product_data.brand.name
+            name = product_data.name or item_id # item_id as backup
+            description = product_data.description
+            images = product_data.image
 
-            brand = product_data["brand"]["name"]
-
-            name = product_data.get("name", item_id) # item_id as backup
-
-            description = product_data["description"]
-
-            images = product_data["image"]
-            if not isinstance(images, list):
-                images = [images]
-            
-            colors = [product_data["color"]]
-            currency = product_data["offers"]["priceCurrency"]
-            price = product_data["offers"]["price"]
-
-            breadcrumbs = breadcrumb_data["itemListElement"]
-            if not isinstance(breadcrumbs, list):
-                logging.error(f"breadcrumbs is not a list: {breadcrumbs}, url: {parsed_item.item_url}")
-                breadcrumbs = [breadcrumbs]
+            colors = [product_data.color]
+            currency = product_data.offers.priceCurrency
+            price = product_data.offers.price
+            breadcrumbs = breadcrumb_data.itemListElement
 
             sizes = get_sizes(parsed_item.sizes)
             categories = get_categories(breadcrumbs)

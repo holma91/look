@@ -1,6 +1,8 @@
 import json
+import logging
 
 from sqlalchemy import create_engine, text
+from pydantic import ValidationError
 import models
 
 from Types import Item
@@ -24,9 +26,12 @@ class BaseTransformer:
         parsed_items = []
         ParsedItem = self.parsed_item_types[self.model_id]
         with open(s3_path, 'r') as file:
-            for line in file:
-                parsed_item = ParsedItem(**json.loads(line))
-                parsed_items.append(parsed_item)
+            for line_number, line in enumerate(file):
+                try:
+                    parsed_item = ParsedItem(**json.loads(line))
+                    parsed_items.append(parsed_item)
+                except ValidationError as e:
+                    logging.error(f"validation error for s3_path: {s3_path} at line {line_number}: {e}")
 
         return parsed_items
 
