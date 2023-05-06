@@ -31,8 +31,6 @@ class BaseParser:
         await self.process_primitive_items(primitive_items_by_seed)
         print(f'{self.brand} - process_items time: %.2f seconds.' % (time.time() - start_time))
 
-        # run failed jobs
-
     async def process_primitive_items(self, primitive_items_by_seed: dict[str, list[PrimitiveItem]]):
         today = datetime.today()
         date_str = today.strftime('%Y-%m-%d')

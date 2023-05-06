@@ -70,5 +70,39 @@ information = {
           "/c/L2_MEN_VICU%C3%91A/results": "men",
           # "/c/L2_MEN_BABYCASH/results": "men"
       }
+    },
+    'moncler': {
+      'headers': {
+        'authority': 'www.moncler.com',
+        'accept': 'application/json',
+        'accept-language': 'en-US,en;q=0.9',
+        'device': 'undefined',
+        'sec-ch-ua': '"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+        'x-requested-with': 'XMLHttpRequest',
+      },
+      'urls': {
+        'us': 'https://www.moncler.com/en-us',
+        'uk': 'https://www.moncler.com/en-gb/',
+        'se': 'https://www.moncler.com/en-se',
+      },
+      'seeds': {
+        # "men-outerwear": "men", # 238
+        # "men-ready-to-wear": "men", # 386
+        "men-footwear": "men", # 61
+        # "men-accessories": "men", # 295
+        # "grenoble-men": "men", # 101
+        # "genius-shop-genius-collection": "unisex", # 74
+        # "grenoble-women": "women", # 108
+        # "women-accessories": "women", # 276
+        # "women-footwear": "women", # 59
+        # "women-outerwear": "women", # 255
+        # "women-ready-to-wear": "women", # 285
+      }
     }
 }
