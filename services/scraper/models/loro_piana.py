@@ -1,9 +1,8 @@
 import json
-import logging
 from lxml import html
 from typing import Optional
 
-from pydantic import BaseModel, HttpUrl, ValidationError, Field, validator
+from pydantic import BaseModel, HttpUrl, Field, validator
 from Scraper import Scraper
 from Types import PrimitiveItem, Item, CustomBaseModel
 from BaseParser import BaseParser
@@ -79,13 +78,14 @@ class ParsedItem(BaseModel):
     audience: str
     domain: str
     country: str
+
     product_data: ProductData
     breadcrumb_data: BreadcrumbData
     size_data: list[SizeData]
     extra_description: str
 
 # when, the parser fails, we know that page structure has changed
-class LoroPiana(BaseParser):
+class Parser(BaseParser):
     def __init__(self, country: str, scraper: Scraper):
         super().__init__(country, scraper, brand="loro_piana", domain="loropiana.com")
 
@@ -94,7 +94,6 @@ class LoroPiana(BaseParser):
         for seed, audience in self.seeds.items():
             api_url = f"{self.base_url}{seed}"
             primitive_items = []
-            # for page in range(1):
             for page in range(self.scraper.max_page):
                 page_url = f"{api_url}?page={page}"
                 try:
@@ -110,52 +109,36 @@ class LoroPiana(BaseParser):
                     item_url = f"{self.base_url}{item['url']}"
                     primitive_item = PrimitiveItem(item_url=item_url, audience=audience)
                     primitive_items.append(primitive_item)
-                    # if (len(primitive_items) >= 10):
-                        # break
             
             primitive_items_by_seed[seed] = primitive_items
         
         return primitive_items_by_seed
 
-    async def get_extracted_item(self, primitive_item: PrimitiveItem, headers: dict) -> ParsedItem:
-        # by returning None, the BaseParser will see this as a failed job and will retry it
-        async def create_extracted_item(doc: str, primitive_item: PrimitiveItem):
-            product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
-            breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
+    async def get_extracted_item(self, doc: str, primitive_item: PrimitiveItem):
+        product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
+        breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
 
-            sku = product_data['sku']
-            article_code, color_code = sku.rsplit("_", 1)
-            product_url = f"{self.base_url}/api/pdp/product-variants?articleCode={article_code}&colorCode={color_code}"
-            article = await self.scraper.get_json(product_url, headers=headers, model_id=self.domain)
-            size_data = article[0]['sizes']
+        sku = product_data['sku']
+        article_code, color_code = sku.rsplit("_", 1)
+        product_url = f"{self.base_url}/api/pdp/product-variants?articleCode={article_code}&colorCode={color_code}"
+        article = await self.scraper.get_json(product_url, headers=self.headers, model_id=self.domain)
+        size_data = article[0]['sizes']
 
-            extra_description = doc.xpath('//*[@id="productDetail"]')
-            formatted_extra_description = html.tostring(extra_description[0], pretty_print=True, encoding='unicode')
+        extra_description = doc.xpath('//*[@id="productDetail"]')
+        formatted_extra_description = html.tostring(extra_description[0], pretty_print=True, encoding='unicode')
+ 
+        item = ParsedItem(
+            item_url=primitive_item.item_url,
+            audience=primitive_item.audience,
+            domain=self.domain,
+            country=self.country,
+            product_data=ProductData(**product_data), 
+            breadcrumb_data=BreadcrumbData(**breadcrumb_data), 
+            size_data=[SizeData(**size) for size in size_data],
+            extra_description=formatted_extra_description
+        )
 
-            item = ParsedItem(
-                item_url=primitive_item.item_url,
-                audience=primitive_item.audience,
-                domain=self.domain,
-                country=self.country,
-                product_data=ProductData(**product_data), 
-                breadcrumb_data=BreadcrumbData(**breadcrumb_data), 
-                size_data=[SizeData(**size) for size in size_data],
-                extra_description=formatted_extra_description
-            )
-
-            return item
-        
-        try:
-            doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
-            item = await create_extracted_item(doc, primitive_item)
-            return item
-        except ValidationError as e:
-            logging.error(f"validation error for url {primitive_item.item_url}: {e}")
-            print('validation error:', e)
-            return None
-        except Exception as e:
-            print('exception', e)
-            return None
+        return item
         
 
 class Transformer(BaseTransformer):

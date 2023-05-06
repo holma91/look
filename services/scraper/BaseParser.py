@@ -1,9 +1,11 @@
 import time
+import logging
 import asyncio
 
 from datetime import datetime
-from Scraper import Scraper
+from pydantic import ValidationError
 
+from Scraper import Scraper
 from Types import PrimitiveItem
 from utils.information import information
 
@@ -56,7 +58,7 @@ class BaseParser:
             tasks = []
             for item, result in zip(items, results):
                 if result is None:
-                    task = asyncio.create_task(self.get_extracted_item(item, self.headers))
+                    task = asyncio.create_task(self.process_item(item, self.headers))
                     tasks.append(task)
 
             print("len(tasks):", len(tasks))
@@ -79,9 +81,23 @@ class BaseParser:
             retries += 1
 
         return results
+    
+    async def process_item(self, primitive_item: PrimitiveItem, headers: dict):
+        """If this method returns None, the job will be considered failed and retried."""
+        try:
+            doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
+            item = await self.get_extracted_item(doc, primitive_item)
+            return item
+        except ValidationError as e:
+            logging.error(f"validation error for url {primitive_item.item_url}: {e}")
+            print('validation error:', e)
+            return None
+        except Exception as e:
+            print("exception", e)
+            return None
 
     async def get_primitive_items(self) -> dict[str, list[PrimitiveItem]]:
         raise NotImplementedError("This method should be implemented in a subclass.")
 
-    async def get_extracted_item(self, primitive_item: PrimitiveItem, headers: dict) -> any:
+    async def get_extracted_item(self, doc: str, primitive_item: PrimitiveItem) -> any:
         raise NotImplementedError("This method should be implemented in a subclass.")

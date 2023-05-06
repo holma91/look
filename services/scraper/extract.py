@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 import aiohttp
 
 from Scraper import Scraper
-import models
+import models.gucci
+import models.loro_piana
 
 load_dotenv()
 
@@ -21,10 +22,10 @@ async def main():
     connector = aiohttp.TCPConnector(limit=20)
     async with aiohttp.ClientSession(connector=connector) as session:
         scraper = Scraper(session=session, proxy_url=proxy_url, proxy_auth=proxy_auth)
-        parser = models.Gucci(country='us', scraper=scraper)
-        parser2 = models.LoroPiana(country='us', scraper=scraper)
-        # await parser.start()
-        await parser2.start()
+        gucci = models.gucci.Parser(country='us', scraper=scraper)
+        loro_piana = models.loro_piana.Parser(country='us', scraper=scraper)
+        # await gucci.start()
+        await loro_piana.start()
 
 if __name__ == '__main__':
     asyncio.run(main())

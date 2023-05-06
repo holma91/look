@@ -1,25 +1,73 @@
 import json
-import logging
 from lxml import html
-
-from pydantic import BaseModel, HttpUrl
+from typing import Optional
+from pydantic import BaseModel, HttpUrl, Field, validator
 
 from Scraper import Scraper
-from Types import PrimitiveItem, Item
+from Types import PrimitiveItem, Item, CustomBaseModel
 from BaseParser import BaseParser
 from BaseTransformer import BaseTransformer
+
+# TYPECHECKING FOR BREADCRUMBS
+class BreadcrumbItem(CustomBaseModel):
+    id: str = Field(alias="@id")
+    name: str
+
+class ListItem(CustomBaseModel):
+    type: str = Field(alias="@type")
+    position: int
+    item: BreadcrumbItem
+
+class BreadcrumbData(CustomBaseModel):
+    context: str = Field(alias="@context")
+    type: str = Field(alias="@type")
+    itemListElement: list[ListItem]
+
+# TYPECHECKING FOR PRODUCT
+class Brand(CustomBaseModel):
+    type: str = Field(alias="@type")
+    name: str
+
+class Offer(CustomBaseModel):
+    type: str = Field(alias="@type")
+    sku: str
+    price: str
+    priceCurrency: str
+    seller: str
+    url: HttpUrl
+    availability: str
+
+class ProductData(CustomBaseModel):
+    context: str = Field(alias="@context")
+    type: str = Field(alias="@type")
+    sku: str
+    url: HttpUrl
+    itemCondition: str
+    name: Optional[str]
+    description: str
+    productID: str
+    brand: Brand
+    image: list[HttpUrl]
+    offers: list[Offer]
+
+    @validator("image", pre=True)
+    def handle_single_image(cls, value):
+        if isinstance(value, str):
+            return [value]
+        return value
 
 class ParsedItem(BaseModel):
     item_url: str
     audience: str
     domain: str
     country: str
-    product_data: dict
-    breadcrumb_data: dict
-    colors: list
+
+    product_data: ProductData
+    breadcrumb_data: BreadcrumbData
+    colors: list[str]
     extra_description: str
 
-class Gucci(BaseParser):
+class Parser(BaseParser):
     def __init__(self, country: str, scraper: Scraper):
         super().__init__(country, scraper, brand="gucci", domain="gucci.com")
 
@@ -28,7 +76,6 @@ class Gucci(BaseParser):
         for seed, audience in self.seeds.items():
             api_url = f"{self.base_url}/c/productgrid?categoryCode={seed}&show=Page"
             primitive_items = []
-            # for page in range(1):
             for page in range(self.scraper.max_page):
                 page_url = f"{api_url}&page={page}"
                 try:
@@ -44,68 +91,51 @@ class Gucci(BaseParser):
                     item_url = f"{self.base_url}{item['productLink']}"
                     primitive_item = PrimitiveItem(item_url=item_url, audience=audience)
                     primitive_items.append(primitive_item)
-                    # if (len(primitive_items) >= 10):
-                        # break
             
             primitive_items_by_seed[seed] = primitive_items
         
         return primitive_items_by_seed
         
-    async def get_extracted_item(self, primitive_item: PrimitiveItem, headers: dict) -> ParsedItem:
-        def create_extracted_item(doc: str, primitive_item: PrimitiveItem):
-            product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
-            breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
-            assert product_data['@type'] == 'Product'
-            assert breadcrumb_data['@type'] == 'BreadcrumbList'
+    async def get_extracted_item(self, doc: str, primitive_item: PrimitiveItem):
+        product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
+        breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
 
-            if not isinstance(breadcrumb_data['itemListElement'], list):
-                logging.error(f"breadcrumb_data['itemListElement'] is not a list for url: {primitive_item.item_url}")
-                return None
+        colors = list(set(doc.xpath('//span[@class="color-material-name"]/text()')))
+        extra_description = doc.xpath('//*[@id="product-details"]')
+        formatted_extra_description = html.tostring(extra_description[0], pretty_print=True, encoding='unicode')
 
-            colors = list(set(doc.xpath('//span[@class="color-material-name"]/text()')))
-            extra_description = doc.xpath('//*[@id="product-details"]')
-            formatted_extra_description = html.tostring(extra_description[0], pretty_print=True, encoding='unicode')
+        item = ParsedItem(
+            item_url=primitive_item.item_url,
+            audience=primitive_item.audience,
+            domain=self.domain,
+            country=self.country,
+            product_data=ProductData(**product_data), 
+            breadcrumb_data=BreadcrumbData(**breadcrumb_data), 
+            colors=colors,
+            extra_description=formatted_extra_description
+        )
 
-            item = ParsedItem(
-                item_url=primitive_item.item_url,
-                audience=primitive_item.audience,
-                domain=self.domain,
-                country=self.country,
-                product_data=product_data, 
-                breadcrumb_data=breadcrumb_data, 
-                colors=colors,
-                extra_description=formatted_extra_description
-            )
-
-            return item
-        
-        try:
-            doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
-            item = create_extracted_item(doc, primitive_item)
-            return item
-        except Exception as e:
-            print(e)
-            return None
-               
+        return item
+                       
 
 class Transformer(BaseTransformer):
     def __init__(self, db_url: str, model_id: str):
         super().__init__(db_url=db_url, model_id=model_id)
 
     def transform(self, parsed_items: list[ParsedItem]) -> list[Item]:
-        def get_sizes(offers: list[dict]):
+        def get_sizes(offers: list[Offer]):
             sizes = {}
             for offer in offers:
-                size = offer["sku"].split("_")[-1]
-                in_stock = offer["availability"] == 'InStock'
+                size = offer.sku.split("_")[-1]
+                in_stock = offer.availability == 'InStock'
                 sizes[size] = in_stock
             return sizes
 
-        def get_categories(breadcrumbs: list[dict]):
+        def get_categories(breadcrumbs: list[ListItem]):
             categories = []
             for breadcrumb in breadcrumbs:
-                name = breadcrumb["item"]["name"]
-                rank = breadcrumb["position"]
+                name = breadcrumb.item.name
+                rank = breadcrumb.position
                 categories.append({"name": name, "rank": rank})
             return categories
 
@@ -114,36 +144,23 @@ class Transformer(BaseTransformer):
             product_data = parsed_item.product_data
             breadcrumb_data = parsed_item.breadcrumb_data
 
-            item_id = product_data["productID"]
-
-            brand = product_data["brand"]["name"]
-            name = product_data["name"]
-            description = product_data["description"]
-            images = product_data["image"]
-            
-            colors = parsed_item.colors
-            currency = product_data["offers"][0]["priceCurrency"]
-            price = product_data["offers"][0]["price"]
-
-            breadcrumbs = breadcrumb_data["itemListElement"]
-
-            sizes = get_sizes(product_data["offers"])
-            categories = get_categories(breadcrumbs)
+            sizes = get_sizes(product_data.offers)
+            categories = get_categories(breadcrumb_data.itemListElement)
 
             item = Item(
                 item_url=parsed_item.item_url,
                 audience=parsed_item.audience,
-                item_id=item_id,
-                brand=brand.strip().lower().replace(" ", "_"), 
+                item_id=product_data.productID,
+                brand=product_data.brand.name.strip().lower().replace(" ", "_"), 
                 domain=parsed_item.domain,
                 country=parsed_item.country,
-                name=name,
-                description=description,
-                images=images,
+                name=product_data.name or product_data.productID,
+                description=product_data.description,
+                images=product_data.image,
                 sizes=sizes,
-                colors=colors,
-                currency=currency,
-                price=price,
+                colors=parsed_item.colors,
+                currency=product_data.offers[0].priceCurrency,
+                price=product_data.offers[0].price,
                 categories=categories
             )
 

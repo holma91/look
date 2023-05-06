@@ -20,12 +20,12 @@ information = {
         'se': 'https://www.gucci.com/se/en_gb',
       },
       'seeds': {
-        "women-handbags": "women",
+        # "women-handbags": "women",
         # "women-accessories-lifestyle-bags-and-luggage": "women",
         # "women-readytowear": "women",
         # "women-shoes": "women",
         # "women-accessories-wallets": "women",
-        # "women-accessories-belts": "women",
+        "women-accessories-belts": "women",
         # "jewelry-watches-watches-women": "women",
         # "men-bags": "men",
         # "men-bags-trolleys": "men",
@@ -61,13 +61,13 @@ information = {
           # "/c/L2_SHOES_WOM/results": "women", # shoes
           # "/c/L2_WOM_GOK/results": "women", # gifts of kings
           # "/c/L2_WOM_VICU%C3%91A/results": "women", # vicuna
-          "/c/L2_WOM_BABYCASH/results": "women", # baby cashmere
+          # "/c/L2_WOM_BABYCASH/results": "women", # baby cashmere
 
           # "/c/L1_MEN/results": "men",
           # "/c/L2_MEN_ACCESSORIES/results": "men",
           # "/c/L2_SHOES_MAN/results": "men",
           # "/c/L2_MEN_GOK/results": "men",
-          # "/c/L2_MEN_VICU%C3%91A/results": "men",
+          "/c/L2_MEN_VICU%C3%91A/results": "men",
           # "/c/L2_MEN_BABYCASH/results": "men"
       }
     }
