@@ -22,6 +22,8 @@ class BaseParser:
         self.headers = info['headers']
         self.seeds = info['seeds']
 
+        self.failed_tasks: list[PrimitiveItem] = []
+
     async def start(self):
         start_time = time.time()
         primitive_items_by_seed = await self.get_primitive_items()
@@ -34,7 +36,9 @@ class BaseParser:
     async def process_primitive_items(self, primitive_items_by_seed: dict[str, list[PrimitiveItem]]):
         today = datetime.today()
         date_str = today.strftime('%Y-%m-%d')
-        output_file = f'./results/{self.brand}/{date_str}.jsonl'
+        success_path = f'./results/{self.brand}/{date_str}.jsonl'
+        failed_path = f'./results/{self.brand}/failed/{date_str}.jsonl'
+
 
         all_primitive_items = [primitive_item 
                             for _, primitive_items in primitive_items_by_seed.items()
@@ -42,12 +46,15 @@ class BaseParser:
 
         parsed_items: list = await self.get_parsed_items(all_primitive_items)
 
-        with open(output_file, 'w') as file:
-            for item in parsed_items:
-                if item is not None:
-                    file.write(item.json() + '\n')
+        with open(success_path, 'w') as success_file, open(failed_path, 'w') as failed_file:
+            for i, item in enumerate(parsed_items):
+                if item is None:
+                    failed_file.write(all_primitive_items[i].json() + '\n')
+                else:
+                    success_file.write(item.json() + '\n')
 
     async def get_parsed_items(self, items, max_retries=2, retry_delay=10):
+        # think a little bit more about how to handle failed jobs
         """Process a list of primitive items and return the parsed results. Automatically retries."""
         results = [None for _ in items]
         retries = -1
@@ -62,7 +69,6 @@ class BaseParser:
             print("len(tasks):", len(tasks))
 
             if not tasks:
-                # all tasks are successful
                 break
 
             if retries >= 0:
@@ -81,9 +87,10 @@ class BaseParser:
         return results
     
     async def process_item(self, primitive_item: PrimitiveItem, headers: dict):
-        # this method can be overridden in a subclass
+        # this method can be overridden in a subclass IF we want JSON for a specific item
         """If this method returns None, the job will be considered failed and retried."""
         try:
+            # could choose between get_html and get_json here depending on model_id
             doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
             item = await self.get_extracted_item(doc, primitive_item)
             return item
@@ -97,7 +104,10 @@ class BaseParser:
             return None
 
     async def get_primitive_items(self) -> dict[str, list[PrimitiveItem]]:
+        """Returns a dict of primitive items which are essentially item urls, keyed by seed."""
         raise NotImplementedError("This method should be implemented in a subclass.")
 
+    # maybe change doc to src, because sometimes it's just json
     async def get_extracted_item(self, doc: str, primitive_item: PrimitiveItem) -> any:
+        """returns the extracted item that's ready to be written to S3"""
         raise NotImplementedError("This method should be implemented in a subclass.")

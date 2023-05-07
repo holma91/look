@@ -25,7 +25,7 @@ async def main():
         gucci = models.gucci.Parser(country='us', scraper=scraper)
         loro_piana = models.loro_piana.Parser(country='us', scraper=scraper)
         await gucci.start()
-        await loro_piana.start()
+        # await loro_piana.start()
         # await moncler.start()
 
 if __name__ == '__main__':
