@@ -122,3 +122,9 @@ check that the html tree is the same as before
 - write type checker
 - add 10 sites (moncler first)
 - start designing web UI
+
+### conclusion
+
+NOT scalable to have different intermediate types for every site (the data stored in S3)
+
+- need to come up with a data type for what's stored in s3

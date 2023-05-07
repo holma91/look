@@ -81,6 +81,7 @@ class BaseParser:
         return results
     
     async def process_item(self, primitive_item: PrimitiveItem, headers: dict):
+        # this method can be overridden in a subclass
         """If this method returns None, the job will be considered failed and retried."""
         try:
             doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)

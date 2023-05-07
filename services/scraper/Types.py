@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 class PrimitiveItem(BaseModel):
     item_url: str
+    item_api_url: Optional[str]
     audience: str
 
 class Item(PrimitiveItem):
