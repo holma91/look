@@ -3,12 +3,11 @@ import logging
 import time
 from lxml import html
 from typing import Optional
-from pydantic import BaseModel, HttpUrl, Field, validator, ValidationError
+from pydantic import BaseModelValidationError
 
 from Scraper import Scraper
-from Types import PrimitiveItem, Item, CustomBaseModel
+from Types import PrimitiveItem
 from BaseParser import BaseParser
-from BaseTransformer import BaseTransformer
 
 # type: API-API
 
@@ -143,7 +142,7 @@ class Parser(BaseParser):
             short_description=api_data["shortDescription"],
             composition=composition,
             care=care,
-            
+
 
             size_data=[SizeData(**size) for size in sizes["values"]],
             breadcrumbs=[BreadcrumbItem(**breadcrumb) for breadcrumb in api_data["breadcrumbs"]]

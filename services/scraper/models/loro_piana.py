@@ -1,88 +1,8 @@
 import json
-from lxml import html
-from typing import Optional
 
-from pydantic import BaseModel, HttpUrl, Field, validator
 from Scraper import Scraper
-from Types import PrimitiveItem, Item, CustomBaseModel
+from Types import PrimitiveItem, Item, Size, Category, Color
 from BaseParser import BaseParser
-from BaseTransformer import BaseTransformer
-
-# TYPECHECKING FOR BREADCRUMBS
-class ListItem(CustomBaseModel):
-    type: str = Field(alias="@type")
-    name: str
-    position: str
-    item: Optional[HttpUrl]
-
-class BreadcrumbData(CustomBaseModel):
-    context: list[str] = Field(alias="@context")
-    type: str = Field(alias="@type")
-    itemListElement: list[ListItem]
-
-# TYPECHECKING FOR PRODUCT
-class Brand(CustomBaseModel):
-    type: str = Field(alias='@type')
-    name: str
-    url: HttpUrl
-
-class Offer(CustomBaseModel):
-    type: str = Field(alias='@type')
-    price: str
-    priceCurrency: str
-    url: HttpUrl
-    availability: HttpUrl
-    itemCondition: HttpUrl
-
-class ProductData(CustomBaseModel):
-    context: list[str] = Field(alias='@context')
-    type: str = Field(alias='@type')
-    name: Optional[str]
-    description: str
-    color: str
-    sku: str
-    brand: Brand
-    offers: Offer
-    image: list[HttpUrl]
-
-    @validator("image", pre=True)
-    def handle_single_image(cls, value):
-        if isinstance(value, str):
-            return [value]
-        return value
-
-# TYPECHECKING FOR SIZES
-class StockLevelStatus(BaseModel):
-    code: str
-    type: str
-
-class Stock(BaseModel):
-    stockLevelStatus: StockLevelStatus
-    stockLevel: Optional[int]
-    stockThreshold: Optional[int]
-    effectiveStock: Optional[int]
-    preorderable: Optional[bool]
-    backorderable: Optional[bool]
-    inTransit: Optional[int]
-    openOrders: Optional[int]
-
-class SizeData(BaseModel):
-    variantCode: str
-    code: str
-    stock: Stock
-    order: int
-
-# THE TYPE THAT'S SAVED TO S3
-class ParsedItem(BaseModel):
-    item_url: str
-    audience: str
-    domain: str
-    country: str
-
-    product_data: ProductData
-    breadcrumb_data: BreadcrumbData
-    size_data: list[SizeData]
-    extra_description: str
 
 # when, the parser fails, we know that page structure has changed
 class Parser(BaseParser):
@@ -115,79 +35,57 @@ class Parser(BaseParser):
         return primitive_items_by_seed
 
     async def get_extracted_item(self, doc: str, primitive_item: PrimitiveItem):
+        def get_sizes(size_data: list) -> list[Size]:
+            sizes = []
+            for size_info in size_data:
+                size = size_info['code']
+                in_stock = size_info['stock']['stockLevelStatus']['code'] == 'inStock'
+                sizes.append(Size(size=size, in_stock=in_stock))
+            return sizes
+
+        def get_categories(breadcrumbs: list) -> list[Category]:
+            categories = []
+            for breadcrumb in breadcrumbs:
+                name = breadcrumb['name']
+                rank = breadcrumb['position']
+                categories.append(Category(name=name, rank=rank))
+            return categories
+        
+        def get_color(color_data: str) -> list[Color]:
+            return [Color(name=color_data)]
+        
         product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
         breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
+
+        images = product_data['image']
+        if isinstance(images, str):
+            images = [images]
 
         sku = product_data['sku']
         article_code, color_code = sku.rsplit("_", 1)
         product_url = f"{self.base_url}/api/pdp/product-variants?articleCode={article_code}&colorCode={color_code}"
         article = await self.scraper.get_json(product_url, headers=self.headers, model_id=self.domain)
-        size_data = article[0]['sizes']
 
-        extra_description = doc.xpath('//*[@id="productDetail"]')
-        formatted_extra_description = html.tostring(extra_description[0], pretty_print=True, encoding='unicode')
- 
-        item = ParsedItem(
+        sizes = get_sizes(article[0]['sizes'])
+        categories = get_categories(breadcrumb_data['itemListElement'])
+        colors = get_color(product_data['color'])
+
+        item = Item(
             item_url=primitive_item.item_url,
             audience=primitive_item.audience,
             domain=self.domain,
             country=self.country,
-            product_data=ProductData(**product_data), 
-            breadcrumb_data=BreadcrumbData(**breadcrumb_data), 
-            size_data=[SizeData(**size) for size in size_data],
-            extra_description=formatted_extra_description
+            item_id=product_data['sku'],
+            brand=product_data['brand']['name'].strip().lower().replace(" ", "_"), 
+            name=product_data['name'] or product_data['sku'],
+            description=product_data['description'],
+            images=images,
+            currency=product_data['offers']['priceCurrency'],
+            price=product_data['offers']['price'],
+            sizes=sizes,
+            categories=categories,
+            colors=colors,
         )
 
         return item
         
-
-class Transformer(BaseTransformer):
-    def __init__(self, db_url: str, model_id: str):
-        super().__init__(db_url=db_url, model_id=model_id)
-    
-    def transform(self, parsed_items: list[ParsedItem]) -> list[Item]:
-        def get_sizes(size_data: list[SizeData]) -> dict:
-            sizes = {}
-            for size_info in size_data:
-                size = size_info.code
-                in_stock = size_info.stock.stockLevelStatus.code == 'inStock'
-                sizes[size] = in_stock
-            return sizes
-
-        def get_categories(breadcrumbs: list[ListItem]) -> list:
-            categories = []
-            for breadcrumb in breadcrumbs:
-                name = breadcrumb.name
-                rank = breadcrumb.position
-                categories.append({"name": name, "rank": rank})
-            return categories
-        
-        transformed_items = []
-        for parsed_item in parsed_items:
-            product_data = parsed_item.product_data
-            breadcrumb_data = parsed_item.breadcrumb_data
-            size_data = parsed_item.size_data
-
-            sizes = get_sizes(size_data)
-            categories = get_categories(breadcrumb_data.itemListElement)
-
-            item = Item(
-                item_url=parsed_item.item_url,
-                audience=parsed_item.audience,
-                item_id=product_data.sku,
-                brand=product_data.brand.name.strip().lower().replace(" ", "_"), 
-                domain=parsed_item.domain,
-                country=parsed_item.country,
-                name=product_data.name or product_data.sku, # product_data.sku as backup
-                description=product_data.description,
-                images=product_data.image,
-                sizes=sizes,
-                colors=[product_data.color],
-                currency=product_data.offers.priceCurrency,
-                price=product_data.offers.price,
-                categories=categories
-            )
-
-            transformed_items.append(item)
-        
-        return transformed_items

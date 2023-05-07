@@ -92,7 +92,8 @@ class BaseParser:
             print('validation error:', e)
             return None
         except Exception as e:
-            print("exception", e)
+            print("an exception", e)
+            logging.error(f"exception for url {primitive_item.item_url}: {e}")
             return None
 
     async def get_primitive_items(self) -> dict[str, list[PrimitiveItem]]:

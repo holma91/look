@@ -1,12 +1,24 @@
-from typing import Optional
+from typing import Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 class PrimitiveItem(BaseModel):
     item_url: str
     item_api_url: Optional[str]
     audience: str
 
+class Size(BaseModel):
+    size: str
+    in_stock: bool
+
+class Category(BaseModel):
+    name: str
+    rank: str
+
+class Color(BaseModel):
+    name: str
+
+## make this class more exact
 class Item(PrimitiveItem):
     item_id: str
     brand: str
@@ -14,17 +26,10 @@ class Item(PrimitiveItem):
     country: str
     name: str
     description: str
-    images: list
-    sizes: dict
-    colors: list
-    currency: str
-    price: str
-    categories: list
+    currency: Union[str, None]
+    price: Union[str, None]
+    images: list[HttpUrl]
+    sizes: list[Size]
+    categories: list[Category]
+    colors: list[Color]
 
-
-class TransformedItem(BaseModel):
-    pass
-
-class CustomBaseModel(BaseModel):
-    class Config:
-        allow_population_by_field_name = True

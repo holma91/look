@@ -3,37 +3,29 @@ import logging
 
 from sqlalchemy import create_engine, text
 from pydantic import ValidationError
-import models
 
 from Types import Item
 
-class BaseTransformer:
+class Loader:
     "reads the lightly parsed data from s3, transforms it and puts it into postgres"
-    def __init__(self, db_url: str, model_id: str):
+    def __init__(self, db_url: str):
         self.engine = create_engine(db_url)
-        self.model_id = model_id
-        self.parsed_item_types = {
-            "gucci": models.gucci.ParsedItem,
-            "loro_piana": models.loro_piana.ParsedItem,
-        }
 
     def run(self, s3_path: str):
-        parsed_items = self.read_from_s3(s3_path)
-        items = self.transform(parsed_items)
+        items = self.read_from_s3(s3_path)
         self.load(items)
 
-    def read_from_s3(self, s3_path: str):
-        parsed_items = []
-        ParsedItem = self.parsed_item_types[self.model_id]
+    def read_from_s3(self, s3_path: str) -> list[Item]:
+        items = []
         with open(s3_path, 'r') as file:
             for line_number, line in enumerate(file):
                 try:
-                    parsed_item = ParsedItem(**json.loads(line))
-                    parsed_items.append(parsed_item)
+                    item = Item(**json.loads(line))
+                    items.append(item)
                 except ValidationError as e:
                     logging.error(f"validation error at line {line_number} for s3_path: {s3_path}: {e}")
 
-        return parsed_items
+        return items
 
     def load(self, items: list[Item]):
         for item in items:
@@ -51,11 +43,11 @@ class BaseTransformer:
                             ON CONFLICT (name, audience) DO NOTHING
                             """
                         ),
-                        {"name": category["name"].strip().lower(), "audience": item.audience},
+                        {"name": category.name.strip().lower(), "audience": item.audience},
                     )
 
                 # Insert sizes if they don't exist
-                for size in item.sizes.keys():
+                for size in item.sizes:
                     conn.execute(
                         text(
                             """
@@ -64,7 +56,7 @@ class BaseTransformer:
                             ON CONFLICT (size) DO NOTHING
                             """
                         ),
-                        {"size": size.strip().lower()},
+                        {"size": size.size.strip().lower()},
                     )
                 
                 # Insert images if they don't exist
@@ -90,7 +82,7 @@ class BaseTransformer:
                             ON CONFLICT (name) DO NOTHING
                             """
                         ),
-                        {"name": color.strip().lower()},
+                        {"name": color.name.strip().lower()},
                     )
 
                 # Insert abstract_item
@@ -104,6 +96,9 @@ class BaseTransformer:
                     ),
                     {"id": abstract_item_id, "brand": item.brand.strip().lower(), "gender": item.audience},
                 )
+
+                currency = item.currency.strip().lower() if item.currency else None
+                price = item.price if item.price else None
 
                 # Insert item
                 conn.execute(
@@ -122,8 +117,8 @@ class BaseTransformer:
                         "website": item.domain.strip().lower(),
                         "country": item.country.strip().lower(),
                         "item_url": item.item_url.strip().lower(),
-                        "currency": item.currency.strip().lower(),
-                        "price": item.price,
+                        "currency": currency,
+                        "price": price,
                         "name": item.name,
                         "description": item.description,
                     },
@@ -138,7 +133,7 @@ class BaseTransformer:
                             ON CONFLICT (item_id, color_id) DO NOTHING
                             """
                         ),
-                        {"item_id": item_id, "color_id": color.strip().lower()},
+                        {"item_id": item_id, "color_id": color.name.strip().lower()},
                     )
 
                 for category in item.categories:
@@ -150,7 +145,7 @@ class BaseTransformer:
                             ON CONFLICT (item_id, category_id) DO NOTHING
                             """
                         ),
-                        {"item_id": item_id, "name": category["name"].strip().lower(), "audience": item.audience ,"rank": category["rank"]},
+                        {"item_id": item_id, "name": category.name.strip().lower(), "audience": item.audience ,"rank": category.rank},
                     )
 
                 for image in item.images:
@@ -165,7 +160,7 @@ class BaseTransformer:
                         {"item_id": item_id, "url": image.strip().lower()},
                     )
 
-                for size, in_stock in item.sizes.items():
+                for size in item.sizes:
                     conn.execute(
                         text(
                             """
@@ -175,8 +170,6 @@ class BaseTransformer:
                                 in_stock = :in_stock
                             """
                         ),
-                        {"item_id": item_id, "size": size.strip().lower(), "in_stock": in_stock},
+                        {"item_id": item_id, "size": size.size.strip().lower(), "in_stock": size.in_stock},
                     )
     
-    def transform(self, parsed_items: list) -> list[Item]:
-        raise NotImplementedError("This method should be implemented in a subclass.")

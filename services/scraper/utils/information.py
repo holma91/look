@@ -25,13 +25,13 @@ information = {
         # "women-readytowear": "women",
         # "women-shoes": "women",
         # "women-accessories-wallets": "women",
-        "women-accessories-belts": "women",
+        # "women-accessories-belts": "women",
         # "jewelry-watches-watches-women": "women",
         # "men-bags": "men",
         # "men-bags-trolleys": "men",
         # "men-readytowear": "men",
         # "men-shoes": "men",
-        # "men-accessories-wallets": "men",
+        "men-accessories-wallets": "men",
         # "jewelry-watches-watches-men": "men",
       }
     },
@@ -64,10 +64,10 @@ information = {
           # "/c/L2_WOM_BABYCASH/results": "women", # baby cashmere
 
           # "/c/L1_MEN/results": "men",
-          # "/c/L2_MEN_ACCESSORIES/results": "men",
+          "/c/L2_MEN_ACCESSORIES/results": "men",
           # "/c/L2_SHOES_MAN/results": "men",
           # "/c/L2_MEN_GOK/results": "men",
-          "/c/L2_MEN_VICU%C3%91A/results": "men",
+          # "/c/L2_MEN_VICU%C3%91A/results": "men",
           # "/c/L2_MEN_BABYCASH/results": "men"
       }
     },
