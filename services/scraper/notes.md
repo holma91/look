@@ -145,3 +145,29 @@ check that the html tree is the same as before
 ### inspiration
 
 - launch page: https://www.airbnb.se/release
+
+### small pivot
+
+- app where users can train like lensa
+- provide integration for shopping sites
+
+for a user:
+
+1. create an avatar in our app
+2. connect to our service from the shopping site/app
+3. generate
+
+for a website:
+
+1. get contacted by us
+2. integrate our SDK
+3. now users can just click a button on the page to generate an image
+
+Downstream effects:
+
+- generated images are on the users profile in the app
+  - content for a small niche social media play
+
+### TODO
+
+- fine tune realistic vision

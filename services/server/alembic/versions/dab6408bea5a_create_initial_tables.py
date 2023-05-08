@@ -52,7 +52,7 @@ def upgrade() -> None:
 
         CREATE TABLE "item_category" (
         "item_id" text,
-        "category_id" text,
+        "category_id" int,
         "rank" int
         );
 
@@ -72,7 +72,8 @@ def upgrade() -> None:
         );
 
         CREATE TABLE "category" (
-        "name" text PRIMARY KEY,
+        "id" SERIAL PRIMARY KEY,
+        "name" text,
         "audience" audience_type
         );
 
@@ -116,7 +117,7 @@ def upgrade() -> None:
 
         ALTER TABLE "item_category" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
 
-        ALTER TABLE "item_category" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("name");
+        ALTER TABLE "item_category" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("id");
 
         ALTER TABLE "item_image" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
 

@@ -162,3 +162,4 @@ cython_debug/
 
 # CUSTOM
 services/scraper/trash
+services/scraper/results
