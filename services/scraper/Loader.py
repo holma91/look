@@ -69,7 +69,7 @@ class Loader:
                             ON CONFLICT (url) DO NOTHING
                             """
                         ),
-                        {"url": image.strip().lower()},
+                        {"url": image.strip()},
                     )
                 
                 # Insert colors if they don't exist
@@ -116,7 +116,7 @@ class Loader:
                         "abstract_item_id": abstract_item_id,
                         "website": item.domain.strip().lower(),
                         "country": item.country.strip().lower(),
-                        "item_url": item.item_url.strip().lower(),
+                        "item_url": item.item_url.strip(),
                         "currency": currency,
                         "price": price,
                         "name": item.name,
@@ -157,7 +157,7 @@ class Loader:
                             ON CONFLICT (item_id, image_id) DO NOTHING
                             """
                         ),
-                        {"item_id": item_id, "url": image.strip().lower()},
+                        {"item_id": item_id, "url": image.strip()},
                     )
 
                 for size in item.sizes:

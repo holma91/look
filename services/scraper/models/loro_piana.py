@@ -6,8 +6,8 @@ from BaseParser import BaseParser
 
 # when, the parser fails, we know that page structure has changed
 class Parser(BaseParser):
-    def __init__(self, country: str, scraper: Scraper):
-        super().__init__(country, scraper, brand="loro_piana", domain="loropiana.com")
+    def __init__(self, country: str, scraper: Scraper, scraping_type: str):
+        super().__init__(country, scraper, scraping_type, brand="loro_piana", domain="loropiana.com")
 
     async def get_primitive_items(self) -> dict[str, list[PrimitiveItem]]:
         primitive_items_by_seed = {}
@@ -34,7 +34,7 @@ class Parser(BaseParser):
         
         return primitive_items_by_seed
 
-    async def get_extracted_item(self, doc: str, primitive_item: PrimitiveItem):
+    async def get_extracted_item(self, src: str, primitive_item: PrimitiveItem):
         def get_sizes(size_data: list) -> list[Size]:
             sizes = []
             for size_info in size_data:
@@ -54,8 +54,8 @@ class Parser(BaseParser):
         def get_color(color_data: str) -> list[Color]:
             return [Color(name=color_data)]
         
-        product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
-        breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
+        product_data = json.loads(src.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
+        breadcrumb_data = json.loads(src.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
 
         images = product_data['image']
         if isinstance(images, str):

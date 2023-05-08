@@ -44,6 +44,8 @@ insert into brand (id) values ('gucci');
 insert into website (domain, multi_brand, second_hand) values ('gucci.com', false, false);
 insert into brand (id) values ('loro_piana');
 insert into website (domain, multi_brand, second_hand) values ('loropiana.com', false, false);
+insert into brand (id) values ('moncler');
+insert into website (domain, multi_brand, second_hand) values ('moncler.com', false, false);
 ```
 
 ```sql
@@ -119,12 +121,27 @@ check that the html tree is the same as before
 
 ### TODO
 
-- write type checker
-- add 10 sites (moncler first)
+- write some tests
 - start designing web UI
 
-### conclusion
+### frontend
 
-NOT scalable to have different intermediate types for every site (the data stored in S3)
+- should be possible to create an account with google
+- view product, change model if you are logged in
+- upload photo, train AI
 
-- need to come up with a data type for what's stored in s3
+### design
+
+- a ui that's some combination of normal shopping and aggregation sites. VERY minimalistic.
+  - black and white
+
+### pages
+
+- home
+- search
+  - airbnb search components are really good
+- product
+
+### inspiration
+
+- launch page: https://www.airbnb.se/release

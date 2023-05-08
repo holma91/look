@@ -5,8 +5,8 @@ from Types import PrimitiveItem, Item, Size, Category, Color
 from BaseParser import BaseParser
 
 class Parser(BaseParser):
-    def __init__(self, country: str, scraper: Scraper):
-        super().__init__(country, scraper, brand="gucci", domain="gucci.com")
+    def __init__(self, country: str, scraper: Scraper, scraping_type: str):
+        super().__init__(country, scraper,  scraping_type, brand="gucci", domain="gucci.com")
 
     async def get_primitive_items(self) -> dict[str, list[PrimitiveItem]]:
         primitive_items_by_seed = {}
@@ -33,7 +33,7 @@ class Parser(BaseParser):
         
         return primitive_items_by_seed
         
-    async def get_extracted_item(self, doc: str, primitive_item: PrimitiveItem):
+    async def get_extracted_item(self, src: str, primitive_item: PrimitiveItem):
         def get_sizes(offers: list) -> list[Size]:
             sizes = []
             for offer in offers:
@@ -57,8 +57,8 @@ class Parser(BaseParser):
                 colors.append(Color(name=color))
             return colors
         
-        product_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
-        breadcrumb_data = json.loads(doc.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
+        product_data = json.loads(src.xpath('//script[@type="application/ld+json"]')[0].text, strict=False)
+        breadcrumb_data = json.loads(src.xpath('//script[@type="application/ld+json"]')[1].text, strict=False)
 
         images = product_data.get('image', [])
         if isinstance(images, str):

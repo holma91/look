@@ -11,9 +11,10 @@ from utils.information import information
 
 class BaseParser:
     "does some light parsing and puts the results into S3"
-    def __init__(self, country: str, scraper: Scraper, brand: str, domain: str):
+    def __init__(self, country: str, scraper: Scraper, scraping_type: str, brand: str, domain: str):
         self.country = country
         self.scraper = scraper
+        self.scraping_type = scraping_type
         self.brand = brand
         self.domain = domain
 
@@ -87,12 +88,13 @@ class BaseParser:
         return results
     
     async def process_item(self, primitive_item: PrimitiveItem, headers: dict):
-        # this method can be overridden in a subclass IF we want JSON for a specific item
         """If this method returns None, the job will be considered failed and retried."""
         try:
-            # could choose between get_html and get_json here depending on model_id
-            doc = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
-            item = await self.get_extracted_item(doc, primitive_item)
+            if self.scraping_type == 'html':
+                src = await self.scraper.get_html(primitive_item.item_url, headers=headers, model_id=self.domain)
+            elif self.scraping_type == 'json':
+                src = await self.scraper.get_json(primitive_item.item_api_url, headers=headers, model_id=self.domain)
+            item = await self.get_extracted_item(src, primitive_item)
             return item
         except ValidationError as e:
             logging.error(f"validation error for url {primitive_item.item_url}: {e}")
@@ -108,6 +110,6 @@ class BaseParser:
         raise NotImplementedError("This method should be implemented in a subclass.")
 
     # maybe change doc to src, because sometimes it's just json
-    async def get_extracted_item(self, doc: str, primitive_item: PrimitiveItem) -> any:
+    async def get_extracted_item(self, src: str, primitive_item: PrimitiveItem) -> any:
         """returns the extracted item that's ready to be written to S3"""
         raise NotImplementedError("This method should be implemented in a subclass.")

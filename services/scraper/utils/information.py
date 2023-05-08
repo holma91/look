@@ -92,12 +92,12 @@ information = {
         'se': 'https://www.moncler.com/en-se',
       },
       'seeds': {
-        # "men-outerwear": "men", # 238
-        # "men-ready-to-wear": "men", # 386
+        "men-outerwear": "men", # 238
+        "men-ready-to-wear": "men", # 386
         "men-footwear": "men", # 61
-        # "men-accessories": "men", # 295
-        # "grenoble-men": "men", # 101
-        # "genius-shop-genius-collection": "unisex", # 74
+        "men-accessories": "men", # 295
+        "grenoble-men": "men", # 101
+        "genius-shop-genius-collection": "unisex", # 74
         # "grenoble-women": "women", # 108
         # "women-accessories": "women", # 276
         # "women-footwear": "women", # 59
