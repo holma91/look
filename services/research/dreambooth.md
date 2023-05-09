@@ -36,6 +36,7 @@ custom photorealistic models:
     - easier to swap out face
     - "restore faces" is decent when I try but removes detail
       - basically airbrushes it
+      - safer (less chance we get a fcked up image)
   - go into rv more in depth
   - negative prompting fixes the eyes
 

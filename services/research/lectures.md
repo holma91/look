@@ -25,3 +25,9 @@ DiffEdit paper
 
 - does not return the text that generates the photo
   The CLIP image encoder takes an input image and return a text embedding. Then inverse function does not exist (probably).
+
+### Learning to do
+
+- LORAs in depth.
+- controlnet
+- fine-tune something
