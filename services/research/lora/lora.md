@@ -66,9 +66,11 @@ repeats = 10
 epochs = 10
 batch_size = 6
 total_steps = 14 \* 10 / 6 \* 10 = 233
-Results: Looks decents. Not good for inpainting on images far away.
+Results: Doesn't look like me at all. Otherwise it's decents. Not good for inpainting on images far away.
 
 The following all use the same 14 training images.
+
+Alex_LoRA or Alex_LoRA2 are probably the best.
 
 **Alex_LoRA3**:
 base_model = RV2
@@ -85,24 +87,42 @@ Results: Looks overtrained AF.
 **Alex_LoRA4**:
 base_model = RV2
 same as Alex_LoRA3 but with network_alpha = 1
+Results: Doesn't look like me at all.
 
 **Alex_LoRA5**:
 base_model = RV2
 same as Alex_LoRA3 but with train_batch_size = 6
+Results: Doesn't really look like me either.
 
 **Alex_LoRA6**:
 base_model = SD1.5
 otherwise, same as Alex_LoRA5.
+Results: a little better maybe.
+
+**Alex_LoRA7**:
+base_model = RV2
+network_dim = 128
+network_alpha = 128
+batch_size = 3
+images = 25
+reg_images = 100
+Results: Bad AF. Some images have no similarity at all, and some are overtrained AF.
+
+**Alex_LoRA8**:
+base_model = RV2
+network_dim = 8
+network_alpha = 1
+repeats = 50
+batch_size = 2
+images = 25
+reg_images = 0
+Results:
 
 ### Programmatically train LoRAs
 
 LoRA applied to Dreambooth?
 
 Huggingface provides script for fine-tuning. Then we just call that script with bunch of parameters.
-
-### Dreamboothing with LoRA
-
-output from LoRA is a .pt file, that you can merge with a checkpoint to get a .ckpt file?
 
 ### Do fine-tuning with low-rank adaptation article
 
@@ -141,16 +161,4 @@ kolla senare: https://www.youtube.com/watch?v=sRdtVanSRl4
 
 kolla senare (LoRA serie): https://www.youtube.com/@life-is-boring-so-programming
 
-### question
-
-Awesome tutorial!
-
-I just went through it and created "a LoRA" of myself. I used SD1.5 as the base model, and generated a 144mb LoRA file from that with what should resemble me. I can then use this LoRA file with any model I want in the Automatic1111 GUI and generate images. I just have some questions for you:
-
-- How much does it matter what base model I use? Should I always use the base model that I wanna use later? E.g if I want to generate images with Realistic Vision 2.0, should I train the LoRA "on top of" that model?
-
-- I have seen some people train LoRAs, then merge their LoRA with a checkpoint to get a .ckpt file. What's the difference between doing that and doing what you have done here (just putting the LoRA in the right folder and then including it in the prompt)?
-
-- I don't really understand then connection between LoRA and Dreambooth. The file name is kohya-LoRA-dreambooth.ipynb and I often see people write "LoRA with Dreambooth" and similar things, but does this have anything to do with Dreambooth? I thought that was a separate thing, where you actually modify the underlying model and where you always get a new model that's larger as output.
-
-And just as a last question, how do you think this compares with the classical dreambooth approach? In terms of quality, since LoRAs are obviously more space-efficient and takes less time to train.
+maybe start modifying the LoRA strength in the prompt.
