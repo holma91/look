@@ -70,8 +70,6 @@ Results: Doesn't look like me at all. Otherwise it's decents. Not good for inpai
 
 The following all use the same 14 training images.
 
-Alex_LoRA or Alex_LoRA2 are probably the best.
-
 **Alex_LoRA3**:
 base_model = RV2
 network_dim = 128
@@ -116,13 +114,22 @@ repeats = 50
 batch_size = 2
 images = 25
 reg_images = 0
+Results: Absolute trash. Constructing the input images almost completely.
+
+**Alex_LoRA9**:
+same as Alex_LoRA8 but with 10 repeats instead of 50.
+Results: Trash af, files are small as fuck so prob because of the nd and na.
+
+**Alex_LoRA10**
+same as 9 but with nd = 128 and na = 128.
+Results: Doesn't look like me.
+
+**Alex_LoRA11**
+same as 10 but with 24 epochs instead of 12.
 Results:
 
-### Programmatically train LoRAs
-
-LoRA applied to Dreambooth?
-
-Huggingface provides script for fine-tuning. Then we just call that script with bunch of parameters.
+All sucks, but 1, 2, 5 and 6 are probably the least bad.
+1 is the one we used captions with, and it's also the only one that hasn't memorized the input clothes!
 
 ### Do fine-tuning with low-rank adaptation article
 
@@ -159,6 +166,8 @@ best results in the 1500 to 3500 step range.
 
 kolla senare: https://www.youtube.com/watch?v=sRdtVanSRl4
 
-kolla senare (LoRA serie): https://www.youtube.com/@life-is-boring-so-programming
+### Thoughts
 
-maybe start modifying the LoRA strength in the prompt.
+Have not gotten any good results at all. With how they work it would be assume if it worked though.
+
+Experiment to do: train a LoRA on my segmented head.
