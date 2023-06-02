@@ -31,3 +31,4 @@ DiffEdit paper
 - LORAs in depth.
 - controlnet
 - fine-tune something
+- continue from this one: https://course.fast.ai/Lessons/lesson15.html

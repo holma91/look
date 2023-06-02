@@ -150,6 +150,7 @@ check that the html tree is the same as before
 
 - app where users can train like lensa
 - provide integration for shopping sites
+  - barbershop also?
 
 for a user:
 
@@ -171,3 +172,4 @@ Downstream effects:
 ### TODO
 
 - fine tune realistic vision
+  - everydream
