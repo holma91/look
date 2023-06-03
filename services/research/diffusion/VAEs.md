@@ -30,7 +30,7 @@ The search of encoder and decoder that minimise the reconstruction error is done
 
 We have discussed the dimensionality reduction problem and introduced autoencoders that are encoder-decoder architectures that can be trained by gradient descent. With these autoencoders, we have no way to produce any new content.
 
-Why can't we take a point randomly from the latent space, and decode it to get new content (the decoder would kinda act like the generator of GAN)?
+Why can't we take a point randomly from the latent space, and decode it to get new content (the decoder would kinda act like the generator of a GAN)?
 
 It is pretty difficult (if not impossible) to ensure, a priori, that the encoder will organize the latent space in a smart way compatible with the generative process we just described.
 
