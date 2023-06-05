@@ -84,3 +84,7 @@ Notes from the following blog post: https://towardsdatascience.com/why-vae-are-l
 
 **what's a likelihood based model?**
 A class of generative model that model the distribution of the data directly with a likelihood function. Most popular example of one is VAE.
+
+### SD WebUI
+
+What VAE to use? There is a default one for every model, but if we are using SD1.5 we should probably use more fine-tuned (?) ones. Either EMA or VAE.

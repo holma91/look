@@ -40,7 +40,7 @@ In the upsampling blocks, we can EMBED more information.
 
 ### Training
 
-NN learns to predict noi8se - really learns the distribution of what is not noise.
+NN learns to predict noise - really learns the distribution of what is not noise.
 
 Take an image, add noise to it, ask the neural network to predict the noise, and the compare the predicted noise with the actual noise to get the loss.
 

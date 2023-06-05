@@ -1,6 +1,5 @@
 ## SD Deep Dive Notebook
 
-exee
 tokenizer and scheduler on the CPU.
 vae, unet and text_encoder on the GPU.
 
