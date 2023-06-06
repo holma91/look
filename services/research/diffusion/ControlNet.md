@@ -8,4 +8,12 @@ The weights of the SD models are freezed. In additition to that we create an ext
 
 ### Possible applications
 
+can I make people fatter or skinnier with controlnet?
+
 ### SD WebUI
+
+Pixel Perfect: chooses the resolution of the input image as the preprocessor resolution
+
+Tips:
+
+- reduce input image size if it's too big, preprocessing will take less time then
