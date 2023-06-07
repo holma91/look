@@ -17,3 +17,7 @@ Pixel Perfect: chooses the resolution of the input image as the preprocessor res
 Tips:
 
 - reduce input image size if it's too big, preprocessing will take less time then
+
+### Results
+
+openpose face works pretty good for directing facial expressions.
