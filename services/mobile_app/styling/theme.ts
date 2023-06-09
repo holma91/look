@@ -9,9 +9,9 @@ const palette = {
 
 export const theme = createTheme({
   colors: {
+    primary: palette.purple,
+    secondary: palette.green,
     background: palette.white,
-    cardPrimaryBackground: palette.purple,
-    cardSecondaryBackground: palette.green,
     title: palette.black,
     text: palette.white,
   },
@@ -44,10 +44,22 @@ export const theme = createTheme({
       borderRadius: 10,
     },
     primary: {
-      backgroundColor: 'cardPrimaryBackground',
+      backgroundColor: 'primary',
     },
     secondary: {
-      backgroundColor: 'cardSecondaryBackground',
+      backgroundColor: 'secondary',
+    },
+  },
+  buttonVariants: {
+    defaults: {
+      padding: 'm',
+      borderRadius: 10,
+    },
+    primary: {
+      backgroundColor: 'primary',
+    },
+    secondary: {
+      backgroundColor: 'secondary',
     },
   },
 });

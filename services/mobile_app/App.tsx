@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@shopify/restyle';
-import { theme } from './theme';
+import { theme } from './styling/theme';
 import { NavigationContainer } from '@react-navigation/native';
 import TabNavigator from './screens/Tabs.navigator';
 

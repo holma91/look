@@ -6,7 +6,7 @@ import {
   createVariant,
   VariantProps,
 } from '@shopify/restyle';
-import { theme, darkTheme, Theme } from '../theme';
+import { theme, darkTheme, Theme } from '../styling/theme';
 import { useState } from 'react';
 
 const Box = createBox<Theme>();

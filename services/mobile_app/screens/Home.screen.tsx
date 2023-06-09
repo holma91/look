@@ -6,7 +6,7 @@ import {
   createVariant,
   VariantProps,
 } from '@shopify/restyle';
-import { Theme } from '../theme';
+import { Theme } from '../styling/theme';
 
 const Box = createBox<Theme>();
 const Text = createText<Theme>();
