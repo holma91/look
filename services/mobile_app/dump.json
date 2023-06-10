@@ -1,0 +1,32 @@
+ED7AC36B-A150-4C38-BB8C-B6D696F4F2ED/L0/001
+ED7AC36B-A150-4C38-BB8C-B6D696F4F2ED/L0/001
+{
+  "assets": [
+    {
+      "assetId": "07361861-1D22-4D71-8141-3323E0A3D181/L0/001",
+      "base64": null,
+      "duration": null,
+      "exif": null,
+      "fileName": "IMG_0011.png",
+      "fileSize": 2919949,
+      "height": 1440,
+      "type": "image",
+      "uri": "file:///Users/lapuerta/Library/Developer/CoreSimulator/Devices/1C514820-9FB3-4232-AF56-6BB834DCD0BD/data/Containers/Data/Application/6B52F53D-E93E-4E28-92AD-4104F549D412/Library/Caches/ExponentExperienceData/%2540anonymous%252Fmobile_app-2f702930-64f0-4375-82db-66bbc255ac5a/ImagePicker/E3D12238-F8F7-41C9-BEA6-A05339E5DD36.png",
+      "width": 960
+    },
+    {
+      "assetId": "01BAF92D-53A4-483A-89C9-23A2195E02CC/L0/001",
+      "base64": null,
+      "duration": null,
+      "exif": null,
+      "fileName": "IMG_0007.png",
+      "fileSize": 2424115,
+      "height": 1620,
+      "type": "image",
+      "uri": "file:///Users/lapuerta/Library/Developer/CoreSimulator/Devices/1C514820-9FB3-4232-AF56-6BB834DCD0BD/data/Containers/Data/Application/6B52F53D-E93E-4E28-92AD-4104F549D412/Library/Caches/ExponentExperienceData/%2540anonymous%252Fmobile_app-2f702930-64f0-4375-82db-66bbc255ac5a/ImagePicker/08EB358B-3EB6-4F2A-962E-F4275EFA6211.png",
+      "width": 960
+    }
+  ],
+  "canceled": false,
+  "cancelled": false
+}

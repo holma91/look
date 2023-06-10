@@ -1,21 +1,72 @@
+import { useState } from 'react';
 import { SafeAreaView, Image, FlatList, View } from 'react-native';
 import { createBox, createText } from '@shopify/restyle';
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { Theme } from '../styling/theme';
-import { useState } from 'react';
 import { Button } from '../components/Button';
 
 const Box = createBox<Theme>();
 const Text = createText<Theme>();
 
+type ImageProps = {
+  uri: string;
+  id: string;
+};
+
 export default function Create({ navigation }: { navigation: any }) {
-  const handleCreate = () => {
-    console.log('create');
+  const [selectedImages, setSelectedImages] = useState<ImageProps[]>([]);
+  const [readyToCreate, setReadyToCreate] = useState(false);
+
+  const pickImages = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsMultipleSelection: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const images: ImageProps[] = result.assets.map((asset) => {
+        let assetId = asset.assetId;
+        if (!assetId) {
+          // Android does not provide assetId under certain circumstances
+          assetId = asset.uri;
+        }
+        return { uri: asset.uri, id: assetId };
+      });
+
+      setSelectedImages((prevSelectedImages) => {
+        const prevSelectedImageIds = prevSelectedImages.map(
+          (image) => image.id
+        );
+        const newUris = images.filter(
+          (image) => !prevSelectedImageIds.includes(image.id)
+        );
+        const updatedImages = [...prevSelectedImages, ...newUris];
+
+        if (updatedImages.length >= 6) {
+          setReadyToCreate(true);
+        }
+
+        return updatedImages;
+      });
+    } else {
+      alert('You did not select any image.');
+    }
   };
 
-  const images = Array.from({ length: 25 }).map((_, i) => ({
-    id: i,
-    uri: 'https://images.aftonbladet-cdn.se/v2/images/4300bf71-b377-4f97-b9bc-f61480b03ae0?fit=crop&format=auto&h=1024&q=50&w=683&s=4f632c05d43adbda308dd6813236a17699649f7e',
-  }));
+  const removeImage = async (oldImage: ImageProps) => {
+    const newImages = selectedImages.filter(
+      (image) => image.uri !== oldImage.uri
+    );
+    setSelectedImages(newImages);
+    if (newImages.length < 6) {
+      setReadyToCreate(false);
+    }
+  };
+
+  const createLora = async () => {
+    console.log('Creating Lora');
+  };
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -27,13 +78,7 @@ export default function Create({ navigation }: { navigation: any }) {
           justifyContent="space-between"
           marginVertical="m"
         >
-          <Box
-            borderColor="primary"
-            borderWidth={2}
-            borderRadius={10}
-            flex={1}
-            padding="m"
-          >
+          <Box flex={1} padding="m">
             <Text
               variant="body"
               fontWeight="bold"
@@ -44,7 +89,7 @@ export default function Create({ navigation }: { navigation: any }) {
               Your photos
             </Text>
             <FlatList
-              data={images}
+              data={selectedImages}
               renderItem={({ item }) => (
                 <View
                   style={{
@@ -52,6 +97,7 @@ export default function Create({ navigation }: { navigation: any }) {
                     flexDirection: 'column',
                     margin: 3,
                     borderRadius: 10,
+                    position: 'relative',
                   }}
                 >
                   <Image
@@ -59,23 +105,45 @@ export default function Create({ navigation }: { navigation: any }) {
                       justifyContent: 'center',
                       alignItems: 'center',
                       height: 100,
-                      width: 100,
+                      width: '100%',
                       borderRadius: 5,
                     }}
                     source={{ uri: item.uri }}
                   />
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: 5,
+                      right: 5,
+                      backgroundColor: 'rgba(150,150,150,0.7)',
+                      borderRadius: 8,
+                      padding: 4,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                    onTouchEnd={() => removeImage(item)}
+                  >
+                    <Ionicons name="close-sharp" size={18} color="white" />
+                  </View>
                 </View>
               )}
               numColumns={3}
-              keyExtractor={(item) => item.id.toString()}
+              keyExtractor={(item) => item.id}
             />
           </Box>
-
-          <Button
-            label="click"
-            onPress={handleCreate}
-            variant="primary"
-          ></Button>
+          {readyToCreate ? (
+            <Button
+              label="Create LoRA"
+              onPress={createLora}
+              variant="primary"
+            ></Button>
+          ) : (
+            <Button
+              label="Upload photos"
+              onPress={pickImages}
+              variant="primary"
+            ></Button>
+          )}
         </Box>
       </SafeAreaView>
     </Box>
