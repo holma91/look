@@ -24,12 +24,12 @@ export default function Home({ navigation }: { navigation: any }) {
         <Box flex={1} paddingHorizontal="m" gap="s">
           <Text variant="header">Welcome</Text>
           <Card variant="primary">
-            <Text variant="body">
+            <Text variant="onBackground">
               This is a simple example displaying how to use Restyle
             </Text>
           </Card>
           <Card variant="secondary">
-            <Text variant="body">
+            <Text variant="onBackground">
               You can find the theme in theme.ts. Update the theme values to see
               how it changes this screen
             </Text>

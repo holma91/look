@@ -29,7 +29,12 @@ export const Button = ({ label, onPress, variant }: Props) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <ButtonContainer variant={variant}>
-        <Text textAlign="center" fontWeight="bold" fontSize={18} variant="body">
+        <Text
+          textAlign="center"
+          fontWeight="bold"
+          fontSize={18}
+          variant="onBackground"
+        >
           {label}
         </Text>
       </ButtonContainer>

@@ -13,7 +13,8 @@ export const theme = createTheme({
     secondary: palette.green,
     background: palette.white,
     title: palette.black,
-    text: palette.white,
+    text: palette.black,
+    textOnBackground: palette.white,
   },
   spacing: {
     s: 8,
@@ -35,6 +36,10 @@ export const theme = createTheme({
       color: 'title',
     },
     body: {
+      fontSize: 16,
+    },
+    onBackground: {
+      color: 'textOnBackground',
       fontSize: 16,
     },
   },

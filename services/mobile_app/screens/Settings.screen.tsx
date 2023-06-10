@@ -31,7 +31,7 @@ export default function Settings({ navigation }: { navigation: any }) {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Text variant="body">Toggle dark mode</Text>
+            <Text variant="onBackground">Toggle dark mode</Text>
             <Switch
               value={darkMode}
               onValueChange={(value: boolean) => setDarkMode(value)}
