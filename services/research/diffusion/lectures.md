@@ -1,25 +1,19 @@
-# mentioned probabilites/stats concepts
+# Deep Learning Foundations to Stable Diffusion
 
-- density function
-- probability distributions
-- expected value
-
-## Stable Diffusion Deep Dive Notebook
-
-### Lesson 10
+## Lesson 10
 
 Imagic paper
 
 - take an image of a thing and change what it's doing
 
-### Lesson 11
+## Lesson 11
 
 DiffEdit paper
 
 - semantic image editing
   - very relevant to what I'm doing
 
-### Lesson 12
+## Lesson 12
 
 **CLIP Interrogator**
 Give it an image, get back a prompt that somewhat describes the image.
@@ -32,27 +26,27 @@ BLIP has been trained to give an "ok-ish" caption of an image.
 **Einstein summation**:
 "An extremely general way to perform tensor operations". Notability for the math.
 
-### Lesson 13-14
+## Lesson 13-14
 
 Covers more fundamental Neural Network concepts. Don't have time for this right now.
 
-### Lesson 15 - Goes through CNNs and Autoencoders (which contains CNNs)
+## Lesson 15 - Goes through CNNs and Autoencoders (which contains CNNs)
 
 Don't have time for this right now.
 
-### Lesson 16 - Builds the learner in the training framework
+## Lesson 16 - Builds the learner in the training framework
 
 Don't have times for this right now.
 
-### Lesson 17 - Normalization, regularization and stuff
+## Lesson 17 - Normalization, regularization and stuff
 
 Don't have times for this right now.
 
-### Lesson 18 - Accelerated SGDs and ResNets
+## Lesson 18 - Accelerated SGDs and ResNets
 
 Don't have times for this right now.
 
-### Lesson 19 - DDPM and Dropout
+## Lesson 19 - DDPM and Dropout
 
 **Dropout**:
 Randomly delete some activations. We only do this at training time ofc. A pretty common place to add dropout is before the last linear layer.
@@ -60,13 +54,28 @@ Randomly delete some activations. We only do this at training time ofc. A pretty
 **DDPM**:
 "Does not have the latent VAE thing or conditioning". So, we are going to do "unconditional DDPM" from scratch.
 
-### Lesson 20 - Mixed Precision
+## Lesson 20 - Mixed Precision
 
 Don't have times for this right now.
 
-### Lesson 21 - DDIM
+## Lesson 21 - DDIM
 
 **Experiment Tracking (WandB)**:
+Can be nice to use but not essential. Maybe wait until I work on some large project.
+
+**metrics for generated images**:
+Difficult to tell how "good" the images from the diffusion models are. FID and KID can help somewhat.
+
+FID (Frechet Inception Distance):
+Will tell "how similar are these generated images to real images?" We are not looking on individual images, but on a batch. So, we take our samples, and put it through a pre-trained model that predicts what type of fashion something is. Number of samples really matter here.
+
+KID (Kernel Inception Distance):
+Number of samples doesn't matter. Very high variance though (Jeremy have not found it useful at all because of it).
+
+None of FID and KID are great, but they can be helpful.
+
+**DDIM**:
+Basically a faster version of DDPM.
 
 ### Learning to do
 
