@@ -78,7 +78,13 @@ export default function Create({ navigation }: { navigation: any }) {
           justifyContent="space-between"
           marginVertical="m"
         >
-          <Box flex={1} padding="m">
+          <Box
+            flex={1}
+            // borderColor="primary"
+            // borderWidth={2}
+            // borderRadius={10}
+            padding="m"
+          >
             <Text
               variant="body"
               fontWeight="bold"

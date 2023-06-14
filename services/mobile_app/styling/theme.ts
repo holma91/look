@@ -35,6 +35,11 @@ export const theme = createTheme({
       fontWeight: 'bold',
       color: 'title',
     },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: 'title',
+    },
     body: {
       fontSize: 16,
     },

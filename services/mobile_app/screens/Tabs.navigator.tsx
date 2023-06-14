@@ -1,9 +1,12 @@
 import { useTheme } from '@shopify/restyle';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import Home from './Home.screen';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Fontisto from '@expo/vector-icons/Fontisto';
 import Settings from './Settings.screen';
 import Create from './Create.screen';
+import Shop from './Shop.screen';
+import Browse from './Browse.screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -16,12 +19,30 @@ export default function TabNavigator() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: any = '';
 
-          if (route.name === 'Home') {
-            iconName = focused ? 'ios-home' : 'ios-home-outline';
+          if (route.name === 'Shop') {
+            iconName = focused ? 'shopping' : 'shopping-outline';
+            return (
+              <MaterialCommunityIcons
+                name={iconName}
+                size={size}
+                color={color}
+              />
+            );
           } else if (route.name === 'Create') {
             iconName = focused ? 'ios-add-circle' : 'ios-add-circle-outline';
+            return <Ionicons name={iconName} size={size} color={color} />;
+          } else if (route.name === 'Browse') {
+            iconName = focused ? 'web' : 'web';
+            return (
+              <MaterialCommunityIcons
+                name={iconName}
+                size={size}
+                color={color}
+              />
+            );
           } else if (route.name === 'Settings') {
             iconName = focused ? 'ios-settings' : 'ios-settings-outline';
+            return <Ionicons name={iconName} size={size} color={color} />;
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -29,10 +50,12 @@ export default function TabNavigator() {
         tabBarActiveTintColor: activeTheme.colors.primary,
         tabBarInactiveTintColor: 'gray',
         tabBarLabel: () => null,
+        headerShown: false,
       })}
     >
-      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Shop" component={Shop} />
       <Tab.Screen name="Create" component={Create} />
+      <Tab.Screen name="Browse" component={Browse} />
       <Tab.Screen name="Settings" component={Settings} />
     </Tab.Navigator>
   );
