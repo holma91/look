@@ -1,4 +1,4 @@
-!pip install --upgrade diffusers accelerate transformers torch torchvision
+!pip install --upgrade -q diffusers accelerate transformers torch torchvision
 !nvidia-smi
 Restart kernel with cmd + M + . after doing a !pip install
 
@@ -51,13 +51,13 @@ def report_gpu():
 
 ### Pipelines
 
-Most general one is DiffusionPipeline. There are also pipelines such as StableDiffusionPipeline, StableDiffusionImg2ImgPipeline, and StableDiffusionInpaintPipeline.
+Most general one is DiffusionPipeline. There are also pipelines such as StableDiffusionPipeline, StableDiffusionImg2ImgPipeline, and StableDiffusionInpaintPipeline that inherit from DiffusionPipeline.
 
 To use the "SD mega pipeline":
 `pipe = DiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", custom_pipeline="stable_diffusion_mega", torch_dtype=torch.float16, revision="fp16")`
 SD Mega Pipeline can run txt2img, img2img and inpainting in one pipeline.
 
-Default scheduler (PDPM) is super slow. Change to EulerDiscreteScheduler.
+Default scheduler (PDPM) is super slow. Change to EulerDiscreteScheduler (or something else).
 
 ### Conceptual Guides
 

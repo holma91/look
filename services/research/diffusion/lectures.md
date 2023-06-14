@@ -77,6 +77,23 @@ None of FID and KID are great, but they can be helpful.
 **DDIM**:
 Basically a faster version of DDPM.
 
+## Lesson 22 - Karras et al
+
+Goes through different samplers. Also starts diving into the UNet. Don't have time for this right now.
+
+## Lesson 23 - Super-resolution
+
+Keeps going into the UNet. Don't have time for this right now.
+
+## Lesson 24 - Attention & Transformers
+
+Don't have time for this right now.
+
+## Lesson 25 - VAE
+
+Starts with John going through an audio diffusion notebook.
+.npmm is a memory-mapped numpy file.
+
 ### Learning to do
 
 - LORAs in depth.
