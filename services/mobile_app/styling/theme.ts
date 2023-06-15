@@ -17,6 +17,7 @@ export const theme = createTheme({
     title: palette.black,
     text: palette.black,
     textOnBackground: palette.white,
+    grey: palette.grey,
   },
   spacing: {
     s: 8,
@@ -85,6 +86,12 @@ export const theme = createTheme({
     },
     secondary: {
       backgroundColor: 'secondary',
+    },
+    tertiary: {
+      backgroundColor: 'text',
+      color: 'textOnBackground',
+      fontSize: 3,
+      padding: 's',
     },
   },
 });

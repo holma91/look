@@ -22,18 +22,19 @@ const ButtonContainer = createRestyleComponent<
 type Props = {
   onPress: () => void;
   label: string;
-  variant: 'primary' | 'secondary';
+  variant: 'primary' | 'secondary' | 'tertiary';
 };
 
-export const Button = ({ label, onPress, variant }: Props) => {
+export const Button = ({ label, onPress, variant, ...rest }: Props | any) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <ButtonContainer variant={variant}>
         <Text
           textAlign="center"
           fontWeight="bold"
-          fontSize={18}
-          variant="onBackground"
+          // fontSize={18}
+          // variant="onBackground"
+          {...rest}
         >
           {label}
         </Text>

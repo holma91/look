@@ -24,11 +24,12 @@ import { Theme } from '../styling/theme';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { TextInput } from '../styling/TextInput';
+import { Button } from '../components/Button';
 
 // The minimum and maximum heights for our bottom sheet
 const MIN_HEIGHT = 0;
-const MEDIUM_HEIGHT = 250;
-const MAX_HEIGHT = 500;
+const MEDIUM_HEIGHT = 300;
+const MAX_HEIGHT = 600;
 
 export default function Browse() {
   const [url, setUrl] = useState(
@@ -138,13 +139,56 @@ export default function Browse() {
               style={[
                 {
                   backgroundColor: 'white',
-                  borderWidth: 2,
-                  borderColor: 'black',
+                  position: 'absolute',
+                  bottom: 50,
+                  left: 0,
+                  right: 0,
                 },
                 animatedStyle,
               ]}
             >
-              {/* Your bottom sheet content goes here */}
+              <Box
+                height={5}
+                width={40}
+                backgroundColor="grey"
+                borderRadius={2.5}
+                alignSelf="center"
+                margin="m"
+              ></Box>
+              <Box
+                flex={1}
+                flexDirection="row"
+                // borderWidth={1}
+                paddingHorizontal="m"
+                paddingVertical="l"
+                justifyContent="space-between"
+              >
+                <Box flex={1}>
+                  <Image
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: 200,
+                    }}
+                    resizeMode="contain"
+                    source={{
+                      uri: 'https://static.zara.net/photos///2023/V/0/1/p/7901/234/942/2/w/1126/7901234942_1_1_1.jpg?ts=1677513491932',
+                    }}
+                  />
+                </Box>
+                <Box flex={1} gap="s">
+                  <Text variant="body">RAK OCH ÅTSITTANDE BLAZER</Text>
+                  <Text variant="body">Zara</Text>
+                  <Text variant="body">499kr</Text>
+                  <Button
+                    label="Generate"
+                    onPress={() => {}}
+                    variant="tertiary"
+                    fontSize={14}
+                    color="textOnBackground"
+                  ></Button>
+                </Box>
+              </Box>
             </Animated.View>
           </GestureDetector>
           <Box
@@ -153,6 +197,8 @@ export default function Browse() {
             flexDirection="row"
             padding="s"
             justifyContent="space-between"
+            backgroundColor="background"
+            zIndex={100}
           >
             <Box flex={0} flexDirection="row" gap="m" alignItems="center">
               <Ionicons
