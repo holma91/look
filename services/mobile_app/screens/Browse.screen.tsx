@@ -18,9 +18,11 @@ import Animated, {
   withSpring,
   withTiming,
   runOnJS,
+  Layout,
+  LightSpeedInLeft,
 } from 'react-native-reanimated';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Theme } from '../styling/theme';
+import { Theme, theme } from '../styling/theme';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { TextInput } from '../styling/TextInput';
@@ -39,7 +41,6 @@ export default function Browse() {
   const [expandedMenu, setExpandedMenu] = useState(false);
   const webviewRef = useRef<WebView>(null);
 
-  // Create a shared value to hold the height of the bottom sheet
   const bottomSheetHeight = useSharedValue(0);
   const start = useSharedValue(0);
 
@@ -77,11 +78,35 @@ export default function Browse() {
     })
     .onFinalize(() => {});
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const animatedStyleOuter = useAnimatedStyle(() => {
     return {
       height: bottomSheetHeight.value,
+      backgroundColor: withTiming(
+        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'black' : 'white'
+      ),
     };
   });
+
+  const animatedStyleInner = useAnimatedStyle(() => {
+    return {
+      backgroundColor: withTiming(
+        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'grey' : 'white'
+      ),
+    };
+  });
+
+  const animatedTextStyle = useAnimatedStyle(() => {
+    return {
+      color: withTiming(
+        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'white' : 'black'
+      ),
+    };
+  });
+
+  const handleGenerate = () => {
+    // generate image(s)
+    console.log('generating image(s)');
+  };
 
   const handleSearch = () => {
     console.log('searching for', search);
@@ -106,13 +131,13 @@ export default function Browse() {
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
-        <Box flex={1} gap="s">
+        <Box flex={1}>
           <Box
             flex={0}
             flexDirection="row"
             alignItems="center"
             gap="s"
-            paddingHorizontal="s"
+            padding="s"
           >
             <Box flex={1}>
               <TextInput
@@ -140,11 +165,11 @@ export default function Browse() {
                 {
                   backgroundColor: 'white',
                   position: 'absolute',
-                  bottom: 50,
+                  bottom: 45,
                   left: 0,
                   right: 0,
                 },
-                animatedStyle,
+                animatedStyleOuter,
               ]}
             >
               <Box
@@ -155,13 +180,18 @@ export default function Browse() {
                 alignSelf="center"
                 margin="m"
               ></Box>
-              <Box
-                flex={1}
-                flexDirection="row"
-                // borderWidth={1}
-                paddingHorizontal="m"
-                paddingVertical="l"
-                justifyContent="space-between"
+
+              <Animated.View
+                style={[
+                  {
+                    flex: 1,
+                    flexDirection: 'row',
+                    paddingHorizontal: theme.spacing.m,
+                    paddingVertical: theme.spacing.l,
+                    justifyContent: 'space-between',
+                  },
+                  animatedStyleInner,
+                ]}
               >
                 <Box flex={1}>
                   <Image
@@ -177,18 +207,20 @@ export default function Browse() {
                   />
                 </Box>
                 <Box flex={1} gap="s">
-                  <Text variant="body">RAK OCH ÅTSITTANDE BLAZER</Text>
+                  <Animated.Text style={animatedTextStyle}>
+                    RAK OCH ÅTSITTANDE BLAZER
+                  </Animated.Text>
                   <Text variant="body">Zara</Text>
                   <Text variant="body">499kr</Text>
                   <Button
                     label="Generate"
-                    onPress={() => {}}
+                    onPress={handleGenerate}
                     variant="tertiary"
                     fontSize={14}
                     color="textOnBackground"
                   ></Button>
                 </Box>
-              </Box>
+              </Animated.View>
             </Animated.View>
           </GestureDetector>
           <Box

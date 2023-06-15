@@ -24,6 +24,8 @@ import Animated, {
 export default function Settings({ navigation }: { navigation: any }) {
   const isPressed = useSharedValue(false);
   const offset = useSharedValue({ x: 0, y: 0 });
+  const start = useSharedValue({ x: 0, y: 0 });
+
   const animatedStyles = useAnimatedStyle(() => {
     return {
       transform: [
@@ -31,11 +33,11 @@ export default function Settings({ navigation }: { navigation: any }) {
         { translateY: offset.value.y },
         { scale: withSpring(isPressed.value ? 1.2 : 1) },
       ],
-      backgroundColor: isPressed.value ? 'yellow' : 'blue',
+      // backgroundColor: isPressed.value ? 'yellow' : 'blue',
+      backgroundColor: offset.value.y > 300 ? 'yellow' : 'blue',
     };
   });
 
-  const start = useSharedValue({ x: 0, y: 0 });
   const gesture = Gesture.Pan()
     .onBegin(() => {
       isPressed.value = true;

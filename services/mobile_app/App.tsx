@@ -1,4 +1,4 @@
-import 'react-native-gesture-handler';
+import 'react-native-gesture-handler'; // might need to do more than this on android
 import { ThemeProvider } from '@shopify/restyle';
 import { theme } from './styling/theme';
 import { NavigationContainer } from '@react-navigation/native';
