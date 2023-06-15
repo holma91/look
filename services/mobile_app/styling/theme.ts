@@ -5,6 +5,7 @@ const palette = {
   green: '#099C77',
   black: '#101010',
   white: '#FFF',
+  grey: '#DDDFE9',
 };
 
 export const theme = createTheme({
@@ -12,6 +13,7 @@ export const theme = createTheme({
     primary: palette.purple,
     secondary: palette.green,
     background: palette.white,
+    secondaryBackground: palette.grey,
     title: palette.black,
     text: palette.black,
     textOnBackground: palette.white,
@@ -46,6 +48,19 @@ export const theme = createTheme({
     onBackground: {
       color: 'textOnBackground',
       fontSize: 16,
+    },
+  },
+  inputVariants: {
+    defaults: {
+      padding: 's',
+    },
+    primary: {
+      backgroundColor: 'secondaryBackground',
+      color: 'text',
+      borderRadius: 10,
+      // borderColor: 'text',
+      // borderWidth: 2,
+      height: 40,
     },
   },
   cardVariants: {
