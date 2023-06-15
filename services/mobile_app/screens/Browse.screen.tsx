@@ -6,29 +6,75 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useRef, useState } from 'react';
+import {
+  Gesture,
+  GestureDetector,
+  PanGestureHandler,
+} from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedGestureHandler,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Theme } from '../styling/theme';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import {
-  VariantProps,
-  createRestyleComponent,
-  createVariant,
-} from '@shopify/restyle';
-
-const TextInput = createRestyleComponent<
-  VariantProps<Theme, 'inputVariants'> &
-    React.ComponentProps<typeof TextInputRN>,
-  Theme
->([createVariant({ themeKey: 'inputVariants' })], TextInputRN);
+import { TextInput } from '../styling/TextInput';
 
 export default function Browse() {
   const [url, setUrl] = useState(
     'https://github.com/react-native-webview/react-native-webview'
   );
   const [search, setSearch] = useState('');
-
   const webviewRef = useRef<WebView>(null);
+
+  // Create a shared value to hold the height of the bottom sheet
+  const bottomSheetHeight = useSharedValue(0);
+
+  // The minimum and maximum heights for our bottom sheet
+  const MIN_HEIGHT = 0;
+  const MAX_HEIGHT = 300; // You can adjust this value as needed
+
+  const gesture = Gesture.Pan()
+    .onBegin(() => {
+      // isPressed.value = true;
+      // bottomSheetHeight.value = 0;
+    })
+    .onUpdate((e) => {
+      // translation is the distance moved since the gesture started
+      console.log('onUpdate', e.translationY);
+      bottomSheetHeight.value = MAX_HEIGHT - e.translationY;
+    })
+    .onEnd((e) => {
+      console.log('onEnd v', e.velocityY);
+      console.log('onEnd t', e.translationY);
+
+      if (e.translationY > 150) {
+        bottomSheetHeight.value = withTiming(MIN_HEIGHT);
+      } else {
+        bottomSheetHeight.value = withTiming(MAX_HEIGHT);
+      }
+
+      // const shouldOpen = e.velocityY < 0;
+      // bottomSheetHeight.value = withTiming(
+      // shouldOpen ? MAX_HEIGHT : MIN_HEIGHT
+      // );
+    })
+    .onFinalize(() => {
+      // isPressed.value = false;
+    });
+
+  // The animated style for the bottom sheet
+  const animatedStyle = useAnimatedStyle(() => {
+    // I think this is running in the UI thread
+
+    return {
+      height: bottomSheetHeight.value,
+    };
+  });
 
   const handleSearch = () => {
     console.log('searching for', search);
@@ -81,6 +127,13 @@ export default function Browse() {
               }}
             />
           </Box>
+          <GestureDetector gesture={gesture}>
+            <Animated.View
+              style={[{ backgroundColor: 'white' }, animatedStyle]}
+            >
+              {/* Your bottom sheet content goes here */}
+            </Animated.View>
+          </GestureDetector>
           <Box
             flex={0}
             borderWidth={0}
@@ -103,7 +156,18 @@ export default function Browse() {
               />
             </Box>
             <Box flex={0} flexDirection="row" alignItems="center">
-              <Ionicons name="arrow-up-circle" size={28} color="black" />
+              <Ionicons
+                name="arrow-up-circle"
+                size={28}
+                color="black"
+                onPress={() => {
+                  if (bottomSheetHeight.value === MAX_HEIGHT) {
+                    bottomSheetHeight.value = withTiming(MIN_HEIGHT);
+                  } else {
+                    bottomSheetHeight.value = withTiming(MAX_HEIGHT);
+                  }
+                }}
+              />
             </Box>
             <Box flex={0} flexDirection="row" gap="m" alignItems="center">
               <Ionicons name="md-star-outline" size={24} color="black" />
