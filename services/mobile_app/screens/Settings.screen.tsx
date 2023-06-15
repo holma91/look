@@ -1,4 +1,4 @@
-import { Button, SafeAreaView, Switch } from 'react-native';
+import { Button, SafeAreaView, StyleSheet, Switch } from 'react-native';
 import {
   createBox,
   createText,
@@ -8,37 +8,67 @@ import {
 } from '@shopify/restyle';
 import { theme, darkTheme, Theme } from '../styling/theme';
 import { useState } from 'react';
-
-const Box = createBox<Theme>();
-const Text = createText<Theme>();
-
-// Basically, Card is a Box with that can take a variant prop
-const Card = createRestyleComponent<
-  VariantProps<Theme, 'cardVariants'> & React.ComponentProps<typeof Box>,
-  Theme
->([createVariant({ themeKey: 'cardVariants' })], Box);
+import {
+  Gesture,
+  GestureDetector,
+  PanGestureHandler,
+} from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  useAnimatedGestureHandler,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 export default function Settings({ navigation }: { navigation: any }) {
-  const [darkMode, setDarkMode] = useState(false);
+  const isPressed = useSharedValue(false);
+  const offset = useSharedValue({ x: 0, y: 0 });
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: offset.value.x },
+        { translateY: offset.value.y },
+        { scale: withSpring(isPressed.value ? 1.2 : 1) },
+      ],
+      backgroundColor: isPressed.value ? 'yellow' : 'blue',
+    };
+  });
+
+  const start = useSharedValue({ x: 0, y: 0 });
+  const gesture = Gesture.Pan()
+    .onBegin(() => {
+      isPressed.value = true;
+    })
+    .onUpdate((e) => {
+      offset.value = {
+        x: e.translationX + start.value.x,
+        y: e.translationY + start.value.y,
+      };
+    })
+    .onEnd(() => {
+      start.value = {
+        x: offset.value.x,
+        y: offset.value.y,
+      };
+    })
+    .onFinalize(() => {
+      isPressed.value = false;
+    });
 
   return (
-    <Box backgroundColor="background" flex={1}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Box flex={1} paddingHorizontal="m" marginTop="s" gap="s">
-          <Card
-            variant="primary"
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Text variant="onBackground">Toggle dark mode</Text>
-            <Switch
-              value={darkMode}
-              onValueChange={(value: boolean) => setDarkMode(value)}
-            />
-          </Card>
-        </Box>
-      </SafeAreaView>
-    </Box>
+    <GestureDetector gesture={gesture}>
+      <Animated.View style={[styles.ball, animatedStyles]} />
+    </GestureDetector>
   );
 }
+
+const styles = StyleSheet.create({
+  ball: {
+    width: 100,
+    height: 100,
+    borderRadius: 100,
+    backgroundColor: 'blue',
+    alignSelf: 'center',
+  },
+});

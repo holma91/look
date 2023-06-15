@@ -17,6 +17,7 @@ import Animated, {
   useAnimatedGestureHandler,
   withSpring,
   withTiming,
+  runOnJS,
 } from 'react-native-reanimated';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Theme } from '../styling/theme';
@@ -24,53 +25,58 @@ import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { TextInput } from '../styling/TextInput';
 
+// The minimum and maximum heights for our bottom sheet
+const MIN_HEIGHT = 0;
+const MEDIUM_HEIGHT = 250;
+const MAX_HEIGHT = 500;
+
 export default function Browse() {
   const [url, setUrl] = useState(
     'https://github.com/react-native-webview/react-native-webview'
   );
   const [search, setSearch] = useState('');
+  const [expandedMenu, setExpandedMenu] = useState(false);
   const webviewRef = useRef<WebView>(null);
 
   // Create a shared value to hold the height of the bottom sheet
   const bottomSheetHeight = useSharedValue(0);
-
-  // The minimum and maximum heights for our bottom sheet
-  const MIN_HEIGHT = 0;
-  const MAX_HEIGHT = 300; // You can adjust this value as needed
+  const start = useSharedValue(0);
 
   const gesture = Gesture.Pan()
     .onBegin(() => {
-      // isPressed.value = true;
-      // bottomSheetHeight.value = 0;
+      start.value = bottomSheetHeight.value;
     })
     .onUpdate((e) => {
-      // translation is the distance moved since the gesture started
-      console.log('onUpdate', e.translationY);
-      bottomSheetHeight.value = MAX_HEIGHT - e.translationY;
+      if (start.value === MAX_HEIGHT) {
+        bottomSheetHeight.value = MAX_HEIGHT - e.translationY;
+      } else if (start.value === MEDIUM_HEIGHT) {
+        bottomSheetHeight.value = MEDIUM_HEIGHT - e.translationY;
+      }
     })
     .onEnd((e) => {
-      console.log('onEnd v', e.velocityY);
-      console.log('onEnd t', e.translationY);
-
-      if (e.translationY > 150) {
-        bottomSheetHeight.value = withTiming(MIN_HEIGHT);
-      } else {
-        bottomSheetHeight.value = withTiming(MAX_HEIGHT);
+      if (start.value === MAX_HEIGHT) {
+        if (e.translationY > 150) {
+          bottomSheetHeight.value = withTiming(MIN_HEIGHT);
+          runOnJS(setExpandedMenu)(false);
+        } else if (e.translationY > 50) {
+          bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
+        } else {
+          bottomSheetHeight.value = withTiming(MAX_HEIGHT);
+        }
+      } else if (start.value === MEDIUM_HEIGHT) {
+        if (e.translationY > 50) {
+          bottomSheetHeight.value = withTiming(MIN_HEIGHT);
+          runOnJS(setExpandedMenu)(false);
+        } else if (e.translationY < -50) {
+          bottomSheetHeight.value = withTiming(MAX_HEIGHT);
+        } else {
+          bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
+        }
       }
-
-      // const shouldOpen = e.velocityY < 0;
-      // bottomSheetHeight.value = withTiming(
-      // shouldOpen ? MAX_HEIGHT : MIN_HEIGHT
-      // );
     })
-    .onFinalize(() => {
-      // isPressed.value = false;
-    });
+    .onFinalize(() => {});
 
-  // The animated style for the bottom sheet
   const animatedStyle = useAnimatedStyle(() => {
-    // I think this is running in the UI thread
-
     return {
       height: bottomSheetHeight.value,
     };
@@ -129,7 +135,14 @@ export default function Browse() {
           </Box>
           <GestureDetector gesture={gesture}>
             <Animated.View
-              style={[{ backgroundColor: 'white' }, animatedStyle]}
+              style={[
+                {
+                  backgroundColor: 'white',
+                  borderWidth: 2,
+                  borderColor: 'black',
+                },
+                animatedStyle,
+              ]}
             >
               {/* Your bottom sheet content goes here */}
             </Animated.View>
@@ -156,18 +169,27 @@ export default function Browse() {
               />
             </Box>
             <Box flex={0} flexDirection="row" alignItems="center">
-              <Ionicons
-                name="arrow-up-circle"
-                size={28}
-                color="black"
-                onPress={() => {
-                  if (bottomSheetHeight.value === MAX_HEIGHT) {
+              {expandedMenu ? (
+                <Ionicons
+                  name="close-circle"
+                  size={28}
+                  color="black"
+                  onPress={() => {
+                    setExpandedMenu(false);
                     bottomSheetHeight.value = withTiming(MIN_HEIGHT);
-                  } else {
-                    bottomSheetHeight.value = withTiming(MAX_HEIGHT);
-                  }
-                }}
-              />
+                  }}
+                />
+              ) : (
+                <Ionicons
+                  name="arrow-up-circle"
+                  size={28}
+                  color="black"
+                  onPress={() => {
+                    setExpandedMenu(true);
+                    bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
+                  }}
+                />
+              )}
             </Box>
             <Box flex={0} flexDirection="row" gap="m" alignItems="center">
               <Ionicons name="md-star-outline" size={24} color="black" />
