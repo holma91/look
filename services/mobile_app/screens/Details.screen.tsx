@@ -26,7 +26,7 @@ const MIN_HEIGHT = 0;
 const MEDIUM_HEIGHT = 300;
 const MAX_HEIGHT = SCREEN_HEIGHT - 115;
 
-export default function Browse() {
+export default function Details() {
   const [url, setUrl] = useState('https://zalando.com/');
   const [search, setSearch] = useState('');
   const [expandedMenu, setExpandedMenu] = useState(false);
@@ -248,7 +248,7 @@ function BottomSheet({ bottomSheetHeight, setExpandedMenu }: BottomSheetProps) {
           alignSelf="center"
           margin="m"
         ></Box>
-        {(sheetState === 'MIN' || sheetState === 'MEDIUM') && (
+        {sheetState === 'MEDIUM' && (
           <Animated.View
             style={[
               {

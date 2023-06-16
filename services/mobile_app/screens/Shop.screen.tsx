@@ -6,6 +6,8 @@ import {
   createVariant,
   VariantProps,
 } from '@shopify/restyle';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 import { Theme } from '../styling/theme';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
@@ -34,7 +36,7 @@ const startSites = [
   },
 ];
 
-export default function Shop() {
+export default function Shop({ navigation }: { navigation: any }) {
   const [sites, setSites] = useState(
     startSites
       .concat(startSites)
@@ -75,6 +77,13 @@ export default function Shop() {
                   </Text>
                   <Text variant="body">{item.url}</Text>
                 </Box>
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={24}
+                  color="black"
+                  onPress={() => navigation.navigate('Details')}
+                  alignSelf="flex-end"
+                />
               </Box>
             )}
             keyExtractor={(site) => site.id}
