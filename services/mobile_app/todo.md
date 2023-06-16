@@ -10,6 +10,4 @@ Pages:
 
 ### TODO fredag
 
-1. click generate, wait 5s, get image
-2. when image arrive, expand sheet
-3. show generated image, with product info below
+1. when at max height, make sheet non draggable (apart from the top)

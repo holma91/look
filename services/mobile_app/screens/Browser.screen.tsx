@@ -26,7 +26,7 @@ const MIN_HEIGHT = 0;
 const MEDIUM_HEIGHT = 300;
 const MAX_HEIGHT = SCREEN_HEIGHT - 115;
 
-export default function Details() {
+export default function Browser({ navigation }: { navigation: any }) {
   const [url, setUrl] = useState('https://zalando.com/');
   const [search, setSearch] = useState('');
   const [expandedMenu, setExpandedMenu] = useState(false);
@@ -75,11 +75,19 @@ export default function Details() {
                 onSubmitEditing={handleSearch}
               />
             </Box>
-            <Ionicons name="close" flex={0} size={28} color="black" />
+            <Ionicons
+              name="close"
+              flex={0}
+              size={28}
+              color="black"
+              onPress={() => navigation.goBack()}
+            />
           </Box>
           <Box flex={1}>
             <WebView
               ref={webviewRef}
+              onShouldStartLoadWithRequest={() => true}
+              startInLoadingState={true} // https://github.com/react-native-webview/react-native-webview/issues/124
               source={{
                 uri: url,
               }}
@@ -185,27 +193,29 @@ function BottomSheet({ bottomSheetHeight, setExpandedMenu }: BottomSheetProps) {
     })
     .onUpdate((e) => {
       if (start.value === MAX_HEIGHT) {
-        bottomSheetHeight.value = MAX_HEIGHT - e.translationY;
+        // bottomSheetHeight.value = MAX_HEIGHT - e.translationY;
       } else if (start.value === MEDIUM_HEIGHT) {
-        bottomSheetHeight.value = MEDIUM_HEIGHT - e.translationY;
+        if (e.translationY > 0) {
+          bottomSheetHeight.value = MEDIUM_HEIGHT - e.translationY;
+        }
       }
     })
     .onEnd((e) => {
       if (start.value === MAX_HEIGHT) {
         if (e.translationY > 150) {
-          bottomSheetHeight.value = withTiming(MIN_HEIGHT);
-          runOnJS(setExpandedMenu)(false);
+          // bottomSheetHeight.value = withTiming(MIN_HEIGHT);
+          // runOnJS(setExpandedMenu)(false);
         } else if (e.translationY > 50) {
-          bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
+          // bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
         } else {
-          bottomSheetHeight.value = withTiming(MAX_HEIGHT);
+          // bottomSheetHeight.value = withTiming(MAX_HEIGHT);
         }
       } else if (start.value === MEDIUM_HEIGHT) {
         if (e.translationY > 50) {
           bottomSheetHeight.value = withTiming(MIN_HEIGHT);
           runOnJS(setExpandedMenu)(false);
         } else if (e.translationY < -50) {
-          bottomSheetHeight.value = withTiming(MAX_HEIGHT);
+          // bottomSheetHeight.value = withTiming(MAX_HEIGHT);
         } else {
           bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
         }
