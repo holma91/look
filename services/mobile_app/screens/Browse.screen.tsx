@@ -21,7 +21,12 @@ import Animated, {
   runOnJS,
   Layout,
   LightSpeedInLeft,
+  useDerivedValue,
+  LightSpeedInRight,
+  LightSpeedOutRight,
+  useAnimatedReaction,
 } from 'react-native-reanimated';
+import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Theme, theme } from '../styling/theme';
 import { Box } from '../styling/Box';
@@ -34,7 +39,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 // The minimum and maximum heights for our bottom sheet
 const MIN_HEIGHT = 0;
 const MEDIUM_HEIGHT = 300;
-const MAX_HEIGHT = 600;
+const MAX_HEIGHT = SCREEN_HEIGHT - 115;
 
 export default function Browse() {
   const [url, setUrl] = useState('https://zalando.com/');
@@ -63,8 +68,6 @@ export default function Browse() {
       webviewRef.current.goForward();
     }
   };
-
-  console.log('height', SCREEN_HEIGHT);
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -174,35 +177,30 @@ function BottomSheet({
   expandedMenu,
   setExpandedMenu,
 }: BottomSheetProps) {
+  const [sheetState, setSheetState] = useState<'MIN' | 'MEDIUM' | 'MAX'>('MIN');
+  const [generating, setGenerating] = useState(false);
+  const [imageURI, setImageURI] = useState('assets/test4.png');
   const start = useSharedValue(0);
 
-  const handleGenerate = () => {
-    // generate image(s)
+  const handleGenerate = async () => {
+    const sleep = (ms: number) => {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    };
+    setGenerating(true);
+
     console.log('generating image(s)');
+    await sleep(3000);
+    console.log('done generating image(s)');
+    setGenerating(false);
+    bottomSheetHeight.value = withTiming(MAX_HEIGHT);
   };
 
   const animatedStyleOuter = useAnimatedStyle(() => {
     return {
       height: bottomSheetHeight.value,
-      backgroundColor: withTiming(
-        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'black' : 'white'
-      ),
-    };
-  });
-
-  const animatedStyleInner = useAnimatedStyle(() => {
-    return {
-      backgroundColor: withTiming(
-        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'grey' : 'white'
-      ),
-    };
-  });
-
-  const animatedTextStyle = useAnimatedStyle(() => {
-    return {
-      color: withTiming(
-        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'white' : 'black'
-      ),
+      // backgroundColor: withTiming(
+      //   bottomSheetHeight.value > MEDIUM_HEIGHT ? 'black' : 'white'
+      // ),
     };
   });
 
@@ -240,6 +238,19 @@ function BottomSheet({
     })
     .onFinalize(() => {});
 
+  useAnimatedReaction(
+    () => bottomSheetHeight.value,
+    (height) => {
+      if (height === MAX_HEIGHT) {
+        runOnJS(setSheetState)('MAX');
+      } else if (height === MEDIUM_HEIGHT) {
+        runOnJS(setSheetState)('MEDIUM');
+      } else {
+        runOnJS(setSheetState)('MIN');
+      }
+    }
+  );
+
   return (
     <GestureDetector gesture={gesture}>
       <Animated.View
@@ -262,47 +273,96 @@ function BottomSheet({
           alignSelf="center"
           margin="m"
         ></Box>
-
-        <Animated.View
-          style={[
-            {
-              flex: 1,
-              flexDirection: 'row',
-              paddingHorizontal: theme.spacing.m,
-              paddingVertical: theme.spacing.l,
-              justifyContent: 'space-between',
-            },
-            animatedStyleInner,
-          ]}
-        >
-          <Box flex={1}>
-            <Image
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 200,
-              }}
-              resizeMode="contain"
-              source={{
-                uri: 'https://static.zara.net/photos///2023/V/0/1/p/7901/234/942/2/w/1126/7901234942_1_1_1.jpg?ts=1677513491932',
-              }}
-            />
-          </Box>
-          <Box flex={1} gap="s">
-            <Animated.Text style={animatedTextStyle}>
-              RAK OCH ÅTSITTANDE BLAZER
-            </Animated.Text>
-            <Text variant="body">Zara</Text>
-            <Text variant="body">499kr</Text>
-            <Button
-              label="Generate"
-              onPress={handleGenerate}
-              variant="tertiary"
-              fontSize={14}
-              color="textOnBackground"
-            ></Button>
-          </Box>
-        </Animated.View>
+        {(sheetState === 'MIN' || sheetState === 'MEDIUM') && (
+          <Animated.View
+            style={[
+              {
+                flex: 1,
+                flexDirection: 'row',
+                paddingHorizontal: theme.spacing.m,
+                paddingVertical: theme.spacing.l,
+                justifyContent: 'space-between',
+              },
+            ]}
+            entering={LightSpeedInLeft}
+            exiting={LightSpeedOutRight.duration(100)}
+          >
+            <Box flex={1}>
+              <ExpoImage
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 200,
+                }}
+                source={require('../assets/test4.jpeg')}
+                contentFit="contain"
+              />
+            </Box>
+            <Box flex={1} gap="s">
+              <Text>RAK OCH ÅTSITTANDE BLAZER</Text>
+              <Text variant="body">Zara</Text>
+              <Text variant="body">499kr</Text>
+              {generating ? (
+                <Button
+                  label="Generating..."
+                  variant="tertiary"
+                  fontSize={14}
+                  color="textOnBackground"
+                ></Button>
+              ) : (
+                <Button
+                  label="Generate"
+                  onPress={handleGenerate}
+                  variant="tertiary"
+                  fontSize={14}
+                  color="textOnBackground"
+                ></Button>
+              )}
+            </Box>
+          </Animated.View>
+        )}
+        {sheetState === 'MAX' && (
+          <Animated.View
+            style={[
+              {
+                flex: 1,
+                flexDirection: 'column',
+                paddingHorizontal: theme.spacing.m,
+                paddingVertical: theme.spacing.l,
+                justifyContent: 'space-between',
+                gap: theme.spacing.m,
+              },
+            ]}
+            entering={LightSpeedInLeft}
+            exiting={LightSpeedOutRight.duration(500)}
+          >
+            <Box flex={1}>
+              <ExpoImage
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                }}
+                source={require('../assets/res4-1.png')}
+                contentFit="contain"
+              />
+            </Box>
+            <Box flex={0} gap="m">
+              <Box gap="s">
+                <Text fontWeight="bold">KORREN - Kofta</Text>
+                <Text variant="body">Tiger of Sweden</Text>
+                <Text variant="body">2 995.00kr</Text>
+              </Box>
+              <Button
+                label="Add to cart"
+                variant="tertiary"
+                fontSize={14}
+                color="textOnBackground"
+                paddingVertical="s"
+              ></Button>
+            </Box>
+          </Animated.View>
+        )}
       </Animated.View>
     </GestureDetector>
   );
