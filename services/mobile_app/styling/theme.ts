@@ -20,6 +20,8 @@ export const theme = createTheme({
     grey: palette.grey,
   },
   spacing: {
+    xxs: 2,
+    xs: 6,
     s: 8,
     m: 16,
     l: 24,
@@ -52,16 +54,17 @@ export const theme = createTheme({
     },
   },
   inputVariants: {
-    defaults: {
-      padding: 's',
-    },
+    defaults: {},
     primary: {
       backgroundColor: 'secondaryBackground',
       color: 'text',
-      borderRadius: 10,
+      borderRadius: 20,
       // borderColor: 'text',
       // borderWidth: 2,
-      height: 40,
+      height: 36,
+      width: '92%',
+      // paddingVertical: 's',
+      // paddingHorizontal: 'm',
     },
   },
   cardVariants: {

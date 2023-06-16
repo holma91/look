@@ -44,13 +44,15 @@ export default function Browser({ navigation }: { navigation: any }) {
     setUrl(finalUrl);
   };
 
-  const navigate = (direction: 'back' | 'forward') => {
+  const navigate = (direction: 'back' | 'forward' | 'reload') => {
     if (!webviewRef.current) return;
 
     if (direction === 'back') {
       webviewRef.current.goBack();
     } else if (direction === 'forward') {
       webviewRef.current.goForward();
+    } else if (direction === 'reload') {
+      webviewRef.current.reload();
     }
   };
 
@@ -58,35 +60,16 @@ export default function Browser({ navigation }: { navigation: any }) {
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1}>
-          <Box
-            flex={0}
-            flexDirection="row"
-            alignItems="center"
-            gap="s"
-            padding="s"
-          >
-            <Box flex={1}>
-              <TextInput
-                onChangeText={setSearch}
-                value={search}
-                autoCapitalize="none"
-                autoComplete="off"
-                variant="primary"
-                onSubmitEditing={handleSearch}
-              />
-            </Box>
-            <Ionicons
-              name="close"
-              flex={0}
-              size={28}
-              color="black"
-              onPress={() => navigation.goBack()}
-            />
-          </Box>
+          <SearchBar
+            setSearch={setSearch}
+            search={search}
+            handleSearch={handleSearch}
+            webviewNavigation={navigate}
+            navigation={navigation}
+          />
           <Box flex={1}>
             <WebView
               ref={webviewRef}
-              onShouldStartLoadWithRequest={() => true}
               startInLoadingState={true} // https://github.com/react-native-webview/react-native-webview/issues/124
               source={{
                 uri: url,
@@ -97,63 +80,149 @@ export default function Browser({ navigation }: { navigation: any }) {
             bottomSheetHeight={bottomSheetHeight}
             setExpandedMenu={setExpandedMenu}
           />
-          <Box
-            flex={0}
-            borderWidth={0}
-            flexDirection="row"
-            padding="s"
-            justifyContent="space-between"
-            backgroundColor="background"
-            zIndex={100}
-          >
-            <Box flex={0} flexDirection="row" gap="m" alignItems="center">
-              <Ionicons
-                name="arrow-back"
-                size={28}
-                color="black"
-                onPress={() => navigate('back')}
-              />
-              <Ionicons
-                name="arrow-forward"
-                size={28}
-                color="black"
-                onPress={() => navigate('forward')}
-              />
-            </Box>
-            <Box flex={0} flexDirection="row" alignItems="center">
-              {expandedMenu ? (
-                <Ionicons
-                  name="close-circle"
-                  size={28}
-                  color="black"
-                  onPress={() => {
-                    setExpandedMenu(false);
-                    bottomSheetHeight.value = withTiming(MIN_HEIGHT);
-                  }}
-                />
-              ) : (
-                <Ionicons
-                  name="arrow-up-circle"
-                  size={28}
-                  color="black"
-                  onPress={() => {
-                    setExpandedMenu(true);
-                    bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
-                  }}
-                />
-              )}
-            </Box>
-            <Box flex={0} flexDirection="row" gap="m" alignItems="center">
-              <Ionicons name="md-star-outline" size={24} color="black" />
-              <Ionicons
-                name="md-ellipsis-horizontal-sharp"
-                size={24}
-                color="black"
-              />
-            </Box>
-          </Box>
+          <NavBar
+            bottomSheetHeight={bottomSheetHeight}
+            expandedMenu={expandedMenu}
+            setExpandedMenu={setExpandedMenu}
+            navigate={navigate}
+          />
         </Box>
       </SafeAreaView>
+    </Box>
+  );
+}
+
+type SearchBarProps = {
+  setSearch: (search: string) => void;
+  search: string;
+  handleSearch: () => void;
+  navigation: any;
+  webviewNavigation: (direction: 'back' | 'forward' | 'reload') => void;
+};
+
+function SearchBar({
+  setSearch,
+  search,
+  handleSearch,
+  navigation,
+  webviewNavigation,
+}: SearchBarProps) {
+  return (
+    <Box
+      flex={0}
+      flexDirection="row"
+      alignItems="center"
+      gap="s"
+      paddingBottom="s"
+      paddingHorizontal="m"
+    >
+      <Box
+        flex={1}
+        backgroundColor="grey"
+        borderRadius={20}
+        flexDirection="row"
+        alignItems="center"
+        paddingHorizontal="m"
+        paddingVertical="xxs"
+      >
+        <TextInput
+          onChangeText={setSearch}
+          value={search}
+          autoCapitalize="none"
+          autoComplete="off"
+          autoCorrect={false}
+          inputMode="url"
+          variant="primary"
+          onSubmitEditing={handleSearch}
+          selectTextOnFocus={true}
+        />
+        <Ionicons
+          name="refresh"
+          flex={0}
+          size={24}
+          color="black"
+          onPress={() => webviewNavigation('reload')}
+        />
+      </Box>
+      <Box flex={0} backgroundColor="grey" borderRadius={20} padding="xs">
+        <Ionicons
+          name="close"
+          flex={0}
+          size={24}
+          color="black"
+          onPress={() => navigation.goBack()}
+        />
+      </Box>
+    </Box>
+  );
+}
+
+type NavBarProps = {
+  bottomSheetHeight: Animated.SharedValue<number>;
+  expandedMenu: boolean;
+  setExpandedMenu: (expanded: boolean) => void;
+  navigate: (direction: 'back' | 'forward') => void;
+};
+
+function NavBar({
+  bottomSheetHeight,
+  expandedMenu,
+  setExpandedMenu,
+  navigate,
+}: NavBarProps) {
+  return (
+    <Box
+      flex={0}
+      borderWidth={0}
+      flexDirection="row"
+      paddingVertical="s"
+      paddingHorizontal="m"
+      marginTop="s"
+      justifyContent="space-between"
+      backgroundColor="background"
+      zIndex={100}
+    >
+      <Box flex={0} flexDirection="row" gap="m" alignItems="center">
+        <Ionicons
+          name="arrow-back"
+          size={28}
+          color="black"
+          onPress={() => navigate('back')}
+        />
+        <Ionicons
+          name="arrow-forward"
+          size={28}
+          color="black"
+          onPress={() => navigate('forward')}
+        />
+      </Box>
+      <Box flex={0} flexDirection="row" alignItems="center">
+        {expandedMenu ? (
+          <Ionicons
+            name="close-circle"
+            size={28}
+            color="black"
+            onPress={() => {
+              setExpandedMenu(false);
+              bottomSheetHeight.value = withTiming(MIN_HEIGHT);
+            }}
+          />
+        ) : (
+          <Ionicons
+            name="arrow-up-circle"
+            size={28}
+            color="black"
+            onPress={() => {
+              setExpandedMenu(true);
+              bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
+            }}
+          />
+        )}
+      </Box>
+      <Box flex={0} flexDirection="row" gap="m" alignItems="center">
+        <Ionicons name="heart-outline" size={24} color="black" />
+        <Ionicons name="md-ellipsis-horizontal-sharp" size={24} color="black" />
+      </Box>
     </Box>
   );
 }
