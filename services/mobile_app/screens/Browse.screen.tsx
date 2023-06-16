@@ -1,4 +1,5 @@
 import {
+  Dimensions,
   FlatList,
   Image,
   SafeAreaView,
@@ -28,85 +29,20 @@ import { Text } from '../styling/Text';
 import { TextInput } from '../styling/TextInput';
 import { Button } from '../components/Button';
 
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+
 // The minimum and maximum heights for our bottom sheet
 const MIN_HEIGHT = 0;
 const MEDIUM_HEIGHT = 300;
 const MAX_HEIGHT = 600;
 
 export default function Browse() {
-  const [url, setUrl] = useState(
-    'https://github.com/react-native-webview/react-native-webview'
-  );
+  const [url, setUrl] = useState('https://zalando.com/');
   const [search, setSearch] = useState('');
   const [expandedMenu, setExpandedMenu] = useState(false);
   const webviewRef = useRef<WebView>(null);
 
   const bottomSheetHeight = useSharedValue(0);
-  const start = useSharedValue(0);
-
-  const gesture = Gesture.Pan()
-    .onBegin(() => {
-      start.value = bottomSheetHeight.value;
-    })
-    .onUpdate((e) => {
-      if (start.value === MAX_HEIGHT) {
-        bottomSheetHeight.value = MAX_HEIGHT - e.translationY;
-      } else if (start.value === MEDIUM_HEIGHT) {
-        bottomSheetHeight.value = MEDIUM_HEIGHT - e.translationY;
-      }
-    })
-    .onEnd((e) => {
-      if (start.value === MAX_HEIGHT) {
-        if (e.translationY > 150) {
-          bottomSheetHeight.value = withTiming(MIN_HEIGHT);
-          runOnJS(setExpandedMenu)(false);
-        } else if (e.translationY > 50) {
-          bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
-        } else {
-          bottomSheetHeight.value = withTiming(MAX_HEIGHT);
-        }
-      } else if (start.value === MEDIUM_HEIGHT) {
-        if (e.translationY > 50) {
-          bottomSheetHeight.value = withTiming(MIN_HEIGHT);
-          runOnJS(setExpandedMenu)(false);
-        } else if (e.translationY < -50) {
-          bottomSheetHeight.value = withTiming(MAX_HEIGHT);
-        } else {
-          bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
-        }
-      }
-    })
-    .onFinalize(() => {});
-
-  const animatedStyleOuter = useAnimatedStyle(() => {
-    return {
-      height: bottomSheetHeight.value,
-      backgroundColor: withTiming(
-        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'black' : 'white'
-      ),
-    };
-  });
-
-  const animatedStyleInner = useAnimatedStyle(() => {
-    return {
-      backgroundColor: withTiming(
-        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'grey' : 'white'
-      ),
-    };
-  });
-
-  const animatedTextStyle = useAnimatedStyle(() => {
-    return {
-      color: withTiming(
-        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'white' : 'black'
-      ),
-    };
-  });
-
-  const handleGenerate = () => {
-    // generate image(s)
-    console.log('generating image(s)');
-  };
 
   const handleSearch = () => {
     console.log('searching for', search);
@@ -127,6 +63,8 @@ export default function Browse() {
       webviewRef.current.goForward();
     }
   };
+
+  console.log('height', SCREEN_HEIGHT);
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -159,70 +97,11 @@ export default function Browse() {
               }}
             />
           </Box>
-          <GestureDetector gesture={gesture}>
-            <Animated.View
-              style={[
-                {
-                  backgroundColor: 'white',
-                  position: 'absolute',
-                  bottom: 45,
-                  left: 0,
-                  right: 0,
-                },
-                animatedStyleOuter,
-              ]}
-            >
-              <Box
-                height={5}
-                width={40}
-                backgroundColor="grey"
-                borderRadius={2.5}
-                alignSelf="center"
-                margin="m"
-              ></Box>
-
-              <Animated.View
-                style={[
-                  {
-                    flex: 1,
-                    flexDirection: 'row',
-                    paddingHorizontal: theme.spacing.m,
-                    paddingVertical: theme.spacing.l,
-                    justifyContent: 'space-between',
-                  },
-                  animatedStyleInner,
-                ]}
-              >
-                <Box flex={1}>
-                  <Image
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      height: 200,
-                    }}
-                    resizeMode="contain"
-                    source={{
-                      uri: 'https://static.zara.net/photos///2023/V/0/1/p/7901/234/942/2/w/1126/7901234942_1_1_1.jpg?ts=1677513491932',
-                    }}
-                  />
-                </Box>
-                <Box flex={1} gap="s">
-                  <Animated.Text style={animatedTextStyle}>
-                    RAK OCH ÅTSITTANDE BLAZER
-                  </Animated.Text>
-                  <Text variant="body">Zara</Text>
-                  <Text variant="body">499kr</Text>
-                  <Button
-                    label="Generate"
-                    onPress={handleGenerate}
-                    variant="tertiary"
-                    fontSize={14}
-                    color="textOnBackground"
-                  ></Button>
-                </Box>
-              </Animated.View>
-            </Animated.View>
-          </GestureDetector>
+          <BottomSheet
+            bottomSheetHeight={bottomSheetHeight}
+            expandedMenu={expandedMenu}
+            setExpandedMenu={setExpandedMenu}
+          />
           <Box
             flex={0}
             borderWidth={0}
@@ -281,5 +160,150 @@ export default function Browse() {
         </Box>
       </SafeAreaView>
     </Box>
+  );
+}
+
+type BottomSheetProps = {
+  bottomSheetHeight: Animated.SharedValue<number>;
+  expandedMenu: boolean;
+  setExpandedMenu: (expanded: boolean) => void;
+};
+
+function BottomSheet({
+  bottomSheetHeight,
+  expandedMenu,
+  setExpandedMenu,
+}: BottomSheetProps) {
+  const start = useSharedValue(0);
+
+  const handleGenerate = () => {
+    // generate image(s)
+    console.log('generating image(s)');
+  };
+
+  const animatedStyleOuter = useAnimatedStyle(() => {
+    return {
+      height: bottomSheetHeight.value,
+      backgroundColor: withTiming(
+        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'black' : 'white'
+      ),
+    };
+  });
+
+  const animatedStyleInner = useAnimatedStyle(() => {
+    return {
+      backgroundColor: withTiming(
+        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'grey' : 'white'
+      ),
+    };
+  });
+
+  const animatedTextStyle = useAnimatedStyle(() => {
+    return {
+      color: withTiming(
+        bottomSheetHeight.value > MEDIUM_HEIGHT ? 'white' : 'black'
+      ),
+    };
+  });
+
+  const gesture = Gesture.Pan()
+    .onBegin(() => {
+      start.value = bottomSheetHeight.value;
+    })
+    .onUpdate((e) => {
+      if (start.value === MAX_HEIGHT) {
+        bottomSheetHeight.value = MAX_HEIGHT - e.translationY;
+      } else if (start.value === MEDIUM_HEIGHT) {
+        bottomSheetHeight.value = MEDIUM_HEIGHT - e.translationY;
+      }
+    })
+    .onEnd((e) => {
+      if (start.value === MAX_HEIGHT) {
+        if (e.translationY > 150) {
+          bottomSheetHeight.value = withTiming(MIN_HEIGHT);
+          runOnJS(setExpandedMenu)(false);
+        } else if (e.translationY > 50) {
+          bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
+        } else {
+          bottomSheetHeight.value = withTiming(MAX_HEIGHT);
+        }
+      } else if (start.value === MEDIUM_HEIGHT) {
+        if (e.translationY > 50) {
+          bottomSheetHeight.value = withTiming(MIN_HEIGHT);
+          runOnJS(setExpandedMenu)(false);
+        } else if (e.translationY < -50) {
+          bottomSheetHeight.value = withTiming(MAX_HEIGHT);
+        } else {
+          bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
+        }
+      }
+    })
+    .onFinalize(() => {});
+
+  return (
+    <GestureDetector gesture={gesture}>
+      <Animated.View
+        style={[
+          {
+            backgroundColor: 'white',
+            position: 'absolute',
+            bottom: 45,
+            left: 0,
+            right: 0,
+          },
+          animatedStyleOuter,
+        ]}
+      >
+        <Box
+          height={5}
+          width={40}
+          backgroundColor="grey"
+          borderRadius={2.5}
+          alignSelf="center"
+          margin="m"
+        ></Box>
+
+        <Animated.View
+          style={[
+            {
+              flex: 1,
+              flexDirection: 'row',
+              paddingHorizontal: theme.spacing.m,
+              paddingVertical: theme.spacing.l,
+              justifyContent: 'space-between',
+            },
+            animatedStyleInner,
+          ]}
+        >
+          <Box flex={1}>
+            <Image
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 200,
+              }}
+              resizeMode="contain"
+              source={{
+                uri: 'https://static.zara.net/photos///2023/V/0/1/p/7901/234/942/2/w/1126/7901234942_1_1_1.jpg?ts=1677513491932',
+              }}
+            />
+          </Box>
+          <Box flex={1} gap="s">
+            <Animated.Text style={animatedTextStyle}>
+              RAK OCH ÅTSITTANDE BLAZER
+            </Animated.Text>
+            <Text variant="body">Zara</Text>
+            <Text variant="body">499kr</Text>
+            <Button
+              label="Generate"
+              onPress={handleGenerate}
+              variant="tertiary"
+              fontSize={14}
+              color="textOnBackground"
+            ></Button>
+          </Box>
+        </Animated.View>
+      </Animated.View>
+    </GestureDetector>
   );
 }
