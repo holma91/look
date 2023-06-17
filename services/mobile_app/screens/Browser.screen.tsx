@@ -26,10 +26,28 @@ const MIN_HEIGHT = 0;
 const MEDIUM_HEIGHT = 300;
 const MAX_HEIGHT = SCREEN_HEIGHT - 115;
 
+type Product = {
+  name: string;
+  brand: string;
+  price: string;
+  currency: string;
+  images: string[];
+};
+
 export default function Browser({ navigation }: { navigation: any }) {
   const [url, setUrl] = useState('https://zalando.com/');
   const [search, setSearch] = useState('');
   const [expandedMenu, setExpandedMenu] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState({
+    name: 'RAK BLAZER',
+    brand: 'Zara',
+    price: '599',
+    currency: 'SEK',
+    images: [
+      'https://static.zara.net/photos///2023/V/0/1/p/7901/234/942/2/w/1126/7901234942_1_1_1.jpg?ts=1677513491932',
+    ],
+  });
+
   const webviewRef = useRef<WebView>(null);
 
   const bottomSheetHeight = useSharedValue(0);
@@ -56,6 +74,39 @@ export default function Browser({ navigation }: { navigation: any }) {
     }
   };
 
+  const handleNavigationStateChange = (navState: any) => {
+    if (!navState.loading && webviewRef.current) {
+      // we are using var instead of let/const because of a console error
+      const script = `
+        try {
+          var elements = document.querySelectorAll('script[type="application/ld+json"]');
+  
+          var product = {};
+          var productData = JSON.parse(elements[0].textContent);
+          product['name'] = productData['name'];
+          product['brand'] = productData['brand']['name'];
+          product['price'] = productData['offers'][0]['price'];
+          product['currency'] = productData['offers'][0]['priceCurrency'];
+          product['images'] = productData['image'];
+          
+          window.ReactNativeWebView.postMessage(JSON.stringify(product));
+        } catch (e) {
+
+        }
+      `;
+
+      webviewRef.current.injectJavaScript(script);
+    }
+  };
+
+  const handleMessage = (event: any) => {
+    const product: Product = JSON.parse(event.nativeEvent.data);
+    console.log('received data:', product);
+    // do some verification here
+
+    setCurrentProduct(product);
+  };
+
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -74,11 +125,14 @@ export default function Browser({ navigation }: { navigation: any }) {
               source={{
                 uri: url,
               }}
+              onNavigationStateChange={handleNavigationStateChange}
+              onMessage={handleMessage}
             />
           </Box>
           <BottomSheet
             bottomSheetHeight={bottomSheetHeight}
             setExpandedMenu={setExpandedMenu}
+            currentProduct={currentProduct}
           />
           <NavBar
             bottomSheetHeight={bottomSheetHeight}
@@ -230,9 +284,14 @@ function NavBar({
 type BottomSheetProps = {
   bottomSheetHeight: Animated.SharedValue<number>;
   setExpandedMenu: (expanded: boolean) => void;
+  currentProduct: Product;
 };
 
-function BottomSheet({ bottomSheetHeight, setExpandedMenu }: BottomSheetProps) {
+function BottomSheet({
+  bottomSheetHeight,
+  setExpandedMenu,
+  currentProduct,
+}: BottomSheetProps) {
   const [sheetState, setSheetState] = useState<'MIN' | 'MEDIUM' | 'MAX'>('MIN');
   const [generating, setGenerating] = useState(false);
   const start = useSharedValue(0);
@@ -348,14 +407,14 @@ function BottomSheet({ bottomSheetHeight, setExpandedMenu }: BottomSheetProps) {
                   alignItems: 'center',
                   height: 200,
                 }}
-                source={require('../assets/test4.jpeg')}
+                source={currentProduct.images[0]}
                 contentFit="contain"
               />
             </Box>
             <Box flex={1} gap="s">
-              <Text>RAK OCH ÅTSITTANDE BLAZER</Text>
-              <Text variant="body">Zara</Text>
-              <Text variant="body">499kr</Text>
+              <Text>{currentProduct.name}</Text>
+              <Text variant="body">{currentProduct.brand}</Text>
+              <Text variant="body">{`${currentProduct.price} ${currentProduct.currency}`}</Text>
               {generating ? (
                 <Button
                   label="Generating..."

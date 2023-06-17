@@ -8,3 +8,9 @@ Specify how props should be mapped to values in a resulting style object, that c
 
 Restyle comes with 2 predefined components:
 **Box**:
+
+# Shopping Research
+
+### Most popular websites
+
+Zalando, Zara, Boozt, Asos, HM
