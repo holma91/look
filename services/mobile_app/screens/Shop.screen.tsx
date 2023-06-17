@@ -7,6 +7,7 @@ import {
   VariantProps,
 } from '@shopify/restyle';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { Image as ExpoImage } from 'expo-image';
 
 import { Theme } from '../styling/theme';
 import { Box } from '../styling/Box';
@@ -16,24 +17,29 @@ import { TextInput } from '../styling/TextInput';
 
 const startSites = [
   {
-    url: 'https://www.zalando.com',
+    url: 'www.zalando.com',
     name: 'Zalando',
-    icon: 'https://companieslogo.com/img/orig/ZAL.DE-38291d55.png?t=1648046036',
+    icon: require('../assets/logos/zalando.png'),
   },
   {
-    url: 'https://www.zara.com',
+    url: 'www.zara.com',
     name: 'Zara',
-    icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Zara_Logo.svg/2560px-Zara_Logo.svg.png',
+    icon: require('../assets/logos/zara.png'),
   },
   {
-    url: 'https://www.asos.com',
+    url: 'www.asos.com',
     name: 'Asos',
-    icon: 'https://static-00.iconduck.com/assets.00/asos-icon-1024x1024-67s53sn1.png',
+    icon: require('../assets/logos/asos.png'),
   },
   {
-    url: 'https://www.hm.com',
+    url: 'www.hm.com',
     name: 'H&M',
-    icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/H%26M-Logo.svg/1200px-H%26M-Logo.svg.png',
+    icon: require('../assets/logos/hm.png'),
+  },
+  {
+    url: 'www.boozt.com',
+    name: 'Boozt',
+    icon: require('../assets/logos/boozt.png'),
   },
 ];
 
@@ -149,36 +155,36 @@ export default function Shop({ navigation }: { navigation: any }) {
             <FlatList
               data={displaySites}
               renderItem={({ item }) => (
-                <Box
-                  flex={1}
-                  flexDirection="row"
-                  marginVertical="s"
-                  gap="m"
-                  alignItems="center"
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Browser', { url: item.url })
+                  }
                 >
-                  <Image
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      height: 32,
-                      width: 32,
-                    }}
-                    source={{ uri: item.icon }}
-                  />
-                  <Box>
-                    <Text variant="body" fontWeight={'bold'}>
-                      {item.name}
-                    </Text>
-                    <Text variant="body">{item.url}</Text>
+                  <Box
+                    flex={1}
+                    flexDirection="row"
+                    marginVertical="s"
+                    gap="l"
+                    alignItems="center"
+                  >
+                    <ExpoImage
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: 40,
+                        width: 40,
+                      }}
+                      source={item.icon}
+                      contentFit="contain"
+                    />
+                    <Box gap="s">
+                      <Text variant="body" fontWeight={'bold'}>
+                        {item.name}
+                      </Text>
+                      <Text variant="body">{item.url}</Text>
+                    </Box>
                   </Box>
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={24}
-                    color="black"
-                    onPress={() => navigation.navigate('Details')}
-                    alignSelf="flex-end"
-                  />
-                </Box>
+                </TouchableOpacity>
               )}
               keyExtractor={(site) => site.id}
             />

@@ -18,6 +18,7 @@ import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { TextInput } from '../styling/TextInput';
 import { Button } from '../components/Button';
+import { jsScripts } from '../utils/scripts';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -34,9 +35,15 @@ type Product = {
   images: string[];
 };
 
-export default function Browser({ navigation }: { navigation: any }) {
-  const [url, setUrl] = useState('https://zalando.com/');
-  const [search, setSearch] = useState('');
+export default function Browser({
+  navigation,
+  route,
+}: {
+  navigation: any;
+  route: any;
+}) {
+  const [url, setUrl] = useState(`https://${route.params.url}`);
+  const [search, setSearch] = useState(`${route.params.url}`);
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({
     name: 'RAK BLAZER',
@@ -49,8 +56,9 @@ export default function Browser({ navigation }: { navigation: any }) {
   });
 
   const webviewRef = useRef<WebView>(null);
-
   const bottomSheetHeight = useSharedValue(0);
+
+  console.log('url', url);
 
   const handleSearch = () => {
     console.log('searching for', search);
@@ -77,25 +85,15 @@ export default function Browser({ navigation }: { navigation: any }) {
   const handleNavigationStateChange = (navState: any) => {
     if (!navState.loading && webviewRef.current) {
       // we are using var instead of let/const because of a console error
-      const script = `
-        try {
-          var elements = document.querySelectorAll('script[type="application/ld+json"]');
-  
-          var product = {};
-          var productData = JSON.parse(elements[0].textContent);
-          product['name'] = productData['name'];
-          product['brand'] = productData['brand']['name'];
-          product['price'] = productData['offers'][0]['price'];
-          product['currency'] = productData['offers'][0]['priceCurrency'];
-          product['images'] = productData['image'];
-          
-          window.ReactNativeWebView.postMessage(JSON.stringify(product));
-        } catch (e) {
+      const match = url.match(/:\/\/(.[^/]+)/); // "www.zara.com"
+      if (match && match[1]) {
+        let domain = match[1];
+        console.log('domain', domain);
+        let script = jsScripts[domain];
+        console.log('script', script);
 
-        }
-      `;
-
-      webviewRef.current.injectJavaScript(script);
+        webviewRef.current.injectJavaScript(script);
+      }
     }
   };
 
