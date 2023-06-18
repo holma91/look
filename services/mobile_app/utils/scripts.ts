@@ -32,7 +32,7 @@ export const jsScripts: { [key: string]: string } = {
       
       window.ReactNativeWebView.postMessage(JSON.stringify(product));
     } catch (e) {
-      alert(e);
+      // alert(e);
     }
   `,
 };

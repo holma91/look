@@ -8,6 +8,23 @@ Pages:
 - Browse sites (coinbase inspo)
 - Shop on site (klarna inspo)
 
-### TODO fredag
+### TODO rn
 
-1. when at max height, make sheet non draggable (apart from the top)
+- allow favoriting of sites
+- add more sites
+
+### TODO
+
+- connectors for chosen swedish sites
+- "gallery" design, with fav stuff functionality
+- choose model UI
+- auth
+- create model UI
+- share functionality
+
+### TODO far away
+
+- write "connectors" for every website. this shouldn't be hard, say 1000 US sites and 100 swedish sites.
+- write basic adblocking software.
+- make it so that when a user favorites something, it's checked daily if the size exists etc.
+- put in shopping info somewhere in app, and autofill on sites

@@ -46,6 +46,7 @@ const startSites = [
 export default function Shop({ navigation }: { navigation: any }) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [favorites, setFavorites] = useState([]);
   const [sites, setSites] = useState(
     startSites
       .concat(startSites)
@@ -56,6 +57,10 @@ export default function Shop({ navigation }: { navigation: any }) {
   );
 
   const handleSearch = () => {};
+
+  const handleFavorite = (site: any) => {
+    console.log('handleFavorite', site);
+  };
 
   let displaySites = sites;
   if (selectedCategory === 'Favorites') {
@@ -151,40 +156,59 @@ export default function Shop({ navigation }: { navigation: any }) {
               )}
             />
           </Box>
-          <Box paddingHorizontal="m">
+          <Box>
             <FlatList
               data={displaySites}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('Browser', { url: item.url })
-                  }
+                <Box
+                  flex={1}
+                  flexDirection="row"
+                  alignItems="center"
+                  borderTopWidth={1}
+                  borderColor="grey"
+                  paddingHorizontal="m"
+                  paddingVertical="s"
                 >
-                  <Box
-                    flex={1}
-                    flexDirection="row"
-                    marginVertical="s"
-                    gap="l"
-                    alignItems="center"
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('Browser', { url: item.url })
+                    }
+                    style={{ flex: 1 }}
                   >
-                    <ExpoImage
-                      style={{
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: 40,
-                        width: 40,
-                      }}
-                      source={item.icon}
-                      contentFit="contain"
-                    />
-                    <Box gap="s">
-                      <Text variant="body" fontWeight={'bold'}>
-                        {item.name}
-                      </Text>
-                      <Text variant="body">{item.url}</Text>
+                    <Box
+                      flexDirection="row"
+                      alignItems="center"
+                      gap="l"
+                      flex={1}
+                    >
+                      <ExpoImage
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          height: 40,
+                          width: 40,
+                        }}
+                        source={item.icon}
+                        contentFit="contain"
+                      />
+                      <Box gap="s">
+                        <Text variant="body" fontWeight={'bold'}>
+                          {item.name}
+                        </Text>
+                        <Text variant="body">{item.url}</Text>
+                      </Box>
                     </Box>
-                  </Box>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                  <Ionicons
+                    name="ios-star-outline"
+                    flex={0}
+                    size={24}
+                    color="black"
+                    onPress={() => {
+                      handleFavorite(item);
+                    }}
+                  />
+                </Box>
               )}
               keyExtractor={(site) => site.id}
             />
