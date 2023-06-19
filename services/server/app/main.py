@@ -6,7 +6,9 @@ from app.api import ping, summaries
 
 log = logging.getLogger("uvicorn")
 
+
 def create_application() -> FastAPI:
+    log.info("Creating application...")
     application = FastAPI()
 
     # connect to db
@@ -18,6 +20,7 @@ def create_application() -> FastAPI:
 
 
 app = create_application()
+
 
 @app.on_event("startup")
 async def startup_event():
