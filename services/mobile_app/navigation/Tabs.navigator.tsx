@@ -2,10 +2,10 @@ import { useTheme } from '@shopify/restyle';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Create from './Create.screen';
-import Shop from './Shop.screen';
-import Profile from './Profile.screen';
-import Likes from './Likes.screen';
+import Create from '../screens/Create.screen';
+import Shop from '../screens/Shop.screen';
+import Profile from '../screens/Profile.screen';
+import Likes from '../screens/Likes.screen';
 
 const Tab = createBottomTabNavigator();
 
