@@ -9,6 +9,7 @@ WebBrowser.maybeCompleteAuthSession();
 const SignInWithOAuth = () => {
   useWarmUpBrowser();
 
+  // useOAuth: https://github.com/clerkinc/javascript/blob/main/packages/expo/src/useOAuth.ts
   const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
 
   const onPress = React.useCallback(async () => {
@@ -17,6 +18,8 @@ const SignInWithOAuth = () => {
         await startOAuthFlow();
 
       if (createdSessionId && setActive) {
+        // we have a sessionId, now we just have to make it active
+        console.log('createdSessionId', createdSessionId);
         setActive({ session: createdSessionId });
       } else {
         // Use signIn or signUp for next steps such as MFA

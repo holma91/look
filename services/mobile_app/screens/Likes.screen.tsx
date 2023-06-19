@@ -1,27 +1,12 @@
-import { Button, SafeAreaView, StyleSheet, Switch } from 'react-native';
-import {
-  createBox,
-  createText,
-  createRestyleComponent,
-  createVariant,
-  VariantProps,
-} from '@shopify/restyle';
-import { theme, darkTheme, Theme } from '../styling/theme';
-import { useState } from 'react';
-import {
-  Gesture,
-  GestureDetector,
-  PanGestureHandler,
-} from 'react-native-gesture-handler';
+import { StyleSheet } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  useAnimatedGestureHandler,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
 
-export default function Settings({ navigation }: { navigation: any }) {
+export default function Likes() {
   const isPressed = useSharedValue(false);
   const offset = useSharedValue({ x: 0, y: 0 });
   const start = useSharedValue({ x: 0, y: 0 });

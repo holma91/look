@@ -7,6 +7,7 @@ import {
   VariantProps,
 } from '@shopify/restyle';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Image as ExpoImage } from 'expo-image';
 
 import { Theme } from '../styling/theme';
@@ -44,6 +45,9 @@ const startSites = [
 ];
 
 export default function Shop({ navigation }: { navigation: any }) {
+  const auth = useAuth();
+  const user = useUser();
+
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [favorites, setFavorites] = useState([]);
