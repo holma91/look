@@ -7,6 +7,7 @@ import Settings from './Settings.screen';
 import Create from './Create.screen';
 import Shop from './Shop.screen';
 import Browse from './Browse.screen';
+import Profile from './Profile.screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -32,7 +33,7 @@ export default function TabNavigator() {
             iconName = focused ? 'ios-add-circle' : 'ios-add-circle-outline';
             return <Ionicons name={iconName} size={size} color={color} />;
           } else if (route.name === 'Browse') {
-            iconName = focused ? 'web' : 'web';
+            iconName = focused ? 'heart' : 'heart-outline';
             return (
               <MaterialCommunityIcons
                 name={iconName}
@@ -40,8 +41,8 @@ export default function TabNavigator() {
                 color={color}
               />
             );
-          } else if (route.name === 'Settings') {
-            iconName = focused ? 'ios-settings' : 'ios-settings-outline';
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'ios-person' : 'ios-person-outline';
             return <Ionicons name={iconName} size={size} color={color} />;
           }
 
@@ -56,7 +57,7 @@ export default function TabNavigator() {
       <Tab.Screen name="Shop" component={Shop} />
       <Tab.Screen name="Create" component={Create} />
       <Tab.Screen name="Browse" component={Browse} />
-      <Tab.Screen name="Settings" component={Settings} />
+      <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );
 }
