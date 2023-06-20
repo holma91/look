@@ -85,3 +85,14 @@ Recommends to determine a style to use as the core of the prompt, e.g: `high det
 ### Combine all different charactheristic to create "persons"
 
 **Base structure**: Hair color, Hairstyle, Eyes, Ears, Skin, Body Modifier, Emotion, Pose, Setting
+
+Notes from https://mythicalai.substack.com/p/how-to-create-consistent-characters.
+
+## Simple trick to get consistent characters in SD
+
+Notes from https://www.reddit.com/r/StableDiffusion/comments/zv5mbq/simple_trick_i_use_to_get_consistent_characters/
+
+Do a gender and ethnicity swap.
+**Example for woman->man**:
+prompt: `[man: Scarlett Johansen: 0.5] as a 25 year old asian male, smiling, stunningly beautiful, zeiss lens, half length shot, ultra realistic, octane render, 8k`
+negative prompt: `female,women`

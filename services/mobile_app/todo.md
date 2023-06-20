@@ -10,8 +10,8 @@ Pages:
 
 ### TODO rn
 
-- allow favoriting of sites
-- add more sites
+- set up fastapi with postgres (with alembic)
+- design database schema
 
 ### TODO
 

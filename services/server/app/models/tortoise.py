@@ -1,6 +1,8 @@
 from tortoise import fields, models
 from tortoise.contrib.pydantic import pydantic_model_creator
 
+# These are the models that go into the database
+# Could switch them to Pydantic models if we wanted to that maps to the DB
 
 class TextSummary(models.Model):
     url = fields.TextField()

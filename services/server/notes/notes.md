@@ -15,3 +15,21 @@ ASGI relies on the following mental model: when the client connects to the serve
 It means that there is a way for your code (in this case, your path operation functions) to declare things that it requires to work and use: "dependencies". FastAPI will then "inject" the dependencies.
 
 The Depends function is a dependency that declares another dependency, get_settings. Put another way, Depends depends on the result of get_settings. The value returned, Settings, is then assigned to the settings parameter.
+
+### Using raw sql
+
+```py
+import fastapi import FastAPI
+import asyncpg
+
+app = FastAPI()
+
+#Create DB connection
+@app.on_event('startup')
+async def startup_event():
+    app.db = await asyncpg.connect(<your db url>)
+
+@app.on_event('shutdown')
+async def shutdown_event():
+    await app.db.close()
+```
