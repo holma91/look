@@ -2,7 +2,7 @@ version: '3.8' # Docker compose file version
 
 services:
   web:
-    build: ./ # build from Dockerfile in current directory
+    build: ./
     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000 # run command on container start
     volumes:
       - ./:/usr/src/app # mount code -> container, necessary to avoid image rebuilding on every change
