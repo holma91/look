@@ -1,17 +1,17 @@
 import logging
-
 from functools import lru_cache
-from pydantic import BaseSettings, AnyUrl
+
+from pydantic import BaseSettings
+
 
 log = logging.getLogger("uvicorn")
 
 
 class Settings(BaseSettings):
     environment: str = "dev"
-    database_url: AnyUrl = None
+    testing: bool = 0
 
 
-# cache so that get_settings is only called when the environment changes
 @lru_cache()
 def get_settings() -> BaseSettings:
     log.info("Loading config settings from the environment...")

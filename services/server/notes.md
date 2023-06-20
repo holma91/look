@@ -1,12 +1,17 @@
-to start:
-`uvicorn app.main:app --reload`
+Uvicorn is the web server. FastAPI is the web framework.
 
-### Alembic
+### ASGI: Asynchronous Server Gateway Interface
 
-to generate a revision: `alembic revision -m "create account table"`
+At a very high-level, ASGI is a communication interface between apps and servers. ASGI consists of
 
-to run a migration:
-`alembic upgrade head` or `alembic upgrade <revision>`
+- a protocol server
+- an application
+  lives inside the protocol server
 
-to downgrade:
-`alembic downgrade base` or `alembic downgrade -1`
+ASGI relies on the following mental model: when the client connects to the server, we instanciate an application. We then feed incoming bytes into the app and send back whatever bytes come out. "Feed into the app" here really means call the app as if it were a function, i.e. something that takes some input, and returns an output.
+
+### Dependency injection
+
+It means that there is a way for your code (in this case, your path operation functions) to declare things that it requires to work and use: "dependencies". FastAPI will then "inject" the dependencies.
+
+The Depends function is a dependency that declares another dependency, get_settings. Put another way, Depends depends on the result of get_settings. The value returned, Settings, is then assigned to the settings parameter.
