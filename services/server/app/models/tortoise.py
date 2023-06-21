@@ -9,7 +9,7 @@ class User(models.Model):
     )
 
 class Website(models.Model):
-    domain = fields.TextField()
+    domain = fields.TextField(pk=True)
     multi_brand = fields.BooleanField()
     second_hand = fields.BooleanField()
 

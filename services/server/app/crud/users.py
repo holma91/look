@@ -1,5 +1,5 @@
-from app.models.tortoise import User
-from app.models.pydantic import UserPayloadSchema
+import asyncio
+from app.models.tortoise import User, Website, UserSchema, WebsiteSchema
 
 async def get(id: str) -> dict:
     user = await User.filter(id=id).first().values()
@@ -7,8 +7,20 @@ async def get(id: str) -> dict:
         return user
     return None
 
+async def get_favorites(id: str) -> list:
+    # favorite_websites = await Website.filter(users__id=id).all().values()
+    websites = await Website.filter(users__id=id).all()
+    user = await User.get(id=id)
+    websites = await user.favorites.all()
+
+    return await asyncio.gather(
+        *(WebsiteSchema.from_tortoise_orm(website) for website in websites)
+    )
+
+
+
 async def get_all() -> list:
-    users = await User.all().values()
+    users = await User.all().values() # maybe it doesn't want to do a join by default?
     return users
 
 # Below are the functions that will ONLY be called by the clerk webhook

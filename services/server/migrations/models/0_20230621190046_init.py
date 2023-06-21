@@ -7,8 +7,7 @@ async def upgrade(db: BaseDBAsyncClient) -> str:
     "id" TEXT NOT NULL  PRIMARY KEY
 );
 CREATE TABLE IF NOT EXISTS "website" (
-    "id" SERIAL NOT NULL PRIMARY KEY,
-    "domain" TEXT NOT NULL,
+    "domain" TEXT NOT NULL  PRIMARY KEY,
     "multi_brand" BOOL NOT NULL,
     "second_hand" BOOL NOT NULL
 );
@@ -20,7 +19,7 @@ CREATE TABLE IF NOT EXISTS "aerich" (
 );
 CREATE TABLE IF NOT EXISTS "user_website" (
     "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
-    "website_id" INT NOT NULL REFERENCES "website" ("id") ON DELETE CASCADE
+    "website_id" TEXT NOT NULL REFERENCES "website" ("domain") ON DELETE CASCADE
 );"""
 
 
