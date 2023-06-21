@@ -8,3 +8,13 @@ class SummaryPayloadSchema(BaseModel):
 
 class SummaryResponseSchema(SummaryPayloadSchema):
     id: int
+
+
+############### LOOK ###############
+
+class UserPayloadSchema(BaseModel):
+    user_id: str
+
+
+class UserResponseSchema(UserPayloadSchema):
+    id: int

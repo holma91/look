@@ -4,7 +4,7 @@ import logging
 from fastapi import FastAPI
 import asyncpg
 
-from app.api import ping, summaries
+from app.api import ping, summaries, users
 from app.db import init_db
 
 
@@ -15,11 +15,16 @@ def create_application() -> FastAPI:
     application = FastAPI()
     application.include_router(ping.router)
     application.include_router(summaries.router, prefix="/summaries", tags=["summaries"])
+    application.include_router(users.router, prefix="/users", tags=["users"])
 
     return application
 
 
 app = create_application()
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
 
 
 @app.on_event("startup")
@@ -32,4 +37,5 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
+    await app.db.close()
     log.info("Shutting down...")

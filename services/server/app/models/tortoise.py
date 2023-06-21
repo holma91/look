@@ -1,9 +1,6 @@
 from tortoise import fields, models
 from tortoise.contrib.pydantic import pydantic_model_creator
 
-# These are the models that go into the database
-# Could switch them to Pydantic models if we wanted to that maps to the DB
-
 class TextSummary(models.Model):
     url = fields.TextField()
     summary = fields.TextField()
@@ -14,3 +11,19 @@ class TextSummary(models.Model):
 
 
 SummarySchema = pydantic_model_creator(TextSummary) # generates a Pydantic model from a Tortoise model
+
+############### LOOK ###############
+
+class User(models.Model):
+    id = fields.TextField(pk=True)
+    favorites = fields.ManyToManyField(
+        'models.Website', related_name='users', through='user_website'
+    )
+
+class Website(models.Model):
+    domain = fields.TextField()
+    multi_brand = fields.BooleanField()
+    second_hand = fields.BooleanField()
+
+UserSchema = pydantic_model_creator(User)
+WebsiteSchema = pydantic_model_creator(Website)
