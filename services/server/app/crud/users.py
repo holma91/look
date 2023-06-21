@@ -14,7 +14,7 @@ async def get_all() -> list:
 
 async def post(payload: UserPayloadSchema) -> int:
     user = User(
-        id=payload.user_id
+        id=payload.id
     )
     await user.save()
     return user.id

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from typing import List
 
-from app.api import crud
+from app.crud import summaries as crud
 from app.models.pydantic import SummaryPayloadSchema, SummaryResponseSchema
 from app.models.tortoise import SummarySchema
 

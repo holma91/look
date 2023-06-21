@@ -22,9 +22,9 @@ async def read_all_users() -> list[UserSchema]:
 
 @router.post("/", response_model=UserResponseSchema, status_code=201)
 async def create_user(payload: UserPayloadSchema) -> UserResponseSchema:
-    user_id = await crud.post(payload)
+    id = await crud.post(payload)
 
     response_object = {
-        "user_id": user_id,
+        "id": id,
     }
     return response_object

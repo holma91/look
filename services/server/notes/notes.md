@@ -33,3 +33,10 @@ async def startup_event():
 async def shutdown_event():
     await app.db.close()
 ```
+
+### Syncing clerk and our DB
+
+every time someone signs up -> create user in DB
+every time someone removes their account -> remove user in DB
+
+Both these operations should only exist in one place, so it should not be that hard to keep in sync.

@@ -4,7 +4,7 @@ import logging
 from fastapi import FastAPI
 import asyncpg
 
-from app.api import ping, summaries, users
+from app.routes import ping, summaries, users
 from app.db import init_db
 
 

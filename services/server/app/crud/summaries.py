@@ -1,9 +1,7 @@
-from typing import Union, List
+from typing import Union
 
 from app.models.pydantic import SummaryPayloadSchema
 from app.models.tortoise import TextSummary
-
-# could write raw SQL queries here instead of this BS
 
 async def get(id: int) -> Union[dict, None]:
     summary = await TextSummary.filter(id=id).first().values()
@@ -11,7 +9,7 @@ async def get(id: int) -> Union[dict, None]:
         return summary
     return None
 
-async def get_all() -> List:
+async def get_all() -> list:
     summaries = await TextSummary.all().values()
     return summaries
 
