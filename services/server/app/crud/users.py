@@ -1,12 +1,6 @@
 from app.models.tortoise import User
 from app.models.pydantic import UserPayloadSchema
 
-
-# clerk webhooks
-# listen for user.created
-# listen for user.deleted
-# listen for user.updated
-
 async def get(id: str) -> dict:
     user = await User.filter(id=id).first().values()
     if user:
@@ -17,9 +11,18 @@ async def get_all() -> list:
     users = await User.all().values()
     return users
 
-async def post(payload: UserPayloadSchema) -> int:
+# Below are the functions that will ONLY be called by the clerk webhook
+
+async def create(id: str) -> int:
     user = User(
-        id=payload.id
+        id=id
     )
     await user.save()
     return user.id
+
+async def update(id: str) -> int:
+    return id
+
+async def delete(id: str) -> int:
+    user = await User.filter(id=id).first().delete()
+    return user

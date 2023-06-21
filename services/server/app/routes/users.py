@@ -1,9 +1,10 @@
 import logging
-from typing import Any
+import os
+
 from fastapi import APIRouter, HTTPException, Request
+from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserResponseSchema, UserPayloadSchema
 from app.models.tortoise import UserSchema
 
 
@@ -23,17 +24,36 @@ async def read_user(id: str) -> UserSchema:
 async def read_all_users() -> list[UserSchema]:
     return await crud.get_all()
 
+
+WEBHOOK_SECRET = os.environ.get("CLERK_WEBHOOK_SECRET")
+
 @router.post("/")
 async def handle_user(request: Request) -> dict:
+    """
+    Handles a user webhook from Clerk
+    """
+    # verify webhook signature
+    headers = request.headers
+    payload = await request.body()
+
+    try:
+        wh = Webhook(WEBHOOK_SECRET)
+        msg = wh.verify(payload, headers)
+    except WebhookVerificationError as e:
+        log.info("Invalid webhook signature: %s", e)
+        raise HTTPException(status_code=400, detail="Invalid payload type")
+
     body = await request.json() 
-    print("payload.type:", body['type'])
-    log.info("payload: %s", body)
+    user_id = body['data']['id']
 
     if body['type'] == 'user.created':
-        crud.create(body['data']['id'])
-    elif body['type'] == 'user.deleted':
-        crud.delete(body['data']['id'])
+        await crud.create(user_id)
     elif body['type'] == 'user.updated':
-        pass
+        await crud.update(user_id)
+    elif body['type'] == 'user.deleted':
+        await crud.delete(user_id)
+    else:
+        log.info("Invalid payload type: %s", body['type'])
+        raise HTTPException(status_code=400, detail="Invalid payload type")
     
-    return {"message": "Webhook received"}
+    return {"message": "User with id {user_id} updated"}

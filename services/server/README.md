@@ -1,3 +1,9 @@
+### Start app, step by step
+
+1. `docker compose up -d --build`
+2. `docker compose exec web aerich init -t app.db.TORTOISE_ORM`
+3. `docker compose exec web aerich init-db`
+
 ### Poetry
 
 add a dep: `poetry add <package name>`

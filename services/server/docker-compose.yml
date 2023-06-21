@@ -13,6 +13,7 @@ services:
       - TESTING=0
       - DATABASE_URL=postgres://postgres:postgres@web-db:5432/web_dev
       - DATABASE_TEST_URL=postgres://postgres:postgres@web-db:5432/web_test
+      - CLERK_WEBHOOK_SECRET=${CLERK_WEBHOOK_SECRET}
     depends_on:
       - web-db
 
