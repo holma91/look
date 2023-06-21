@@ -2,6 +2,11 @@ from app.models.tortoise import User
 from app.models.pydantic import UserPayloadSchema
 
 
+# clerk webhooks
+# listen for user.created
+# listen for user.deleted
+# listen for user.updated
+
 async def get(id: str) -> dict:
     user = await User.filter(id=id).first().values()
     if user:

@@ -1,10 +1,10 @@
 import os
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import asyncpg
 
-from app.routes import ping, summaries, users
+from app.routes import ping, users
 from app.db import init_db
 
 
@@ -14,7 +14,6 @@ log = logging.getLogger("uvicorn")
 def create_application() -> FastAPI:
     application = FastAPI()
     application.include_router(ping.router)
-    application.include_router(summaries.router, prefix="/summaries", tags=["summaries"])
     application.include_router(users.router, prefix="/users", tags=["users"])
 
     return application
@@ -31,11 +30,8 @@ def read_root():
 async def startup_event():
     log.info("Starting up...")
     init_db(app)
-    app.db = await asyncpg.connect(os.environ.get("DATABASE_URL"))
-    print("app.db: ", app.db)
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await app.db.close()
     log.info("Shutting down...")

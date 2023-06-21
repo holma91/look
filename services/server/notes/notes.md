@@ -39,4 +39,14 @@ async def shutdown_event():
 every time someone signs up -> create user in DB
 every time someone removes their account -> remove user in DB
 
-Both these operations should only exist in one place, so it should not be that hard to keep in sync.
+Keep in sync by using Clerk webhooks. This is what the payload looks like for user.created:
+
+```
+{
+   "object": "event",
+   "type": "user.created",
+   "data": {
+      // user object
+  }
+}
+```

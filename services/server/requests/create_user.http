@@ -2,5 +2,6 @@ POST http://localhost:8004/users HTTP/1.1
 content-type: application/json
 
 {
-    "id": "user_2RPiL6iYDS0b8tAyupZhEKNwLZk"
+    "name": "John Doe",
+    "email": ""
 }
