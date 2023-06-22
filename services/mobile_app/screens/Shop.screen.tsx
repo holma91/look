@@ -1,11 +1,5 @@
 import { FlatList, Image, SafeAreaView, TouchableOpacity } from 'react-native';
-import {
-  createBox,
-  createText,
-  createRestyleComponent,
-  createVariant,
-  VariantProps,
-} from '@shopify/restyle';
+import { useQuery } from '@tanstack/react-query';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Image as ExpoImage } from 'expo-image';
@@ -44,13 +38,36 @@ const startSites = [
   },
 ];
 
-export default function Shop({ navigation }: { navigation: any }) {
-  const auth = useAuth();
-  const user = useUser();
+const URL = 'https://4566-146-70-202-4.ngrok-free.app';
+const fetchWebsites = async (id: string) => {
+  const completeUrl = `${URL}/websites/`;
+  const response = await fetch(completeUrl);
 
-  const [search, setSearch] = useState('');
+  // get all websites
+  // get all favorites
+
+  if (!response.ok) {
+    throw new Error(
+      `Network response was not ok. Status code: ${response.status}`
+    );
+  }
+  return response.json();
+};
+
+const fetchFavoriteWebsites = async (id: string) => {
+  const completeUrl = `${URL}/users/${id}/websites`;
+  const response = await fetch(completeUrl);
+
+  if (!response.ok) {
+    throw new Error(
+      `Network response was not ok. Status code: ${response.status}`
+    );
+  }
+  return response.json();
+};
+
+export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [favorites, setFavorites] = useState([]);
   const [sites, setSites] = useState(
     startSites
       .concat(startSites)
@@ -60,16 +77,36 @@ export default function Shop({ navigation }: { navigation: any }) {
       })
   );
 
-  const handleSearch = () => {};
+  const { user } = useUser();
+  const userId = user?.id;
+
+  const { status, data: allWebsites } = useQuery({
+    queryKey: ['info', user?.id],
+    queryFn: () => fetchWebsites(userId as string),
+    enabled: !!userId,
+  });
+
+  console.log('data', allWebsites);
+
+  if (status === 'loading') {
+    return <Text>Loading...</Text>;
+  }
+
+  if (status === 'error') {
+    return <Text>Error</Text>;
+  }
 
   const handleFavorite = (site: any) => {
     console.log('handleFavorite', site);
+    // make request to backend to add favorite
   };
 
   let displaySites = sites;
   if (selectedCategory === 'Favorites') {
     displaySites = sites.filter((site) => site.name === 'Zalando');
-  } else if (selectedCategory === 'All') {
+  } else if (selectedCategory === 'Luxury') {
+    displaySites = sites.filter((site) => site.name === 'Zara');
+  } else {
     displaySites = sites;
   }
 
@@ -77,50 +114,10 @@ export default function Shop({ navigation }: { navigation: any }) {
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1} gap="s">
-          <Box
-            flex={0}
-            flexDirection="row"
-            alignItems="center"
-            gap="s"
-            paddingBottom="s"
-            paddingHorizontal="m"
-          >
-            <Box
-              flex={1}
-              backgroundColor="grey"
-              borderRadius={20}
-              flexDirection="row"
-              alignItems="center"
-              paddingHorizontal="m"
-              paddingVertical="xxs"
-            >
-              <TextInput
-                onChangeText={setSearch}
-                value={search}
-                autoCapitalize="none"
-                autoComplete="off"
-                autoCorrect={false}
-                inputMode="url"
-                variant="secondary"
-                onSubmitEditing={handleSearch}
-                selectTextOnFocus={true}
-                placeholder="Search and shop anywhere"
-                placeholderTextColor="black"
-              />
-              <Ionicons
-                name="search"
-                size={18}
-                color="black"
-                style={{ position: 'absolute', left: 15 }}
-              />
-            </Box>
-            <Ionicons
-              name="ellipsis-vertical"
-              flex={0}
-              size={24}
-              color="black"
-            />
-          </Box>
+          {allWebsites.map((site: any) => (
+            <Text key={site.domain}>{site.domain}</Text>
+          ))}
+          <SearchBar />
           <Text variant="title" paddingHorizontal="m">
             Top sites
           </Text>
@@ -219,6 +216,54 @@ export default function Shop({ navigation }: { navigation: any }) {
           </Box>
         </Box>
       </SafeAreaView>
+    </Box>
+  );
+}
+
+function SearchBar() {
+  const [search, setSearch] = useState('');
+
+  const handleSearch = () => {};
+
+  return (
+    <Box
+      flex={0}
+      flexDirection="row"
+      alignItems="center"
+      gap="s"
+      paddingBottom="s"
+      paddingHorizontal="m"
+    >
+      <Box
+        flex={1}
+        backgroundColor="grey"
+        borderRadius={20}
+        flexDirection="row"
+        alignItems="center"
+        paddingHorizontal="m"
+        paddingVertical="xxs"
+      >
+        <TextInput
+          onChangeText={setSearch}
+          value={search}
+          autoCapitalize="none"
+          autoComplete="off"
+          autoCorrect={false}
+          inputMode="url"
+          variant="secondary"
+          onSubmitEditing={handleSearch}
+          selectTextOnFocus={true}
+          placeholder="Search and shop anywhere"
+          placeholderTextColor="black"
+        />
+        <Ionicons
+          name="search"
+          size={18}
+          color="black"
+          style={{ position: 'absolute', left: 15 }}
+        />
+      </Box>
+      <Ionicons name="ellipsis-vertical" flex={0} size={24} color="black" />
     </Box>
   );
 }

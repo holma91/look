@@ -3,13 +3,13 @@ import * as WebBrowser from 'expo-web-browser';
 import { Button } from 'react-native';
 import { useOAuth } from '@clerk/clerk-expo';
 import { useWarmUpBrowser } from '../hooks/useWarmUpBrowser';
+// import { useOAuth } from '../hooks/useOAuth';
 
 WebBrowser.maybeCompleteAuthSession();
 
 const SignInWithOAuth = () => {
   useWarmUpBrowser();
 
-  // useOAuth: https://github.com/clerkinc/javascript/blob/main/packages/expo/src/useOAuth.ts
   const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
 
   const onPress = React.useCallback(async () => {
