@@ -3,7 +3,13 @@ VALUES
     ('zara.com', false, false),
     ('zalando.com', true, false),
     ('boozt.com', true, false),
-    ('hm.com', false, false);
+    ('hm.com', false, false),
+    ('asos.com', true, false),
+    ('softgoat.com', false, false),
+    ('adaysmarch.com', false, false),
+    ('sellpy.com', true, true),
+    ('nakd.com', false, false),
+    ('careofcarl.com', true, false);
 
 INSERT INTO user_website (user_id, website_id)
 VALUES
