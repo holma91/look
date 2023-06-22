@@ -7,50 +7,8 @@ import { Image as ExpoImage } from 'expo-image';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { useEffect, useState } from 'react';
-import { TextInput } from '../styling/TextInput';
-
-const domainToInfo: { [key: string]: { name: string; icon: any } } = {
-  'zalando.com': {
-    name: 'Zalando',
-    icon: require('../assets/logos/zalando.png'),
-  },
-  'zara.com': {
-    name: 'Zara',
-    icon: require('../assets/logos/zara.png'),
-  },
-  'asos.com': {
-    name: 'Asos',
-    icon: require('../assets/logos/asos.png'),
-  },
-  'hm.com': {
-    name: 'H&M',
-    icon: require('../assets/logos/hm.png'),
-  },
-  'boozt.com': {
-    name: 'Boozt',
-    icon: require('../assets/logos/boozt.png'),
-  },
-  'sellpy.com': {
-    name: 'Sellpy',
-    icon: require('../assets/logos/sellpy.png'),
-  },
-  'nakd.com': {
-    name: 'Nakd',
-    icon: require('../assets/logos/nakd.png'),
-  },
-  'softgoat.com': {
-    name: 'Softgoat',
-    icon: require('../assets/logos/softgoat.png'),
-  },
-  'careofcarl.com': {
-    name: 'Care of Carl',
-    icon: require('../assets/logos/careofcarl.png'),
-  },
-  'adaysmarch.com': {
-    name: "A Day's March",
-    icon: require('../assets/logos/adaysmarch.png'),
-  },
-};
+import { domainToInfo } from '../utils/utils';
+import { SearchBar } from '../components/SearchBar';
 
 type WebsiteItem = {
   domain: string;
@@ -90,6 +48,7 @@ export default function Shop({ navigation }: { navigation: any }) {
 
   const mutation = useMutation({
     mutationFn: async (website: WebsiteItem) => {
+      // add error handling later
       const userId = user?.id;
       if (website.is_favorite) {
         const response = await fetch(
@@ -127,19 +86,18 @@ export default function Shop({ navigation }: { navigation: any }) {
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['websites'] });
     },
-    onSettled: async () => {},
   });
 
   useEffect(() => {
     let filtered;
     if (selectedCategory === 'Favorites') {
-      filtered = websites.filter((site: any) => site.is_favorite);
+      filtered = websites.filter((site: WebsiteItem) => site.is_favorite);
     } else if (selectedCategory === 'Multi') {
-      filtered = websites.filter((site: any) => site.multi_brand);
+      filtered = websites.filter((site: WebsiteItem) => site.multi_brand);
     } else if (selectedCategory === 'Single') {
-      filtered = websites.filter((site: any) => !site.multi_brand);
+      filtered = websites.filter((site: WebsiteItem) => !site.multi_brand);
     } else if (selectedCategory === '2nd hand') {
-      filtered = websites.filter((site: any) => site.second_hand);
+      filtered = websites.filter((site: WebsiteItem) => site.second_hand);
     } else {
       filtered = websites;
     }
@@ -159,7 +117,7 @@ export default function Shop({ navigation }: { navigation: any }) {
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1} gap="s">
-          <SearchBar />
+          <SearchBar navigation={navigation} isFakeSearchBar={true} />
           <Text variant="title" paddingHorizontal="m">
             Top sites
           </Text>
@@ -258,54 +216,6 @@ export default function Shop({ navigation }: { navigation: any }) {
           </Box>
         </Box>
       </SafeAreaView>
-    </Box>
-  );
-}
-
-function SearchBar() {
-  const [search, setSearch] = useState('');
-
-  const handleSearch = () => {};
-
-  return (
-    <Box
-      flex={0}
-      flexDirection="row"
-      alignItems="center"
-      gap="s"
-      paddingBottom="s"
-      paddingHorizontal="m"
-    >
-      <Box
-        flex={1}
-        backgroundColor="grey"
-        borderRadius={20}
-        flexDirection="row"
-        alignItems="center"
-        paddingHorizontal="m"
-        paddingVertical="xxs"
-      >
-        <TextInput
-          onChangeText={setSearch}
-          value={search}
-          autoCapitalize="none"
-          autoComplete="off"
-          autoCorrect={false}
-          inputMode="url"
-          variant="secondary"
-          onSubmitEditing={handleSearch}
-          selectTextOnFocus={true}
-          placeholder="Search and shop anywhere"
-          placeholderTextColor="black"
-        />
-        <Ionicons
-          name="search"
-          size={18}
-          color="black"
-          style={{ position: 'absolute', left: 15 }}
-        />
-      </Box>
-      <Ionicons name="ellipsis-vertical" flex={0} size={24} color="black" />
     </Box>
   );
 }

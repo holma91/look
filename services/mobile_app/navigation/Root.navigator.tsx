@@ -4,6 +4,7 @@ import { ClerkLoaded, useUser } from '@clerk/clerk-expo';
 import TabNavigator from './Tabs.navigator';
 import Browser from '../screens/Browser.screen';
 import SignUpOrIn from '../screens/SignUpOrIn.screen';
+import Search from '../screens/Search.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,11 @@ export default function RootNavigator() {
           <>
             <Stack.Screen name="Home" component={TabNavigator} />
             <Stack.Screen name="Browser" component={Browser} />
+            <Stack.Screen
+              name="Search"
+              component={Search}
+              options={{ animation: 'none' }}
+            />
           </>
         ) : (
           <Stack.Screen name="SignUpOrIn" component={SignUpOrIn} />

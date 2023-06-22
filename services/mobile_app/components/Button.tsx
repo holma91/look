@@ -1,9 +1,6 @@
 import * as React from 'react';
 import { TouchableOpacity } from 'react-native';
 import {
-  SpacingProps,
-  BorderProps,
-  BackgroundColorProps,
   VariantProps,
   createRestyleComponent,
   createVariant,
