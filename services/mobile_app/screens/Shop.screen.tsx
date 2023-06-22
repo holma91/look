@@ -4,58 +4,44 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Image as ExpoImage } from 'expo-image';
 
-import { Theme } from '../styling/theme';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TextInput } from '../styling/TextInput';
 
-const startSites = [
-  {
-    url: 'www.zalando.com',
+const domainToInfo: { [key: string]: { name: string; icon: any } } = {
+  'zalando.com': {
     name: 'Zalando',
     icon: require('../assets/logos/zalando.png'),
   },
-  {
-    url: 'www.zara.com',
+  'zara.com': {
     name: 'Zara',
     icon: require('../assets/logos/zara.png'),
   },
-  {
-    url: 'www.asos.com',
+  'asos.com': {
     name: 'Asos',
     icon: require('../assets/logos/asos.png'),
   },
-  {
-    url: 'www.hm.com',
+  'hm.com': {
     name: 'H&M',
     icon: require('../assets/logos/hm.png'),
   },
-  {
-    url: 'www.boozt.com',
+  'boozt.com': {
     name: 'Boozt',
     icon: require('../assets/logos/boozt.png'),
   },
-];
+};
+
+type WebsiteItem = {
+  domain: string;
+  is_favorite: string;
+  multi_brand: boolean;
+  second_hand: boolean;
+};
 
 const URL = 'https://4566-146-70-202-4.ngrok-free.app';
 const fetchWebsites = async (id: string) => {
-  const completeUrl = `${URL}/websites/`;
-  const response = await fetch(completeUrl);
-
-  // get all websites
-  // get all favorites
-
-  if (!response.ok) {
-    throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
-    );
-  }
-  return response.json();
-};
-
-const fetchFavoriteWebsites = async (id: string) => {
-  const completeUrl = `${URL}/users/${id}/websites`;
+  const completeUrl = `${URL}/websites/?user_id=${id}`;
   const response = await fetch(completeUrl);
 
   if (!response.ok) {
@@ -68,25 +54,16 @@ const fetchFavoriteWebsites = async (id: string) => {
 
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [sites, setSites] = useState(
-    startSites
-      .concat(startSites)
-      .concat(startSites)
-      .map((site, i) => {
-        return { ...site, id: i.toString() };
-      })
-  );
+  const [filteredSites, setFilteredSites] = useState([]);
 
   const { user } = useUser();
   const userId = user?.id;
 
-  const { status, data: allWebsites } = useQuery({
+  const { status, data: websites } = useQuery({
     queryKey: ['info', user?.id],
     queryFn: () => fetchWebsites(userId as string),
     enabled: !!userId,
   });
-
-  console.log('data', allWebsites);
 
   if (status === 'loading') {
     return <Text>Loading...</Text>;
@@ -101,22 +78,29 @@ export default function Shop({ navigation }: { navigation: any }) {
     // make request to backend to add favorite
   };
 
-  let displaySites = sites;
-  if (selectedCategory === 'Favorites') {
-    displaySites = sites.filter((site) => site.name === 'Zalando');
-  } else if (selectedCategory === 'Luxury') {
-    displaySites = sites.filter((site) => site.name === 'Zara');
-  } else {
-    displaySites = sites;
-  }
+  useEffect(() => {
+    let filtered;
+    if (selectedCategory === 'Favorites') {
+      filtered = websites.filter((site: any) => site.is_favorite);
+    } else if (selectedCategory === 'Multi') {
+      filtered = websites.filter((site: any) => site.multi_brand);
+    } else if (selectedCategory === 'Single') {
+      filtered = websites.filter((site: any) => !site.multi_brand);
+    } else if (selectedCategory === '2nd hand') {
+      filtered = websites.filter((site: any) => site.second_hand);
+    } else {
+      filtered = websites;
+    }
+
+    setFilteredSites(filtered);
+  }, [selectedCategory]);
+
+  // console.log('sites:', sites);
 
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1} gap="s">
-          {allWebsites.map((site: any) => (
-            <Text key={site.domain}>{site.domain}</Text>
-          ))}
           <SearchBar />
           <Text variant="title" paddingHorizontal="m">
             Top sites
@@ -129,8 +113,8 @@ export default function Shop({ navigation }: { navigation: any }) {
               data={[
                 { label: 'Favorites' },
                 { label: 'All' },
-                { label: 'Luxury' },
-                { label: 'Cheap' },
+                { label: 'Multi' },
+                { label: 'Single' },
                 { label: '2nd hand' },
                 { label: 'Other' },
               ]}
@@ -158,8 +142,8 @@ export default function Shop({ navigation }: { navigation: any }) {
             />
           </Box>
           <Box>
-            <FlatList
-              data={displaySites}
+            <FlatList<WebsiteItem>
+              data={filteredSites}
               renderItem={({ item }) => (
                 <Box
                   flex={1}
@@ -172,7 +156,7 @@ export default function Shop({ navigation }: { navigation: any }) {
                 >
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate('Browser', { url: item.url })
+                      navigation.navigate('Browser', { url: item.domain })
                     }
                     style={{ flex: 1 }}
                   >
@@ -189,14 +173,14 @@ export default function Shop({ navigation }: { navigation: any }) {
                           height: 40,
                           width: 40,
                         }}
-                        source={item.icon}
+                        source={domainToInfo[item.domain].icon}
                         contentFit="contain"
                       />
                       <Box gap="s">
                         <Text variant="body" fontWeight={'bold'}>
-                          {item.name}
+                          {domainToInfo[item.domain].name}
                         </Text>
-                        <Text variant="body">{item.url}</Text>
+                        <Text variant="body">{item.domain}</Text>
                       </Box>
                     </Box>
                   </TouchableOpacity>
@@ -211,7 +195,7 @@ export default function Shop({ navigation }: { navigation: any }) {
                   />
                 </Box>
               )}
-              keyExtractor={(site) => site.id}
+              keyExtractor={(site) => site.domain}
             />
           </Box>
         </Box>
