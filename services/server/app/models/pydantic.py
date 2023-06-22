@@ -7,3 +7,10 @@ class UserPayloadSchema(BaseModel):
 
 class UserResponseSchema(UserPayloadSchema):
     id: str
+
+
+class WebsiteUserSchema(BaseModel):
+    domain: str
+    multi_brand: bool
+    second_hand: bool
+    is_favorite: bool

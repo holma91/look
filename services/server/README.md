@@ -28,3 +28,7 @@ upgrade: `docker compose exec web aerich upgrade`
 ### HTTPie
 
 http --json POST http://localhost:8004/summaries/ url=http://testdriven.io
+
+## API Design
+
+/users, /users/id, /users/id/favorites, users/id/likes,
