@@ -1,10 +1,9 @@
-import os
 import logging
 
 from fastapi import FastAPI, Request
-import asyncpg
+from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import ping, users
+from app.routes import ping, users, websites
 from app.db import init_db
 
 
@@ -13,8 +12,10 @@ log = logging.getLogger("uvicorn")
 
 def create_application() -> FastAPI:
     application = FastAPI()
+
     application.include_router(ping.router)
     application.include_router(users.router, prefix="/users", tags=["users"])
+    application.include_router(websites.router, prefix="/websites", tags=["websites"])
 
     return application
 

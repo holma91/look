@@ -13,5 +13,8 @@ class Website(models.Model):
     multi_brand = fields.BooleanField()
     second_hand = fields.BooleanField()
 
+class Product(models.Model):
+    id = fields.TextField(pk=True) #
+
 UserSchema = pydantic_model_creator(User)
 WebsiteSchema = pydantic_model_creator(Website)

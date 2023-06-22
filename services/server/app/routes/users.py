@@ -23,10 +23,11 @@ async def read_user(id: str) -> UserSchema:
 @router.get("/{id}/favorites", response_model=list[WebsiteSchema])
 async def read_user_favorites(id: str) -> list[WebsiteSchema]:
     favorites = await crud.get_favorites(id)
-    if not favorites:
-        raise HTTPException(status_code=404, detail="User not found")
-
     return favorites
+
+@router.get("/{id}/likes", response_model=list[WebsiteSchema])
+async def read_user_likes(id: str) -> list[WebsiteSchema]:
+    pass
 
 @router.get("/", response_model=list[UserSchema])
 async def read_all_users() -> list[UserSchema]:

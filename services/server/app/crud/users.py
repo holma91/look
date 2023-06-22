@@ -7,15 +7,18 @@ async def get(id: str) -> dict:
         return user
     return None
 
-async def get_favorites(id: str) -> list:
+async def get_favorites(id: str) -> list[WebsiteSchema]:
     # favorite_websites = await Website.filter(users__id=id).all().values()
-    websites = await Website.filter(users__id=id).all()
+    # websites = await Website.filter(users__id=id).all()
     user = await User.get(id=id)
     websites = await user.favorites.all()
 
     return await asyncio.gather(
         *(WebsiteSchema.from_tortoise_orm(website) for website in websites)
     )
+
+async def get_likes(id: str) -> list:
+    pass
 
 
 
