@@ -1,5 +1,5 @@
 import { FlatList, Image, SafeAreaView, TouchableOpacity } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Image as ExpoImage } from 'expo-image';
@@ -39,7 +39,7 @@ type WebsiteItem = {
   second_hand: boolean;
 };
 
-const URL = 'https://4566-146-70-202-4.ngrok-free.app';
+const URL = 'https://ad0e-83-255-121-67.ngrok-free.app';
 const fetchWebsites = async (id: string) => {
   const completeUrl = `${URL}/websites/?user_id=${id}`;
   const response = await fetch(completeUrl);
@@ -56,27 +56,59 @@ export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [filteredSites, setFilteredSites] = useState([]);
 
+  const queryClient = useQueryClient();
+
   const { user } = useUser();
   const userId = user?.id;
 
   const { status, data: websites } = useQuery({
-    queryKey: ['info', user?.id],
+    queryKey: ['websites', user?.id],
     queryFn: () => fetchWebsites(userId as string),
     enabled: !!userId,
+    onSuccess: () => {},
   });
 
-  if (status === 'loading') {
-    return <Text>Loading...</Text>;
-  }
+  const mutation = useMutation({
+    mutationFn: async (website: WebsiteItem) => {
+      const userId = user?.id;
+      if (website.is_favorite) {
+        const response = await fetch(
+          `${URL}/users/${userId}/favorites/${website.domain}`,
+          {
+            method: 'DELETE',
+          }
+        );
 
-  if (status === 'error') {
-    return <Text>Error</Text>;
-  }
+        if (!response.ok) {
+          throw new Error(
+            `Network response was not ok. Status code: ${response.status}`
+          );
+        }
 
-  const handleFavorite = (site: any) => {
-    console.log('handleFavorite', site);
-    // make request to backend to add favorite
-  };
+        return;
+      } else {
+        const response = await fetch(
+          `${URL}/users/${userId}/favorites/${website.domain}`,
+          {
+            method: 'POST',
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Network response was not ok. Status code: ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+        return data;
+      }
+    },
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ['websites'] });
+    },
+    onSettled: async () => {},
+  });
 
   useEffect(() => {
     let filtered;
@@ -93,9 +125,15 @@ export default function Shop({ navigation }: { navigation: any }) {
     }
 
     setFilteredSites(filtered);
-  }, [selectedCategory]);
+  }, [selectedCategory, websites]);
 
-  // console.log('sites:', sites);
+  if (status === 'loading') {
+    return <Text>Loading...</Text>;
+  }
+
+  if (status === 'error') {
+    return <Text>Error</Text>;
+  }
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -185,12 +223,12 @@ export default function Shop({ navigation }: { navigation: any }) {
                     </Box>
                   </TouchableOpacity>
                   <Ionicons
-                    name="ios-star-outline"
+                    name={item.is_favorite ? 'ios-star' : 'ios-star-outline'}
                     flex={0}
                     size={24}
                     color="black"
                     onPress={() => {
-                      handleFavorite(item);
+                      mutation.mutate(item);
                     }}
                   />
                 </Box>

@@ -33,6 +33,20 @@ async def read_user_likes(id: str) -> list[WebsiteSchema]:
 async def read_all_users() -> list[UserSchema]:
     return await crud.get_all()
 
+@router.post("/{user_id}/favorites/{website_id}", status_code=200, response_model=WebsiteSchema)
+async def add_favorite(user_id: str, website_id: str) -> WebsiteSchema:
+    website = await crud.add_favorite(user_id, website_id)
+    if website is None:
+        raise HTTPException(status_code=404, detail="User or Website not found!")
+    return website
+
+
+@router.delete("/{user_id}/favorites/{website_id}", status_code=204)
+async def delete_favorite(user_id: str, website_id: str):
+    result = await crud.un_favorite(user_id, website_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="User or Website not found!")
+
 
 WEBHOOK_SECRET = os.environ.get("CLERK_WEBHOOK_SECRET")
 

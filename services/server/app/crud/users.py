@@ -1,4 +1,5 @@
 import asyncio
+from typing import Optional
 from app.models.tortoise import User, Website, UserSchema, WebsiteSchema
 
 async def get(id: str) -> dict:
@@ -8,8 +9,6 @@ async def get(id: str) -> dict:
     return None
 
 async def get_favorites(id: str) -> list[WebsiteSchema]:
-    # favorite_websites = await Website.filter(users__id=id).all().values()
-    # websites = await Website.filter(users__id=id).all()
     user = await User.get(id=id)
     websites = await user.favorites.all()
 
@@ -20,6 +19,26 @@ async def get_favorites(id: str) -> list[WebsiteSchema]:
 async def get_likes(id: str) -> list:
     pass
 
+
+async def add_favorite(user_id: str, website_id: str) -> Optional[WebsiteSchema]:
+    user = await User.get(id=user_id)
+    if user is None:
+        return None
+    website = await Website.get(domain=website_id)
+    if website is None:
+        return None
+    await user.favorites.add(website)
+    return website
+
+
+
+async def un_favorite(user_id: str, website_id: str) -> Optional[str]:
+    user = await User.get(id=user_id)
+    website = await Website.get(domain=website_id)
+    if user is None or website is None:
+        return None
+    await user.favorites.remove(website)
+    return website.domain
 
 
 async def get_all() -> list:
