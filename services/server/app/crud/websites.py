@@ -1,10 +1,4 @@
-import asyncio
 from tortoise import Tortoise
-from app.models.tortoise import Website, WebsiteSchema
-
-# async def get_all() -> list:
-#     websites = await Website.all().values()
-#     return websites
 
 async def get_all(user_id: str) -> list:
     # check if user_id exists

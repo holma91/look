@@ -1,48 +1,6 @@
-import os
-import asyncio
 from typing import Optional
 from tortoise import Tortoise
-import asyncpg
-from app.models.tortoise import User, Website, UserSchema, WebsiteSchema
-
-async def get(id: str) -> dict:
-    user = await User.filter(id=id).first().values()
-    if user:
-        return user
-    return None
-
-async def get_favorites(id: str) -> list[WebsiteSchema]:
-    user = await User.get(id=id)
-    websites = await user.favorites.all()
-
-    return await asyncio.gather(
-        *(WebsiteSchema.from_tortoise_orm(website) for website in websites)
-    )
-
-async def get_likes(id: str) -> list:
-    pass
-
-
-async def add_favorite(user_id: str, website_id: str) -> Optional[WebsiteSchema]:
-    user = await User.get(id=user_id)
-    if user is None:
-        return None
-    website = await Website.get(domain=website_id)
-    if website is None:
-        return None
-    await user.favorites.add(website)
-    return website
-
-
-
-async def un_favorite(user_id: str, website_id: str) -> Optional[str]:
-    user = await User.get(id=user_id)
-    website = await Website.get(domain=website_id)
-    if user is None or website is None:
-        return None
-    await user.favorites.remove(website)
-    return website.domain
-
+from tortoise.transactions import in_transaction
 
 async def get_all() -> list[dict]:
     conn = Tortoise.get_connection("default")
@@ -50,20 +8,66 @@ async def get_all() -> list[dict]:
         select * from "user";
     """
     users = await conn.execute_query_dict(query)
+    await conn.close()
     return users
 
-# Below are the functions that will ONLY be called by the clerk webhook
+async def get(id: str) -> dict:
+    conn = Tortoise.get_connection("default")
+    query = """
+        select * from "user" u where u.id = $1;
+    """
+    users = await conn.execute_query_dict(query, [id])
+    await conn.close()
+    return users[0]
+
+
+async def get_likes(id: str) -> list:
+    pass
+
+
+async def add_favorite(user_id: str, website_id: str) -> Optional[str]:
+    query = """
+    insert into user_website (user_id, website_id)
+    values ($1, $2);
+    """
+    async with in_transaction("default") as tconn:
+        await tconn.execute_query_dict(query, [user_id, website_id])
+
+    return website_id
+
+
+
+async def un_favorite(user_id: str, website_id: str) -> Optional[str]:
+    query = """
+    delete from user_website where user_id = $1 and website_id = $2;
+    """
+    async with in_transaction("default") as tconn:
+        await tconn.execute_query_dict(query, [user_id, website_id])
+
+    return website_id
+
+
+### CLERK WEBHOOK FUNCTIONS ###
 
 async def create(id: str) -> int:
-    user = User(
-        id=id
-    )
-    await user.save()
-    return user.id
+    conn = Tortoise.get_connection("default")
+    query = """
+    insert into "user" (id) values ($1);
+    """
+    await conn.execute_query_dict(query, [id])
+    await conn.close()
+
+    return id
 
 async def update(id: str) -> int:
     return id
 
 async def delete(id: str) -> int:
-    user = await User.filter(id=id).first().delete()
-    return user
+    conn = Tortoise.get_connection("default")
+    query = """
+    delete from "user" where id = $1;
+    """
+    await conn.execute_query_dict(query, [id])
+    await conn.close()
+
+    return id

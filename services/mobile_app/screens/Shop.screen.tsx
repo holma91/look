@@ -12,7 +12,7 @@ import { SearchBar } from '../components/SearchBar';
 
 type WebsiteItem = {
   domain: string;
-  is_favorite: string;
+  is_favorite: boolean;
   multi_brand: boolean;
   second_hand: boolean;
 };
@@ -33,6 +33,7 @@ const fetchWebsites = async (id: string) => {
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [filteredSites, setFilteredSites] = useState([]);
+  const [randomNumber, setRandomNumber] = useState(0);
 
   const queryClient = useQueryClient();
 
@@ -48,9 +49,11 @@ export default function Shop({ navigation }: { navigation: any }) {
 
   const mutation = useMutation({
     mutationFn: async (website: WebsiteItem) => {
+      // website.is_favorite is already optimistically updated
+
       // add error handling later
       const userId = user?.id;
-      if (website.is_favorite) {
+      if (!website.is_favorite) {
         const response = await fetch(
           `${URL}/users/${userId}/favorites/${website.domain}`,
           {
@@ -83,8 +86,34 @@ export default function Shop({ navigation }: { navigation: any }) {
         return data;
       }
     },
-    onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ['websites'] });
+    onMutate: async (website: WebsiteItem) => {
+      // this is before mutationFn is called, has the old website value ofc
+      website.is_favorite = !website.is_favorite;
+
+      // cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: ['websites', user?.id] });
+
+      // snapshot previous value
+      const previousWebsite = queryClient.getQueryData([
+        'websites',
+        website.domain,
+      ]);
+
+      queryClient.setQueryData(['websites', website.domain], website);
+
+      return { previousWebsite, website };
+    },
+    onError: (err, website, context) => {
+      console.log('error', err, website, context);
+      queryClient.setQueryData(
+        ['websites', context?.website.domain],
+        context?.previousWebsite
+      );
+    },
+    onSettled: async () => {
+      setRandomNumber(Math.random()); // used temporarily to force a list re-render
+
+      queryClient.invalidateQueries({ queryKey: ['websites', user?.id] });
     },
   });
 
@@ -103,7 +132,7 @@ export default function Shop({ navigation }: { navigation: any }) {
     }
 
     setFilteredSites(filtered);
-  }, [selectedCategory, websites]);
+  }, [selectedCategory, websites, randomNumber]);
 
   if (status === 'loading') {
     return <Text>Loading...</Text>;
@@ -118,9 +147,6 @@ export default function Shop({ navigation }: { navigation: any }) {
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1} gap="s">
           <SearchBar navigation={navigation} isFakeSearchBar={true} />
-          {/* <Text variant="title" paddingHorizontal="m">
-            Popular sites
-          </Text> */}
           <Box flexDirection="row" gap="m" marginVertical="s">
             <FlatList
               style={{ flex: 1, gap: 10 }}

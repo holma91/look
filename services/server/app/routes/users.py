@@ -5,12 +5,15 @@ from fastapi import APIRouter, HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.tortoise import UserSchema, WebsiteSchema
-
+from app.models.pydantic import UserSchema, WebsiteSchema
 
 router = APIRouter()
 
 log = logging.getLogger("uvicorn")
+
+@router.get("/", response_model=list[UserSchema])
+async def read_users() -> list[UserSchema]:
+    return await crud.get_all()
 
 @router.get("/{id}/", response_model=UserSchema)
 async def read_user(id: str) -> UserSchema:
@@ -20,24 +23,18 @@ async def read_user(id: str) -> UserSchema:
 
     return user
 
-@router.get("/{id}/favorites", response_model=list[WebsiteSchema])
-async def read_user_favorites(id: str) -> list[WebsiteSchema]:
-    favorites = await crud.get_favorites(id)
-    return favorites
 
 @router.get("/{id}/likes", response_model=list[WebsiteSchema])
 async def read_user_likes(id: str) -> list[WebsiteSchema]:
     pass
 
-@router.get("/", response_model=list[UserSchema])
-async def read_all_users() -> list[UserSchema]:
-    return await crud.get_all()
 
-@router.post("/{user_id}/favorites/{website_id}", status_code=200, response_model=WebsiteSchema)
-async def add_favorite(user_id: str, website_id: str) -> WebsiteSchema:
+@router.post("/{user_id}/favorites/{website_id}", status_code=200, response_model=str)
+async def add_favorite(user_id: str, website_id: str) -> str:
     website = await crud.add_favorite(user_id, website_id)
     if website is None:
         raise HTTPException(status_code=404, detail="User or Website not found!")
+
     return website
 
 
@@ -47,6 +44,8 @@ async def delete_favorite(user_id: str, website_id: str):
     if result is None:
         raise HTTPException(status_code=404, detail="User or Website not found!")
 
+
+### CLERK WEBHOOK ROUTES ###
 
 WEBHOOK_SECRET = os.environ.get("CLERK_WEBHOOK_SECRET")
 

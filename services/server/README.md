@@ -18,6 +18,10 @@ Connect to database: `docker compose exec web-db psql -U postgres`
 Build containers: `docker compose up -d --build`
 Bring down containers and volumes: `docker compose down -v`
 
+### Tortoise
+
+using tortoise with raw sql: https://stackoverflow.com/questions/69401708/how-do-i-execute-native-sql-with-tortoise-orm
+
 ### Aerich
 
 https://tortoise.github.io/migration.html#quick-start

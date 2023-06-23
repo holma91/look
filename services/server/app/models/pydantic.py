@@ -1,20 +1,13 @@
 from pydantic import BaseModel
 
 
-class UserPayloadSchema(BaseModel):
+class UserSchema(BaseModel):
     id: str
 
-
-class UserResponseSchema(UserPayloadSchema):
-    id: str
-
-
-class WebsiteUserSchema(BaseModel):
+class WebsiteSchema(BaseModel):
     domain: str
     multi_brand: bool
     second_hand: bool
+
+class WebsiteUserSchema(WebsiteSchema):
     is_favorite: bool
-
-
-class UserSchema(BaseModel):
-    id: str

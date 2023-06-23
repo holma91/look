@@ -1,11 +1,5 @@
 // mapping from url to injection script
 
-export const getScriptFromDomain = (domain: string) => {
-  if (domain[0] === 'w') {
-    domain = domain.slice(4);
-  }
-};
-
 export const jsScripts: { [key: string]: string } = {
   zalando: `
     try {

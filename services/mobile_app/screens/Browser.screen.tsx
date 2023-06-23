@@ -438,9 +438,11 @@ function BottomSheet({
               />
             </Box>
             <Box flex={1} gap="s">
-              <Text>{currentProduct.name}</Text>
+              <Text variant="body" fontWeight="bold">
+                {currentProduct.name}
+              </Text>
               <Text variant="body">{currentProduct.brand}</Text>
-              <Text variant="body">{currentProduct.brand}</Text>
+
               <Text variant="body">{`${currentProduct.price} ${currentProduct.currency}`}</Text>
               {generating ? (
                 <Button
