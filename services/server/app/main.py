@@ -1,5 +1,7 @@
+import os
 import logging
 
+import asyncpg
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -30,9 +32,11 @@ def read_root():
 @app.on_event("startup")
 async def startup_event():
     log.info("Starting up...")
+    # app.db = await asyncpg.connect(os.environ.get("DATABASE_URL"))
     init_db(app)
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     log.info("Shutting down...")
+    # await app.db.close()

@@ -1,8 +1,5 @@
-import os
 import asyncio
 from typing import Optional
-from tortoise import Tortoise
-import asyncpg
 from app.models.tortoise import User, Website, UserSchema, WebsiteSchema
 
 async def get(id: str) -> dict:
@@ -44,12 +41,8 @@ async def un_favorite(user_id: str, website_id: str) -> Optional[str]:
     return website.domain
 
 
-async def get_all() -> list[dict]:
-    conn = Tortoise.get_connection("default")
-    query = """
-        select * from "user";
-    """
-    users = await conn.execute_query_dict(query)
+async def get_all() -> list:
+    users = await User.all().values() # maybe it doesn't want to do a join by default?
     return users
 
 # Below are the functions that will ONLY be called by the clerk webhook

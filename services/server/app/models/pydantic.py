@@ -14,3 +14,7 @@ class WebsiteUserSchema(BaseModel):
     multi_brand: bool
     second_hand: bool
     is_favorite: bool
+
+
+class UserSchema(BaseModel):
+    id: str
