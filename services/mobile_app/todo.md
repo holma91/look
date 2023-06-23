@@ -10,10 +10,14 @@ Pages:
 
 ### TODO rn
 
-- set up fastapi with postgres (with alembic)
-- design database schema
+- write connectors for the 10 sites
 
 ### TODO
+
+what happens if we search and go to an unsupported site?
+
+- it goes to the all bucket
+- gets inserted to the db (or saved locally, and inserted if user favs it?)
 
 - connectors for chosen swedish sites
 - "gallery" design, with fav stuff functionality

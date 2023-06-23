@@ -118,9 +118,9 @@ export default function Shop({ navigation }: { navigation: any }) {
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1} gap="s">
           <SearchBar navigation={navigation} isFakeSearchBar={true} />
-          <Text variant="title" paddingHorizontal="m">
-            Top sites
-          </Text>
+          {/* <Text variant="title" paddingHorizontal="m">
+            Popular sites
+          </Text> */}
           <Box flexDirection="row" gap="m" marginVertical="s">
             <FlatList
               style={{ flex: 1, gap: 10 }}

@@ -10,6 +10,9 @@ import Animated, {
   LightSpeedInLeft,
   LightSpeedOutRight,
   useAnimatedReaction,
+  FadeIn,
+  FadeOut,
+  ZoomIn,
 } from 'react-native-reanimated';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -85,10 +88,13 @@ export default function Browser({
   const handleNavigationStateChange = (navState: any) => {
     if (!navState.loading && webviewRef.current) {
       // we are using var instead of let/const because of a console error
-      const match = url.match(/:\/\/(.[^/]+)/); // "www.zara.com"
+      console.log('uu:', url);
+      console.log('navState:', navState);
+
+      let match = url.match(/https?:\/\/(?:www\.)?(\w+)\./);
       if (match && match[1]) {
         let domain = match[1];
-        console.log('domain', domain);
+        console.log('matched domain', domain);
         let script = jsScripts[domain];
         console.log('script', script);
 
@@ -102,8 +108,22 @@ export default function Browser({
     console.log('received data:', product);
     // do some verification here
 
+    // remove query parameters from images
+    for (let i = 0; i < product.images.length; i++) {
+      product.images[i] = product.images[i].substring(
+        0,
+        product.images[i].indexOf('?')
+      );
+    }
+
     setCurrentProduct(product);
   };
+
+  const handleLikeProduct = () => {
+    console.log('liked product:', currentProduct);
+  };
+
+  // need a mutation that checks (by url) if the product is already liked
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -137,6 +157,7 @@ export default function Browser({
             expandedMenu={expandedMenu}
             setExpandedMenu={setExpandedMenu}
             navigate={navigate}
+            handleLikeProduct={handleLikeProduct}
           />
         </Box>
       </SafeAreaView>
@@ -214,6 +235,7 @@ type NavBarProps = {
   expandedMenu: boolean;
   setExpandedMenu: (expanded: boolean) => void;
   navigate: (direction: 'back' | 'forward') => void;
+  handleLikeProduct: () => void;
 };
 
 function NavBar({
@@ -221,6 +243,7 @@ function NavBar({
   expandedMenu,
   setExpandedMenu,
   navigate,
+  handleLikeProduct,
 }: NavBarProps) {
   return (
     <Box
@@ -272,7 +295,12 @@ function NavBar({
         )}
       </Box>
       <Box flex={0} flexDirection="row" gap="m" alignItems="center">
-        <Ionicons name="heart-outline" size={24} color="black" />
+        <Ionicons
+          name="heart-outline"
+          size={24}
+          color="black"
+          onPress={handleLikeProduct}
+        />
         <Ionicons name="md-ellipsis-horizontal-sharp" size={24} color="black" />
       </Box>
     </Box>
@@ -384,7 +412,7 @@ function BottomSheet({
           alignSelf="center"
           margin="m"
         ></Box>
-        {sheetState === 'MEDIUM' && (
+        {(sheetState === 'MEDIUM' || sheetState === 'MIN') && (
           <Animated.View
             style={[
               {
@@ -395,8 +423,8 @@ function BottomSheet({
                 justifyContent: 'space-between',
               },
             ]}
-            entering={LightSpeedInLeft}
-            exiting={LightSpeedOutRight.duration(100)}
+            // entering={LightSpeedInLeft}
+            exiting={FadeOut.duration(500)}
           >
             <Box flex={1}>
               <ExpoImage
@@ -411,6 +439,7 @@ function BottomSheet({
             </Box>
             <Box flex={1} gap="s">
               <Text>{currentProduct.name}</Text>
+              <Text variant="body">{currentProduct.brand}</Text>
               <Text variant="body">{currentProduct.brand}</Text>
               <Text variant="body">{`${currentProduct.price} ${currentProduct.currency}`}</Text>
               {generating ? (
@@ -444,7 +473,7 @@ function BottomSheet({
                 gap: theme.spacing.m,
               },
             ]}
-            entering={LightSpeedInLeft}
+            entering={ZoomIn.duration(100)}
             exiting={LightSpeedOutRight.duration(500)}
           >
             <Box flex={1}>

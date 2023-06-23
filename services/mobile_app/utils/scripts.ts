@@ -1,7 +1,13 @@
 // mapping from url to injection script
 
+export const getScriptFromDomain = (domain: string) => {
+  if (domain[0] === 'w') {
+    domain = domain.slice(4);
+  }
+};
+
 export const jsScripts: { [key: string]: string } = {
-  'www.zalando.com': `
+  zalando: `
     try {
       var elements = document.querySelectorAll('script[type="application/ld+json"]');
 
@@ -18,7 +24,7 @@ export const jsScripts: { [key: string]: string } = {
 
     }
   `,
-  'www.zara.com': `
+  zara: `
     try {
       var elements = document.querySelectorAll('script[type="application/ld+json"]');
 
