@@ -22,3 +22,19 @@ async def read_product(id: str) -> Product:
         raise HTTPException(status_code=404, detail="Product not found")
 
     return product
+
+@router.post("/", status_code=200, response_model=Product)
+async def add_product(product: Product) -> Product:
+    # call this whenever a user views a product
+    product = await crud.add(product)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product could not be created!")
+
+    return product
+
+@router.delete("/{id}/", status_code=204)
+async def delete_product(id: str):
+    # basically never call this
+    deleted = await crud.delete(id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Product not found!")

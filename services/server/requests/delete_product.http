@@ -1,0 +1,1 @@
+DELETE http://localhost:8004/products/https:||softgoat.com|p|mens-pants-light-grey| HTTP/1.1

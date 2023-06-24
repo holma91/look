@@ -24,6 +24,27 @@ async def get(id: str) -> dict:
 async def get_likes(id: str) -> list:
     pass
 
+async def add_like(user_id: str, product_id: str) -> Optional[str]:
+    product_url = product_id.replace('|', '/')
+    query = """
+    insert into user_product (user_id, product_url)
+    values ($1, $2);
+    """
+    async with in_transaction("default") as tconn:
+        await tconn.execute_query_dict(query, [user_id, product_url])
+
+    return product_url
+
+async def un_like(user_id: str, product_id: str) -> Optional[str]:
+    product_url = product_id.replace('|', '/')
+    query = """
+    delete from user_product where user_id = $1 and product_url = $2;
+    """
+    async with in_transaction("default") as tconn:
+        await tconn.execute_query_dict(query, [user_id, product_url])
+
+    return product_url
+
 
 async def add_favorite(user_id: str, website_id: str) -> Optional[str]:
     query = """

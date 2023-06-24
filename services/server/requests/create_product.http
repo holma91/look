@@ -1,0 +1,11 @@
+POST http://localhost:8004/products HTTP/1.1
+content-type: application/json
+
+{
+    "url": "https://softgoat.com/p/mens-pants-light-grey/",
+    "domain":"softgoat.com",
+    "brand":"Soft Goat",
+    "name":"MEN'S PANTS",
+    "price":"1887",
+    "currency":"SEK"
+}

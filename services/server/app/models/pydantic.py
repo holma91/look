@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 import datetime
 
@@ -21,4 +23,4 @@ class Product(BaseModel):
     name: str
     price: float
     currency: str
-    updated_at: datetime.datetime
+    updated_at: Optional[datetime.datetime] = None

@@ -28,6 +28,19 @@ async def read_user(id: str) -> UserSchema:
 async def read_user_likes(id: str) -> list[WebsiteSchema]:
     pass
 
+@router.post("/{user_id}/likes/{product_id}", status_code=200, response_model=str)
+async def add_like(user_id: str, product_id: str) -> str:
+    product = await crud.add_like(user_id, product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="User or Product not found!")
+
+    return product
+
+@router.delete("/{user_id}/likes/{product_id}", status_code=204)
+async def delete_like(user_id: str, product_id: str):
+    result = await crud.un_like(user_id, product_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="User or Product not found!")
 
 @router.post("/{user_id}/favorites/{website_id}", status_code=200, response_model=str)
 async def add_favorite(user_id: str, website_id: str) -> str:
