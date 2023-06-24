@@ -14,8 +14,10 @@ import Animated, {
   FadeOut,
   ZoomIn,
 } from 'react-native-reanimated';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 import { theme } from '../styling/theme';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
@@ -31,11 +33,26 @@ const MEDIUM_HEIGHT = 300;
 const MAX_HEIGHT = SCREEN_HEIGHT - 115;
 
 type Product = {
+  url: string;
   name: string;
   brand: string;
   price: string;
   currency: string;
+  updated_at?: string;
   images?: string[];
+};
+
+const URL = 'http://localhost:8004';
+const fetchLikes = async (id: string) => {
+  const completeUrl = `${URL}/users/${id}/likes`;
+  const response = await fetch(completeUrl);
+
+  if (!response.ok) {
+    throw new Error(
+      `Network response was not ok. Status code: ${response.status}`
+    );
+  }
+  return response.json();
 };
 
 export default function Browser({
@@ -49,16 +66,17 @@ export default function Browser({
   const [search, setSearch] = useState(`${route.params.url}`);
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product>({
+    url: 'https://www.zara.com/se/en/rak-blazer-p08068001.html?v1=78861699&v2=1718127',
     name: 'RAK BLAZER',
     brand: 'Zara',
     price: '599',
     currency: 'SEK',
   });
 
+  const { user } = useUser();
+
   const webviewRef = useRef<WebView>(null);
   const bottomSheetHeight = useSharedValue(0);
-
-  console.log('url', url);
 
   const handleSearch = () => {
     console.log('searching for', search);
@@ -83,7 +101,7 @@ export default function Browser({
   };
 
   const handleNavigationStateChange = (navState: any) => {
-    console.log('NAV CHANGE! navState:', navState);
+    // console.log('NAV CHANGE! navState:', navState);
     if (!navState.loading && webviewRef.current) {
       // we are using var instead of let/const because of a console error
 
@@ -111,11 +129,14 @@ export default function Browser({
   };
 
   const handleMessage = (event: any) => {
-    console.log('received data:', event.nativeEvent.data);
+    const product_url = event.nativeEvent.url;
+
+    // console.log('received data:', event.nativeEvent.data);
     // message 1: product data
     const parsedData = JSON.parse(event.nativeEvent.data);
     if (parsedData.type === 'product') {
       const product: Product = parsedData.data;
+      product.url = product_url;
       if (product?.images) {
         // remove query parameters from images
         for (let i = 0; i < product.images.length; i++) {
@@ -126,6 +147,7 @@ export default function Browser({
         }
       }
       setCurrentProduct(product);
+      // when setting currentProduct here, do we send it to the db? not for know, but maybe later
     } else if (parsedData.type === 'imageSrc') {
       const imageSrc: string = parsedData.data;
       setCurrentProduct((prev) => ({ ...prev, images: [imageSrc] }));
@@ -138,7 +160,17 @@ export default function Browser({
     console.log('liked product:', currentProduct);
   };
 
+  const { data: products } = useQuery({
+    queryKey: ['likes', user?.id],
+    queryFn: () => fetchLikes(user?.id as string),
+    enabled: !!user?.id,
+  });
+
+  console.log('products:', products);
+
   // need a mutation that checks (by url) if the product is already liked
+
+  // is the current product already liked?
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -173,6 +205,9 @@ export default function Browser({
             setExpandedMenu={setExpandedMenu}
             navigate={navigate}
             handleLikeProduct={handleLikeProduct}
+            user={user}
+            currentProduct={currentProduct}
+            products={products}
           />
         </Box>
       </SafeAreaView>
@@ -251,6 +286,9 @@ type NavBarProps = {
   setExpandedMenu: (expanded: boolean) => void;
   navigate: (direction: 'back' | 'forward') => void;
   handleLikeProduct: () => void;
+  user: any;
+  currentProduct: Product;
+  products: Product[];
 };
 
 function NavBar({
@@ -259,7 +297,48 @@ function NavBar({
   setExpandedMenu,
   navigate,
   handleLikeProduct,
+  user,
+  currentProduct,
+  products,
 }: NavBarProps) {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (product: Product) => {},
+    onMutate: async (product: Product) => {
+      console.log('onMutate', product);
+
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries(['products', user?.id]);
+
+      const previousProducts = queryClient.getQueryData(['products']);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(['products'], (old: Product[] | undefined) => {
+        return old?.filter((p) => p.url !== product.url);
+      });
+
+      return { previousProducts };
+    },
+    onError: (err, website, context) => {
+      console.log('error', err, website, context);
+      queryClient.setQueryData(['products'], context?.previousProducts);
+    },
+    onSettled: async () => {
+      // setRandomNumber(Math.random()); // used temporarily to force a list re-render
+      // queryClient.invalidateQueries({ queryKey: ['websites', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+
+  let icon: 'heart' | 'heart-outline' = products.find(
+    (product) => product.url === currentProduct?.url
+  )
+    ? 'heart'
+    : 'heart-outline';
+
+  console.log('icon:', icon);
+
   return (
     <Box
       flex={0}
@@ -311,10 +390,12 @@ function NavBar({
       </Box>
       <Box flex={0} flexDirection="row" gap="m" alignItems="center">
         <Ionicons
-          name="heart-outline"
+          name={icon}
           size={24}
           color="black"
-          onPress={handleLikeProduct}
+          onPress={() => {
+            mutation.mutate(currentProduct);
+          }}
         />
         <Ionicons name="md-ellipsis-horizontal-sharp" size={24} color="black" />
       </Box>

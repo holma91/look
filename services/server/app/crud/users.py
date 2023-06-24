@@ -21,11 +21,18 @@ async def get(id: str) -> dict:
     return users[0]
 
 
-async def get_likes(id: str) -> list:
-    pass
+async def get_likes(user_id: str) -> list:
+    conn = Tortoise.get_connection("default")
+    query = """
+    select * from user_product up 
+    join product p on p.url = up.product_url
+    where up.user_id = $1;
+    """
+    products = await conn.execute_query_dict(query, [user_id])
+    await conn.close()
+    return products
 
-async def add_like(user_id: str, product_id: str) -> Optional[str]:
-    product_url = product_id.replace('|', '/')
+async def add_like(user_id: str, product_url: str) -> Optional[str]:
     query = """
     insert into user_product (user_id, product_url)
     values ($1, $2);
@@ -35,8 +42,7 @@ async def add_like(user_id: str, product_id: str) -> Optional[str]:
 
     return product_url
 
-async def un_like(user_id: str, product_id: str) -> Optional[str]:
-    product_url = product_id.replace('|', '/')
+async def un_like(user_id: str, product_url: str) -> Optional[str]:
     query = """
     delete from user_product where user_id = $1 and product_url = $2;
     """

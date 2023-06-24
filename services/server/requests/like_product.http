@@ -1,0 +1,20 @@
+POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/likes/https:||www.zalando.se|nike-sportswear-trend-tank-linne-neutral-olive-ni121d0sb-n12.html HTTP/1.1
+content-type: application/json
+
+###
+
+POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/likes HTTP/1.1
+content-type: application/json
+
+{
+    "product_url": "https://www.zalando.se/nike-sportswear-bodysuit-linne-khaki-ni121t00p-n11.html"
+}
+
+
+###
+DELETE http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/likes HTTP/1.1
+content-type: application/json
+
+{
+    "product_url": "https://www.zalando.se/nike-sportswear-bodysuit-linne-khaki-ni121t00p-n11.html"
+}

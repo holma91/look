@@ -17,7 +17,7 @@ type WebsiteItem = {
   second_hand: boolean;
 };
 
-const URL = 'https://ad0e-83-255-121-67.ngrok-free.app';
+const URL = 'http://localhost:8004';
 const fetchWebsites = async (id: string) => {
   const completeUrl = `${URL}/websites/?user_id=${id}`;
   const response = await fetch(completeUrl);

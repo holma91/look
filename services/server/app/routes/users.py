@@ -5,7 +5,16 @@ from fastapi import APIRouter, HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserSchema, WebsiteSchema
+from app.models.pydantic import UserSchema, WebsiteSchema, Product
+
+from pydantic import BaseModel
+
+class LikeProduct(BaseModel):
+    product_url: str
+
+class LikeProductResponse(BaseModel):
+    user_id: str
+    product_url: str
 
 router = APIRouter()
 
@@ -24,23 +33,28 @@ async def read_user(id: str) -> UserSchema:
     return user
 
 
-@router.get("/{id}/likes", response_model=list[WebsiteSchema])
-async def read_user_likes(id: str) -> list[WebsiteSchema]:
-    pass
+@router.get("/{user_id}/likes", response_model=list[Product])
+async def read_user_likes(user_id: str) -> list[Product]:
+    products = await crud.get_likes(user_id)
+    return products
 
-@router.post("/{user_id}/likes/{product_id}", status_code=200, response_model=str)
-async def add_like(user_id: str, product_id: str) -> str:
-    product = await crud.add_like(user_id, product_id)
+
+@router.post("/{user_id}/likes", status_code=201, response_model=LikeProductResponse)
+async def add_like(user_id: str, product: LikeProduct) -> LikeProductResponse:
+    product = await crud.add_like(user_id, product.product_url)
     if product is None:
         raise HTTPException(status_code=404, detail="User or Product not found!")
 
-    return product
+    return LikeProductResponse(user_id=user_id, product_url=product)
 
-@router.delete("/{user_id}/likes/{product_id}", status_code=204)
-async def delete_like(user_id: str, product_id: str):
-    result = await crud.un_like(user_id, product_id)
+@router.delete("/{user_id}/likes", status_code=204)
+async def delete_like(user_id: str, product: LikeProduct):
+    result = await crud.un_like(user_id, product.product_url)
     if result is None:
         raise HTTPException(status_code=404, detail="User or Product not found!")
+    
+
+### Change the following to use the body of the requests instead
 
 @router.post("/{user_id}/favorites/{website_id}", status_code=200, response_model=str)
 async def add_favorite(user_id: str, website_id: str) -> str:
@@ -49,7 +63,6 @@ async def add_favorite(user_id: str, website_id: str) -> str:
         raise HTTPException(status_code=404, detail="User or Website not found!")
 
     return website
-
 
 @router.delete("/{user_id}/favorites/{website_id}", status_code=204)
 async def delete_favorite(user_id: str, website_id: str):
