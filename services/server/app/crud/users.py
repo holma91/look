@@ -1,6 +1,9 @@
 from typing import Optional
 from tortoise import Tortoise
 from tortoise.transactions import in_transaction
+from app.models.pydantic import Product, UserProduct, ProductStrict
+
+from app.crud import products as product_crud
 
 async def get_all() -> list[dict]:
     conn = Tortoise.get_connection("default")
@@ -21,11 +24,34 @@ async def get(id: str) -> dict:
     return users[0]
 
 
+async def add_product(user_id: str, product: ProductStrict) -> Optional[UserProduct]:
+    # Adding a product from a user's perspective
+    # 1. add the actual product if it doesn't exist and it's images
+    result = await product_crud.add(product)
+    if not result:
+        return None
+    
+
+    # 3. add the user_product relationship
+    conn = Tortoise.get_connection("default")
+    check_query = """select * from user_product where user_id = $1 and product_url = $2;"""
+    check_result = await conn.execute_query_dict(check_query, [user_id, product.url])
+    if check_result:
+        return UserProduct(**check_result[0])
+    
+    query = """
+    insert into user_product (user_id, product_url)
+    values ($1, $2) returning *;
+    """
+    user_product = await conn.execute_query_dict(query, [user_id, product.url])
+
+    return UserProduct(**user_product[0])
+
+
 async def get_likes(user_id: str) -> list:
     conn = Tortoise.get_connection("default")
     query = """
     select * from user_product up 
-    join product p on p.url = up.product_url
     where up.user_id = $1;
     """
     products = await conn.execute_query_dict(query, [user_id])

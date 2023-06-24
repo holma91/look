@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException
 
 from app.crud import products as crud
-from app.models.pydantic import Product
+from app.models.pydantic import Product, ProductStrict
 
 
 router = APIRouter()
@@ -11,12 +11,12 @@ router = APIRouter()
 log = logging.getLogger("uvicorn")
 
 
-@router.get("/", response_model=list[Product])
-async def read_all_products() -> list[Product]:
+@router.get("/", response_model=list[ProductStrict])
+async def read_all_products() -> list[ProductStrict]:
     return await crud.get_all()
 
-@router.get("/{id}/", response_model=Product)
-async def read_product(id: str) -> Product:
+@router.get("/{id}/", response_model=ProductStrict)
+async def read_product(id: str) -> ProductStrict:
     product = await crud.get(id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -24,9 +24,8 @@ async def read_product(id: str) -> Product:
     return product
 
 @router.post("/", status_code=200, response_model=Product)
-async def add_product(product: Product) -> Product:
+async def add_product(product: ProductStrict) -> Product:
     # call this whenever a user views a product
-    print(product)
     product = await crud.add(product)
     if product is None:
         raise HTTPException(status_code=404, detail="Product could not be created!")

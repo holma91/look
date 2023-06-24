@@ -50,3 +50,7 @@ Keep in sync by using Clerk webhooks. This is what the payload looks like for us
   }
 }
 ```
+
+### TODO
+
+- maybe remove all return types for POST requests and just return a success message?

@@ -2,7 +2,22 @@ POST http://localhost:8004/products HTTP/1.1
 content-type: application/json
 
 {
-    "url": "https://www.zalando.se/nike-sportswear-bodysuit-linne-khaki-ni121t00p-n11.html",
+    "url": "https://www.zalando.se/nike-sportswear-bodysuitttr-linne-khaki-ni121t00p-n11.html",
+    "domain": "zalando.com",
+    "brand": "Nike",
+    "name": "BODYSUIT - Linne",
+    "price": "449",
+    "currency": "SEK",
+    "images": []
+}
+
+
+### from a user's perspective
+POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/products HTTP/1.1
+content-type: application/json
+
+{
+    "url": "https://www.zalando.se/nike-sportswear-bodysuit-linne-khaki-ni121t00p-n12.html",
     "domain": "zalando.com",
     "brand": "Nike",
     "name": "BODYSUIT - Linne",

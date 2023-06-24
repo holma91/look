@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserSchema, WebsiteSchema, Product
+from app.models.pydantic import UserSchema, WebsiteSchema, Product, UserProduct, ProductStrict
 
 from pydantic import BaseModel
 
@@ -33,10 +33,18 @@ async def read_user(id: str) -> UserSchema:
     return user
 
 
-@router.get("/{user_id}/likes", response_model=list[Product])
-async def read_user_likes(user_id: str) -> list[Product]:
+@router.get("/{user_id}/likes", response_model=list[UserProduct])
+async def read_user_likes(user_id: str) -> list[UserProduct]:
     products = await crud.get_likes(user_id)
     return products
+
+@router.post("/{user_id}/products", status_code=201, response_model=UserProduct) # history basically
+async def add_product(user_id: str, product: ProductStrict) -> UserProduct:
+    user_product = await crud.add_product(user_id, product)
+    if user_product is None:
+        raise HTTPException(status_code=404, detail="User not found!")
+
+    return user_product
 
 
 @router.post("/{user_id}/likes", status_code=201, response_model=LikeProductResponse)

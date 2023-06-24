@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS "product_image" (
 CREATE TABLE IF NOT EXISTS "user_product" (
     "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
     "product_url" TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,
+    "liked" BOOL NOT NULL DEFAULT FALSE,
     UNIQUE(user_id, product_url)
 );
 
@@ -69,3 +70,6 @@ INSERT INTO user_product (user_id, product_url)
 VALUES
 ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey'),
 ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/mens-fine-knit-t-shirt-white');
+
+UPDATE user_product SET liked = TRUE
+WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey';
