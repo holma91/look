@@ -5,7 +5,7 @@ import asyncpg
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import ping, users, websites
+from app.routes import ping, users, websites, products
 from app.db import init_db
 
 
@@ -18,6 +18,7 @@ def create_application() -> FastAPI:
     application.include_router(ping.router)
     application.include_router(users.router, prefix="/users", tags=["users"])
     application.include_router(websites.router, prefix="/websites", tags=["websites"])
+    application.include_router(products.router, prefix="/products", tags=["products"])
 
     return application
 
