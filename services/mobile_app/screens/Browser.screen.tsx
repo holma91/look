@@ -63,6 +63,7 @@ export default function Browser({
   route: any;
 }) {
   const [url, setUrl] = useState(`https://${route.params.url}`);
+  const [domain, setDomain] = useState('');
   const [search, setSearch] = useState(`${route.params.url}`);
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product>({
@@ -108,6 +109,7 @@ export default function Browser({
       let match = url.match(/https?:\/\/(?:www\.)?(\w+)\./);
       if (match && match[1]) {
         let domain = match[1];
+        setDomain(domain + '.com');
 
         let script = jsScripts[domain];
 
@@ -128,7 +130,7 @@ export default function Browser({
     }
   };
 
-  const handleMessage = (event: any) => {
+  const handleMessage = async (event: any) => {
     const product_url = event.nativeEvent.url;
 
     // console.log('received data:', event.nativeEvent.data);
@@ -148,6 +150,32 @@ export default function Browser({
       }
       setCurrentProduct(product);
       // when setting currentProduct here, do we send it to the db? not for know, but maybe later
+      const backendProduct = {
+        url: product.url,
+        brand: product.brand,
+        domain: domain,
+        name: product.name,
+        price: product.price,
+        currency: product.currency,
+      };
+      const response = await fetch(`${URL}/products/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(backendProduct),
+      });
+
+      if (!response.ok) {
+        console.error(
+          `HTTP error! status: ${response.status}, error: ${response.statusText}`
+        );
+      } else {
+        const responseBody = await response.json();
+        console.log('Server response:', responseBody);
+      }
+
+      // todo: insert images also
     } else if (parsedData.type === 'imageSrc') {
       const imageSrc: string = parsedData.data;
       setCurrentProduct((prev) => ({ ...prev, images: [imageSrc] }));
@@ -331,7 +359,7 @@ function NavBar({
     },
   });
 
-  let icon: 'heart' | 'heart-outline' = products.find(
+  let icon: 'heart' | 'heart-outline' = products?.find(
     (product) => product.url === currentProduct?.url
   )
     ? 'heart'

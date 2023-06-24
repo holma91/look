@@ -26,6 +26,7 @@ async def read_product(id: str) -> Product:
 @router.post("/", status_code=200, response_model=Product)
 async def add_product(product: Product) -> Product:
     # call this whenever a user views a product
+    print(product)
     product = await crud.add(product)
     if product is None:
         raise HTTPException(status_code=404, detail="Product could not be created!")

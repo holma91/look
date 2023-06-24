@@ -16,8 +16,14 @@ async def get(id: str) -> dict:
     product = await conn.execute_query_dict(query, [url])
     return product[0] if product else None
 
-async def add(product: Product) -> Optional[str]:
+async def add(product: Product) -> Optional[Product]:
     conn = Tortoise.get_connection("default")
+
+    check_query = """select * from product where url = $1;"""
+    check_result = await conn.execute_query_dict(check_query, [product.url])
+    if check_result:
+        return Product(**check_result[0])
+
     query = """
     insert into product (url, domain, brand, name, price, currency)
     values ($1, $2, $3, $4, $5, $6) returning *;
