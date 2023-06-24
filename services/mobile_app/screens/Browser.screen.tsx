@@ -35,7 +35,7 @@ type Product = {
   brand: string;
   price: string;
   currency: string;
-  images: string[];
+  images?: string[];
 };
 
 export default function Browser({
@@ -48,14 +48,11 @@ export default function Browser({
   const [url, setUrl] = useState(`https://${route.params.url}`);
   const [search, setSearch] = useState(`${route.params.url}`);
   const [expandedMenu, setExpandedMenu] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState({
+  const [currentProduct, setCurrentProduct] = useState<Product>({
     name: 'RAK BLAZER',
     brand: 'Zara',
     price: '599',
     currency: 'SEK',
-    images: [
-      'https://static.zara.net/photos///2023/V/0/1/p/7901/234/942/2/w/1126/7901234942_1_1_1.jpg?ts=1677513491932',
-    ],
   });
 
   const webviewRef = useRef<WebView>(null);
@@ -86,37 +83,55 @@ export default function Browser({
   };
 
   const handleNavigationStateChange = (navState: any) => {
+    console.log('NAV CHANGE! navState:', navState);
     if (!navState.loading && webviewRef.current) {
       // we are using var instead of let/const because of a console error
-      console.log('uu:', url);
-      console.log('navState:', navState);
 
       let match = url.match(/https?:\/\/(?:www\.)?(\w+)\./);
       if (match && match[1]) {
         let domain = match[1];
-        console.log('matched domain', domain);
-        let script = jsScripts[domain];
-        console.log('script', script);
 
-        webviewRef.current.injectJavaScript(script);
+        let script = jsScripts[domain];
+
+        // Very hacky solution
+        // in the future, throw away the scripts and write something more robust
+        setTimeout(() => {
+          if (webviewRef.current) {
+            webviewRef.current.injectJavaScript(script.interact);
+            webviewRef.current.injectJavaScript(script.extract);
+          }
+        }, 1000);
+        setTimeout(() => {
+          if (webviewRef.current) {
+            webviewRef.current.injectJavaScript(script.interact);
+          }
+        }, 1500);
       }
     }
   };
 
   const handleMessage = (event: any) => {
-    const product: Product = JSON.parse(event.nativeEvent.data);
-    console.log('received data:', product);
-    // do some verification here
-
-    // remove query parameters from images
-    for (let i = 0; i < product.images.length; i++) {
-      product.images[i] = product.images[i].substring(
-        0,
-        product.images[i].indexOf('?')
-      );
+    console.log('received data:', event.nativeEvent.data);
+    // message 1: product data
+    const parsedData = JSON.parse(event.nativeEvent.data);
+    if (parsedData.type === 'product') {
+      const product: Product = parsedData.data;
+      if (product?.images) {
+        // remove query parameters from images
+        for (let i = 0; i < product.images.length; i++) {
+          product.images[i] = product.images[i].substring(
+            0,
+            product.images[i].indexOf('?')
+          );
+        }
+      }
+      setCurrentProduct(product);
+    } else if (parsedData.type === 'imageSrc') {
+      const imageSrc: string = parsedData.data;
+      setCurrentProduct((prev) => ({ ...prev, images: [imageSrc] }));
+    } else {
+      console.log('unknown message type:', parsedData.data);
     }
-
-    setCurrentProduct(product);
   };
 
   const handleLikeProduct = () => {
@@ -433,7 +448,7 @@ function BottomSheet({
                   alignItems: 'center',
                   height: 200,
                 }}
-                source={currentProduct.images[0]}
+                source={currentProduct.images ? currentProduct.images[0] : ''}
                 contentFit="contain"
               />
             </Box>
