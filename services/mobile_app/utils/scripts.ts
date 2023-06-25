@@ -35,6 +35,7 @@ export const jsScripts: { [key: string]: any } = {
             product['brand'] = productData['brand']['name'];
             product['price'] = productData['offers']['price'];
             product['currency'] = productData['offers']['priceCurrency'];
+            product['images'] = [];
             
             window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: product }));
           }

@@ -39,6 +39,9 @@ class ProductStrict(BaseModel):
     images: list[str]
     updated_at: Optional[datetime.datetime] = None
 
+class ProductUser(Product):
+    liked: bool
+
 class UserProduct(BaseModel):
     user_id: str
     product_url: str

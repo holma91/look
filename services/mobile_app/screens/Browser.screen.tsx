@@ -39,7 +39,18 @@ type Product = {
   price: string;
   currency: string;
   updated_at?: string;
-  images?: string[];
+  images: string[];
+};
+
+type UserProduct = {
+  url: string;
+  name: string;
+  brand: string;
+  price: string;
+  currency: string;
+  updated_at?: string;
+  images: string[];
+  liked: boolean;
 };
 
 const URL = 'http://localhost:8004';
@@ -72,6 +83,7 @@ export default function Browser({
     brand: 'Zara',
     price: '599',
     currency: 'SEK',
+    images: [],
   });
 
   const { user } = useUser();
@@ -104,8 +116,6 @@ export default function Browser({
   const handleNavigationStateChange = (navState: any) => {
     // console.log('NAV CHANGE! navState:', navState);
     if (!navState.loading && webviewRef.current) {
-      // we are using var instead of let/const because of a console error
-
       let match = url.match(/https?:\/\/(?:www\.)?(\w+)\./);
       if (match && match[1]) {
         let domain = match[1];
@@ -133,8 +143,7 @@ export default function Browser({
   const handleMessage = async (event: any) => {
     const product_url = event.nativeEvent.url;
 
-    // console.log('received data:', event.nativeEvent.data);
-    // message 1: product data
+    // message type 1: product data
     const parsedData = JSON.parse(event.nativeEvent.data);
     if (parsedData.type === 'product') {
       const product: Product = parsedData.data;
@@ -149,16 +158,12 @@ export default function Browser({
         }
       }
       setCurrentProduct(product);
-      // when setting currentProduct here, do we send it to the db? not for know, but maybe later
+
       const backendProduct = {
-        url: product.url,
-        brand: product.brand,
+        ...product,
         domain: domain,
-        name: product.name,
-        price: product.price,
-        currency: product.currency,
       };
-      const response = await fetch(`${URL}/products/`, {
+      const response = await fetch(`${URL}/users/${user?.id}/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -171,11 +176,9 @@ export default function Browser({
           `HTTP error! status: ${response.status}, error: ${response.statusText}`
         );
       } else {
-        const responseBody = await response.json();
-        console.log('Server response:', responseBody);
+        await response.json();
+        refetchProducts();
       }
-
-      // todo: insert images also
     } else if (parsedData.type === 'imageSrc') {
       const imageSrc: string = parsedData.data;
       setCurrentProduct((prev) => ({ ...prev, images: [imageSrc] }));
@@ -188,17 +191,26 @@ export default function Browser({
     console.log('liked product:', currentProduct);
   };
 
-  const { data: products } = useQuery({
+  const {
+    data: products,
+    status,
+    refetch: refetchProducts,
+  } = useQuery({
     queryKey: ['likes', user?.id],
     queryFn: () => fetchLikes(user?.id as string),
     enabled: !!user?.id,
   });
 
-  console.log('products:', products);
+  if (status === 'loading') {
+    return <Text>Loading...</Text>;
+  }
 
-  // need a mutation that checks (by url) if the product is already liked
+  if (status === 'error') {
+    return <Text>Error!</Text>;
+  }
 
-  // is the current product already liked?
+  console.log('products.length:', products.length);
+  console.log('products[products.length - 1]:', products[products.length - 1]);
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -232,7 +244,6 @@ export default function Browser({
             expandedMenu={expandedMenu}
             setExpandedMenu={setExpandedMenu}
             navigate={navigate}
-            handleLikeProduct={handleLikeProduct}
             user={user}
             currentProduct={currentProduct}
             products={products}
@@ -313,10 +324,9 @@ type NavBarProps = {
   expandedMenu: boolean;
   setExpandedMenu: (expanded: boolean) => void;
   navigate: (direction: 'back' | 'forward') => void;
-  handleLikeProduct: () => void;
   user: any;
   currentProduct: Product;
-  products: Product[];
+  products: UserProduct[];
 };
 
 function NavBar({
@@ -324,7 +334,6 @@ function NavBar({
   expandedMenu,
   setExpandedMenu,
   navigate,
-  handleLikeProduct,
   user,
   currentProduct,
   products,
@@ -332,40 +341,73 @@ function NavBar({
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (product: Product) => {},
-    onMutate: async (product: Product) => {
-      console.log('onMutate', product);
+    mutationFn: async (product: UserProduct) => {
+      console.log('mutationFn', product);
 
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries(['products', user?.id]);
+      if (!product.liked) {
+        const response = await fetch(`${URL}/users/${user?.id}/likes`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ product_url: product.url }),
+        });
 
-      const previousProducts = queryClient.getQueryData(['products']);
+        if (!response.ok) {
+          console.error(
+            `HTTP error! status: ${response.status}, error: ${response.statusText}`
+          );
+        }
+      } else {
+        const response = await fetch(`${URL}/users/${user?.id}/likes`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ product_url: product.url }),
+        });
 
-      // Optimistically update to the new value
-      queryClient.setQueryData(['products'], (old: Product[] | undefined) => {
-        return old?.filter((p) => p.url !== product.url);
-      });
-
-      return { previousProducts };
+        if (!response.ok) {
+          console.error(
+            `HTTP error! status: ${response.status}, error: ${response.statusText}`
+          );
+        }
+      }
+      return;
     },
-    onError: (err, website, context) => {
-      console.log('error', err, website, context);
-      queryClient.setQueryData(['products'], context?.previousProducts);
+    onMutate: async (product: UserProduct) => {
+      console.log('onMutate', product);
+      product.liked = !product.liked;
+
+      await queryClient.cancelQueries(['likes', user?.id]);
+
+      const previousProducts = queryClient.getQueryData(['likes', product.url]);
+
+      queryClient.setQueryData(['likes', product.url], product);
+
+      return { previousProducts, product };
+    },
+    onError: (err, product, context) => {
+      console.log('error', err, product, context);
+      queryClient.setQueryData(
+        ['likes', context?.product.url],
+        context?.previousProducts
+      );
     },
     onSettled: async () => {
       // setRandomNumber(Math.random()); // used temporarily to force a list re-render
       // queryClient.invalidateQueries({ queryKey: ['websites', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['likes', user?.id] });
     },
   });
 
   let icon: 'heart' | 'heart-outline' = products?.find(
-    (product) => product.url === currentProduct?.url
+    (product) => product.url === currentProduct?.url && product.liked
   )
     ? 'heart'
     : 'heart-outline';
 
-  console.log('icon:', icon);
+  let activeProduct = products?.find((p) => p.url === currentProduct?.url);
 
   return (
     <Box
@@ -422,7 +464,9 @@ function NavBar({
           size={24}
           color="black"
           onPress={() => {
-            mutation.mutate(currentProduct);
+            if (activeProduct) {
+              mutation.mutate(activeProduct);
+            }
           }}
         />
         <Ionicons name="md-ellipsis-horizontal-sharp" size={24} color="black" />

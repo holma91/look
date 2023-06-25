@@ -73,3 +73,11 @@ VALUES
 
 UPDATE user_product SET liked = TRUE
 WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey';
+
+SELECT 
+    product.*,
+    up.liked
+FROM product
+LEFT JOIN user_product up
+    ON up.product_url = product.url
+    AND up.user_id = $1

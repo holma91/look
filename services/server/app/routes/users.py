@@ -1,11 +1,12 @@
 import logging
 import os
+from typing import Optional, Any
 
 from fastapi import APIRouter, HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserSchema, WebsiteSchema, Product, UserProduct, ProductStrict
+from app.models.pydantic import UserSchema, WebsiteSchema, Product, UserProduct, ProductStrict, ProductUser
 
 from pydantic import BaseModel
 
@@ -33,9 +34,9 @@ async def read_user(id: str) -> UserSchema:
     return user
 
 
-@router.get("/{user_id}/likes", response_model=list[UserProduct])
-async def read_user_likes(user_id: str) -> list[UserProduct]:
-    products = await crud.get_likes(user_id)
+@router.get("/{user_id}/likes", response_model=list[ProductUser])
+async def read_user_likes(user_id: str) -> ProductUser:
+    products = await crud.get_likes_alternative(user_id)
     return products
 
 @router.post("/{user_id}/products", status_code=201, response_model=UserProduct) # history basically

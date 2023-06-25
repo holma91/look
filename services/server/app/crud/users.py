@@ -58,10 +58,24 @@ async def get_likes(user_id: str) -> list:
     await conn.close()
     return products
 
+async def get_likes_alternative(user_id: str) -> list:
+    conn = Tortoise.get_connection("default")
+    query = """
+        SELECT 
+            product.*,
+            up.liked
+        FROM product
+        INNER JOIN user_product up
+            ON up.product_url = product.url
+            AND up.user_id = $1;
+    """
+    products = await conn.execute_query_dict(query, [user_id])
+    await conn.close()
+    return products
+
 async def add_like(user_id: str, product_url: str) -> Optional[str]:
     query = """
-    insert into user_product (user_id, product_url)
-    values ($1, $2);
+    update user_product set liked = TRUE where user_id = $1 and product_url = $2;
     """
     async with in_transaction("default") as tconn:
         await tconn.execute_query_dict(query, [user_id, product_url])
@@ -70,7 +84,7 @@ async def add_like(user_id: str, product_url: str) -> Optional[str]:
 
 async def un_like(user_id: str, product_url: str) -> Optional[str]:
     query = """
-    delete from user_product where user_id = $1 and product_url = $2;
+    update user_product set liked = FALSE where user_id = $1 and product_url = $2;
     """
     async with in_transaction("default") as tconn:
         await tconn.execute_query_dict(query, [user_id, product_url])
