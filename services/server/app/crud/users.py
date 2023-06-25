@@ -1,7 +1,6 @@
 from typing import Optional
-from tortoise import Tortoise
 
-from app.models.pydantic import UserProduct, ProductStrict
+from app.models.pydantic import ProductExtended
 
 from app.crud import products as product_crud
 from app.db import get_db_connection
@@ -18,20 +17,37 @@ async def get_all() -> list[dict]:
 
 async def get(id: str) -> dict:
     async with get_db_connection() as conn:
-        query = """
-            select * from "user" u where u.id = $1;
+        user_query = """
+            select * from "user" where id = $1;
         """
-        users = await conn.execute_query_dict(query, [id])
+        user = await conn.execute_query_dict(user_query, [id])
 
-    return users[0]
+        if not user:
+            return None
+
+        user = user[0]
+
+        product_query = """
+            select product_url from user_product where user_id = $1 and liked = TRUE;
+        """
+        liked_products = await conn.execute_query_dict(product_query, [id])
+
+        website_query = """
+            select website_id from user_website where user_id = $1;
+        """
+        favorite_websites = await conn.execute_query_dict(website_query, [id])
+
+    user['likes'] = [product["product_url"] for product in liked_products]
+    user['favorites'] = [website["website_id"] for website in favorite_websites]
+    return user
 
 
-async def add_product(user_id: str, product: ProductStrict) -> Optional[UserProduct]:
+async def add_product(user_id: str, product: ProductExtended) -> bool:
     # Adding a product from a user's perspective
     # 1. add the actual product if it doesn't exist and it's images
     result = await product_crud.add(product)
     if not result:
-        return None
+        return False
     
 
     # 3. add the user_product relationship
@@ -39,41 +55,84 @@ async def add_product(user_id: str, product: ProductStrict) -> Optional[UserProd
         check_query = """select * from user_product where user_id = $1 and product_url = $2;"""
         check_result = await conn.execute_query_dict(check_query, [user_id, product.url])
         if check_result:
-            return UserProduct(**check_result[0])
+            return True
         
         query = """
         insert into user_product (user_id, product_url)
-        values ($1, $2) returning *;
+        values ($1, $2);
         """
-        user_product = await conn.execute_query_dict(query, [user_id, product.url])
+        await conn.execute_query_dict(query, [user_id, product.url])
 
-    return UserProduct(**user_product[0])
+    return True
 
 
 async def get_likes(user_id: str) -> list:
     async with get_db_connection() as conn:
         query = """
-        select * from user_product up 
-        where up.user_id = $1;
+            select * from user_product up
+            join product p on up.product_url = p.url
+            join product_image pi on p.url = pi.product_url
+            where up.user_id = $1 and liked = TRUE;
         """
-        products = await conn.execute_query_dict(query, [user_id])
+        rows = await conn.execute_query_dict(query, [user_id])
+
+    products_dict = {}
+    for row in rows:
+        product_url = row["product_url"]
+        if product_url not in products_dict:
+            product = {
+                "url": product_url,
+                "domain": row["domain"],
+                "brand": row["brand"],
+                "name": row["name"],
+                "price": row["price"],
+                "currency": row["currency"],
+                "images": []
+            }
+            products_dict[product_url] = product
+
+        # Add the image URL to the product's image list
+        products_dict[product_url]["images"].append(row["image_url"])
+
+    # Get a list of the products
+    products = list(products_dict.values())
 
     return products
 
-async def get_likes_alternative(user_id: str) -> list:
+async def get_history(user_id: str) -> list:
     async with get_db_connection() as conn:
         query = """
-            SELECT 
-                product.*,
-                up.liked
-            FROM product
-            INNER JOIN user_product up
-                ON up.product_url = product.url
-                AND up.user_id = $1;
+            select * from user_product up
+            join product p on up.product_url = p.url
+            join product_image pi on p.url = pi.product_url
+            where up.user_id = $1;
         """
-        products = await conn.execute_query_dict(query, [user_id])
+        rows = await conn.execute_query_dict(query, [user_id])
+
+    products_dict = {}
+    for row in rows:
+        product_url = row["product_url"]
+        if product_url not in products_dict:
+            product = {
+                "url": product_url,
+                "domain": row["domain"],
+                "brand": row["brand"],
+                "name": row["name"],
+                "price": row["price"],
+                "currency": row["currency"],
+                "liked": row["liked"],
+                "images": []
+            }
+            products_dict[product_url] = product
+
+        # Add the image URL to the product's image list
+        products_dict[product_url]["images"].append(row["image_url"])
+
+    # Get a list of the products
+    products = list(products_dict.values())
 
     return products
+
 
 async def add_like(user_id: str, product_url: str) -> Optional[str]:
     async with get_db_connection() as conn:

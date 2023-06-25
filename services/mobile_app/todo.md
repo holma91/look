@@ -10,6 +10,10 @@ Pages:
 
 ### TODO rn
 
+1. make it possible to like products
+2. create the likes page
+
+- dreambooth
 - write connectors for the 10 sites
 
 ### TODO

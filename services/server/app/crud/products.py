@@ -1,11 +1,11 @@
 from typing import Optional
 
 from tortoise import Tortoise
-from app.models.pydantic import Product, ProductStrict
+from app.models.pydantic import ProductBase, ProductExtended
 from app.db import get_db_connection
 
 
-async def get_all() -> list[ProductStrict]:
+async def get_all() -> list:
     async with get_db_connection() as conn:
         query = """SELECT * FROM product 
                 LEFT JOIN product_image 
@@ -35,7 +35,7 @@ async def get_all() -> list[ProductStrict]:
 
     return products_list
 
-async def get(id: str) -> ProductStrict:
+async def get(id: str) -> dict:
     url = id.replace('|', '/')
     conn = Tortoise.get_connection("default")
     async with get_db_connection() as conn:
@@ -55,13 +55,13 @@ async def get(id: str) -> ProductStrict:
 
     return product
 
-async def add(product: ProductStrict) -> Optional[Product]:
+async def add(product: ProductExtended) -> Optional[ProductBase]:
 
     async with get_db_connection() as conn:
         check_query = """select * from product where url = $1;"""
         check_result = await conn.execute_query_dict(check_query, [product.url])
         if check_result:
-            return Product(**check_result[0])
+            return ProductBase(**check_result[0])
         
         # Insert product
 
@@ -81,7 +81,7 @@ async def add(product: ProductStrict) -> Optional[Product]:
         for image in product.images:
             await conn.execute_query_dict(query, [product.url, image])
 
-    return Product(**result[0]) if result else None
+    return ProductBase(**result[0]) if result else None
 
 async def delete(id: str) -> bool:
     product_url = id.replace('|', '/')

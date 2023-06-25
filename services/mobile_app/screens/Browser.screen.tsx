@@ -66,6 +66,18 @@ const fetchLikes = async (id: string) => {
   return response.json();
 };
 
+const fetchHistory = async (id: string) => {
+  const completeUrl = `${URL}/users/${id}/history`;
+  const response = await fetch(completeUrl);
+
+  if (!response.ok) {
+    throw new Error(
+      `Network response was not ok. Status code: ${response.status}`
+    );
+  }
+  return response.json();
+};
+
 export default function Browser({
   navigation,
   route,
@@ -176,7 +188,6 @@ export default function Browser({
           `HTTP error! status: ${response.status}, error: ${response.statusText}`
         );
       } else {
-        await response.json();
         refetchProducts();
       }
     } else if (parsedData.type === 'imageSrc') {
@@ -197,7 +208,7 @@ export default function Browser({
     refetch: refetchProducts,
   } = useQuery({
     queryKey: ['likes', user?.id],
-    queryFn: () => fetchLikes(user?.id as string),
+    queryFn: () => fetchHistory(user?.id as string),
     enabled: !!user?.id,
   });
 
@@ -396,7 +407,6 @@ function NavBar({
     },
     onSettled: async () => {
       // setRandomNumber(Math.random()); // used temporarily to force a list re-render
-      // queryClient.invalidateQueries({ queryKey: ['websites', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['likes', user?.id] });
     },
   });
@@ -408,6 +418,8 @@ function NavBar({
     : 'heart-outline';
 
   let activeProduct = products?.find((p) => p.url === currentProduct?.url);
+
+  console.log('activeProduct', activeProduct);
 
   return (
     <Box

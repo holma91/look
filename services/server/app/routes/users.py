@@ -6,27 +6,21 @@ from fastapi import APIRouter, HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserSchema, WebsiteSchema, Product, UserProduct, ProductStrict, ProductUser
-
-from pydantic import BaseModel
-
-class LikeProduct(BaseModel):
-    product_url: str
-
-class LikeProductResponse(BaseModel):
-    user_id: str
-    product_url: str
+from app.models.pydantic import UserBase, UserExtended, UserLiked, UserHistory, ProductExtended, POSTResponse, LikeProduct
+from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
 
 log = logging.getLogger("uvicorn")
 
-@router.get("/", response_model=list[UserSchema])
-async def read_users() -> list[UserSchema]:
+### GET REQUESTS ###
+
+@router.get("/", response_model=list[UserBase])
+async def read_users() -> list[UserBase]:
     return await crud.get_all()
 
-@router.get("/{id}/", response_model=UserSchema)
-async def read_user(id: str) -> UserSchema:
+@router.get("/{id}/", response_model=UserExtended)
+async def read_user(id: str) -> UserExtended:
     user = await crud.get(id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -34,27 +28,34 @@ async def read_user(id: str) -> UserSchema:
     return user
 
 
-@router.get("/{user_id}/likes", response_model=list[ProductUser])
-async def read_user_likes(user_id: str) -> ProductUser:
-    products = await crud.get_likes_alternative(user_id)
+@router.get("/{user_id}/likes", response_model=list[UserLiked])
+async def read_user_likes(user_id: str) -> UserLiked:
+    products = await crud.get_likes(user_id)
     return products
 
-@router.post("/{user_id}/products", status_code=201, response_model=UserProduct) # history basically
-async def add_product(user_id: str, product: ProductStrict) -> UserProduct:
-    user_product = await crud.add_product(user_id, product)
-    if user_product is None:
+@router.get("/{user_id}/history", response_model=list[UserHistory])
+async def read_user_history(user_id: str) -> UserHistory:
+    products = await crud.get_history(user_id)
+    return products
+
+### POST & DELETE REQUESTS ###
+
+@router.post("/{user_id}/products", status_code=201, response_model=POSTResponse) # history basically
+async def add_product(user_id: str, product: ProductExtended) -> POSTResponse:
+    success = await crud.add_product(user_id, product)
+    if not success:
         raise HTTPException(status_code=404, detail="User not found!")
 
-    return user_product
+    return SUCCESSFUL_POST_RESPONSE
 
 
-@router.post("/{user_id}/likes", status_code=201, response_model=LikeProductResponse)
-async def add_like(user_id: str, product: LikeProduct) -> LikeProductResponse:
+@router.post("/{user_id}/likes", status_code=201, response_model=POSTResponse)
+async def add_like(user_id: str, product: LikeProduct) -> POSTResponse:
     product = await crud.add_like(user_id, product.product_url)
     if product is None:
         raise HTTPException(status_code=404, detail="User or Product not found!")
 
-    return LikeProductResponse(user_id=user_id, product_url=product)
+    return SUCCESSFUL_POST_RESPONSE
 
 @router.delete("/{user_id}/likes", status_code=204)
 async def delete_like(user_id: str, product: LikeProduct):
