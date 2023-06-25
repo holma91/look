@@ -1,14 +1,15 @@
-import { FlatList, Image, SafeAreaView, TouchableOpacity } from 'react-native';
+import { FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useAuth, useUser } from '@clerk/clerk-expo';
+import { useUser } from '@clerk/clerk-expo';
 import { Image as ExpoImage } from 'expo-image';
 
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { domainToInfo } from '../utils/utils';
 import { SearchBar } from '../components/SearchBar';
+import { favoriteWebsite, fetchWebsites, unFavoriteWebsite } from '../api';
 
 type WebsiteItem = {
   domain: string;
@@ -17,130 +18,8 @@ type WebsiteItem = {
   second_hand: boolean;
 };
 
-const URL = 'http://localhost:8004';
-const fetchWebsites = async (id: string) => {
-  const completeUrl = `${URL}/websites/?user_id=${id}`;
-  const response = await fetch(completeUrl);
-
-  if (!response.ok) {
-    throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
-    );
-  }
-  return response.json();
-};
-
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [filteredSites, setFilteredSites] = useState([]);
-  const [randomNumber, setRandomNumber] = useState(0);
-
-  const queryClient = useQueryClient();
-
-  const { user } = useUser();
-  const userId = user?.id;
-
-  const { status, data: websites } = useQuery({
-    queryKey: ['websites', user?.id],
-    queryFn: () => fetchWebsites(userId as string),
-    enabled: !!userId,
-    onSuccess: () => {},
-  });
-
-  const mutation = useMutation({
-    mutationFn: async (website: WebsiteItem) => {
-      // website.is_favorite is already optimistically updated
-
-      // add error handling later
-      const userId = user?.id;
-      if (!website.is_favorite) {
-        const response = await fetch(
-          `${URL}/users/${userId}/favorites/${website.domain}`,
-          {
-            method: 'DELETE',
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Network response was not ok. Status code: ${response.status}`
-          );
-        }
-
-        return;
-      } else {
-        const response = await fetch(
-          `${URL}/users/${userId}/favorites/${website.domain}`,
-          {
-            method: 'POST',
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Network response was not ok. Status code: ${response.status}`
-          );
-        }
-
-        const data = await response.json();
-        return data;
-      }
-    },
-    onMutate: async (website: WebsiteItem) => {
-      // this is before mutationFn is called, has the old website value ofc
-      website.is_favorite = !website.is_favorite;
-
-      // cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({ queryKey: ['websites', user?.id] });
-
-      // snapshot previous value
-      const previousWebsite = queryClient.getQueryData([
-        'websites',
-        website.domain,
-      ]);
-
-      queryClient.setQueryData(['websites', website.domain], website);
-
-      return { previousWebsite, website };
-    },
-    onError: (err, website, context) => {
-      console.log('error', err, website, context);
-      queryClient.setQueryData(
-        ['websites', context?.website.domain],
-        context?.previousWebsite
-      );
-    },
-    onSettled: async () => {
-      setRandomNumber(Math.random()); // used temporarily to force a list re-render
-
-      queryClient.invalidateQueries({ queryKey: ['websites', user?.id] });
-    },
-  });
-
-  useEffect(() => {
-    let filtered;
-    if (selectedCategory === 'Favorites') {
-      filtered = websites.filter((site: WebsiteItem) => site.is_favorite);
-    } else if (selectedCategory === 'Multi') {
-      filtered = websites.filter((site: WebsiteItem) => site.multi_brand);
-    } else if (selectedCategory === 'Single') {
-      filtered = websites.filter((site: WebsiteItem) => !site.multi_brand);
-    } else if (selectedCategory === '2nd hand') {
-      filtered = websites.filter((site: WebsiteItem) => site.second_hand);
-    } else {
-      filtered = websites;
-    }
-
-    setFilteredSites(filtered);
-  }, [selectedCategory, websites, randomNumber]);
-
-  if (status === 'loading') {
-    return <Text>Loading...</Text>;
-  }
-
-  if (status === 'error') {
-    return <Text>Error</Text>;
-  }
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -184,64 +63,146 @@ export default function Shop({ navigation }: { navigation: any }) {
             />
           </Box>
           <Box>
-            <FlatList<WebsiteItem>
-              data={filteredSites}
-              renderItem={({ item }) => (
-                <Box
-                  flex={1}
-                  flexDirection="row"
-                  alignItems="center"
-                  borderTopWidth={1}
-                  borderColor="grey"
-                  paddingHorizontal="m"
-                  paddingVertical="s"
-                >
-                  <TouchableOpacity
-                    onPress={() =>
-                      navigation.navigate('Browser', { url: item.domain })
-                    }
-                    style={{ flex: 1 }}
-                  >
-                    <Box
-                      flexDirection="row"
-                      alignItems="center"
-                      gap="l"
-                      flex={1}
-                    >
-                      <ExpoImage
-                        style={{
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          height: 40,
-                          width: 40,
-                        }}
-                        source={domainToInfo[item.domain].icon}
-                        contentFit="contain"
-                      />
-                      <Box gap="s">
-                        <Text variant="body" fontWeight={'bold'}>
-                          {domainToInfo[item.domain].name}
-                        </Text>
-                        <Text variant="body">{item.domain}</Text>
-                      </Box>
-                    </Box>
-                  </TouchableOpacity>
-                  <Ionicons
-                    name={item.is_favorite ? 'ios-star' : 'ios-star-outline'}
-                    flex={0}
-                    size={24}
-                    color="black"
-                    onPress={() => {
-                      mutation.mutate(item);
-                    }}
-                  />
-                </Box>
-              )}
-              keyExtractor={(site) => site.domain}
+            <WebsiteList
+              navigation={navigation}
+              selectedCategory={selectedCategory}
             />
           </Box>
         </Box>
       </SafeAreaView>
     </Box>
+  );
+}
+
+type WebsiteListProps = {
+  navigation: any;
+  selectedCategory: string;
+};
+
+function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
+  const [renderToggle, setRenderToggle] = useState(false);
+  const queryClient = useQueryClient();
+  const { user } = useUser();
+
+  const { status, data: websites } = useQuery({
+    queryKey: ['websites', user?.id],
+    queryFn: () => fetchWebsites(user?.id as string),
+    enabled: !!user?.id,
+    onSuccess: () => {},
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (website: WebsiteItem) => {
+      if (!user?.id) return;
+
+      if (!website.is_favorite) {
+        return unFavoriteWebsite(user.id, website.domain);
+      } else {
+        return favoriteWebsite(user.id, website.domain);
+      }
+    },
+    onMutate: async (website: WebsiteItem) => {
+      website.is_favorite = !website.is_favorite;
+
+      await queryClient.cancelQueries({ queryKey: ['websites', user?.id] });
+
+      const previousWebsite = queryClient.getQueryData([
+        'websites',
+        website.domain,
+      ]);
+
+      queryClient.setQueryData(['websites', website.domain], website);
+
+      return { previousWebsite, website };
+    },
+    onError: (err, website, context) => {
+      console.log('mutation error', err, website, context);
+      queryClient.setQueryData(
+        ['websites', context?.website.domain],
+        context?.previousWebsite
+      );
+    },
+    onSettled: async () => {
+      setRenderToggle(!renderToggle);
+
+      queryClient.invalidateQueries({ queryKey: ['websites', user?.id] });
+    },
+  });
+
+  const filteredSites = useMemo(() => {
+    let filtered;
+    if (selectedCategory === 'Favorites') {
+      filtered = websites.filter((site: WebsiteItem) => site.is_favorite);
+    } else if (selectedCategory === 'Multi') {
+      filtered = websites.filter((site: WebsiteItem) => site.multi_brand);
+    } else if (selectedCategory === 'Single') {
+      filtered = websites.filter((site: WebsiteItem) => !site.multi_brand);
+    } else if (selectedCategory === '2nd hand') {
+      filtered = websites.filter((site: WebsiteItem) => site.second_hand);
+    } else {
+      filtered = websites;
+    }
+    return filtered;
+  }, [selectedCategory, websites, renderToggle]);
+
+  console.log('filteredSites', filteredSites);
+
+  if (status === 'loading') {
+    return <Text>Loading...</Text>;
+  }
+
+  if (status === 'error') {
+    return <Text>Error when getting websites</Text>;
+  }
+
+  return (
+    <FlatList<WebsiteItem>
+      data={filteredSites}
+      renderItem={({ item }) => (
+        <Box
+          flex={1}
+          flexDirection="row"
+          alignItems="center"
+          borderTopWidth={1}
+          borderColor="grey"
+          paddingHorizontal="m"
+          paddingVertical="s"
+        >
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Browser', { url: item.domain })}
+            style={{ flex: 1 }}
+          >
+            <Box flexDirection="row" alignItems="center" gap="l" flex={1}>
+              <ExpoImage
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 40,
+                  width: 40,
+                }}
+                source={domainToInfo[item.domain].icon}
+                contentFit="contain"
+              />
+              <Box gap="s">
+                <Text variant="body" fontWeight={'bold'}>
+                  {domainToInfo[item.domain].name}
+                </Text>
+                <Text variant="body">{item.domain}</Text>
+              </Box>
+            </Box>
+          </TouchableOpacity>
+          <Ionicons
+            name={item.is_favorite ? 'ios-star' : 'ios-star-outline'}
+            flex={0}
+            size={24}
+            color="black"
+            onPress={() => {
+              mutation.mutate(item);
+            }}
+          />
+        </Box>
+      )}
+      keyExtractor={(site) => site.domain}
+    />
   );
 }

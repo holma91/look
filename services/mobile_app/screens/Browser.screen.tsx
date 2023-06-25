@@ -1,4 +1,4 @@
-import { Dimensions, SafeAreaView } from 'react-native';
+import { Dimensions } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useRef, useState } from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -7,23 +7,24 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   runOnJS,
-  LightSpeedInLeft,
   LightSpeedOutRight,
   useAnimatedReaction,
-  FadeIn,
   FadeOut,
   ZoomIn,
 } from 'react-native-reanimated';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useAuth, useUser } from '@clerk/clerk-expo';
+import { useUser } from '@clerk/clerk-expo';
 import { theme } from '../styling/theme';
+import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { TextInput } from '../styling/TextInput';
 import { Button } from '../components/Button';
 import { jsScripts } from '../utils/scripts';
+import { fetchHistory } from '../api';
+import { Product, UserProduct } from '../utils/types';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -32,51 +33,7 @@ const MIN_HEIGHT = 0;
 const MEDIUM_HEIGHT = 300;
 const MAX_HEIGHT = SCREEN_HEIGHT - 115;
 
-type Product = {
-  url: string;
-  name: string;
-  brand: string;
-  price: string;
-  currency: string;
-  updated_at?: string;
-  images: string[];
-};
-
-type UserProduct = {
-  url: string;
-  name: string;
-  brand: string;
-  price: string;
-  currency: string;
-  updated_at?: string;
-  images: string[];
-  liked: boolean;
-};
-
 const URL = 'http://localhost:8004';
-const fetchLikes = async (id: string) => {
-  const completeUrl = `${URL}/users/${id}/likes`;
-  const response = await fetch(completeUrl);
-
-  if (!response.ok) {
-    throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
-    );
-  }
-  return response.json();
-};
-
-const fetchHistory = async (id: string) => {
-  const completeUrl = `${URL}/users/${id}/history`;
-  const response = await fetch(completeUrl);
-
-  if (!response.ok) {
-    throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
-    );
-  }
-  return response.json();
-};
 
 export default function Browser({
   navigation,
@@ -152,56 +109,6 @@ export default function Browser({
     }
   };
 
-  const handleMessage = async (event: any) => {
-    const product_url = event.nativeEvent.url;
-
-    // message type 1: product data
-    const parsedData = JSON.parse(event.nativeEvent.data);
-    if (parsedData.type === 'product') {
-      const product: Product = parsedData.data;
-      product.url = product_url;
-      if (product?.images) {
-        // remove query parameters from images
-        for (let i = 0; i < product.images.length; i++) {
-          product.images[i] = product.images[i].substring(
-            0,
-            product.images[i].indexOf('?')
-          );
-        }
-      }
-      setCurrentProduct(product);
-
-      const backendProduct = {
-        ...product,
-        domain: domain,
-      };
-      const response = await fetch(`${URL}/users/${user?.id}/products`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(backendProduct),
-      });
-
-      if (!response.ok) {
-        console.error(
-          `HTTP error! status: ${response.status}, error: ${response.statusText}`
-        );
-      } else {
-        refetchProducts();
-      }
-    } else if (parsedData.type === 'imageSrc') {
-      const imageSrc: string = parsedData.data;
-      setCurrentProduct((prev) => ({ ...prev, images: [imageSrc] }));
-    } else {
-      console.log('unknown message type:', parsedData.data);
-    }
-  };
-
-  const handleLikeProduct = () => {
-    console.log('liked product:', currentProduct);
-  };
-
   const {
     data: products,
     status,
@@ -225,42 +132,39 @@ export default function Browser({
 
   return (
     <Box backgroundColor="background" flex={1}>
-      <SafeAreaView style={{ flex: 1 }}>
+      <Box flex={1}>
+        <SearchBar
+          setSearch={setSearch}
+          search={search}
+          handleSearch={handleSearch}
+          webviewNavigation={navigate}
+          navigation={navigation}
+        />
         <Box flex={1}>
-          <SearchBar
-            setSearch={setSearch}
-            search={search}
-            handleSearch={handleSearch}
-            webviewNavigation={navigate}
-            navigation={navigation}
-          />
-          <Box flex={1}>
-            <WebView
-              ref={webviewRef}
-              startInLoadingState={true} // https://github.com/react-native-webview/react-native-webview/issues/124
-              source={{
-                uri: url,
-              }}
-              onNavigationStateChange={handleNavigationStateChange}
-              onMessage={handleMessage}
-            />
-          </Box>
-          <BottomSheet
-            bottomSheetHeight={bottomSheetHeight}
-            setExpandedMenu={setExpandedMenu}
-            currentProduct={currentProduct}
-          />
-          <NavBar
-            bottomSheetHeight={bottomSheetHeight}
-            expandedMenu={expandedMenu}
-            setExpandedMenu={setExpandedMenu}
-            navigate={navigate}
-            user={user}
-            currentProduct={currentProduct}
-            products={products}
+          <WebViewBox
+            webviewRef={webviewRef}
+            handleNavigationStateChange={handleNavigationStateChange}
+            url={url}
+            domain={domain}
+            setCurrentProduct={setCurrentProduct}
+            refetchProducts={refetchProducts}
           />
         </Box>
-      </SafeAreaView>
+        <BottomSheet
+          bottomSheetHeight={bottomSheetHeight}
+          setExpandedMenu={setExpandedMenu}
+          currentProduct={currentProduct}
+        />
+        <NavBar
+          bottomSheetHeight={bottomSheetHeight}
+          expandedMenu={expandedMenu}
+          setExpandedMenu={setExpandedMenu}
+          navigate={navigate}
+          user={user}
+          currentProduct={currentProduct}
+          products={products}
+        />
+      </Box>
     </Box>
   );
 }

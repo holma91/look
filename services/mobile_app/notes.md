@@ -23,3 +23,18 @@ The User object holds all the information for a user of your application and pro
 
 **syncing to backend**:
 user and session changes might have to be synced to a backend. for this: https://clerk.com/docs/users/sync-data-to-your-backend.
+
+## injection script
+
+const scriptElements = document.querySelectorAll(
+'script[type="application/ld+json"]'
+);
+
+// Iterate over the NodeList and process each matching element
+scriptElements.forEach((scriptElement) => {
+// Extract the JSON content and parse it into a JavaScript object
+const data = JSON.parse(scriptElement.textContent);
+
+// Log the data to the console
+console.log(data);
+});
