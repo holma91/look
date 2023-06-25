@@ -2,15 +2,15 @@ from typing import Optional
 
 from tortoise import Tortoise
 from app.models.pydantic import Product, ProductStrict
+from app.db import get_db_connection
+
 
 async def get_all() -> list[ProductStrict]:
-    conn = Tortoise.get_connection("default")
-
-    # Fetch all products and their associated images.
-    query = """SELECT * FROM product 
-               LEFT JOIN product_image 
-               ON product.url = product_image.product_url;"""
-    result = await conn.execute_query_dict(query)
+    async with get_db_connection() as conn:
+        query = """SELECT * FROM product 
+                LEFT JOIN product_image 
+                ON product.url = product_image.product_url;"""
+        result = await conn.execute_query_dict(query)
 
     products = {}
 
@@ -38,13 +38,13 @@ async def get_all() -> list[ProductStrict]:
 async def get(id: str) -> ProductStrict:
     url = id.replace('|', '/')
     conn = Tortoise.get_connection("default")
-
-    query = """select * from product 
-               left join product_image on product.url = product_image.product_url 
-               where product.url = $1;"""
-    
-    result = await conn.execute_query_dict(query, [url])
-    if not result: return None
+    async with get_db_connection() as conn:
+        query = """select * from product 
+                left join product_image on product.url = product_image.product_url 
+                where product.url = $1;"""
+        
+        result = await conn.execute_query_dict(query, [url])
+        if not result: return None
 
     product = result[0]
     product['images'] = []
@@ -56,43 +56,42 @@ async def get(id: str) -> ProductStrict:
     return product
 
 async def add(product: ProductStrict) -> Optional[Product]:
-    conn = Tortoise.get_connection("default")
 
-    check_query = """select * from product where url = $1;"""
-    check_result = await conn.execute_query_dict(check_query, [product.url])
-    if check_result:
-        return Product(**check_result[0])
-    
-    # Insert product
+    async with get_db_connection() as conn:
+        check_query = """select * from product where url = $1;"""
+        check_result = await conn.execute_query_dict(check_query, [product.url])
+        if check_result:
+            return Product(**check_result[0])
+        
+        # Insert product
 
-    query = """
-    insert into product (url, domain, brand, name, price, currency)
-    values ($1, $2, $3, $4, $5, $6) returning *;
-    """
-    result = await conn.execute_query_dict(query, [
-        product.url, product.domain, product.brand, product.name, product.price, product.currency
-    ])
+        query = """
+        insert into product (url, domain, brand, name, price, currency)
+        values ($1, $2, $3, $4, $5, $6) returning *;
+        """
+        result = await conn.execute_query_dict(query, [
+            product.url, product.domain, product.brand, product.name, product.price, product.currency
+        ])
 
-    # Insert images
-    query = """
-    insert into product_image (product_url, image_url)
-    values ($1, $2) returning *;
-    """
-    for image in product.images:
-        await conn.execute_query_dict(query, [product.url, image])
+        # Insert images
+        query = """
+        insert into product_image (product_url, image_url)
+        values ($1, $2) returning *;
+        """
+        for image in product.images:
+            await conn.execute_query_dict(query, [product.url, image])
 
     return Product(**result[0]) if result else None
 
 async def delete(id: str) -> bool:
     product_url = id.replace('|', '/')
-    conn = Tortoise.get_connection("default")
+    async with get_db_connection() as conn:
+        check_query = """select * from product where url = $1;"""
+        check_result = await conn.execute_query_dict(check_query, [product_url])
 
-    check_query = """select * from product where url = $1;"""
-    check_result = await conn.execute_query_dict(check_query, [product_url])
-
-    if check_result:  # if product exists
-        delete_query = """delete from product where url = $1;"""
-        await conn.execute_query(delete_query, [product_url])
-        return True
-    else:
-        return False
+        if check_result:  # if product exists
+            delete_query = """delete from product where url = $1;"""
+            await conn.execute_query(delete_query, [product_url])
+            return True
+        else:
+            return False

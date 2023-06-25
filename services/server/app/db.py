@@ -1,7 +1,10 @@
 import logging
 import os
+from contextlib import asynccontextmanager
+
 
 from fastapi import FastAPI
+
 from tortoise import Tortoise, run_async
 from tortoise.contrib.fastapi import register_tortoise
 
@@ -28,6 +31,14 @@ def init_db(app: FastAPI) -> None:
         generate_schemas=False,
         add_exception_handlers=True,
     )
+
+@asynccontextmanager
+async def get_db_connection():
+    conn = Tortoise.get_connection("default")
+    try:
+        yield conn
+    finally:
+        await conn.close()
 
 
 async def generate_schema() -> None:
