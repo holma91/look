@@ -101,3 +101,25 @@ export const createProduct = async (
 
   return response.json();
 };
+
+export const likeProduct = async (userId: string, productUrl: string) => {
+  const response = await fetch(`${URL}/users/${userId}/likes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ product_url: productUrl }),
+  });
+  return response;
+};
+
+export const unlikeProduct = async (userId: string, productUrl: string) => {
+  const response = await fetch(`${URL}/users/${userId}/likes`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ product_url: productUrl }),
+  });
+  return response;
+};

@@ -23,8 +23,9 @@ import { Text } from '../styling/Text';
 import { TextInput } from '../styling/TextInput';
 import { Button } from '../components/Button';
 import { jsScripts } from '../utils/scripts';
-import { fetchHistory } from '../api';
+import { fetchHistory, likeProduct, unlikeProduct } from '../api';
 import { Product, UserProduct } from '../utils/types';
+import { BrowserSearchBar } from '../components/SearchBar';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -133,7 +134,7 @@ export default function Browser({
   return (
     <Box backgroundColor="background" flex={1}>
       <Box flex={1}>
-        <SearchBar
+        <BrowserSearchBar
           setSearch={setSearch}
           search={search}
           handleSearch={handleSearch}
@@ -169,71 +170,6 @@ export default function Browser({
   );
 }
 
-type SearchBarProps = {
-  setSearch: (search: string) => void;
-  search: string;
-  handleSearch: () => void;
-  navigation: any;
-  webviewNavigation: (direction: 'back' | 'forward' | 'reload') => void;
-};
-
-function SearchBar({
-  setSearch,
-  search,
-  handleSearch,
-  navigation,
-  webviewNavigation,
-}: SearchBarProps) {
-  return (
-    <Box
-      flex={0}
-      flexDirection="row"
-      alignItems="center"
-      gap="s"
-      paddingBottom="s"
-      paddingHorizontal="m"
-    >
-      <Box
-        flex={1}
-        backgroundColor="grey"
-        borderRadius={20}
-        flexDirection="row"
-        alignItems="center"
-        paddingHorizontal="m"
-        paddingVertical="xxs"
-      >
-        <TextInput
-          onChangeText={setSearch}
-          value={search}
-          autoCapitalize="none"
-          autoComplete="off"
-          autoCorrect={false}
-          inputMode="url"
-          variant="primary"
-          onSubmitEditing={handleSearch}
-          selectTextOnFocus={true}
-        />
-        <Ionicons
-          name="refresh"
-          flex={0}
-          size={24}
-          color="black"
-          onPress={() => webviewNavigation('reload')}
-        />
-      </Box>
-      <Box flex={0} backgroundColor="grey" borderRadius={20} padding="xs">
-        <Ionicons
-          name="close"
-          flex={0}
-          size={24}
-          color="black"
-          onPress={() => navigation.goBack()}
-        />
-      </Box>
-    </Box>
-  );
-}
-
 type NavBarProps = {
   bottomSheetHeight: Animated.SharedValue<number>;
   expandedMenu: boolean;
@@ -257,47 +193,15 @@ function NavBar({
 
   const mutation = useMutation({
     mutationFn: async (product: UserProduct) => {
-      console.log('mutationFn', product);
-
-      if (!product.liked) {
-        const response = await fetch(`${URL}/users/${user?.id}/likes`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ product_url: product.url }),
-        });
-
-        if (!response.ok) {
-          console.error(
-            `HTTP error! status: ${response.status}, error: ${response.statusText}`
-          );
-        }
-      } else {
-        const response = await fetch(`${URL}/users/${user?.id}/likes`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ product_url: product.url }),
-        });
-
-        if (!response.ok) {
-          console.error(
-            `HTTP error! status: ${response.status}, error: ${response.statusText}`
-          );
-        }
-      }
-      return;
+      !product.liked
+        ? await unlikeProduct(user?.id, product.url)
+        : await likeProduct(user?.id, product.url);
+      return product;
     },
     onMutate: async (product: UserProduct) => {
-      console.log('onMutate', product);
       product.liked = !product.liked;
-
       await queryClient.cancelQueries(['likes', user?.id]);
-
       const previousProducts = queryClient.getQueryData(['likes', product.url]);
-
       queryClient.setQueryData(['likes', product.url], product);
 
       return { previousProducts, product };
@@ -310,7 +214,6 @@ function NavBar({
       );
     },
     onSettled: async () => {
-      // setRandomNumber(Math.random()); // used temporarily to force a list re-render
       queryClient.invalidateQueries({ queryKey: ['likes', user?.id] });
     },
   });
