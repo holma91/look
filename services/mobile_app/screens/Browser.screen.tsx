@@ -41,7 +41,7 @@ export default function Browser({
   route: any;
 }) {
   const [url, setUrl] = useState(`https://${route.params.url}`);
-  const [domain, setDomain] = useState('');
+  const [domain, setDomain] = useState(route.params.url);
   const [search, setSearch] = useState(`${route.params.url}`);
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product>({
@@ -52,6 +52,8 @@ export default function Browser({
     currency: 'SEK',
     images: [],
   });
+
+  console.log('domain', domain);
 
   const { user } = useUser();
 
@@ -80,31 +82,11 @@ export default function Browser({
     }
   };
 
-  const handleNavigationStateChange = (navState: any) => {
-    // console.log('NAV CHANGE! navState:', navState);
-    if (!navState.loading && webviewRef.current) {
-      let match = url.match(/https?:\/\/(?:www\.)?(\w+)\./);
-      if (match && match[1]) {
-        let domain = match[1];
-        setDomain(domain + '.com');
-
-        let script = jsScripts[domain];
-
-        // Very hacky solution
-        // in the future, throw away the scripts and write something more robust
-        setTimeout(() => {
-          if (webviewRef.current) {
-            webviewRef.current.injectJavaScript(script.interact);
-            webviewRef.current.injectJavaScript(script.extract);
-          }
-        }, 1000);
-        setTimeout(() => {
-          if (webviewRef.current) {
-            webviewRef.current.injectJavaScript(script.interact);
-          }
-        }, 1500);
-      }
-    }
+  const handleLoadEnd = (navState: any) => {
+    console.log('handleLoadEnd:', navState.nativeEvent);
+    if (!webviewRef.current) return;
+    let script = jsScripts[domain];
+    webviewRef.current.injectJavaScript(script.extract);
   };
 
   const {
@@ -125,8 +107,8 @@ export default function Browser({
     return <Text>Error!</Text>;
   }
 
-  console.log('products.length:', products.length);
-  console.log('products[products.length - 1]:', products[products.length - 1]);
+  // console.log('products.length:', products.length);
+  // console.log('products[products.length - 1]:', products[products.length - 1]);
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -141,7 +123,7 @@ export default function Browser({
         <Box flex={1}>
           <WebViewBox
             webviewRef={webviewRef}
-            handleNavigationStateChange={handleNavigationStateChange}
+            handleLoadEnd={handleLoadEnd}
             url={url}
             domain={domain}
             setCurrentProduct={setCurrentProduct}
@@ -223,7 +205,7 @@ function NavBar({
 
   let activeProduct = products?.find((p) => p.url === currentProduct?.url);
 
-  console.log('activeProduct', activeProduct);
+  // console.log('activeProduct', activeProduct);
 
   return (
     <Box

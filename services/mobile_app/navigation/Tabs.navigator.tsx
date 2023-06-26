@@ -6,6 +6,7 @@ import Create from '../screens/Create.screen';
 import Shop from '../screens/Shop.screen';
 import Profile from '../screens/Profile.screen';
 import Likes from '../screens/Likes.screen';
+import Testing from '../screens/Testing.screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -42,6 +43,9 @@ export default function TabNavigator() {
           } else if (route.name === 'Profile') {
             iconName = focused ? 'ios-person' : 'ios-person-outline';
             return <Ionicons name={iconName} size={size} color={color} />;
+          } else if (route.name === 'Testing') {
+            iconName = focused ? 'hammer' : 'hammer-outline';
+            return <Ionicons name={iconName} size={size} color={color} />;
           }
         },
         tabBarActiveTintColor: activeTheme.colors.text,
@@ -53,6 +57,7 @@ export default function TabNavigator() {
       <Tab.Screen name="Shop" component={Shop} />
       {/* <Tab.Screen name="Create" component={Create} /> */}
       <Tab.Screen name="Likes" component={Likes} />
+      <Tab.Screen name="Testing" component={Testing} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );

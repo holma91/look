@@ -4,7 +4,7 @@ import { Product } from '../utils/types';
 
 type WebViewBoxProps = {
   webviewRef: any;
-  handleNavigationStateChange: (navState: any) => void;
+  handleLoadEnd: (navState: any) => void;
   url: string;
   domain: string;
   setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
@@ -13,7 +13,7 @@ type WebViewBoxProps = {
 
 export function WebViewBox({
   webviewRef,
-  handleNavigationStateChange,
+  handleLoadEnd,
   url,
   domain,
   setCurrentProduct,
@@ -32,7 +32,7 @@ export function WebViewBox({
       source={{
         uri: url,
       }}
-      onNavigationStateChange={handleNavigationStateChange}
+      onLoadEnd={handleLoadEnd}
       onMessage={handleMessage}
     />
   );

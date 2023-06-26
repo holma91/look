@@ -1,7 +1,7 @@
 // mapping from url to injection script
 
 export const jsScripts: { [key: string]: any } = {
-  zalando: {
+  'zalando.com': {
     extract: `
       function extract() {
         var elements = document.querySelectorAll(
@@ -29,7 +29,7 @@ export const jsScripts: { [key: string]: any } = {
     `,
     interact: ``,
   },
-  softgoat: {
+  'softgoat.com': {
     extract: `
       try {
         window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'any', data: 'trying!' }));
@@ -84,7 +84,7 @@ export const jsScripts: { [key: string]: any } = {
       }
   `,
   },
-  zara: `
+  'zara.com': `
     try {
       var elements = document.querySelectorAll('script[type="application/ld+json"]');
 
