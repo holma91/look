@@ -20,7 +20,6 @@ import { theme } from '../styling/theme';
 import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { TextInput } from '../styling/TextInput';
 import { Button } from '../components/Button';
 import { jsScripts } from '../utils/scripts';
 import { fetchHistory, likeProduct, unlikeProduct } from '../api';
@@ -33,8 +32,6 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const MIN_HEIGHT = 0;
 const MEDIUM_HEIGHT = 300;
 const MAX_HEIGHT = SCREEN_HEIGHT - 115;
-
-const URL = 'http://localhost:8004';
 
 export default function Browser({
   navigation,

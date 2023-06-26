@@ -3,9 +3,11 @@
 export const jsScripts: { [key: string]: any } = {
   zalando: {
     extract: `
-      try {
-        var elements = document.querySelectorAll('script[type="application/ld+json"]');
-
+      function extract() {
+        var elements = document.querySelectorAll(
+          'script[type="application/ld+json"]'
+        );
+      
         var product = {};
         var productData = JSON.parse(elements[0].textContent);
         product['name'] = productData['name'];
@@ -13,7 +15,13 @@ export const jsScripts: { [key: string]: any } = {
         product['price'] = productData['offers'][0]['price'];
         product['currency'] = productData['offers'][0]['priceCurrency'];
         product['images'] = productData['image'];
-        
+
+        return product;
+      };
+
+
+      try {
+        var product = extract();
         window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: product }));
       } catch (e) {
 

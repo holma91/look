@@ -14,7 +14,8 @@ export type UserProduct = {
   brand: string;
   price: string;
   currency: string;
-  updated_at?: string;
   images: string[];
-  liked: boolean;
+  updated_at?: string;
+  liked?: boolean;
+  domain?: string;
 };

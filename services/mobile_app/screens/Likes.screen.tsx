@@ -1,61 +1,69 @@
-import { StyleSheet } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
+import { FlatList, Image } from 'react-native';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { Image as ExpoImage } from 'expo-image';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useUser } from '@clerk/clerk-expo';
+import { fetchHistory, fetchLikes } from '../api';
+import { Box } from '../styling/Box';
+import { Text } from '../styling/Text';
+import { UserProduct } from '../utils/types';
 
 export default function Likes() {
-  const isPressed = useSharedValue(false);
-  const offset = useSharedValue({ x: 0, y: 0 });
-  const start = useSharedValue({ x: 0, y: 0 });
-
-  const animatedStyles = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: offset.value.x },
-        { translateY: offset.value.y },
-        { scale: withSpring(isPressed.value ? 1.2 : 1) },
-      ],
-      // backgroundColor: isPressed.value ? 'yellow' : 'blue',
-      backgroundColor: offset.value.y > 300 ? 'yellow' : 'blue',
-    };
+  const { user } = useUser();
+  const { data: likes, status } = useQuery<UserProduct[]>({
+    queryKey: ['likes', user?.id],
+    queryFn: () => fetchLikes(user?.id as string),
+    enabled: !!user?.id,
   });
 
-  const gesture = Gesture.Pan()
-    .onBegin(() => {
-      isPressed.value = true;
-    })
-    .onUpdate((e) => {
-      offset.value = {
-        x: e.translationX + start.value.x,
-        y: e.translationY + start.value.y,
-      };
-    })
-    .onEnd(() => {
-      start.value = {
-        x: offset.value.x,
-        y: offset.value.y,
-      };
-    })
-    .onFinalize(() => {
-      isPressed.value = false;
-    });
+  if (status === 'loading') {
+    return <Text>Loading...</Text>;
+  }
+
+  if (status === 'error') {
+    return <Text>Error!</Text>;
+  }
 
   return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View style={[styles.ball, animatedStyles]} />
-    </GestureDetector>
+    <Box backgroundColor="background" flex={1} paddingHorizontal="s">
+      <Box justifyContent="center" alignItems="center" paddingVertical="m">
+        <Text variant="title" fontSize={18}>
+          Likes
+        </Text>
+      </Box>
+      <Box flex={1}>
+        <FlatList
+          data={likes?.slice().reverse()}
+          numColumns={2}
+          keyExtractor={(item) => item.url}
+          renderItem={({ item }) => <Product product={item} />}
+        />
+      </Box>
+    </Box>
   );
 }
 
-const styles = StyleSheet.create({
-  ball: {
-    width: 100,
-    height: 100,
-    borderRadius: 100,
-    backgroundColor: 'blue',
-    alignSelf: 'center',
-  },
-});
+function Product({ product }: { product: UserProduct }) {
+  return (
+    <Box flex={1} margin="s" gap="s" marginBottom="m">
+      <ExpoImage
+        style={{
+          width: '100%',
+          height: 200,
+          borderRadius: 20,
+        }}
+        source={{ uri: product.images[0] }}
+      />
+      <Box gap="xxs">
+        <Text variant="body" fontWeight="600">
+          {product.brand}
+        </Text>
+        <Text fontSize={14} numberOfLines={1} ellipsizeMode="tail">
+          {product.name}
+        </Text>
+        <Text>{`${product.price} ${product.currency}`}</Text>
+        <Text>{product.domain}</Text>
+      </Box>
+    </Box>
+  );
+}

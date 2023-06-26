@@ -8,6 +8,10 @@ Pages:
 - Browse sites (coinbase inspo)
 - Shop on site (klarna inspo)
 
+what's left for making this a minimally usable product (for me)?
+
+- connectors for all chosen sites
+
 ### TODO rn
 
 1. make it possible to like products
