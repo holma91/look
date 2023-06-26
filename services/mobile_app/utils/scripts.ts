@@ -88,6 +88,41 @@ export const jsScripts: { [key: string]: any } = {
     `,
     interact: ``,
   },
+  'sellpy.com': {
+    extract: `
+      function extract() {
+        var elements = document.querySelectorAll(
+          'script[type="application/ld+json"]'
+        );
+
+        var productData;
+        for (let i = 0; i < elements.length; i++) {
+          parsed = JSON.parse(elements[i].textContent);
+          if (parsed['@type'] === 'Product') {
+            productData = parsed;
+          }
+        }
+      
+        var product = {};
+        product['name'] = productData['name'];
+        product['brand'] = productData['brand'];
+        product['price'] = productData['offers']['price'];
+        product['currency'] = productData['offers']['priceCurrency'];
+        product['images'] = [productData['image']];
+
+        return product;
+      };
+
+      try {
+        var product = extract();
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: product }));
+      } catch (e) {
+
+      }
+      
+    `,
+    interact: ``,
+  },
   'softgoat.com': {
     extract: `
       try {

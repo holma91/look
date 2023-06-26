@@ -10,6 +10,8 @@ export const useHandleMessage = (
   const { user } = useUser();
 
   const handleMessage = async (event: any) => {
+    console.log('got da message');
+
     const product_url = event.nativeEvent.url;
     if (!user?.id) return;
 
@@ -17,6 +19,7 @@ export const useHandleMessage = (
     const parsedData = JSON.parse(event.nativeEvent.data);
     if (parsedData.type === 'product') {
       const product: Product = parsedData.data;
+      console.log('product', product);
 
       product.url = product_url;
 

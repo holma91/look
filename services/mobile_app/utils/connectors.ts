@@ -28,11 +28,22 @@ function getProductImages() {
 
   return images;
 }
-
+/*
+handleLoadEnd inject a script into the webview (in intervals)
+the script extracts the schema.org data from the webview and sends it back to the app
+onMessage will call the handleMessage function
+map the schema.org data to our product data type
+set the current product to update the UI
+send the product to the backend
 // APPROACH
 // 1. Inject a script into the page that will extract the product data
 // if image is provided, use it
 // if not, use the first image in the list we get from getProductImages()
+
+// More scalable approach:
+// 1. Inject a script into the page that will extract the schema.org data
+// 2. use LLM to map the schema.org data to our product data
+*/
 
 export const connectors: { [key: string]: any } = {
   'zalando.com': {
@@ -108,6 +119,132 @@ export const connectors: { [key: string]: any } = {
       
     `,
     interact: ``,
+  },
+  'sellpy.com': {
+    both: `
+      function extract() {
+        var elements = document.querySelectorAll(
+          'script[type="application/ld+json"]'
+        );
+
+        var productData;
+        for (let i = 0; i < elements.length; i++) {
+          parsed = JSON.parse(elements[i].textContent);
+          if (parsed['@type'] === 'Product') {
+            productData = parsed;
+          }
+        }
+
+      
+        var product = {};
+        product['name'] = productData['name'];
+        product['brand'] = productData['brand'];
+        product['price'] = productData['offers']['price'];
+        product['currency'] = productData['offers']['priceCurrency'];
+        product['images'] = [productData['image']];
+
+        return product;
+      };
+
+      try {
+        var product = extract();
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: product }));
+      } catch (e) {
+        // alert(e)
+      }
+
+      try {
+        if (!window.hasInjectedClickListener) {
+          document.addEventListener('click', function(e) {
+            var element = e.target;
+            
+            if (element.tagName.toLowerCase() === 'img') {
+              // call extract stuff again
+              var product = extract();
+              window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: product }));
+              if (element.getAttribute('data-has-border') === 'true') {
+                // The image already has a border, so remove it
+                element.style.border = 'none';
+                element.setAttribute('data-has-border', 'false');
+              } else {
+                // The image does not have a border, so add one
+                element.style.boxSizing = 'border-box';
+                element.style.border = '5px solid black';
+                element.setAttribute('data-has-border', 'true');
+              }
+              
+              window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'imageSrc', data: element.src }));
+            }
+          });
+          window.hasInjectedClickListener = true;
+        }
+        
+      } catch (e) {
+        alert(e);
+      }
+    `,
+    extract: `
+      function extract() {
+        var elements = document.querySelectorAll(
+          'script[type="application/ld+json"]'
+        );
+
+        var productData;
+        for (let i = 0; i < elements.length; i++) {
+          parsed = JSON.parse(elements[i].textContent);
+          if (parsed['@type'] === 'Product') {
+            productData = parsed;
+          }
+        }
+
+      
+        var product = {};
+        product['name'] = productData['name'];
+        product['brand'] = productData['brand'];
+        product['price'] = productData['offers']['price'];
+        product['currency'] = productData['offers']['priceCurrency'];
+        product['images'] = [productData['image']];
+
+        return product;
+      };
+
+      try {
+        var product = extract();
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: product }));
+      } catch (e) {
+        alert(e)
+      }
+      
+    `,
+    interact: `
+      try {
+        if (!window.hasInjectedClickListener) {
+          document.addEventListener('click', function(e) {
+            var element = e.target;
+            
+            if (element.tagName.toLowerCase() === 'img') {
+              // call extract stuff again
+              if (element.getAttribute('data-has-border') === 'true') {
+                // The image already has a border, so remove it
+                element.style.border = 'none';
+                element.setAttribute('data-has-border', 'false');
+              } else {
+                // The image does not have a border, so add one
+                element.style.boxSizing = 'border-box';
+                element.style.border = '5px solid black';
+                element.setAttribute('data-has-border', 'true');
+              }
+              
+              window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'imageSrc', data: element.src }));
+            }
+          });
+          window.hasInjectedClickListener = true;
+        }
+        
+      } catch (e) {
+        alert(e);
+      }
+  `,
   },
   'softgoat.com': {
     extract: `

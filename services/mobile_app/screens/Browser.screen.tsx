@@ -54,8 +54,6 @@ export default function Browser({
     images: [],
   });
 
-  console.log('domain', domain);
-
   const { user } = useUser();
 
   const webviewRef = useRef<WebView>(null);
@@ -86,8 +84,18 @@ export default function Browser({
   const handleLoadEnd = (navState: any) => {
     console.log('handleLoadEnd:', navState.nativeEvent);
     if (!webviewRef.current) return;
+
     let script = connectors[domain];
-    webviewRef.current.injectJavaScript(script.extract);
+    // webviewRef.current.injectJavaScript(script.extract);
+
+    if (domain === 'sellpy.com') {
+      setTimeout(() => {
+        if (webviewRef.current) {
+          webviewRef.current.injectJavaScript(script.both);
+          // webviewRef.current.injectJavaScript(script.interact);
+        }
+      }, 5000);
+    }
   };
 
   const {
