@@ -12,6 +12,18 @@ what's left for making this a minimally usable product (for me)?
 
 - connectors for all chosen sites
 
+### How to find the product images on a given page
+
+look for image elements that are not wrapped in "a tags". Works on:
+
+- hm.com
+- softgoat.com
+- zara.com
+- adaysmarch.com (uses picture element)
+- careofcarl.com
+- sellpy.com
+  maybe this is universal!
+
 ### TODO rn
 
 1. make it possible to like products

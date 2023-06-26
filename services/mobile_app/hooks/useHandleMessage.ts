@@ -17,16 +17,9 @@ export const useHandleMessage = (
     const parsedData = JSON.parse(event.nativeEvent.data);
     if (parsedData.type === 'product') {
       const product: Product = parsedData.data;
+
       product.url = product_url;
-      if (product?.images) {
-        // remove query parameters from images
-        for (let i = 0; i < product.images.length; i++) {
-          product.images[i] = product.images[i].substring(
-            0,
-            product.images[i].indexOf('?')
-          );
-        }
-      }
+
       setCurrentProduct(product);
 
       try {

@@ -25,6 +25,7 @@ import { jsScripts } from '../utils/scripts';
 import { fetchHistory, likeProduct, unlikeProduct } from '../api';
 import { Product, UserProduct } from '../utils/types';
 import { BrowserSearchBar } from '../components/SearchBar';
+import { connectors } from '../utils/connectors';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -85,7 +86,7 @@ export default function Browser({
   const handleLoadEnd = (navState: any) => {
     console.log('handleLoadEnd:', navState.nativeEvent);
     if (!webviewRef.current) return;
-    let script = jsScripts[domain];
+    let script = connectors[domain];
     webviewRef.current.injectJavaScript(script.extract);
   };
 

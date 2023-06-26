@@ -1,4 +1,40 @@
-export const jsScripts: { [key: string]: any } = {
+function getImageFilterFunction(domain: string) {
+  switch (domain) {
+    case 'hm.com':
+      return (url: string) => url.startsWith('https://lp2.hm.com');
+    default:
+      return (url: string) => true;
+  }
+}
+
+function getProductImages() {
+  function hasLinkAncestor(node: any) {
+    while (node) {
+      if (node.tagName && node.tagName.toLowerCase() === 'a') {
+        return true;
+      }
+      node = node.parentNode;
+    }
+    return false;
+  }
+
+  var images = Array.from(document.querySelectorAll('img'))
+    .filter((img) => !hasLinkAncestor(img))
+    .map((img) => img.src);
+
+  // we have a list of images, choose the first one that fills a specific criteria for the domain
+  let filterFunction = getImageFilterFunction('hm.com');
+  images = images.filter(filterFunction);
+
+  return images;
+}
+
+// APPROACH
+// 1. Inject a script into the page that will extract the product data
+// if image is provided, use it
+// if not, use the first image in the list we get from getProductImages()
+
+export const connectors: { [key: string]: any } = {
   'zalando.com': {
     extract: `
       function extract() {
@@ -14,6 +50,15 @@ export const jsScripts: { [key: string]: any } = {
         product['currency'] = productData['offers'][0]['priceCurrency'];
         product['images'] = productData['image'];
 
+        if (product.images) {
+          // remove query parameters from images
+          for (let i = 0; i < product.images.length; i++) {
+            product.images[i] = product.images[i].substring(
+              0,
+              product.images[i].indexOf('?')
+            );
+          }
+        }
 
         return product;
       };
@@ -44,12 +89,11 @@ export const jsScripts: { [key: string]: any } = {
         }
       
         var product = {};
-        var productData = JSON.parse(elements[0].textContent);
         product['name'] = productData['name'];
         product['brand'] = productData['brand']['name'];
         product['price'] = productData['offers'][0]['price'];
         product['currency'] = productData['offers'][0]['priceCurrency'];
-        product['images'] = productData['image'];
+        product['images'] = ['https://' + productData['image'].slice(2)];
 
         return product;
       };
@@ -61,30 +105,7 @@ export const jsScripts: { [key: string]: any } = {
       } catch (e) {
 
       }
-
-      function hasLinkAncestor(node) {
-        while (node) {
-          if (node.tagName && node.tagName.toLowerCase() === 'a') {
-            return true;
-          }
-          node = node.parentNode;
-        }
-        return false;
-      }
       
-      function extract() {
-        var images = Array.from(document.querySelectorAll('img'))
-          .filter((img) => !hasLinkAncestor(img))
-          .map((img) => img.src);
-      
-        return images;
-      }
-      
-      try {
-        var images = extract();
-      } catch (e) {
-      
-      }
     `,
     interact: ``,
   },
@@ -143,8 +164,21 @@ export const jsScripts: { [key: string]: any } = {
       }
   `,
   },
-  'zara.com': {
-    extract: ``,
-    interact: ``,
-  },
+  'zara.com': `
+    try {
+      var elements = document.querySelectorAll('script[type="application/ld+json"]');
+
+      var product = {};
+      var productData = JSON.parse(elements[0].textContent);
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand'];
+      product['price'] = productData['offers']['price'];
+      product['currency'] = productData['offers']['priceCurrency'];
+      product['images'] = productData['image'];
+      
+      window.ReactNativeWebView.postMessage(JSON.stringify(product));
+    } catch (e) {
+      // alert(e);
+    }
+  `,
 };
