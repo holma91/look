@@ -34,6 +34,27 @@ const MIN_HEIGHT = 0;
 const MEDIUM_HEIGHT = 300;
 const MAX_HEIGHT = SCREEN_HEIGHT - 115;
 
+function getDomain(url: string) {
+  let domain;
+
+  // find & remove protocol (http, ftp, etc.) and get domain
+  if (url.indexOf('://') > -1) {
+    domain = url.split('/')[2];
+  } else {
+    domain = url.split('/')[0];
+  }
+
+  // find & remove port number if present
+  domain = domain.split(':')[0];
+
+  // find & remove "www."
+  if (domain.indexOf('www.') > -1) {
+    domain = domain.split('www.')[1];
+  }
+
+  return domain;
+}
+
 export default function Browser({
   navigation,
   route,
@@ -42,7 +63,7 @@ export default function Browser({
   route: any;
 }) {
   const [url, setUrl] = useState(`https://${route.params.url}`);
-  const [domain, setDomain] = useState(route.params.url);
+  // const [domain, setDomain] = useState(route.params.url);
   const [search, setSearch] = useState(`${route.params.url}`);
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product>({
@@ -53,6 +74,10 @@ export default function Browser({
     currency: 'SEK',
     images: [],
   });
+
+  const domain = getDomain(route.params.url);
+
+  console.log('domain', domain);
 
   const { user } = useUser();
 
@@ -86,15 +111,15 @@ export default function Browser({
     if (!webviewRef.current) return;
 
     let script = connectors[domain];
-    // webviewRef.current.injectJavaScript(script.extract);
 
     if (domain === 'sellpy.com') {
       setTimeout(() => {
         if (webviewRef.current) {
           webviewRef.current.injectJavaScript(script.both);
-          // webviewRef.current.injectJavaScript(script.interact);
         }
-      }, 5000);
+      }, 500);
+    } else {
+      webviewRef.current.injectJavaScript(script.extract);
     }
   };
 

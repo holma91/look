@@ -84,6 +84,44 @@ export const connectors: { [key: string]: any } = {
     `,
     interact: ``,
   },
+  'zalando.se': {
+    extract: `
+      function extract() {
+        var elements = document.querySelectorAll(
+          'script[type="application/ld+json"]'
+        );
+      
+        var product = {};
+        var productData = JSON.parse(elements[0].textContent);
+        product['name'] = productData['name'];
+        product['brand'] = productData['brand']['name'];
+        product['price'] = productData['offers'][0]['price'];
+        product['currency'] = productData['offers'][0]['priceCurrency'];
+        product['images'] = productData['image'];
+
+        if (product.images) {
+          // remove query parameters from images
+          for (let i = 0; i < product.images.length; i++) {
+            product.images[i] = product.images[i].substring(
+              0,
+              product.images[i].indexOf('?')
+            );
+          }
+        }
+
+        return product;
+      };
+
+
+      try {
+        var product = extract();
+        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: product }));
+      } catch (e) {
+
+      }
+    `,
+    interact: ``,
+  },
   'hm.com': {
     extract: `
       function extract() {
