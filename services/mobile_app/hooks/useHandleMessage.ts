@@ -16,9 +16,7 @@ function parseProduct(
     images: [],
   };
 
-  console.log('in parseProduct');
-
-  if (domain === 'zalando.com') {
+  if (domain === 'zalando.com' || domain === 'zalando.se') {
     product['name'] = productData['name'];
     product['brand'] = productData['brand']['name'];
     product['price'] = productData['offers'][0]['price'];
@@ -33,7 +31,7 @@ function parseProduct(
         );
       }
     }
-  } else if (domain === 'hm.com') {
+  } else if (domain === 'hm.com' || domain === 'www2.hm.com') {
     product['name'] = productData['name'];
     product['brand'] = productData['brand']['name'];
     product['price'] = productData['offers'][0]['price'];
@@ -50,9 +48,7 @@ function parseProduct(
     product['brand'] = productData['brand']['name'];
     product['price'] = productData['offers']['price'].replace(/\s/g, '');
     product['currency'] = productData['offers']['priceCurrency'];
-    product['images'] = [
-      'https://upload.wikimedia.org/wikipedia/commons/3/33/White_square_with_question_mark.png',
-    ];
+    product['images'] = [];
   } else if (domain === 'zara.com') {
     product['name'] = productData['name'];
     product['brand'] = productData['brand'];
@@ -62,6 +58,14 @@ function parseProduct(
   }
 
   return product;
+}
+
+function parseImageSrc(domain: string, imageSrc: string) {
+  if (domain === 'hm.com') {
+    return 'https://' + imageSrc.slice(2);
+  }
+
+  return imageSrc;
 }
 
 export const useHandleMessage = (
@@ -98,7 +102,11 @@ export const useHandleMessage = (
       }
     } else if (parsedData.type === 'imageSrc') {
       const imageSrc: string = parsedData.data;
-      setCurrentProduct((prev) => ({ ...prev, images: [imageSrc] }));
+      const parsedImageSrc = parseImageSrc(domain, imageSrc);
+      console.log('parsedImageSrc', parsedImageSrc);
+
+      setCurrentProduct((prev) => ({ ...prev, images: [parsedImageSrc] }));
+      // insert images here
     } else {
       console.log('unknown message type:', parsedData.data);
     }

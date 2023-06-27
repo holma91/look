@@ -55,6 +55,14 @@ function getDomain(url: string) {
   return domain;
 }
 
+function getUrl(urlParam: string) {
+  if (urlParam.startsWith('http://') || urlParam.startsWith('https://')) {
+    return urlParam;
+  } else {
+    return 'https://' + urlParam;
+  }
+}
+
 export default function Browser({
   navigation,
   route,
@@ -62,8 +70,7 @@ export default function Browser({
   navigation: any;
   route: any;
 }) {
-  const [url, setUrl] = useState(`https://${route.params.url}`);
-  // const [domain, setDomain] = useState(route.params.url);
+  const [url, setUrl] = useState(getUrl(route.params.url));
   const [search, setSearch] = useState(`${route.params.url}`);
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product>({
@@ -111,11 +118,12 @@ export default function Browser({
     if (!webviewRef.current) return;
 
     webviewRef.current.injectJavaScript(baseExtractScript);
-    const slowSites = ['sellpy.com', 'softgoat.com'];
+    const slowSites = ['sellpy.com', 'softgoat.com', 'hm.com', 'zara.com'];
     if (slowSites.includes(domain)) {
       setTimeout(() => {
         if (webviewRef.current) {
           webviewRef.current.injectJavaScript(baseExtractScript);
+          webviewRef.current.injectJavaScript(baseInteractScript);
         }
       }, 500);
     }

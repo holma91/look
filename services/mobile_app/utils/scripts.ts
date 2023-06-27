@@ -18,7 +18,7 @@ export const baseExtractScript = `
 export const baseInteractScript = `
   try {
     if (!window.hasInjectedClickListener) {
-      document.addEventListener('click', function(e) {
+      document.addEventListener('mousedown', function(e) {
         var element = e.target;
         
         if (element.tagName.toLowerCase() === 'img') {
