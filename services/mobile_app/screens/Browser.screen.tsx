@@ -75,16 +75,15 @@ export default function Browser({
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product>({
     url: 'https://www.zara.com/se/en/rak-blazer-p08068001.html?v1=78861699&v2=1718127',
-    name: 'RAK BLAZER',
-    brand: 'Zara',
-    price: '599',
-    currency: 'SEK',
+    name: 'NAME',
+    brand: 'BRAND',
+    price: 'PRICE',
+    currency: 'CURRENCY',
     images: [],
   });
+  const [currentImage, setCurrentImage] = useState<string>('');
 
   const domain = getDomain(route.params.url);
-
-  console.log('domain', domain);
 
   const { user } = useUser();
 
@@ -118,7 +117,7 @@ export default function Browser({
     if (!webviewRef.current) return;
 
     webviewRef.current.injectJavaScript(baseExtractScript);
-    const slowSites = ['sellpy.com', 'softgoat.com', 'hm.com', 'zara.com'];
+    const slowSites = ['sellpy.se', 'softgoat.com', 'hm.com', 'zara.com'];
     if (slowSites.includes(domain)) {
       setTimeout(() => {
         if (webviewRef.current) {
@@ -129,26 +128,11 @@ export default function Browser({
     }
   };
 
-  const {
-    data: products,
-    status,
-    refetch: refetchProducts,
-  } = useQuery({
+  const { data: products, refetch: refetchProducts } = useQuery({
     queryKey: ['history', user?.id],
     queryFn: () => fetchHistory(user?.id as string),
     enabled: !!user?.id,
   });
-
-  if (status === 'loading') {
-    return <Text>Loading...</Text>;
-  }
-
-  if (status === 'error') {
-    return <Text>Error!</Text>;
-  }
-
-  // console.log('products.length:', products.length);
-  // console.log('products[products.length - 1]:', products[products.length - 1]);
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -167,6 +151,7 @@ export default function Browser({
             url={url}
             domain={domain}
             setCurrentProduct={setCurrentProduct}
+            setCurrentImage={setCurrentImage}
             refetchProducts={refetchProducts}
           />
         </Box>
@@ -174,6 +159,7 @@ export default function Browser({
           bottomSheetHeight={bottomSheetHeight}
           setExpandedMenu={setExpandedMenu}
           currentProduct={currentProduct}
+          currentImage={currentImage}
         />
         <NavBar
           bottomSheetHeight={bottomSheetHeight}
@@ -320,12 +306,14 @@ type BottomSheetProps = {
   bottomSheetHeight: Animated.SharedValue<number>;
   setExpandedMenu: (expanded: boolean) => void;
   currentProduct: Product;
+  currentImage: string;
 };
 
 function BottomSheet({
   bottomSheetHeight,
   setExpandedMenu,
   currentProduct,
+  currentImage,
 }: BottomSheetProps) {
   const [sheetState, setSheetState] = useState<'MIN' | 'MEDIUM' | 'MAX'>('MIN');
   const [generating, setGenerating] = useState(false);
@@ -432,19 +420,20 @@ function BottomSheet({
                 justifyContent: 'space-between',
               },
             ]}
-            // entering={LightSpeedInLeft}
             exiting={FadeOut.duration(500)}
           >
             <Box flex={1}>
-              <ExpoImage
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: 200,
-                }}
-                source={currentProduct.images ? currentProduct.images[0] : ''}
-                contentFit="contain"
-              />
+              {currentImage !== '' && (
+                <ExpoImage
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: 200,
+                  }}
+                  source={currentImage}
+                  contentFit="contain"
+                />
+              )}
             </Box>
             <Box flex={1} gap="s">
               <Text variant="body" fontWeight="bold">

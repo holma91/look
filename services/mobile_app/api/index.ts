@@ -108,6 +108,33 @@ export const createProduct = async (
   return response.json();
 };
 
+export const addProductImages = async (
+  userId: string,
+  productUrl: string,
+  imageUrl: string
+) => {
+  const imageProduct = {
+    product_url: productUrl,
+    image_url: imageUrl,
+  };
+
+  const response = await fetch(`${URL}/users/${userId}/products/images`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(imageProduct),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+    );
+  }
+
+  return response.json();
+};
+
 export const likeProduct = async (userId: string, productUrl: string) => {
   const response = await fetch(`${URL}/users/${userId}/likes`, {
     method: 'POST',

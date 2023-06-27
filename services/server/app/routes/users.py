@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserBase, UserExtended, UserLiked, UserHistory, ProductExtended, POSTResponse, LikeProduct, FavoriteWebsite, WebsiteBase
+from app.models.pydantic import UserBase, UserExtended, UserLiked, UserHistory, ProductExtended, POSTResponse, LikeProduct, FavoriteWebsite, WebsiteBase, ProductImage
 from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
@@ -64,6 +64,16 @@ async def add_product(user_id: str, product: ProductExtended) -> POSTResponse:
         raise HTTPException(status_code=404, detail="User not found!")
 
     return SUCCESSFUL_POST_RESPONSE
+
+@router.post("/{user_id}/products/images", status_code=201, response_model=POSTResponse)
+async def add_product_image(user_id: str, product_image: ProductImage) -> POSTResponse:
+    success = await crud.add_product_image(product_image)
+    if not success:
+        raise HTTPException(status_code=404, detail="Product not found!")
+
+    return SUCCESSFUL_POST_RESPONSE
+
+
 
 
 @router.post("/{user_id}/likes", status_code=201, response_model=POSTResponse)

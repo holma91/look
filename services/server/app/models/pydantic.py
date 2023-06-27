@@ -33,6 +33,10 @@ class LikeProduct(BaseModel):
 class FavoriteWebsite(BaseModel):
     domain: str
 
+class ProductImage(BaseModel):
+    product_url: str
+    image_url: str
+
 ### RESPONSE MODELS ###
 
 class UserExtended(UserBase):

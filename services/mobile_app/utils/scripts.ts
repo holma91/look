@@ -18,28 +18,34 @@ export const baseExtractScript = `
 export const baseInteractScript = `
   try {
     if (!window.hasInjectedClickListener) {
+      function hasLinkAncestor(node) {
+        while (node) {
+          if (node.tagName && node.tagName.toLowerCase() === 'a') {
+            return true;
+          }
+          node = node.parentNode;
+        }
+        return false;
+      }
       document.addEventListener('mousedown', function(e) {
         var element = e.target;
-        
-        if (element.tagName.toLowerCase() === 'img') {
-          // call extract stuff again
+        if (
+          element.tagName.toLowerCase() === 'img' && 
+          !hasLinkAncestor(element)
+        ) {
           if (element.getAttribute('data-has-border') === 'true') {
-            // The image already has a border, so remove it
             element.style.border = 'none';
             element.setAttribute('data-has-border', 'false');
           } else {
-            // The image does not have a border, so add one
             element.style.boxSizing = 'border-box';
             element.style.border = '5px solid black';
             element.setAttribute('data-has-border', 'true');
           }
-          
           window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'imageSrc', data: element.src }));
         }
       });
       window.hasInjectedClickListener = true;
     }
-    
   } catch (e) {
     alert(e);
   }
