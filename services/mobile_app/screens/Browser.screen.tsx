@@ -134,7 +134,7 @@ export default function Browser({
     status,
     refetch: refetchProducts,
   } = useQuery({
-    queryKey: ['likes', user?.id],
+    queryKey: ['history', user?.id],
     queryFn: () => fetchHistory(user?.id as string),
     enabled: !!user?.id,
   });
@@ -219,21 +219,24 @@ function NavBar({
     },
     onMutate: async (product: UserProduct) => {
       product.liked = !product.liked;
-      await queryClient.cancelQueries(['likes', user?.id]);
-      const previousProducts = queryClient.getQueryData(['likes', product.url]);
-      queryClient.setQueryData(['likes', product.url], product);
+      await queryClient.cancelQueries(['history', user?.id]);
+      const previousProducts = queryClient.getQueryData([
+        'history',
+        product.url,
+      ]);
+      queryClient.setQueryData(['history', product.url], product);
 
       return { previousProducts, product };
     },
     onError: (err, product, context) => {
       console.log('error', err, product, context);
       queryClient.setQueryData(
-        ['likes', context?.product.url],
+        ['history', context?.product.url],
         context?.previousProducts
       );
     },
     onSettled: async () => {
-      queryClient.invalidateQueries({ queryKey: ['likes', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['history', user?.id] });
     },
   });
 

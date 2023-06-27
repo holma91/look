@@ -1,4 +1,4 @@
-import { FlatList, TouchableOpacity } from 'react-native';
+import { FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -7,10 +7,16 @@ import { fetchHistory, fetchLikes } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
+import { useState } from 'react';
 
 export default function Likes({ navigation }: { navigation: any }) {
   const { user } = useUser();
-  const { data: likes, status } = useQuery<UserProduct[]>({
+  const {
+    data: likes,
+    status,
+    refetch,
+    isFetching,
+  } = useQuery<UserProduct[]>({
     queryKey: ['likes', user?.id],
     queryFn: () => fetchLikes(user?.id as string),
     enabled: !!user?.id,
@@ -24,6 +30,8 @@ export default function Likes({ navigation }: { navigation: any }) {
     return <Text>Error!</Text>;
   }
 
+  console.log('likes', likes);
+
   return (
     <Box backgroundColor="background" flex={1} paddingHorizontal="s">
       <Box justifyContent="center" alignItems="center" paddingVertical="m">
@@ -33,12 +41,16 @@ export default function Likes({ navigation }: { navigation: any }) {
       </Box>
       <Box flex={1}>
         <FlatList
-          data={likes?.slice().reverse()}
+          data={likes.slice().reverse()}
           numColumns={2}
           keyExtractor={(item) => item.url}
           renderItem={({ item }) => (
             <Product navigation={navigation} product={item} />
           )}
+          refreshControl={
+            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+          }
+          showsVerticalScrollIndicator={false}
         />
       </Box>
     </Box>
@@ -61,7 +73,7 @@ function Product({
         <ExpoImage
           style={{
             width: '100%',
-            height: 200,
+            height: 225,
             borderRadius: 20,
           }}
           source={{ uri: product.images[0] }}
