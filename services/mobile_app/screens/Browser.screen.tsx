@@ -21,7 +21,7 @@ import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Button } from '../components/Button';
-import { jsScripts } from '../utils/scripts';
+import { baseExtractScript, baseInteractScript } from '../utils/scripts';
 import { fetchHistory, likeProduct, unlikeProduct } from '../api';
 import { Product, UserProduct } from '../utils/types';
 import { BrowserSearchBar } from '../components/SearchBar';
@@ -110,16 +110,14 @@ export default function Browser({
     console.log('handleLoadEnd:', navState.nativeEvent);
     if (!webviewRef.current) return;
 
-    let script = connectors[domain];
-
-    if (domain === 'sellpy.com') {
+    webviewRef.current.injectJavaScript(baseExtractScript);
+    const slowSites = ['sellpy.com', 'softgoat.com'];
+    if (slowSites.includes(domain)) {
       setTimeout(() => {
         if (webviewRef.current) {
-          webviewRef.current.injectJavaScript(script.both);
+          webviewRef.current.injectJavaScript(baseExtractScript);
         }
       }, 500);
-    } else {
-      webviewRef.current.injectJavaScript(script.extract);
     }
   };
 

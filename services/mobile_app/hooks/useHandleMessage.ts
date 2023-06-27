@@ -2,6 +2,68 @@ import { useUser } from '@clerk/clerk-expo';
 import { createProduct } from '../api';
 import { Product } from '../utils/types';
 
+function parseProduct(
+  domain: string,
+  product_url: string,
+  productData: any
+): Product {
+  let product: Product = {
+    url: product_url,
+    name: '',
+    brand: '',
+    price: '',
+    currency: '',
+    images: [],
+  };
+
+  console.log('in parseProduct');
+
+  if (domain === 'zalando.com') {
+    product['name'] = productData['name'];
+    product['brand'] = productData['brand']['name'];
+    product['price'] = productData['offers'][0]['price'];
+    product['currency'] = productData['offers'][0]['priceCurrency'];
+    product['images'] = productData['image'];
+    if (product.images) {
+      // remove query parameters from images to get high quality
+      for (let i = 0; i < product.images.length; i++) {
+        product.images[i] = product.images[i].substring(
+          0,
+          product.images[i].indexOf('?')
+        );
+      }
+    }
+  } else if (domain === 'hm.com') {
+    product['name'] = productData['name'];
+    product['brand'] = productData['brand']['name'];
+    product['price'] = productData['offers'][0]['price'];
+    product['currency'] = productData['offers'][0]['priceCurrency'];
+    product['images'] = ['https://' + productData['image'].slice(2)];
+  } else if (domain === 'sellpy.com') {
+    product['name'] = productData['name'];
+    product['brand'] = productData['brand'] || '?';
+    product['price'] = productData['offers']['price'];
+    product['currency'] = productData['offers']['priceCurrency'];
+    product['images'] = [productData['image']];
+  } else if (domain === 'softgoat.com') {
+    product['name'] = productData['name'];
+    product['brand'] = productData['brand']['name'];
+    product['price'] = productData['offers']['price'].replace(/\s/g, '');
+    product['currency'] = productData['offers']['priceCurrency'];
+    product['images'] = [
+      'https://upload.wikimedia.org/wikipedia/commons/3/33/White_square_with_question_mark.png',
+    ];
+  } else if (domain === 'zara.com') {
+    product['name'] = productData['name'];
+    product['brand'] = productData['brand'];
+    product['price'] = productData['offers']['price'];
+    product['currency'] = productData['offers']['priceCurrency'];
+    product['images'] = productData['image'];
+  }
+
+  return product;
+}
+
 export const useHandleMessage = (
   setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>,
   refetchProducts: () => void,
@@ -11,17 +73,20 @@ export const useHandleMessage = (
 
   const handleMessage = async (event: any) => {
     console.log('got da message');
-
-    const product_url = event.nativeEvent.url;
     if (!user?.id) return;
 
     // message type 1: product data
     const parsedData = JSON.parse(event.nativeEvent.data);
     if (parsedData.type === 'product') {
-      const product: Product = parsedData.data;
-      console.log('product', product);
+      console.log('product data', JSON.parse(parsedData.data));
 
-      product.url = product_url;
+      const product: Product = parseProduct(
+        domain,
+        event.nativeEvent.url,
+        JSON.parse(parsedData.data)
+      );
+
+      console.log('product', product);
 
       setCurrentProduct(product);
 
