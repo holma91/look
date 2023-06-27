@@ -6,19 +6,16 @@ import { useState } from 'react';
 
 function SearchBar({
   navigation,
-  isFakeSearchBar = false,
+  searchText,
+  setSearchText,
+  handleSearch,
 }: {
   navigation: any;
-  isFakeSearchBar?: boolean;
+  searchText: string;
+  setSearchText: React.Dispatch<React.SetStateAction<string>>;
+  handleSearch: () => void;
 }) {
-  const [search, setSearch] = useState('');
-
-  const handleSearch = () => {};
-
   // Function to navigate to the SearchScreen
-  const handleOnPress = () => {
-    navigation.navigate('Search');
-  };
 
   return (
     <Box
@@ -39,19 +36,18 @@ function SearchBar({
         paddingVertical="xxs"
       >
         <TextInput
-          onTouchStart={handleOnPress}
-          onChangeText={setSearch}
-          value={search}
+          onChangeText={setSearchText}
+          value={searchText}
+          onSubmitEditing={handleSearch}
           autoCapitalize="none"
           autoComplete="off"
           autoCorrect={false}
           inputMode="url"
           variant="secondary"
-          onSubmitEditing={handleSearch}
           selectTextOnFocus={true}
           placeholder="Search and shop anywhere"
           placeholderTextColor="black"
-          autoFocus={isFakeSearchBar ? false : true}
+          autoFocus={true}
         />
         <Ionicons
           name="search"
@@ -60,32 +56,69 @@ function SearchBar({
           style={{ position: 'absolute', left: 15 }}
         />
       </Box>
-      {isFakeSearchBar ? (
-        <Box
+      <Box flex={0} backgroundColor="grey" borderRadius={20} padding="xs">
+        <Ionicons
+          name="close"
           flex={0}
-          backgroundColor="background"
-          borderRadius={20}
-          padding="xs"
-        >
-          <Ionicons
-            name="ellipsis-vertical"
-            flex={0}
-            size={24}
-            color="black"
-            onPress={() => {}}
-          />
-        </Box>
-      ) : (
-        <Box flex={0} backgroundColor="grey" borderRadius={20} padding="xs">
-          <Ionicons
-            name="close"
-            flex={0}
-            size={24}
-            color="black"
-            onPress={() => navigation.goBack()}
-          />
-        </Box>
-      )}
+          size={24}
+          color="black"
+          onPress={() => navigation.goBack()}
+        />
+      </Box>
+    </Box>
+  );
+}
+
+function FakeSearchBar({ navigation }: { navigation: any }) {
+  const handleOnPress = () => {
+    navigation.navigate('Search');
+  };
+  return (
+    <Box
+      flex={0}
+      flexDirection="row"
+      alignItems="center"
+      gap="s"
+      paddingBottom="s"
+      paddingHorizontal="m"
+    >
+      <Box
+        flex={1}
+        backgroundColor="grey"
+        borderRadius={20}
+        flexDirection="row"
+        alignItems="center"
+        paddingHorizontal="m"
+        paddingVertical="xxs"
+      >
+        <TextInput
+          onTouchStart={handleOnPress}
+          autoCapitalize="none"
+          autoComplete="off"
+          autoCorrect={false}
+          inputMode="url"
+          variant="secondary"
+          selectTextOnFocus={true}
+          placeholder="Search and shop anywhere"
+          placeholderTextColor="black"
+          autoFocus={false}
+        />
+        <Ionicons
+          name="search"
+          size={18}
+          color="black"
+          style={{ position: 'absolute', left: 15 }}
+        />
+      </Box>
+      <Box flex={0} backgroundColor="background" borderRadius={20} padding="xs">
+        <Ionicons
+          name="ellipsis-vertical"
+          flex={0}
+          size={24}
+          color="black"
+          onPress={() => {}}
+        />
+      </Box>
     </Box>
   );
 }
@@ -155,4 +188,4 @@ function BrowserSearchBar({
   );
 }
 
-export { SearchBar, BrowserSearchBar };
+export { SearchBar, FakeSearchBar, BrowserSearchBar };

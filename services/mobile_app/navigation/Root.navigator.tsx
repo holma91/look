@@ -21,7 +21,11 @@ export default function RootNavigator() {
         {isSignedIn ? (
           <>
             <Stack.Screen name="Home" component={TabNavigator} />
-            <Stack.Screen name="Browser" component={Browser} />
+            <Stack.Screen
+              name="Browser"
+              component={Browser}
+              options={{ animation: 'none' }}
+            />
             <Stack.Screen
               name="Search"
               component={Search}

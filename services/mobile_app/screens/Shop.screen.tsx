@@ -8,7 +8,7 @@ import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { useMemo, useState } from 'react';
 import { domainToInfo } from '../utils/utils';
-import { SearchBar } from '../components/SearchBar';
+import { SearchBar, FakeSearchBar } from '../components/SearchBar';
 import { favoriteWebsite, fetchWebsites, unFavoriteWebsite } from '../api';
 
 type WebsiteItem = {
@@ -23,7 +23,7 @@ export default function Shop({ navigation }: { navigation: any }) {
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1} gap="s">
-          <SearchBar navigation={navigation} isFakeSearchBar={true} />
+          <FakeSearchBar navigation={navigation} />
           <Box flexDirection="row" gap="m" marginVertical="s">
             <FlatList
               style={{ flex: 1, gap: 10 }}

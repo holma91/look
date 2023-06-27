@@ -19,3 +19,8 @@ export type UserProduct = {
   liked?: boolean;
   domain?: string;
 };
+
+export type Website = {
+  domain: string;
+  favorited: boolean;
+};
