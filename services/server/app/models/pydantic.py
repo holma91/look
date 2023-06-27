@@ -24,13 +24,14 @@ class ProductBase(BaseModel):
 
 class WebsiteBase(BaseModel):
     domain: str
-    multi_brand: bool
-    second_hand: bool
 
 ### REQUEST MODELS ###
 
 class LikeProduct(BaseModel):
     product_url: str
+
+class FavoriteWebsite(BaseModel):
+    domain: str
 
 ### RESPONSE MODELS ###
 

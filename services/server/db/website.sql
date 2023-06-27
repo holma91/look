@@ -2,15 +2,14 @@ CREATE TABLE IF NOT EXISTS "user" (
     "id" TEXT NOT NULL PRIMARY KEY
 );
 CREATE TABLE IF NOT EXISTS "website" (
-    "domain" TEXT NOT NULL PRIMARY KEY,
-    "multi_brand" BOOL NOT NULL,
-    "second_hand" BOOL NOT NULL
+    "domain" TEXT NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS "user_website" (
     "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
-    "website_id" TEXT NOT NULL REFERENCES "website" ("domain") ON DELETE CASCADE,
-    UNIQUE(user_id, website_id)
+    "domain" TEXT NOT NULL REFERENCES "website" ("domain") ON DELETE CASCADE,
+    "favorited" BOOL NOT NULL DEFAULT FALSE,
+    UNIQUE(user_id, domain)
 );
 
 CREATE TABLE IF NOT EXISTS "product" (
@@ -37,23 +36,32 @@ CREATE TABLE IF NOT EXISTS "user_product" (
 
 insert into "user" (id) values ('user_2RYsQv4W7NG9YYHaOId6Tq599SV');
 
-INSERT INTO Website (domain, multi_brand, second_hand)
+-- all preconfigured websites
+INSERT INTO Website (domain)
 VALUES
-    ('zara.com', false, false),
-    ('zalando.com', true, false),
-    ('boozt.com', true, false),
-    ('hm.com', false, false),
-    ('asos.com', true, false),
-    ('softgoat.com', false, false),
-    ('adaysmarch.com', false, false),
-    ('sellpy.com', true, true),
-    ('nakd.com', false, false),
-    ('careofcarl.com', true, false);
+    ('zara.com'),
+    ('zalando.se'),
+    ('boozt.com'),
+    ('hm.com'),
+    ('asos.com'),
+    ('softgoat.com'),
+    ('adaysmarch.com'),
+    ('sellpy.se'),
+    ('na-kd.com'),
+    ('careofcarl.se');
 
-INSERT INTO user_website (user_id, website_id)
+INSERT INTO user_website (user_id, domain, favorited)
 VALUES
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'zara.com'),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'boozt.com');
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'zara.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'zalando.se', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'boozt.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'hm.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'asos.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'softgoat.com', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'adaysmarch.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'sellpy.se', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'na-kd.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'careofcarl.se', FALSE);
 
 
 INSERT INTO product (url, domain, brand, name, price, currency)
@@ -73,11 +81,3 @@ VALUES
 
 UPDATE user_product SET liked = TRUE
 WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey';
-
-SELECT 
-    product.*,
-    up.liked
-FROM product
-LEFT JOIN user_product up
-    ON up.product_url = product.url
-    AND up.user_id = $1

@@ -2,8 +2,7 @@
 const URL = 'https://ad0e-83-255-121-67.ngrok-free.app';
 
 export const fetchWebsites = async (id: string) => {
-  const completeUrl = `${URL}/websites/?user_id=${id}`;
-
+  const completeUrl = `${URL}/users/${id}/websites`;
   const response = await fetch(completeUrl);
 
   if (!response.ok) {
@@ -14,31 +13,38 @@ export const fetchWebsites = async (id: string) => {
   return response.json();
 };
 
-export const unFavoriteWebsite = async (userId: string, domain: string) => {
-  const response = await fetch(`${URL}/users/${userId}/favorites/${domain}`, {
-    method: 'DELETE',
-  });
+export const fetchFavorites = async (id: string) => {
+  const completeUrl = `${URL}/users/${id}/favorites`;
+  const response = await fetch(completeUrl);
 
   if (!response.ok) {
     throw new Error(
       `Network response was not ok. Status code: ${response.status}`
     );
   }
+  return response.json();
 };
 
 export const favoriteWebsite = async (userId: string, domain: string) => {
-  const response = await fetch(`${URL}/users/${userId}/favorites/${domain}`, {
+  const response = await fetch(`${URL}/users/${userId}/favorites`, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ domain: domain }),
   });
+  return response;
+};
 
-  if (!response.ok) {
-    throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
-    );
-  }
-
-  const data = await response.json();
-  return data;
+export const unFavoriteWebsite = async (userId: string, domain: string) => {
+  const response = await fetch(`${URL}/users/${userId}/favorites`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ domain: domain }),
+  });
+  return response;
 };
 
 export const fetchLikes = async (id: string) => {

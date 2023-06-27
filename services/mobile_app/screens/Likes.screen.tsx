@@ -30,8 +30,6 @@ export default function Likes({ navigation }: { navigation: any }) {
     return <Text>Error!</Text>;
   }
 
-  console.log('likes', likes);
-
   return (
     <Box backgroundColor="background" flex={1} paddingHorizontal="s">
       <Box justifyContent="center" alignItems="center" paddingVertical="m">

@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserBase, UserExtended, UserLiked, UserHistory, ProductExtended, POSTResponse, LikeProduct
+from app.models.pydantic import UserBase, UserExtended, UserLiked, UserHistory, ProductExtended, POSTResponse, LikeProduct, FavoriteWebsite, WebsiteBase
 from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
@@ -14,6 +14,8 @@ router = APIRouter()
 log = logging.getLogger("uvicorn")
 
 ### GET REQUESTS ###
+
+### USER INFO ###
 
 @router.get("/", response_model=list[UserBase])
 async def read_users() -> list[UserBase]:
@@ -27,6 +29,7 @@ async def read_user(id: str) -> UserExtended:
 
     return user
 
+### PRODUCT INFO ###
 
 @router.get("/{user_id}/likes", response_model=list[UserLiked])
 async def read_user_likes(user_id: str) -> UserLiked:
@@ -38,9 +41,23 @@ async def read_user_history(user_id: str) -> UserHistory:
     products = await crud.get_history(user_id)
     return products
 
+### WEBSITE INFO ###
+
+@router.get("/{user_id}/websites", response_model=list[Any])
+async def read_user_websites(user_id: str) -> list[Any]:
+    sites = await crud.get_websites(user_id)
+    return sites
+
+@router.get("/{user_id}/favorites", response_model=list[Any])
+async def read_user_favorites(user_id: str) -> list[Any]:
+    sites = await crud.get_favorites(user_id)
+    return sites
+
 ### POST & DELETE REQUESTS ###
 
-@router.post("/{user_id}/products", status_code=201, response_model=POSTResponse) # history basically
+### PRODUCT INFO ###
+
+@router.post("/{user_id}/products", status_code=201, response_model=POSTResponse) # when seeing a new product
 async def add_product(user_id: str, product: ProductExtended) -> POSTResponse:
     success = await crud.add_product(user_id, product)
     if not success:
@@ -62,24 +79,30 @@ async def delete_like(user_id: str, product: LikeProduct):
     result = await crud.un_like(user_id, product.product_url)
     if result is None:
         raise HTTPException(status_code=404, detail="User or Product not found!")
+
+### WEBSITE INFO ###
+
+@router.post("/{user_id}/websites", status_code=201, response_model=POSTResponse) # when seeing a new website
+async def add_product(user_id: str, website: WebsiteBase) -> POSTResponse:
+    success = await crud.add_website(user_id, website)
+    if not success:
+        raise HTTPException(status_code=404, detail="User not found!")
+
+    return SUCCESSFUL_POST_RESPONSE
     
-
-### Change the following to use the body of the requests instead
-
-@router.post("/{user_id}/favorites/{website_id}", status_code=200, response_model=str)
-async def add_favorite(user_id: str, website_id: str) -> str:
-    website = await crud.add_favorite(user_id, website_id)
-    if website is None:
+@router.post("/{user_id}/favorites", status_code=201, response_model=POSTResponse)
+async def add_favorite(user_id: str, website: FavoriteWebsite) -> POSTResponse:
+    product = await crud.add_favorite(user_id, website.domain)
+    if product is None:
         raise HTTPException(status_code=404, detail="User or Website not found!")
 
-    return website
+    return SUCCESSFUL_POST_RESPONSE
 
-@router.delete("/{user_id}/favorites/{website_id}", status_code=204)
-async def delete_favorite(user_id: str, website_id: str):
-    result = await crud.un_favorite(user_id, website_id)
+@router.delete("/{user_id}/favorites", status_code=204)
+async def delete_like(user_id: str, website: FavoriteWebsite):
+    result = await crud.un_favorite(user_id, website.domain)
     if result is None:
         raise HTTPException(status_code=404, detail="User or Website not found!")
-
 
 ### CLERK WEBHOOK ROUTES ###
 

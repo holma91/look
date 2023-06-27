@@ -13,9 +13,7 @@ import { favoriteWebsite, fetchWebsites, unFavoriteWebsite } from '../api';
 
 type WebsiteItem = {
   domain: string;
-  is_favorite: boolean;
-  multi_brand: boolean;
-  second_hand: boolean;
+  favorited: boolean;
 };
 
 export default function Shop({ navigation }: { navigation: any }) {
@@ -95,14 +93,14 @@ function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
     mutationFn: async (website: WebsiteItem) => {
       if (!user?.id) return;
 
-      if (!website.is_favorite) {
+      if (!website.favorited) {
         return unFavoriteWebsite(user.id, website.domain);
       } else {
         return favoriteWebsite(user.id, website.domain);
       }
     },
     onMutate: async (website: WebsiteItem) => {
-      website.is_favorite = !website.is_favorite;
+      website.favorited = !website.favorited;
 
       await queryClient.cancelQueries({ queryKey: ['websites', user?.id] });
 
@@ -132,20 +130,26 @@ function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
   const filteredSites = useMemo(() => {
     let filtered;
     if (selectedCategory === 'Favorites') {
-      filtered = websites.filter((site: WebsiteItem) => site.is_favorite);
+      filtered = websites.filter((site: WebsiteItem) => site.favorited);
     } else if (selectedCategory === 'Multi') {
-      filtered = websites.filter((site: WebsiteItem) => site.multi_brand);
+      filtered = websites.filter(
+        (site: WebsiteItem) => domainToInfo[site.domain].multiBrand
+      );
     } else if (selectedCategory === 'Single') {
-      filtered = websites.filter((site: WebsiteItem) => !site.multi_brand);
+      filtered = websites.filter(
+        (site: WebsiteItem) => !domainToInfo[site.domain].multiBrand
+      );
     } else if (selectedCategory === '2nd hand') {
-      filtered = websites.filter((site: WebsiteItem) => site.second_hand);
+      filtered = websites.filter(
+        (site: WebsiteItem) => domainToInfo[site.domain].secondHand
+      );
     } else {
       filtered = websites;
     }
     return filtered;
   }, [selectedCategory, websites, renderToggle]);
 
-  console.log('filteredSites', filteredSites);
+  // console.log('filteredSites', filteredSites);
 
   if (status === 'loading') {
     return <Text>Loading...</Text>;
@@ -192,7 +196,7 @@ function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
             </Box>
           </TouchableOpacity>
           <Ionicons
-            name={item.is_favorite ? 'ios-star' : 'ios-star-outline'}
+            name={item.favorited ? 'ios-star' : 'ios-star-outline'}
             flex={0}
             size={24}
             color="black"

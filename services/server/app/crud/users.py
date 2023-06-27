@@ -134,6 +134,24 @@ async def get_history(user_id: str) -> list:
     return products
 
 
+async def get_websites(user_id: str) -> list:
+    async with get_db_connection() as conn:
+        query = """
+            select * from user_website uw where uw.user_id = $1;
+        """
+        sites = await conn.execute_query_dict(query, [user_id])
+    return sites
+
+async def get_favorites(user_id: str) -> list:
+    async with get_db_connection() as conn:
+        query = """
+            select * from user_website uw 
+            where uw.user_id = $1 and uw.favorited = TRUE;
+        """
+        favorites = await conn.execute_query_dict(query, [user_id])
+    return favorites
+    
+
 async def add_like(user_id: str, product_url: str) -> Optional[str]:
     async with get_db_connection() as conn:
         query = """
@@ -153,28 +171,47 @@ async def un_like(user_id: str, product_url: str) -> Optional[str]:
 
     return product_url
 
-
-async def add_favorite(user_id: str, website_id: str) -> Optional[str]:
+async def add_favorite(user_id: str, domain: str) -> Optional[str]:
     async with get_db_connection() as conn:
         query = """
-        insert into user_website (user_id, website_id)
-        values ($1, $2);
+        update user_website set favorited = TRUE where user_id = $1 and domain = $2;
         """
-        await conn.execute_query_dict(query, [user_id, website_id])
+        await conn.execute_query_dict(query, [user_id, domain])
 
-    return website_id
+    return domain
 
-
-
-async def un_favorite(user_id: str, website_id: str) -> Optional[str]:
+async def un_favorite(user_id: str, domain: str) -> Optional[str]:
     async with get_db_connection() as conn:
         query = """
-        delete from user_website where user_id = $1 and website_id = $2;
+        update user_website set favorited = FALSE where user_id = $1 and domain = $2;
         """
 
-        await conn.execute_query_dict(query, [user_id, website_id])
+        await conn.execute_query_dict(query, [user_id, domain])
 
-    return website_id
+    return domain
+
+
+# async def add_favorite(user_id: str, website_id: str) -> Optional[str]:
+#     async with get_db_connection() as conn:
+#         query = """
+#         insert into user_website (user_id, website_id)
+#         values ($1, $2);
+#         """
+#         await conn.execute_query_dict(query, [user_id, website_id])
+
+#     return website_id
+
+
+
+# async def un_favorite(user_id: str, website_id: str) -> Optional[str]:
+#     async with get_db_connection() as conn:
+#         query = """
+#         delete from user_website where user_id = $1 and website_id = $2;
+#         """
+
+#         await conn.execute_query_dict(query, [user_id, website_id])
+
+#     return website_id
 
 
 ### CLERK WEBHOOK FUNCTIONS ###
