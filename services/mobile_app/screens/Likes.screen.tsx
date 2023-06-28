@@ -64,7 +64,7 @@ function Product({
 }) {
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate('Browser', { url: product.url })}
+      onPress={() => navigation.navigate('Product', { product: product })}
       style={{ flex: 1 }}
     >
       <Box flex={1} margin="s" gap="s" marginBottom="m">

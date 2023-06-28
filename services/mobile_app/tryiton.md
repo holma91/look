@@ -19,3 +19,4 @@ Clothes = Human - Skin.
 https://github.com/yumingj/DeepFashion-MultiModal
 https://github.com/levindabhi/cloth-segmentation
 https://cs230.stanford.edu/projects_fall_2021/reports/103136976.pdf
+CLIPSeg?
