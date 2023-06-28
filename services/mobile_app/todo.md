@@ -30,22 +30,34 @@ look for image elements that are not wrapped in "a tags". Works on:
 
 ### TODO
 
-what happens if we search and go to an unsupported site?
+- Do the try-it-on stuff
 
-- it goes to the all bucket
-- gets inserted to the db (or saved locally, and inserted if user favs it?)
+So, one image will be selected. Send that to the image-gen server.
 
-- connectors for chosen swedish sites
-- "gallery" design, with fav stuff functionality
-- choose model UI
-- auth
-- create model UI
-- share functionality
+DEFAULT MODELS:
+
+- white man
+- black man
+- white woman
+- asian woman
+
+activating extra network lora with arguments [<modules.extra_networks.ExtraNetworkParams object at 0x7fd614987820>]: AttributeError
+Traceback (most recent call last):
+File "/content/drive/MyDrive/stable-diffusion-webui-colab/stable-diffusion-webui/modules/extra_networks.py", line 75, in activate
+extra_network.activate(p, extra_network_args)
+File "/content/drive/MyDrive/stable-diffusion-webui-colab/stable-diffusion-webui/extensions-builtin/Lora/extra_networks_lora.py", line 23, in activate
+lora.load_loras(names, multipliers)
+File "/content/drive/MyDrive/stable-diffusion-webui-colab/stable-diffusion-webui/extensions-builtin/Lora/lora.py", line 170, in load_loras
+lora = load_lora(name, lora_on_disk.filename)
+File "/content/drive/MyDrive/stable-diffusion-webui-colab/stable-diffusion-webui/extensions/a1111-sd-webui-locon/scripts/main.py", line 371, in load_lora
+lora.mtime = os.path.getmtime(lora_on_disk.filename)
+AttributeError: 'str' object has no attribute 'filename'
 
 ### TODO far away
 
-- write "connectors" for every website. this shouldn't be hard, say 1000 US sites and 100 swedish sites.
-- write basic adblocking software.
+- train ML model that can take HTML/Schema.org data and convert it into our schema.
+- train ML model that automatically categorizes a liked product, from the text info it has.
+- Do the try-it-on stuff
 - make it so that when a user favorites something, it's checked daily if the size exists etc.
 - put in shopping info somewhere in app, and autofill on sites
 

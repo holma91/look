@@ -45,14 +45,14 @@ export default function Shop({ navigation }: { navigation: any }) {
                   style={{
                     marginRight: 16,
                     borderBottomWidth: selectedCategory === item.label ? 2 : 0,
-                    borderColor: '#5A31F4',
+                    borderColor: 'black',
                   }}
                 >
                   <Text
                     variant="body"
                     fontWeight={'bold'}
                     paddingBottom="s"
-                    color={selectedCategory === item.label ? 'primary' : 'text'}
+                    color={selectedCategory === item.label ? 'text' : 'text'}
                   >
                     {item.label}
                   </Text>
