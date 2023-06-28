@@ -72,7 +72,7 @@ function Product({
           style={{
             width: '100%',
             height: 225,
-            borderRadius: 20,
+            // borderRadius: 10,
           }}
           source={{ uri: product.images[0] }}
         />

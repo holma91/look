@@ -95,6 +95,7 @@ export const theme = createTheme({
       backgroundColor: 'secondary',
     },
     tertiary: {
+      borderRadius: 10,
       backgroundColor: 'text',
       color: 'textOnBackground',
       fontSize: 3,

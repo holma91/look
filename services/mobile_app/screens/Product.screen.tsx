@@ -8,6 +8,7 @@ import { RouteProp } from '@react-navigation/native';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
+import { Button } from '../components/Button';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
@@ -49,7 +50,7 @@ export default function Product({
   ).current;
 
   return (
-    <Box>
+    <Box backgroundColor="background" flex={1}>
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}
@@ -95,18 +96,30 @@ export default function Product({
         </Box>
       </Box>
       <Box padding="m">
-        <Text variant="title" fontSize={22} marginBottom="s">
-          {product.name}
-        </Text>
-        <Text variant="body" fontSize={18} marginBottom="s">
-          {product.brand}
-        </Text>
-        <Text variant="body" fontSize={18} marginBottom="s">
-          {`${product.price} ${product.currency}`}
-        </Text>
-        <Text variant="body" fontSize={18} marginBottom="s">
-          {product.domain}
-        </Text>
+        <Box alignContent="space-between" justifyContent="space-between">
+          <Text variant="title" fontSize={22} marginBottom="s">
+            {product.name}
+          </Text>
+          <Text variant="body" fontSize={18} marginBottom="s">
+            {product.brand}
+          </Text>
+          <Text variant="body" fontSize={18} marginBottom="s">
+            {`${product.price} ${product.currency}`}
+          </Text>
+          <Text variant="body" fontSize={18} marginBottom="m">
+            {product.domain}
+          </Text>
+        </Box>
+        <Box>
+          <Button
+            label={`Buy on ${product.domain}`}
+            onPress={() => navigation.navigate('Browser', { url: product.url })}
+            variant="tertiary"
+            fontSize={17}
+            paddingVertical="s"
+            color="textOnBackground"
+          ></Button>
+        </Box>
       </Box>
     </Box>
   );
