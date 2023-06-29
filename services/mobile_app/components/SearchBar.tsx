@@ -122,6 +122,66 @@ function FakeSearchBar({ navigation }: { navigation: any }) {
     </Box>
   );
 }
+function FakeSearchBarBrowser({
+  navigation,
+  domain,
+}: {
+  navigation: any;
+  domain: string;
+}) {
+  const handleOnPress = () => {
+    navigation.navigate('Search');
+  };
+  return (
+    <Box
+      flex={0}
+      flexDirection="row"
+      alignItems="center"
+      gap="s"
+      paddingBottom="s"
+      paddingHorizontal="m"
+    >
+      <Box
+        flex={1}
+        backgroundColor="grey"
+        borderRadius={20}
+        flexDirection="row"
+        alignItems="center"
+        paddingHorizontal="m"
+        paddingVertical="xxs"
+      >
+        <TextInput
+          onTouchStart={handleOnPress}
+          autoCapitalize="none"
+          autoComplete="off"
+          autoCorrect={false}
+          inputMode="url"
+          variant="secondary"
+          selectTextOnFocus={true}
+          placeholder="Search and shop anywhere"
+          placeholderTextColor="black"
+          autoFocus={false}
+          value={domain}
+        />
+        <Ionicons
+          name="search"
+          size={18}
+          color="black"
+          style={{ position: 'absolute', left: 15 }}
+        />
+      </Box>
+      <Box flex={0} backgroundColor="grey" borderRadius={20} padding="xs">
+        <Ionicons
+          name="close"
+          flex={0}
+          size={24}
+          color="black"
+          onPress={() => navigation.goBack()}
+        />
+      </Box>
+    </Box>
+  );
+}
 
 type BrowserSearchBar = {
   setSearch: (search: string) => void;
@@ -188,4 +248,4 @@ function BrowserSearchBar({
   );
 }
 
-export { SearchBar, FakeSearchBar, BrowserSearchBar };
+export { SearchBar, FakeSearchBar, BrowserSearchBar, FakeSearchBarBrowser };

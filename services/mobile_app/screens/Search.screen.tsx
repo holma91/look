@@ -30,7 +30,7 @@ export default function Search({ navigation }: { navigation: any }) {
     }
   };
 
-  console.log('websites', websites);
+  // console.log('websites', websites);
 
   const filteredWebsites = websites?.filter((website) =>
     website.domain.includes(searchText)
@@ -61,6 +61,8 @@ export default function Search({ navigation }: { navigation: any }) {
                 >
                   <TouchableOpacity
                     onPress={() => {
+                      console.log('item', item);
+
                       navigation.navigate('Browser', { url: item.domain });
                     }}
                     style={{ flex: 1 }}

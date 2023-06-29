@@ -24,7 +24,11 @@ import { Button } from '../components/Button';
 import { baseExtractScript, baseInteractScript } from '../utils/scripts';
 import { fetchHistory, likeProduct, unlikeProduct } from '../api';
 import { Product, UserProduct } from '../utils/types';
-import { BrowserSearchBar } from '../components/SearchBar';
+import {
+  BrowserSearchBar,
+  FakeSearchBar,
+  FakeSearchBarBrowser,
+} from '../components/SearchBar';
 import { connectors } from '../utils/connectors';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -70,7 +74,6 @@ export default function Browser({
   navigation: any;
   route: any;
 }) {
-  const [url, setUrl] = useState(getUrl(route.params.url));
   const [search, setSearch] = useState(`${route.params.url}`);
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product>({
@@ -83,22 +86,14 @@ export default function Browser({
   });
   const [currentImage, setCurrentImage] = useState<string>('');
 
+  const url = getUrl(route.params.url);
+
   const domain = getDomain(route.params.url);
 
   const { user } = useUser();
 
   const webviewRef = useRef<WebView>(null);
   const bottomSheetHeight = useSharedValue(0);
-
-  const handleSearch = () => {
-    console.log('searching for', search);
-    let finalUrl = search;
-    if (!search.startsWith('http://') && !search.startsWith('https://')) {
-      finalUrl = 'http://' + search;
-    }
-
-    setUrl(finalUrl);
-  };
 
   const navigate = (direction: 'back' | 'forward' | 'reload') => {
     if (!webviewRef.current) return;
@@ -137,13 +132,14 @@ export default function Browser({
   return (
     <Box backgroundColor="background" flex={1}>
       <Box flex={1}>
-        <BrowserSearchBar
+        {/* <BrowserSearchBar
           setSearch={setSearch}
           search={search}
           handleSearch={handleSearch}
           webviewNavigation={navigate}
           navigation={navigation}
-        />
+        /> */}
+        <FakeSearchBarBrowser navigation={navigation} domain={domain} />
         <Box flex={1}>
           <WebViewBox
             webviewRef={webviewRef}

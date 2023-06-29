@@ -22,14 +22,6 @@ export default function Likes({ navigation }: { navigation: any }) {
     enabled: !!user?.id,
   });
 
-  if (status === 'loading') {
-    return <Text>Loading...</Text>;
-  }
-
-  if (status === 'error') {
-    return <Text>Error!</Text>;
-  }
-
   return (
     <Box backgroundColor="background" flex={1} paddingHorizontal="s">
       <Box justifyContent="center" alignItems="center" paddingVertical="m">
@@ -38,18 +30,20 @@ export default function Likes({ navigation }: { navigation: any }) {
         </Text>
       </Box>
       <Box flex={1}>
-        <FlatList
-          data={likes.slice().reverse()}
-          numColumns={2}
-          keyExtractor={(item) => item.url}
-          renderItem={({ item }) => (
-            <Product navigation={navigation} product={item} />
-          )}
-          refreshControl={
-            <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-          }
-          showsVerticalScrollIndicator={false}
-        />
+        {status === 'success' ? (
+          <FlatList
+            data={likes.slice().reverse()}
+            numColumns={2}
+            keyExtractor={(item) => item.url}
+            renderItem={({ item }) => (
+              <Product navigation={navigation} product={item} />
+            )}
+            refreshControl={
+              <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        ) : null}
       </Box>
     </Box>
   );
