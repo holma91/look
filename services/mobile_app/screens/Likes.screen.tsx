@@ -1,4 +1,9 @@
-import { FlatList, TouchableOpacity, RefreshControl } from 'react-native';
+import {
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+  SafeAreaView,
+} from 'react-native';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -24,27 +29,29 @@ export default function Likes({ navigation }: { navigation: any }) {
 
   return (
     <Box backgroundColor="background" flex={1} paddingHorizontal="s">
-      <Box justifyContent="center" alignItems="center" paddingVertical="m">
-        <Text variant="title" fontSize={18}>
-          Likes
-        </Text>
-      </Box>
-      <Box flex={1}>
-        {status === 'success' ? (
-          <FlatList
-            data={likes.slice().reverse()}
-            numColumns={2}
-            keyExtractor={(item) => item.url}
-            renderItem={({ item }) => (
-              <Product navigation={navigation} product={item} />
-            )}
-            refreshControl={
-              <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-            }
-            showsVerticalScrollIndicator={false}
-          />
-        ) : null}
-      </Box>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Box justifyContent="center" alignItems="center" paddingVertical="m">
+          <Text variant="title" fontSize={18}>
+            Likes
+          </Text>
+        </Box>
+        <Box flex={1}>
+          {status === 'success' ? (
+            <FlatList
+              data={likes.slice().reverse()}
+              numColumns={2}
+              keyExtractor={(item) => item.url}
+              renderItem={({ item }) => (
+                <Product navigation={navigation} product={item} />
+              )}
+              refreshControl={
+                <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+              }
+              showsVerticalScrollIndicator={false}
+            />
+          ) : null}
+        </Box>
+      </SafeAreaView>
     </Box>
   );
 }

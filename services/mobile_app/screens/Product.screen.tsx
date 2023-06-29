@@ -14,17 +14,6 @@ import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
 import { useRef, useState } from 'react';
 
-type RootStackParamList = {
-  Product: { product: UserProduct };
-};
-
-type ProductScreenRouteProp = RouteProp<RootStackParamList, 'Product'>;
-
-interface Props {
-  navigation: any;
-  route: ProductScreenRouteProp;
-}
-
 const { width } = Dimensions.get('window');
 
 export default function Product({
@@ -32,11 +21,11 @@ export default function Product({
   route,
 }: {
   navigation: any;
-  route: ProductScreenRouteProp;
+  route: any;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const { product } = route.params;
+  const { product }: { product: UserProduct } = route.params;
   console.log(product);
 
   const viewabilityConfig = useRef({
@@ -53,7 +42,7 @@ export default function Product({
     <Box backgroundColor="background" flex={1}>
       <TouchableOpacity
         onPress={() => navigation.goBack()}
-        style={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}
+        style={{ position: 'absolute', top: 50, left: 10, zIndex: 1 }}
       >
         <Ionicons name="chevron-back" size={30} color="black" />
       </TouchableOpacity>
@@ -95,7 +84,7 @@ export default function Product({
             : null}
         </Box>
       </Box>
-      <Box padding="m">
+      <Box padding="m" flex={1} justifyContent="space-between">
         <Box alignContent="space-between" justifyContent="space-between">
           <Text variant="title" fontSize={22} marginBottom="s">
             {product.name}

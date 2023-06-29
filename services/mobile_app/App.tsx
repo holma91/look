@@ -23,9 +23,9 @@ export default function App() {
         publishableKey={Constants?.expoConfig?.extra?.clerkApiKey}
       >
         <QueryClientProvider client={queryClient}>
-          <SafeAreaView style={{ flex: 1 }}>
-            <Navigation />
-          </SafeAreaView>
+          {/* <SafeAreaView style={{ flex: 1 }}> */}
+          <Navigation />
+          {/* </SafeAreaView> */}
         </QueryClientProvider>
       </ClerkProvider>
     </ThemeProvider>

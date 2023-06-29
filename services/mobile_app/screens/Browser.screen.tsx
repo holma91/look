@@ -1,4 +1,4 @@
-import { Dimensions } from 'react-native';
+import { Dimensions, SafeAreaView } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useRef, useState } from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -74,7 +74,6 @@ export default function Browser({
   navigation: any;
   route: any;
 }) {
-  const [search, setSearch] = useState(`${route.params.url}`);
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product>({
     url: 'https://www.zara.com/se/en/rak-blazer-p08068001.html?v1=78861699&v2=1718127',
@@ -131,42 +130,32 @@ export default function Browser({
 
   return (
     <Box backgroundColor="background" flex={1}>
-      <Box flex={1}>
-        {/* <BrowserSearchBar
-          setSearch={setSearch}
-          search={search}
-          handleSearch={handleSearch}
-          webviewNavigation={navigate}
-          navigation={navigation}
-        /> */}
-        <FakeSearchBarBrowser navigation={navigation} domain={domain} />
+      <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1}>
-          <WebViewBox
-            webviewRef={webviewRef}
-            handleLoadEnd={handleLoadEnd}
-            url={url}
-            domain={domain}
-            setCurrentProduct={setCurrentProduct}
-            setCurrentImage={setCurrentImage}
-            refetchProducts={refetchProducts}
-          />
+          <FakeSearchBarBrowser navigation={navigation} domain={domain} />
+          <Box flex={1}>
+            <WebViewBox
+              webviewRef={webviewRef}
+              handleLoadEnd={handleLoadEnd}
+              url={url}
+              domain={domain}
+              setCurrentProduct={setCurrentProduct}
+              setCurrentImage={setCurrentImage}
+              refetchProducts={refetchProducts}
+            />
+          </Box>
         </Box>
-        <BottomSheet
-          bottomSheetHeight={bottomSheetHeight}
-          setExpandedMenu={setExpandedMenu}
-          currentProduct={currentProduct}
-          currentImage={currentImage}
-        />
-        <NavBar
-          bottomSheetHeight={bottomSheetHeight}
-          expandedMenu={expandedMenu}
-          setExpandedMenu={setExpandedMenu}
-          navigate={navigate}
-          user={user}
-          currentProduct={currentProduct}
-          products={products}
-        />
-      </Box>
+      </SafeAreaView>
+      <NavBar
+        bottomSheetHeight={bottomSheetHeight}
+        expandedMenu={expandedMenu}
+        setExpandedMenu={setExpandedMenu}
+        navigate={navigate}
+        user={user}
+        currentProduct={currentProduct}
+        currentImage={currentImage}
+        products={products}
+      />
     </Box>
   );
 }
@@ -178,6 +167,7 @@ type NavBarProps = {
   navigate: (direction: 'back' | 'forward') => void;
   user: any;
   currentProduct: Product;
+  currentImage: string;
   products: UserProduct[];
 };
 
@@ -188,6 +178,7 @@ function NavBar({
   navigate,
   user,
   currentProduct,
+  currentImage,
   products,
 }: NavBarProps) {
   const queryClient = useQueryClient();
@@ -230,70 +221,81 @@ function NavBar({
 
   let activeProduct = products?.find((p) => p.url === currentProduct?.url);
 
-  // console.log('activeProduct', activeProduct);
-
   return (
-    <Box
-      flex={0}
-      borderWidth={0}
-      flexDirection="row"
-      paddingVertical="s"
-      paddingHorizontal="m"
-      marginTop="s"
-      justifyContent="space-between"
-      backgroundColor="background"
-      zIndex={100}
-    >
-      <Box flex={0} flexDirection="row" gap="m" alignItems="center">
-        <Ionicons
-          name="arrow-back"
-          size={28}
-          color="black"
-          onPress={() => navigate('back')}
-        />
-        <Ionicons
-          name="arrow-forward"
-          size={28}
-          color="black"
-          onPress={() => navigate('forward')}
-        />
-      </Box>
-      <Box flex={0} flexDirection="row" alignItems="center">
-        {expandedMenu ? (
+    <Box>
+      <Box
+        flex={0}
+        borderWidth={0}
+        flexDirection="row"
+        paddingVertical="s"
+        paddingHorizontal="m"
+        marginTop="s"
+        paddingBottom="xl"
+        justifyContent="space-between"
+        backgroundColor="background"
+        zIndex={100}
+      >
+        <Box flex={0} flexDirection="row" gap="m" alignItems="center">
           <Ionicons
-            name="close-circle"
+            name="arrow-back"
             size={28}
             color="black"
-            onPress={() => {
-              setExpandedMenu(false);
-              bottomSheetHeight.value = withTiming(MIN_HEIGHT);
-            }}
+            onPress={() => navigate('back')}
           />
-        ) : (
           <Ionicons
-            name="arrow-up-circle"
+            name="arrow-forward"
             size={28}
             color="black"
+            onPress={() => navigate('forward')}
+          />
+        </Box>
+        <Box flex={0} flexDirection="row" alignItems="center">
+          {expandedMenu ? (
+            <Ionicons
+              name="close-circle"
+              size={28}
+              color="black"
+              onPress={() => {
+                setExpandedMenu(false);
+                bottomSheetHeight.value = withTiming(MIN_HEIGHT);
+              }}
+            />
+          ) : (
+            <Ionicons
+              name="arrow-up-circle"
+              size={28}
+              color="black"
+              onPress={() => {
+                setExpandedMenu(true);
+                bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
+              }}
+            />
+          )}
+        </Box>
+        <Box flex={0} flexDirection="row" gap="m" alignItems="center">
+          <Ionicons
+            name={icon}
+            size={24}
+            color="black"
             onPress={() => {
-              setExpandedMenu(true);
-              bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
+              if (activeProduct) {
+                mutation.mutate(activeProduct);
+              }
             }}
           />
-        )}
+          <Ionicons
+            name="md-ellipsis-horizontal-sharp"
+            size={24}
+            color="black"
+          />
+        </Box>
       </Box>
-      <Box flex={0} flexDirection="row" gap="m" alignItems="center">
-        <Ionicons
-          name={icon}
-          size={24}
-          color="black"
-          onPress={() => {
-            if (activeProduct) {
-              mutation.mutate(activeProduct);
-            }
-          }}
-        />
-        <Ionicons name="md-ellipsis-horizontal-sharp" size={24} color="black" />
-      </Box>
+      <BottomSheet
+        bottomSheetHeight={bottomSheetHeight}
+        setExpandedMenu={setExpandedMenu}
+        currentProduct={currentProduct}
+        currentImage={currentImage}
+      />
     </Box>
   );
 }
@@ -390,7 +392,7 @@ function BottomSheet({
           {
             backgroundColor: 'white',
             position: 'absolute',
-            bottom: 45,
+            bottom: 55,
             left: 0,
             right: 0,
           },

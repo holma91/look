@@ -2,11 +2,9 @@ import { useTheme } from '@shopify/restyle';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Create from '../screens/Create.screen';
 import Shop from '../screens/Shop.screen';
 import Profile from '../screens/Profile.screen';
-import Likes from '../screens/Likes.screen';
-import Testing from '../screens/Testing.screen';
+import LikesNavigator from './Likes.navigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -31,7 +29,7 @@ export default function TabNavigator() {
           } else if (route.name === 'Create') {
             iconName = focused ? 'ios-add-circle' : 'ios-add-circle-outline';
             return <Ionicons name={iconName} size={size} color={color} />;
-          } else if (route.name === 'Likes') {
+          } else if (route.name === 'LikesNavigator') {
             iconName = focused ? 'heart' : 'heart-outline';
             return (
               <MaterialCommunityIcons
@@ -56,7 +54,7 @@ export default function TabNavigator() {
     >
       <Tab.Screen name="Shop" component={Shop} />
       {/* <Tab.Screen name="Create" component={Create} /> */}
-      <Tab.Screen name="Likes" component={Likes} />
+      <Tab.Screen name="LikesNavigator" component={LikesNavigator} />
       {/* <Tab.Screen name="Testing" component={Testing} /> */}
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>

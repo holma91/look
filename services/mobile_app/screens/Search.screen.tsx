@@ -1,4 +1,9 @@
-import { FlatList, TouchableOpacity, Keyboard } from 'react-native';
+import {
+  FlatList,
+  TouchableOpacity,
+  Keyboard,
+  SafeAreaView,
+} from 'react-native';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
 import { Image as ExpoImage } from 'expo-image';
@@ -38,65 +43,67 @@ export default function Search({ navigation }: { navigation: any }) {
 
   return (
     <Box backgroundColor="background" flex={1}>
-      <Box flex={1} gap="s">
-        <SearchBar
-          navigation={navigation}
-          searchText={searchText}
-          setSearchText={setSearchText}
-          handleSearch={handleSearch}
-        />
-        <Box flex={1}>
-          {status === 'success' ? (
-            <FlatList
-              data={filteredWebsites}
-              keyExtractor={(item) => item.domain}
-              keyboardShouldPersistTaps="handled"
-              renderItem={({ item }) => (
-                <Box
-                  flex={1}
-                  flexDirection="row"
-                  alignItems="center"
-                  paddingHorizontal="m"
-                  paddingVertical="s"
-                >
-                  <TouchableOpacity
-                    onPress={() => {
-                      console.log('item', item);
-
-                      navigation.navigate('Browser', { url: item.domain });
-                    }}
-                    style={{ flex: 1 }}
+      <SafeAreaView style={{ flex: 1 }}>
+        <Box flex={1} gap="s">
+          <SearchBar
+            navigation={navigation}
+            searchText={searchText}
+            setSearchText={setSearchText}
+            handleSearch={handleSearch}
+          />
+          <Box flex={1}>
+            {status === 'success' ? (
+              <FlatList
+                data={filteredWebsites}
+                keyExtractor={(item) => item.domain}
+                keyboardShouldPersistTaps="handled"
+                renderItem={({ item }) => (
+                  <Box
+                    flex={1}
+                    flexDirection="row"
+                    alignItems="center"
+                    paddingHorizontal="m"
+                    paddingVertical="s"
                   >
-                    <Box
-                      flexDirection="row"
-                      alignItems="center"
-                      gap="l"
-                      flex={1}
+                    <TouchableOpacity
+                      onPress={() => {
+                        console.log('item', item);
+
+                        navigation.navigate('Browser', { url: item.domain });
+                      }}
+                      style={{ flex: 1 }}
                     >
-                      <ExpoImage
-                        style={{
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          height: 40,
-                          width: 40,
-                        }}
-                        source={domainToInfo[item.domain].icon}
-                        contentFit="contain"
-                      />
-                      <Box gap="s">
-                        <Text variant="body" fontWeight={'bold'}>
-                          {domainToInfo[item.domain].name}
-                        </Text>
-                        <Text variant="body">{item.domain}</Text>
+                      <Box
+                        flexDirection="row"
+                        alignItems="center"
+                        gap="l"
+                        flex={1}
+                      >
+                        <ExpoImage
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            height: 40,
+                            width: 40,
+                          }}
+                          source={domainToInfo[item.domain].icon}
+                          contentFit="contain"
+                        />
+                        <Box gap="s">
+                          <Text variant="body" fontWeight={'bold'}>
+                            {domainToInfo[item.domain].name}
+                          </Text>
+                          <Text variant="body">{item.domain}</Text>
+                        </Box>
                       </Box>
-                    </Box>
-                  </TouchableOpacity>
-                </Box>
-              )}
-            />
-          ) : null}
+                    </TouchableOpacity>
+                  </Box>
+                )}
+              />
+            ) : null}
+          </Box>
         </Box>
-      </Box>
+      </SafeAreaView>
     </Box>
   );
 }

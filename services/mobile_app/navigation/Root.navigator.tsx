@@ -6,6 +6,8 @@ import Browser from '../screens/Browser.screen';
 import SignUpOrIn from '../screens/SignUpOrIn.screen';
 import Search from '../screens/Search.screen';
 import Product from '../screens/Product.screen';
+import Shop from '../screens/Shop.screen';
+import Likes from '../screens/Likes.screen';
 
 const Stack = createNativeStackNavigator();
 
