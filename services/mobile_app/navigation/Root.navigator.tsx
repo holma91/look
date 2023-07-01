@@ -8,6 +8,7 @@ import Search from '../screens/Search.screen';
 import Product from '../screens/Product.screen';
 import Shop from '../screens/Shop.screen';
 import Likes from '../screens/Likes.screen';
+import Studio from '../screens/Studio.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,7 +35,7 @@ export default function RootNavigator() {
               component={Search}
               options={{ animation: 'none' }}
             />
-            <Stack.Screen name="Product" component={Product} />
+            <Stack.Screen name="Studio" component={Studio} />
           </>
         ) : (
           <Stack.Screen name="SignUpOrIn" component={SignUpOrIn} />

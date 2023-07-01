@@ -154,7 +154,7 @@ function Model({
         <ExpoImage
           style={{
             width: '100%',
-            height: 175,
+            height: 256,
             borderRadius: 10,
             borderWidth: selectedModel.id === model.id ? 3 : 0,
           }}

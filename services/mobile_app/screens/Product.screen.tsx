@@ -7,6 +7,7 @@ import {
 import { RouteProp } from '@react-navigation/native';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { Button } from '../components/Button';
 import { Box } from '../styling/Box';
@@ -42,27 +43,50 @@ export default function Product({
     <Box backgroundColor="background" flex={1}>
       <TouchableOpacity
         onPress={() => navigation.goBack()}
-        style={{ position: 'absolute', top: 50, left: 10, zIndex: 1 }}
+        style={{ position: 'absolute', top: 50, left: 20, zIndex: 1 }}
       >
         <Ionicons name="chevron-back" size={30} color="black" />
       </TouchableOpacity>
       <Box>
-        <FlatList
-          data={product.images}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item, index) => index.toString()}
-          onViewableItemsChanged={onViewableItemsChanged}
-          viewabilityConfig={viewabilityConfig}
-          renderItem={({ item }) => (
-            <ExpoImage
-              source={{ uri: item }}
-              style={{ width: width, height: 550 }}
-              resizeMode="cover"
+        <Box>
+          <FlatList
+            data={product.images}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => index.toString()}
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={viewabilityConfig}
+            renderItem={({ item }) => (
+              <ExpoImage
+                source={{ uri: item }}
+                style={{ width: width, height: 550 }}
+                resizeMode="cover"
+              />
+            )}
+          />
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Studio', { product })}
+            style={{
+              position: 'absolute',
+              bottom: 20,
+              right: 20,
+              zIndex: 1,
+              backgroundColor: 'rgba(256, 256, 256, 0.5)',
+              borderRadius: 50,
+              width: 42,
+              height: 42,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <MaterialCommunityIcons
+              name="human-handsdown"
+              size={28}
+              color="black"
             />
-          )}
-        />
+          </TouchableOpacity>
+        </Box>
         <Box
           flexDirection="row"
           justifyContent="center"
