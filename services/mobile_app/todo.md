@@ -26,7 +26,8 @@ look for image elements that are not wrapped in "a tags". Works on:
 
 ### TODO rn
 
-- make search bar work
+- UI for choosing model AND creating (coming soon)
+- UI for going from product image to AI generated
 
 ### TODO
 
@@ -40,18 +41,6 @@ DEFAULT MODELS:
 - black man
 - white woman
 - asian woman
-
-activating extra network lora with arguments [<modules.extra_networks.ExtraNetworkParams object at 0x7fd614987820>]: AttributeError
-Traceback (most recent call last):
-File "/content/drive/MyDrive/stable-diffusion-webui-colab/stable-diffusion-webui/modules/extra_networks.py", line 75, in activate
-extra_network.activate(p, extra_network_args)
-File "/content/drive/MyDrive/stable-diffusion-webui-colab/stable-diffusion-webui/extensions-builtin/Lora/extra_networks_lora.py", line 23, in activate
-lora.load_loras(names, multipliers)
-File "/content/drive/MyDrive/stable-diffusion-webui-colab/stable-diffusion-webui/extensions-builtin/Lora/lora.py", line 170, in load_loras
-lora = load_lora(name, lora_on_disk.filename)
-File "/content/drive/MyDrive/stable-diffusion-webui-colab/stable-diffusion-webui/extensions/a1111-sd-webui-locon/scripts/main.py", line 371, in load_lora
-lora.mtime = os.path.getmtime(lora_on_disk.filename)
-AttributeError: 'str' object has no attribute 'filename'
 
 ### TODO far away
 

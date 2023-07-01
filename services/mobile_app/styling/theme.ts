@@ -20,6 +20,7 @@ export const theme = createTheme({
     grey: palette.grey,
   },
   spacing: {
+    none: 0,
     xxs: 2,
     xs: 6,
     s: 8,

@@ -279,6 +279,9 @@ function NavBar({
             color="black"
             onPress={() => {
               if (activeProduct) {
+                // this is where we go when something has been liked
+                // what info do we have? the product, the url, the image
+                // want to map into a set of categories
                 mutation.mutate(activeProduct);
               }
             }}
