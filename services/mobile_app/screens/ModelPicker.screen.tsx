@@ -14,14 +14,12 @@ const startingModels: Model[] = [
   {
     id: '1',
     name: 'White woman',
-    imageUrl:
-      'https://softgoat.centracdn.net/client/dynamic/images/2184_03af672ba3-softgoat-ss23-nc48111-ribbed-singlet-light-blue-1895-4-size1024.jpg',
+    imageUrl: require('../assets/models/whitewoman1.png'),
   },
   {
     id: '2',
     name: 'White man',
-    imageUrl:
-      'https://softgoat.centracdn.net/client/dynamic/images/2177_8397735c89-softgoat-ss23-25030-mens-waffle-knit-navy-2895-4-size1024.jpg',
+    imageUrl: require('../assets/models/whiteman1.png'),
   },
   {
     id: '3',
@@ -57,8 +55,7 @@ export default function ModelPicker({ navigation }: { navigation: any }) {
     <Box backgroundColor="background" flex={1}>
       <Box
         flex={0.3} // Adjust this to control the size of the image
-        justifyContent="center"
-        alignItems="center"
+        position="relative"
       >
         <ExpoImage
           style={{
@@ -69,6 +66,19 @@ export default function ModelPicker({ navigation }: { navigation: any }) {
             uri: 'https://softgoat.centracdn.net/client/dynamic/images/2167_c2c4adff2f-30-size1024.jpg',
           }}
         />
+        <Box
+          position="absolute"
+          top={0}
+          bottom={0}
+          left={0}
+          right={0}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Text variant="body" fontWeight="bold" color="background">
+            Adjust the Text styling as needed Your text here
+          </Text>
+        </Box>
       </Box>
       <Box flex={0.7}>
         <Text variant="body" fontWeight="bold" padding="m" paddingBottom="s">
@@ -84,15 +94,28 @@ export default function ModelPicker({ navigation }: { navigation: any }) {
                 navigation={navigation}
                 model={item}
                 setSelectedModel={setSelectedModel}
+                selectedModel={selectedModel}
               />
             )}
             showsVerticalScrollIndicator={false}
           />
         </Box>
         {selectedModel && ( // If a model is selected, show their name
-          <Box padding="m">
+          <Box
+            margin="s"
+            marginTop="none"
+            padding="m"
+            borderWidth={1}
+            borderRadius={10}
+            borderColor="grey"
+            flexDirection="row"
+            justifyContent="space-between"
+          >
             <Text variant="body" fontWeight="bold">
-              Selected Model: {selectedModel.name}
+              Selected Model:
+            </Text>
+            <Text variant="body" fontWeight="bold">
+              {selectedModel.name}
             </Text>
           </Box>
         )}
@@ -101,15 +124,19 @@ export default function ModelPicker({ navigation }: { navigation: any }) {
   );
 }
 
+type ModelProps = {
+  navigation: any;
+  model: Model;
+  setSelectedModel: React.Dispatch<React.SetStateAction<Model>>;
+  selectedModel: Model;
+};
+
 function Model({
   navigation,
   model,
   setSelectedModel,
-}: {
-  navigation: any;
-  model: Model;
-  setSelectedModel: React.Dispatch<React.SetStateAction<Model>>;
-}) {
+  selectedModel,
+}: ModelProps) {
   return (
     <TouchableOpacity
       onPress={() => {
@@ -122,14 +149,16 @@ function Model({
         flex={1}
         marginBottom="s"
         marginLeft={parseInt(model.id) % 2 === 0 ? 's' : 'none'}
+        borderRadius={10}
       >
         <ExpoImage
           style={{
             width: '100%',
             height: 175,
             borderRadius: 10,
+            borderWidth: selectedModel.id === model.id ? 3 : 0,
           }}
-          source={{ uri: model.imageUrl }}
+          source={model.imageUrl}
         />
       </Box>
     </TouchableOpacity>
