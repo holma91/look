@@ -141,7 +141,7 @@ function Model({
     <TouchableOpacity
       onPress={() => {
         setSelectedModel(model);
-        // navigation.navigate('Model', { model: model });
+        navigation.navigate('Home2');
       }}
       style={{ flex: 1 }}
     >

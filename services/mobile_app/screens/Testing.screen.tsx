@@ -1,38 +1,27 @@
-import { WebView } from 'react-native-webview';
-import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
+import * as React from 'react';
+import { View, Button } from 'react-native';
+import Animated from 'react-native-reanimated';
 
-export default function Testing() {
-  const handleNavigationStateChange = (navState: any) => {
-    // this will get called whenever ANY property of the navState changes.
-    // console.log('handleNavigationStateChange:', navState);
-  };
-
-  const handleLoadStart = (navState: any) => {
-    // console.log('handleLoadStart:', navState.nativeEvent);
-  };
-
-  const handleLoadEnd = (navState: any) => {
-    console.log('handleLoadEnd:', navState.nativeEvent);
-  };
-
-  const handleLoad = (navState: any) => {
-    // console.log('handleLoad:', navState.nativeEvent);
-  };
-
+export function Screen1({ navigation }: { navigation: any }) {
   return (
-    <Box flex={1}>
-      <WebView
-        source={{ uri: 'https://zalando.se/' }}
-        style={{ flex: 1 }}
-        onNavigationStateChange={handleNavigationStateChange}
-        onLoadStart={handleLoadStart}
-        onLoadEnd={handleLoadEnd}
-        onLoad={handleLoad}
+    <View style={{ flex: 1 }}>
+      <Animated.View
+        style={{ width: 150, height: 150, backgroundColor: 'green' }}
+        sharedTransitionTag="sharedTag"
       />
-    </Box>
+      <Button title="Screen2" onPress={() => navigation.navigate('Screen2')} />
+    </View>
   );
 }
 
-// https://www.zalando.se/gant-luxury-skjorta-light-pink-ga321e0du-j11.html
-// https://www.zalando.se/gant-luxury-skjorta-light-pink-ga321e0du-j11.html
+export function Screen2({ navigation }: { navigation: any }) {
+  return (
+    <View style={{ flex: 1, marginTop: 50 }}>
+      <Animated.View
+        style={{ width: 100, height: 100, backgroundColor: 'green' }}
+        sharedTransitionTag="sharedTag"
+      />
+      <Button title="Screen1" onPress={() => navigation.navigate('Screen1')} />
+    </View>
+  );
+}

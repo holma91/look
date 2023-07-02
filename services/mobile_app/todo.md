@@ -26,8 +26,20 @@ look for image elements that are not wrapped in "a tags". Works on:
 
 ### TODO rn
 
-- UI for choosing model AND creating (coming soon)
-- UI for going from product image to AI generated
+SUNDAY:
+
+- go through reanimated docs, figure out how to make the animation we want when Product -> Screen
+- Clean up dirty code from the week, fix small bugs
+
+NEXT WEEK (focus on demo for AIGrant):
+
+- Dreambooth
+- filter/search UI on likes
+- "completion" productData to product
+- UI details before demo!
+  - font
+  - spacing
+  - border radiuses
 
 ### TODO
 

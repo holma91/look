@@ -13,6 +13,7 @@ import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
 import { useState } from 'react';
+import Animated from 'react-native-reanimated';
 
 export default function Likes({ navigation }: { navigation: any }) {
   const { user } = useUser();
@@ -69,7 +70,8 @@ function Product({
       style={{ flex: 1 }}
     >
       <Box flex={1} margin="s" gap="s" marginBottom="m">
-        <ExpoImage
+        <Animated.Image
+          sharedTransitionTag={`image-${product.url}`}
           style={{
             width: '100%',
             height: 225,
@@ -77,6 +79,14 @@ function Product({
           }}
           source={{ uri: product.images[0] }}
         />
+        {/* <ExpoImage
+          style={{
+            width: '100%',
+            height: 225,
+            // borderRadius: 10,
+          }}
+          source={{ uri: product.images[0] }}
+        /> */}
         <Box gap="xxs">
           <Text variant="body" fontWeight="600">
             {product.brand}

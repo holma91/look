@@ -16,9 +16,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   assetBundlePatterns: ['**/*'],
   ios: {
+    bundleIdentifier: 'com.anonymous.look', // added when doing npx expo prebuild
     supportsTablet: true,
   },
   android: {
+    package: 'com.anonymous.look', // added when doing npx expo prebuild
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#ffffff',

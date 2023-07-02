@@ -6,7 +6,6 @@ import Shop from '../screens/Shop.screen';
 import Profile from '../screens/Profile.screen';
 import LikesNavigator from './Likes.navigator';
 import Create from '../screens/Create.screen';
-import Testing from '../screens/Testing.screen';
 import ModelPicker from '../screens/ModelPicker.screen';
 
 const Tab = createBottomTabNavigator();

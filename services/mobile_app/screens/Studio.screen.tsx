@@ -15,7 +15,7 @@ import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
 import { useRef, useState } from 'react';
-import { set } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
