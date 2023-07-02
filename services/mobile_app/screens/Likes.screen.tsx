@@ -71,7 +71,7 @@ function Product({
     >
       <Box flex={1} margin="s" gap="s" marginBottom="m">
         <Animated.Image
-          sharedTransitionTag={`image-${product.url}`}
+          // sharedTransitionTag={`image-${product.url}`}
           style={{
             width: '100%',
             height: 225,

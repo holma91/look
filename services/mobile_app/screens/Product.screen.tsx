@@ -4,8 +4,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import { RouteProp } from '@react-navigation/native';
-import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
@@ -21,7 +19,40 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+
+const demoImages: { [key: string]: any } = {
+  basic: [
+    require('../assets/generations/demo/basic/1.png'),
+    require('../assets/generations/demo/basic/2.png'),
+    require('../assets/generations/demo/basic/3.png'),
+    require('../assets/generations/demo/basic/4.png'),
+    require('../assets/generations/demo/basic/5.png'),
+    require('../assets/generations/demo/basic/6.png'),
+    require('../assets/generations/demo/basic/7.png'),
+    require('../assets/generations/demo/basic/8.png'),
+    require('../assets/generations/demo/basic/9.png'),
+    require('../assets/generations/demo/basic/10.png'),
+    require('../assets/generations/demo/basic/15.png'),
+    require('../assets/generations/demo/basic/20.png'),
+    require('../assets/generations/demo/basic/25.png'),
+  ],
+  other: [
+    require('../assets/generations/demo/kitchen.png'),
+    require('../assets/generations/demo/park.png'),
+    require('../assets/generations/demo/timessquare.png'),
+    require('../assets/generations/demo/villa.png'),
+  ],
+};
+
+const determineImage = (image: string | number) => {
+  if (typeof image === 'string') {
+    // this means it's a URI
+    return { uri: image };
+  }
+  // if it's not a string, we'll assume it's a local image
+  return image;
+};
 
 export default function Product({
   navigation,
@@ -30,14 +61,17 @@ export default function Product({
   navigation: any;
   route: any;
 }) {
+  const [generatedImages, setGeneratedImages] = useState<any[]>([]);
+  const [hasGenerated, setHasGenerated] = useState(false);
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
-  const randomNumber = useSharedValue(525);
+  const imageHeight = useSharedValue(height * 0.62);
 
   const { product }: { product: UserProduct } = route.params;
 
   const viewabilityConfig = useRef({
-    itemVisiblePercentThreshold: 50, // Item is considered visible if 50% of its area is showing
+    itemVisiblePercentThreshold: 50,
   }).current;
 
   const onViewableItemsChanged = useRef(
@@ -46,16 +80,13 @@ export default function Product({
     }
   ).current;
 
-  const style = useAnimatedStyle(() => {
-    return { width: width, height: withTiming(randomNumber.value) };
+  const animatedStyle = useAnimatedStyle(() => {
+    return { width: width, height: withTiming(imageHeight.value) };
   });
 
   const handleStudioPress = () => {
-    console.log('Studio Pressed');
-    randomNumber.value = expanded ? 525 : 615;
+    imageHeight.value = expanded ? height * 0.62 : height * 0.73;
     setExpanded(!expanded);
-    // image height should increase with animation
-    // some of the in the lowest box should change
   };
 
   return (
@@ -69,7 +100,11 @@ export default function Product({
       <Box>
         <Box>
           <FlatList
-            data={product.images}
+            data={
+              hasGenerated && expanded
+                ? generatedImages
+                : route.params.product.images
+            }
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
@@ -78,9 +113,9 @@ export default function Product({
             viewabilityConfig={viewabilityConfig}
             renderItem={({ item }) => (
               <Animated.Image
-                sharedTransitionTag={`image-${product.url}`}
-                style={style}
-                source={{ uri: item }}
+                // sharedTransitionTag={`image-${product.url}`}
+                style={animatedStyle}
+                source={determineImage(item)}
               />
             )}
           />
@@ -107,90 +142,166 @@ export default function Product({
             />
           </TouchableOpacity>
         </Box>
-        <Box
-          flexDirection="row"
-          justifyContent="center"
-          position="absolute"
-          bottom={17}
-          width="100%"
-          zIndex={0}
-        >
-          {!expanded && product.images.length > 1
-            ? product.images.map((_, i) => (
-                <Box
-                  key={i}
-                  width={7}
-                  height={7}
-                  borderRadius={40}
-                  backgroundColor={i === activeIndex ? 'text' : 'background'}
-                  marginHorizontal="s"
-                />
-              ))
-            : null}
-        </Box>
+        <Carousel
+          images={
+            hasGenerated && expanded
+              ? generatedImages
+              : route.params.product.images
+          }
+          activeIndex={activeIndex}
+        />
       </Box>
-      <Box padding="m" flex={1} justifyContent="space-between">
-        {!expanded ? (
-          <>
-            <Box alignContent="space-between" justifyContent="space-between">
-              <Text variant="title" fontSize={22} marginBottom="s">
-                {product.name}
-              </Text>
-              <Text variant="body" fontSize={18} marginBottom="s">
-                {product.brand}
-              </Text>
-              <Text variant="body" fontSize={18} marginBottom="s">
-                {`${product.price} ${product.currency}`}
-              </Text>
-              <Text variant="body" fontSize={18} marginBottom="m">
-                {product.domain}
-              </Text>
-            </Box>
-            <Box>
-              <Button
-                label={`Buy on ${product.domain}`}
-                onPress={() =>
-                  navigation.navigate('Browser', { url: product.url })
-                }
-                variant="tertiary"
-                fontSize={17}
-                paddingVertical="s"
-                color="textOnBackground"
-              ></Button>
-            </Box>
-          </>
-        ) : (
-          <Box
-            alignContent="space-between"
-            justifyContent="space-between"
-            gap="m"
-          >
-            <Box
-              marginTop="none"
-              padding="m"
-              borderWidth={1}
-              borderRadius={10}
-              borderColor="grey"
-              flexDirection="row"
-              justifyContent="space-between"
-            >
-              <Text variant="body" fontWeight="bold">
-                Selected Model:
-              </Text>
-              <Text variant="body" fontWeight="bold">
-                White man
-              </Text>
-            </Box>
+      <TextBox
+        {...{
+          product,
+          expanded,
+          navigation,
+          setHasGenerated,
+          hasGenerated,
+          setGeneratedImages,
+        }}
+      />
+    </Box>
+  );
+}
+
+type TextBoxProps = {
+  product: UserProduct;
+  expanded: boolean;
+  navigation: any;
+  setHasGenerated: React.Dispatch<React.SetStateAction<boolean>>;
+  hasGenerated: boolean;
+  setGeneratedImages: React.Dispatch<React.SetStateAction<any[]>>;
+};
+
+function TextBox({
+  product,
+  expanded,
+  navigation,
+  setHasGenerated,
+  hasGenerated,
+  setGeneratedImages,
+}: TextBoxProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerate = async () => {
+    if (isGenerating) return;
+
+    setIsGenerating(true);
+    setHasGenerated(true);
+    for (let i = 0; i < demoImages['basic'].length; i++) {
+      setGeneratedImages([demoImages['basic'][i]]);
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    setIsGenerating(false);
+
+    setGeneratedImages(
+      [demoImages['basic'][demoImages['basic'].length - 1]].concat(
+        demoImages['other']
+      )
+    );
+  };
+  return (
+    <Box padding="m" flex={1} justifyContent="space-between">
+      {!expanded ? (
+        <>
+          <Box alignContent="space-between" justifyContent="space-between">
+            <Text variant="title" fontSize={22} marginBottom="s">
+              {product.name}
+            </Text>
+            <Text variant="body" fontSize={18} marginBottom="s">
+              {product.brand}
+            </Text>
+            <Text variant="body" fontSize={18} marginBottom="s">
+              {`${product.price} ${product.currency}`}
+            </Text>
+            <Text variant="body" fontSize={18} marginBottom="m">
+              {product.domain}
+            </Text>
+          </Box>
+          <Box>
             <Button
-              label={`Test on model`}
+              label={`Buy on ${product.domain}`}
+              onPress={() =>
+                navigation.navigate('Browser', { url: product.url })
+              }
               variant="tertiary"
               fontSize={17}
               paddingVertical="s"
               color="textOnBackground"
             ></Button>
           </Box>
-        )}
-      </Box>
+        </>
+      ) : (
+        <Box
+          alignContent="space-between"
+          justifyContent="space-between"
+          gap="m"
+        >
+          <Box
+            marginTop="none"
+            padding="m"
+            borderWidth={1}
+            borderRadius={10}
+            borderColor="grey"
+            flexDirection="row"
+            justifyContent="space-between"
+          >
+            <Text variant="body" fontWeight="bold">
+              Selected Model:
+            </Text>
+            <Text variant="body" fontWeight="bold">
+              White man
+            </Text>
+          </Box>
+          <Button
+            label={
+              hasGenerated && !isGenerating
+                ? 'Generated'
+                : isGenerating
+                ? 'is generating...'
+                : `Test on model`
+            }
+            onPress={handleGenerate}
+            variant="tertiary"
+            fontSize={17}
+            paddingVertical="s"
+            color="textOnBackground"
+          ></Button>
+        </Box>
+      )}
+    </Box>
+  );
+}
+
+function Carousel({
+  images,
+  activeIndex,
+}: {
+  images: any[];
+  activeIndex: number;
+}) {
+  if (images.length <= 1) return null;
+
+  return (
+    <Box
+      flexDirection="row"
+      justifyContent="center"
+      position="absolute"
+      bottom={17}
+      width="100%"
+      zIndex={0}
+    >
+      {images.map((_, i) => (
+        <Box
+          key={i}
+          width={7}
+          height={7}
+          borderRadius={40}
+          backgroundColor={i === activeIndex ? 'text' : 'background'}
+          marginHorizontal="s"
+        />
+      ))}
     </Box>
   );
 }
