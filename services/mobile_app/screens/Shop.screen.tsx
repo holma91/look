@@ -153,8 +153,6 @@ function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
     return filtered;
   }, [selectedCategory, websites, renderToggle]);
 
-  // console.log('filteredSites', filteredSites);
-
   if (status === 'loading') {
     return <Text>Loading...</Text>;
   }

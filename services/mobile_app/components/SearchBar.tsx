@@ -2,7 +2,6 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Box } from '../styling/Box';
 import { TextInput } from '../styling/TextInput';
-import { useState } from 'react';
 
 function SearchBar({
   navigation,
@@ -29,7 +28,7 @@ function SearchBar({
       <Box
         flex={1}
         backgroundColor="grey"
-        borderRadius={20}
+        borderRadius={10}
         flexDirection="row"
         alignItems="center"
         paddingHorizontal="m"
@@ -56,7 +55,7 @@ function SearchBar({
           style={{ position: 'absolute', left: 15 }}
         />
       </Box>
-      <Box flex={0} backgroundColor="grey" borderRadius={20} padding="xs">
+      <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs">
         <Ionicons
           name="close"
           flex={0}
@@ -144,7 +143,7 @@ function FakeSearchBarBrowser({
       <Box
         flex={1}
         backgroundColor="grey"
-        borderRadius={20}
+        borderRadius={10}
         flexDirection="row"
         alignItems="center"
         paddingHorizontal="m"
@@ -170,7 +169,7 @@ function FakeSearchBarBrowser({
           style={{ position: 'absolute', left: 15 }}
         />
       </Box>
-      <Box flex={0} backgroundColor="grey" borderRadius={20} padding="xs">
+      <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs">
         <Ionicons
           name="close"
           flex={0}
