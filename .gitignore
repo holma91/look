@@ -166,3 +166,5 @@ services/scraper/results
 
 research/diffusion/results
 services/research/diffusion/results
+
+.DS_Store
