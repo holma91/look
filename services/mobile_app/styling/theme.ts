@@ -6,6 +6,7 @@ const palette = {
   black: '#101010',
   white: '#FFF',
   grey: '#DDDFE9',
+  darkGrey: '#A4A6B3',
 };
 
 export const theme = createTheme({
@@ -18,6 +19,7 @@ export const theme = createTheme({
     text: palette.black,
     textOnBackground: palette.white,
     grey: palette.grey,
+    darkGrey: palette.darkGrey,
   },
   spacing: {
     none: 0,

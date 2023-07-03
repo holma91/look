@@ -13,30 +13,17 @@ import { Text } from '../styling/Text';
 import { useState } from 'react';
 import { Button } from '../components/Button';
 
-const defaultImages = [
-  {
-    uri: 'https://softgoat.centracdn.net/client/dynamic/images/2151_a7dc7bd334-softgoat-ss23-nc3763-turtleneck-singlet-light-blue-1795-4-size1024.jpg',
-    id: '1',
-  },
-  {
-    uri: 'https://softgoat.centracdn.net/client/dynamic/images/2151_a7dc7bd334-softgoat-ss23-nc3763-turtleneck-singlet-light-blue-1795-4-size1024.jpg',
-    id: '2',
-  },
-  {
-    uri: 'https://softgoat.centracdn.net/client/dynamic/images/2151_a7dc7bd334-softgoat-ss23-nc3763-turtleneck-singlet-light-blue-1795-4-size1024.jpg',
-    id: '3',
-  },
-];
-
 type ImageProps = {
   uri: string;
   id: string;
 };
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 export default function Create({ navigation }: { navigation: any }) {
-  const [selectedImages, setSelectedImages] = useState<ImageProps[]>([]);
+  const [selectedImages, setSelectedImages] = useState<ImageProps[]>([
+    { uri: '', id: 'addButton' },
+  ]);
   const [readyToCreate, setReadyToCreate] = useState(false);
 
   const pickImages = async () => {
@@ -62,7 +49,14 @@ export default function Create({ navigation }: { navigation: any }) {
         const newUris = images.filter(
           (image) => !prevSelectedImageIds.includes(image.id)
         );
-        const updatedImages = [...prevSelectedImages, ...newUris];
+
+        const fakeImage = { uri: '', id: 'addButton' };
+
+        const updatedImages = [
+          ...prevSelectedImages.filter((image) => image.id !== 'addButton'),
+          ...newUris,
+          fakeImage,
+        ];
 
         if (updatedImages.length >= 6) {
           setReadyToCreate(true);
@@ -101,9 +95,9 @@ export default function Create({ navigation }: { navigation: any }) {
           </Text>
         </Box>
         <Box
-          borderWidth={4}
+          // borderWidth={4}
           borderRadius={10}
-          minHeight={height * 0.65}
+          minHeight={height * 0.64}
           padding="xxs"
         >
           <FlatList
@@ -117,27 +111,51 @@ export default function Create({ navigation }: { navigation: any }) {
                   borderRadius: 5,
                 }}
               >
-                <TouchableOpacity onPress={() => removeImage(item)}>
-                  <Image
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      aspectRatio: 1, // This ensures that your images are always squares
-                      width: '100%',
-                      borderRadius: 5,
-                    }}
-                    source={{ uri: item.uri }}
-                  />
-                  <Box
-                    position="absolute"
-                    top={5}
-                    right={5}
-                    padding="xs"
-                    borderRadius={5}
-                    style={{ backgroundColor: 'rgba(150,150,150,0.7)' }}
-                  >
-                    <Ionicons name="close-sharp" size={18} color="white" />
-                  </Box>
+                <TouchableOpacity
+                  onPress={() =>
+                    item.id === 'addButton' ? pickImages() : removeImage(item)
+                  }
+                >
+                  {item.id === 'addButton' ? (
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        aspectRatio: 1,
+                        width: '100%',
+                        borderRadius: 5,
+                        borderColor: 'gray',
+                        borderWidth: 1,
+                        borderStyle: 'dashed',
+                      }}
+                    >
+                      <Ionicons name="add-sharp" size={32} color="gray" />
+                    </View>
+                  ) : (
+                    <Image
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        aspectRatio: 1,
+                        width: '100%',
+                        borderRadius: 5,
+                      }}
+                      source={{ uri: item.uri }}
+                    />
+                  )}
+
+                  {item.id !== 'addButton' && (
+                    <Box
+                      position="absolute"
+                      top={5}
+                      right={5}
+                      padding="xs"
+                      borderRadius={5}
+                      style={{ backgroundColor: 'rgba(150,150,150,0.7)' }}
+                    >
+                      <Ionicons name="close-sharp" size={18} color="white" />
+                    </Box>
+                  )}
                 </TouchableOpacity>
               </View>
             )}
@@ -145,15 +163,26 @@ export default function Create({ navigation }: { navigation: any }) {
             keyExtractor={(item) => item.id}
           />
         </Box>
-        <Button
-          flex={0}
-          label="Upload photos"
-          onPress={pickImages}
-          variant="tertiary"
-          fontSize={16}
-          color="textOnBackground"
-          padding="s"
-        ></Button>
+        <TouchableOpacity
+          onPress={() => {}}
+          disabled={!readyToCreate}
+          activeOpacity={readyToCreate ? 0.2 : 1}
+        >
+          <Box
+            backgroundColor={readyToCreate ? 'text' : 'darkGrey'}
+            borderRadius={10}
+          >
+            <Text
+              textAlign="center"
+              fontWeight="bold"
+              fontSize={18}
+              color="textOnBackground"
+              padding="m"
+            >
+              Create model
+            </Text>
+          </Box>
+        </TouchableOpacity>
       </Box>
     </SafeAreaView>
   );
