@@ -1,0 +1,11 @@
+opencv-python
+pillow
+torch
+torchvision
+torchaudio
+pandas
+psutil
+PyYAML
+tqdm
+ultralytics
+gitpython
