@@ -26,10 +26,10 @@ look for image elements that are not wrapped in "a tags". Works on:
 
 ### TODO rn
 
-SUNDAY:
+MONDAY:
 
-- go through reanimated docs, figure out how to make the animation we want when Product -> Screen
-- Clean up dirty code from the week, fix small bugs
+- Train dreambooth model on myself
+- use it with different models
 
 NEXT WEEK (focus on demo for AIGrant):
 

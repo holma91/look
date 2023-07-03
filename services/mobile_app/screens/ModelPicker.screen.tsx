@@ -3,6 +3,7 @@ import { Image as ExpoImage } from 'expo-image';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { useState } from 'react';
+import { Button } from '../components/Button';
 
 type Model = {
   id: string;
@@ -50,39 +51,46 @@ const startingModels: Model[] = [
 export default function ModelPicker({ navigation }: { navigation: any }) {
   const [models, setModels] = useState<Model[]>(startingModels); // This should be your models data
   const [selectedModel, setSelectedModel] = useState<Model>(startingModels[0]);
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <Box backgroundColor="background" flex={1}>
       <Box
-        flex={0.3} // Adjust this to control the size of the image
+        flex={0.25} // Adjust this to control the size of the image
         position="relative"
       >
         <ExpoImage
           style={{
             width: '100%',
             height: '100%',
+            opacity: 0.3,
           }}
           source={{
             uri: 'https://softgoat.centracdn.net/client/dynamic/images/2167_c2c4adff2f-30-size1024.jpg',
           }}
         />
-        <Box
-          position="absolute"
-          top={0}
-          bottom={0}
-          left={0}
-          right={0}
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Text variant="body" fontWeight="bold" color="background">
-            Adjust the Text styling as needed Your text here
+        <Box position="absolute" bottom={30} left={20} width="60%">
+          <Text variant="title" fontWeight="bold">
+            Create a model of yourself
           </Text>
         </Box>
+        <Box position="absolute" bottom={30} right={20}>
+          <Button
+            variant="tertiary"
+            color="textOnBackground"
+            padding="xs"
+            label="Try Now"
+            onPress={() => {
+              console.log('Create model');
+
+              navigation.navigate('Create');
+            }}
+          />
+        </Box>
       </Box>
-      <Box flex={0.7}>
+      <Box flex={0.75}>
         <Text variant="body" fontWeight="bold" padding="m" paddingBottom="s">
-          Choose your model
+          Choose your default model
         </Text>
         <Box padding="s" flex={1}>
           <FlatList

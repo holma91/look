@@ -5,7 +5,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Shop from '../screens/Shop.screen';
 import Profile from '../screens/Profile.screen';
 import LikesNavigator from './Likes.navigator';
-import Create from '../screens/Create.screen';
+import CreateOld from '../screens/CreateOld.screen';
 import ModelPicker from '../screens/ModelPicker.screen';
 
 const Tab = createBottomTabNavigator();
@@ -28,7 +28,7 @@ export default function TabNavigator() {
                 color={color}
               />
             );
-          } else if (route.name === 'Create') {
+          } else if (route.name === 'ModelPicker') {
             iconName = focused ? 'ios-add-circle' : 'ios-add-circle-outline';
             return <Ionicons name={iconName} size={size * 1.1} color={color} />;
           } else if (route.name === 'LikesNavigator') {
@@ -55,8 +55,8 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="Shop" component={Shop} />
-      <Tab.Screen name="Testing" component={Create} />
-      <Tab.Screen name="Create" component={ModelPicker} />
+      <Tab.Screen name="Testing" component={CreateOld} />
+      <Tab.Screen name="ModelPicker" component={ModelPicker} />
       <Tab.Screen name="LikesNavigator" component={LikesNavigator} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
