@@ -89,13 +89,30 @@ export default function ModelPicker({ navigation }: { navigation: any }) {
         </Box>
       </Box>
       <Box flex={0.75}>
-        <Text variant="body" fontWeight="bold" padding="m" paddingBottom="s">
-          Choose your default model
-        </Text>
-        <Box padding="s" flex={1}>
+        <Box padding="s" flex={1} gap="xs">
+          <Text variant="body" fontWeight="bold" padding="m" paddingBottom="s">
+            Your models
+          </Text>
           <FlatList
-            data={models}
-            numColumns={2}
+            data={models.slice(0, 3)}
+            numColumns={3}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Model
+                navigation={navigation}
+                model={item}
+                setSelectedModel={setSelectedModel}
+                selectedModel={selectedModel}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+          />
+          <Text variant="body" fontWeight="bold" padding="m" paddingBottom="s">
+            Default models
+          </Text>
+          <FlatList
+            data={models.slice(3)}
+            numColumns={3}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <Model
@@ -161,7 +178,7 @@ function Model({
         <ExpoImage
           style={{
             width: '100%',
-            height: 256,
+            height: 128,
             borderRadius: 10,
             borderWidth: selectedModel.id === model.id ? 3 : 0,
           }}

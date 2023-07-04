@@ -62,7 +62,4 @@ DEFAULT MODELS:
 - make it so that when a user favorites something, it's checked daily if the size exists etc.
 - put in shopping info somewhere in app, and autofill on sites
 
-### fasfs
-
-> at softgoat homepage
-> clicks on product (interact script is injected)
+###
