@@ -90,7 +90,6 @@ export default function ModelPickerV2({ navigation }: { navigation: any }) {
         margin="s"
         padding="m"
         borderWidth={1}
-        // borderRadius={10}
         borderColor="grey"
         flexDirection="row"
         justifyContent="space-between"
@@ -136,7 +135,6 @@ export default function ModelPickerV2({ navigation }: { navigation: any }) {
                 </TouchableOpacity>
               ) : (
                 <Model
-                  navigation={navigation}
                   model={item}
                   setSelectedModel={setSelectedModel}
                   selectedModel={selectedModel}
@@ -152,18 +150,12 @@ export default function ModelPickerV2({ navigation }: { navigation: any }) {
 }
 
 type ModelProps = {
-  navigation: any;
   model: Model;
   setSelectedModel: React.Dispatch<React.SetStateAction<Model>>;
   selectedModel: Model;
 };
 
-function Model({
-  navigation,
-  model,
-  setSelectedModel,
-  selectedModel,
-}: ModelProps) {
+function Model({ model, setSelectedModel, selectedModel }: ModelProps) {
   return (
     <TouchableOpacity
       onPress={() => {

@@ -26,10 +26,10 @@ look for image elements that are not wrapped in "a tags". Works on:
 
 ### TODO rn
 
-MONDAY:
+WEDNESDAY:
 
-- Train dreambooth model on myself
-- use it with different models
+- Research how to use dropdowns in RN
+- UI for filtering on likes page
 
 NEXT WEEK (focus on demo for AIGrant):
 
