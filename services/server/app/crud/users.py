@@ -139,6 +139,41 @@ async def get_history(user_id: str) -> list:
 
     return products
 
+async def get_purchased(user_id: str) -> list:
+    async with get_db_connection() as conn:
+        query = """
+            select * from user_product up
+            join product p on up.product_url = p.url
+            join product_image pi on p.url = pi.product_url
+            where up.user_id = $1 and purchased = TRUE;
+        """
+        rows = await conn.execute_query_dict(query, [user_id])
+
+    products_dict = {}
+    for row in rows:
+        product_url = row["product_url"]
+        if product_url not in products_dict:
+            product = {
+                "url": product_url,
+                "domain": row["domain"],
+                "brand": row["brand"],
+                "name": row["name"],
+                "price": row["price"],
+                "currency": row["currency"],
+                "liked": row["liked"],
+                "purchased": row["purchased"],
+                "images": []
+            }
+            products_dict[product_url] = product
+
+        # Add the image URL to the product's image list
+        products_dict[product_url]["images"].append(row["image_url"])
+
+    # Get a list of the products
+    products = list(products_dict.values())
+
+    return products
+
 
 async def get_websites(user_id: str) -> list:
     async with get_db_connection() as conn:

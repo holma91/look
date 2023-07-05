@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS "user_product" (
     "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
     "product_url" TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,
     "liked" BOOL NOT NULL DEFAULT FALSE,
+    "purchased" BOOL NOT NULL DEFAULT FALSE,
     UNIQUE(user_id, product_url)
 );
 
@@ -67,17 +68,26 @@ VALUES
 INSERT INTO product (url, domain, brand, name, price, currency)
 VALUES 
 ('https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey', 'softgoat.com', 'Soft Goat', 'MEN''S FINE KNIT T-SHIRT', 1695.00, 'SEK'),
-('https://softgoat.com/p/mens-fine-knit-t-shirt-white', 'softgoat.com', 'Soft Goat', 'MEN''S FINE KNIT T-SHIRT', 1695.00, 'SEK');
+('https://softgoat.com/p/mens-fine-knit-t-shirt-white', 'softgoat.com', 'Soft Goat', 'MEN''S FINE KNIT T-SHIRT', 1695.00, 'SEK'),
+('https://softgoat.com/p/mens-collar-navy', 'softgoat.com', 'Soft Goat', 'MEN''S COLLAR', 2027.00, 'SEK');
 
 INSERT INTO product_image (product_url, image_url)
 VALUES
 ('https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey', 'https://softgoat.centracdn.net/client/dynamic/images/2196_d9c41cfa31-softgoat-ss23-ss1703-mens-t-shirt-navy-1695-2-size1024.jpg'),
-('https://softgoat.com/p/mens-fine-knit-t-shirt-white', 'https://softgoat.centracdn.net/client/dynamic/images/2196_58f2100716-softgoat-ss23-ss1701-mens-t-shirt-white-1695-2-size1600.jpg');
+('https://softgoat.com/p/mens-fine-knit-t-shirt-white', 'https://softgoat.centracdn.net/client/dynamic/images/2196_58f2100716-softgoat-ss23-ss1701-mens-t-shirt-white-1695-2-size1600.jpg'),
+('https://softgoat.com/p/mens-collar-navy', 'https://softgoat.centracdn.net/client/dynamic/images/2202_8ee99fa254-softgoat-ss23-25030-mens-collar-navy-2895-2-size1024.jpg');
 
 INSERT INTO user_product (user_id, product_url)
 VALUES
 ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey'),
-('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/mens-fine-knit-t-shirt-white');
+('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/mens-fine-knit-t-shirt-white'),
+('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/mens-collar-navy');
 
 UPDATE user_product SET liked = TRUE
 WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey';
+
+UPDATE user_product SET liked = TRUE
+WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-collar-navy';
+
+UPDATE user_product SET purchased = TRUE
+WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-collar-navy';

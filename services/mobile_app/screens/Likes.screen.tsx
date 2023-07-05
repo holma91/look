@@ -22,7 +22,7 @@ import BottomSheet, {
   BottomSheetModalProvider,
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
-import { fetchHistory, fetchLikes } from '../api';
+import { fetchHistory, fetchLikes, fetchPurchased } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
@@ -35,12 +35,23 @@ export default function Likes({ navigation }: { navigation: any }) {
   const { user } = useUser();
   const {
     data: likes,
-    status,
     refetch,
     isFetching,
   } = useQuery<UserProduct[]>({
     queryKey: ['likes', user?.id],
     queryFn: () => fetchLikes(user?.id as string),
+    enabled: !!user?.id,
+  });
+
+  const { data: history } = useQuery<UserProduct[]>({
+    queryKey: ['history', user?.id],
+    queryFn: () => fetchHistory(user?.id as string),
+    enabled: !!user?.id,
+  });
+
+  const { data: purchases } = useQuery<UserProduct[]>({
+    queryKey: ['purchased', user?.id],
+    queryFn: () => fetchPurchased(user?.id as string),
     enabled: !!user?.id,
   });
 
@@ -71,20 +82,24 @@ export default function Likes({ navigation }: { navigation: any }) {
             </TouchableOpacity>
           </Box>
           <Box flex={1}>
-            {status === 'success' ? (
-              <FlatList
-                data={likes.slice().reverse()}
-                numColumns={2}
-                keyExtractor={(item) => item.url}
-                renderItem={({ item }) => (
-                  <Product navigation={navigation} product={item} />
-                )}
-                refreshControl={
-                  <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-                }
-                showsVerticalScrollIndicator={false}
-              />
-            ) : null}
+            <FlatList
+              data={
+                view === 'Likes'
+                  ? likes?.slice().reverse()
+                  : view === 'History'
+                  ? history?.slice().reverse()
+                  : purchases?.slice().reverse()
+              }
+              numColumns={2}
+              keyExtractor={(item) => item.url}
+              renderItem={({ item }) => (
+                <Product navigation={navigation} product={item} />
+              )}
+              refreshControl={
+                <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+              }
+              showsVerticalScrollIndicator={false}
+            />
           </Box>
           <SheetModal
             bottomSheetModalRef={bottomSheetModalRef}

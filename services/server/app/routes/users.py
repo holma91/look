@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserBase, UserExtended, UserLiked, UserHistory, ProductExtended, POSTResponse, LikeProduct, FavoriteWebsite, WebsiteBase, ProductImage
+from app.models.pydantic import UserBase, UserExtended, UserLiked, UserHistory, UserPurchased, ProductExtended, POSTResponse, LikeProduct, FavoriteWebsite, WebsiteBase, ProductImage
 from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
@@ -39,6 +39,11 @@ async def read_user_likes(user_id: str) -> UserLiked:
 @router.get("/{user_id}/history", response_model=list[UserHistory])
 async def read_user_history(user_id: str) -> UserHistory:
     products = await crud.get_history(user_id)
+    return products
+
+@router.get("/{user_id}/purchased", response_model=list[UserPurchased])
+async def read_user_history(user_id: str) -> UserPurchased:
+    products = await crud.get_purchased(user_id)
     return products
 
 ### WEBSITE INFO ###

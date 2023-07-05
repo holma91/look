@@ -50,6 +50,11 @@ class UserHistory(ProductBase):
     liked: bool
     images: list[str]
 
+class UserPurchased(ProductBase):
+    liked: bool
+    purchased: bool
+    images: list[str]
+
 class ProductExtended(ProductBase):
     images: list[str]
 

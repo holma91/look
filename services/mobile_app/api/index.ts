@@ -71,6 +71,18 @@ export const fetchHistory = async (id: string) => {
   return response.json();
 };
 
+export const fetchPurchased = async (id: string) => {
+  const completeUrl = `${URL}/users/${id}/purchased`;
+  const response = await fetch(completeUrl);
+
+  if (!response.ok) {
+    throw new Error(
+      `Network response was not ok. Status code: ${response.status}`
+    );
+  }
+  return response.json();
+};
+
 type Product = {
   url: string;
   name: string;
