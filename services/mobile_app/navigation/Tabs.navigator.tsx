@@ -7,6 +7,7 @@ import Profile from '../screens/Profile.screen';
 import LikesNavigator from './Likes.navigator';
 import ModelPickerV2 from '../screens/ModelPickerV2';
 import Create from '../screens/Create.screen';
+import Testing from '../screens/Testing.screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -55,7 +56,7 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="Shop" component={Shop} />
-      <Tab.Screen name="Testing" component={Shop} />
+      <Tab.Screen name="Testing" component={Testing} />
       <Tab.Screen name="ModelPicker" component={ModelPickerV2} />
       <Tab.Screen name="LikesNavigator" component={LikesNavigator} />
       <Tab.Screen name="Profile" component={Profile} />
