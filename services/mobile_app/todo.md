@@ -26,10 +26,10 @@ look for image elements that are not wrapped in "a tags". Works on:
 
 ### TODO rn
 
-WEDNESDAY:
+THURSDAY:
 
-- Research how to use dropdowns in RN
-- UI for filtering on likes page
+- fix so that all chosen sites can be used
+- add filtering functionality on brand, website, price
 
 NEXT WEEK (focus on demo for AIGrant):
 

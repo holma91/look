@@ -11,8 +11,12 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
-import { useState } from 'react';
-import Animated from 'react-native-reanimated';
+import { useState, useEffect } from 'react';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 import React, { useCallback, useMemo, useRef } from 'react';
 import BottomSheet, {
   BottomSheetModal,
@@ -66,6 +70,16 @@ export default function Likes({ navigation }: { navigation: any }) {
     setShowFilter(!showFilter);
   };
 
+  const displayedProducts = useMemo(() => {
+    if (view === 'Likes') {
+      return likes;
+    } else if (view === 'History') {
+      return history;
+    } else {
+      return purchases;
+    }
+  }, [view]);
+
   return (
     <BottomSheetModalProvider>
       <Box backgroundColor="background" flex={1}>
@@ -101,20 +115,10 @@ export default function Likes({ navigation }: { navigation: any }) {
             </TouchableOpacity>
             <Ionicons name="link" size={24} color="black" />
           </Box>
-          {showFilter ? (
-            <Box paddingVertical="s">
-              <Filter />
-            </Box>
-          ) : null}
+          <Filter showFilter={showFilter} />
           <Box flex={1} paddingHorizontal="xs">
             <FlatList
-              data={
-                view === 'Likes'
-                  ? likes?.slice().reverse()
-                  : view === 'History'
-                  ? history?.slice().reverse()
-                  : purchases?.slice().reverse()
-              }
+              data={displayedProducts?.slice().reverse()}
               numColumns={2}
               keyExtractor={(item) => item.url}
               renderItem={({ item }) => (
@@ -137,50 +141,62 @@ export default function Likes({ navigation }: { navigation: any }) {
   );
 }
 
-function Filter() {
+function Filter({ showFilter }: { showFilter: boolean }) {
+  const animationValue = useSharedValue(0);
+  useEffect(() => {
+    animationValue.value = withTiming(showFilter ? 1 : 0, { duration: 250 });
+  }, [showFilter, animationValue]);
+
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      height: animationValue.value * 42,
+    };
+  });
   return (
-    <FlatList
-      style={{ gap: 10 }}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      data={[
-        { label: 'Category' },
-        { label: 'Brand' },
-        { label: 'Website' },
-        { label: 'Price' },
-        { label: 'On sale' },
-        { label: 'Sort by' },
-      ]}
-      contentContainerStyle={{ paddingLeft: 12 }}
-      keyExtractor={(item, index) => `category-${index}`}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          onPress={() => {}}
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 3,
-            marginRight: 8,
-            borderWidth: 2,
-            borderRadius: 10,
-            padding: 8,
-            borderColor: 'black',
-          }}
-        >
-          <Text variant="body" fontWeight="600" fontSize={13} color="text">
-            {item.label}
-          </Text>
-          <Ionicons
-            name="chevron-down"
-            size={15}
-            color="black"
-            paddingTop={1}
-          />
-        </TouchableOpacity>
-      )}
-    />
+    <Animated.View style={[{ paddingBottom: 8 }, animatedStyles]}>
+      <FlatList
+        style={{ gap: 10 }}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={[
+          { label: 'Category' },
+          { label: 'Brand' },
+          { label: 'Website' },
+          { label: 'Price' },
+          { label: 'On sale' },
+          { label: 'Sort by' },
+        ]}
+        contentContainerStyle={{ paddingLeft: 12 }}
+        keyExtractor={(item, index) => `category-${index}`}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => {}}
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 3,
+              marginRight: 8,
+              borderRadius: 10,
+              padding: 8,
+              paddingHorizontal: 10,
+              backgroundColor: '#ededed',
+            }}
+          >
+            <Text variant="body" fontWeight="600" fontSize={13} color="text">
+              {item.label}
+            </Text>
+            <Ionicons
+              name="chevron-down"
+              size={15}
+              color="black"
+              paddingTop={1}
+            />
+          </TouchableOpacity>
+        )}
+      />
+    </Animated.View>
   );
 }
 
@@ -206,14 +222,6 @@ function Product({
           }}
           source={{ uri: product.images[0] }}
         />
-        {/* <ExpoImage
-          style={{
-            width: '100%',
-            height: 225,
-            // borderRadius: 10,
-          }}
-          source={{ uri: product.images[0] }}
-        /> */}
         <Box gap="xxs">
           <Text variant="body" fontWeight="600">
             {product.brand}
