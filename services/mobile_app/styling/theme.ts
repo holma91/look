@@ -24,6 +24,7 @@ export const theme = createTheme({
   spacing: {
     none: 0,
     xxs: 2,
+    temporary_xxs: 4,
     xs: 6,
     s: 8,
     m: 16,
@@ -103,6 +104,17 @@ export const theme = createTheme({
       color: 'textOnBackground',
       fontSize: 3,
       padding: 's',
+    },
+    new: {
+      padding: 'm',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderWidth: 2,
+      borderRadius: 10,
+    },
+    new2: {
+      padding: 16,
     },
   },
 });

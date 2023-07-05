@@ -62,4 +62,12 @@ DEFAULT MODELS:
 - make it so that when a user favorites something, it's checked daily if the size exists etc.
 - put in shopping info somewhere in app, and autofill on sites
 
-###
+### now
+
+what happens when I visit a product page:
+
+1. handleLoadEnd gets called with the navState (most importantly, the url)
+2. we inject the baseExtractScript, which sends back the @type === 'Product' part of the HTML
+3. we receive the @type === 'Product' part of the HTML in WebViewBox.handleMessage
+4. we call parseProduct(url, domain, productData) and get back a structured product
+5. we send the structured product to the backend

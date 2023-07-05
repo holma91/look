@@ -3,7 +3,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
-  Button,
+  // Button,
   View,
   StyleSheet,
 } from 'react-native';
@@ -26,8 +26,12 @@ import { fetchHistory, fetchLikes } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
+import { Button } from '../components/NewButton';
+
+type ViewTypes = 'Likes' | 'History' | 'Purchases';
 
 export default function Likes({ navigation }: { navigation: any }) {
+  const [view, setView] = useState<ViewTypes>('Likes');
   const { user } = useUser();
   const {
     data: likes,
@@ -61,7 +65,7 @@ export default function Likes({ navigation }: { navigation: any }) {
               }}
             >
               <Text variant="title" fontSize={18}>
-                Likes
+                {view}
               </Text>
               <Ionicons name="chevron-down" size={26} color="black" />
             </TouchableOpacity>
@@ -82,7 +86,11 @@ export default function Likes({ navigation }: { navigation: any }) {
               />
             ) : null}
           </Box>
-          <SheetModal bottomSheetModalRef={bottomSheetModalRef} />
+          <SheetModal
+            bottomSheetModalRef={bottomSheetModalRef}
+            view={view}
+            setView={setView}
+          />
         </SafeAreaView>
       </Box>
     </BottomSheetModalProvider>
@@ -136,33 +144,47 @@ function Product({
 
 type SheetModalProps = {
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;
+  view: ViewTypes;
+  setView: React.Dispatch<React.SetStateAction<ViewTypes>>;
 };
 
-const SheetModal = ({ bottomSheetModalRef }: SheetModalProps) => {
+const SheetModal = ({
+  bottomSheetModalRef,
+  view,
+  setView,
+}: SheetModalProps) => {
   const snapPoints = useMemo(() => ['50%'], []);
 
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
 
-  const data = useMemo(
-    () =>
-      Array(50)
-        .fill(0)
-        .map((_, index) => `index-${index}`),
-    []
-  );
+  const data = useMemo(() => ['Likes', 'History', 'Purchases'], []);
 
-  const renderItem = useCallback(
+  const renderListItem = useCallback(
     ({ item }: { item: any }) => (
-      <View style={styles.itemContainer}>
-        <Text>{item}</Text>
-      </View>
+      <Button
+        onPress={() => setView(item)}
+        variant="new"
+        backgroundColor={item === view ? 'text' : 'background'}
+        margin="temporary_xxs"
+      >
+        <Text
+          variant="body"
+          fontWeight="bold"
+          fontSize={16}
+          color={item === view ? 'background' : 'text'}
+        >
+          {item}
+        </Text>
+        {item === view ? (
+          <Ionicons name="checkmark" size={20} color="white" />
+        ) : null}
+      </Button>
     ),
-    []
+    [view]
   );
 
-  // renders
   return (
     <BottomSheetModal
       ref={bottomSheetModalRef}
@@ -175,25 +197,21 @@ const SheetModal = ({ bottomSheetModalRef }: SheetModalProps) => {
           disappearsOnIndex={-1}
         />
       )}
+      handleIndicatorStyle={{ backgroundColor: 'white' }}
     >
-      <View style={styles.contentContainer}>
-        <Text>Hey there</Text>
-      </View>
+      <Box justifyContent="center" alignItems="center" marginBottom="m">
+        <Text variant="title" fontSize={22}>
+          View
+        </Text>
+      </Box>
+      <BottomSheetFlatList
+        data={data}
+        renderItem={renderListItem}
+        keyExtractor={(item) => item}
+        contentContainerStyle={{ backgroundColor: 'white' }}
+        style={{ paddingHorizontal: 10 }}
+        showsVerticalScrollIndicator={false}
+      />
     </BottomSheetModal>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 200,
-  },
-  contentContainer: {
-    backgroundColor: 'white',
-  },
-  itemContainer: {
-    padding: 6,
-    margin: 6,
-    backgroundColor: '#eee',
-  },
-});
