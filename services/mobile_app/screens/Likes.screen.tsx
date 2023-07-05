@@ -32,6 +32,7 @@ type ViewTypes = 'Likes' | 'History' | 'Purchases';
 
 export default function Likes({ navigation }: { navigation: any }) {
   const [view, setView] = useState<ViewTypes>('Likes');
+  const [showFilter, setShowFilter] = useState(false);
   const { user } = useUser();
   const {
     data: likes,
@@ -61,18 +62,36 @@ export default function Likes({ navigation }: { navigation: any }) {
     bottomSheetModalRef.current?.present();
   }, []);
 
+  const handleFilter = () => {
+    setShowFilter(!showFilter);
+  };
+
   return (
     <BottomSheetModalProvider>
-      <Box backgroundColor="background" flex={1} paddingHorizontal="s">
+      <Box backgroundColor="background" flex={1}>
         <SafeAreaView style={{ flex: 1 }}>
-          <Box justifyContent="center" alignItems="center" paddingVertical="m">
+          <Box
+            flexDirection="row"
+            justifyContent="space-between"
+            alignItems="center"
+            paddingTop="s"
+            paddingBottom="m"
+            paddingHorizontal="m"
+            gap="s"
+          >
+            <Ionicons
+              name={showFilter ? 'options' : 'options-outline'}
+              size={24}
+              color="black"
+              onPress={handleFilter}
+            />
             <TouchableOpacity
               onPress={handlePresentModalPress}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 4,
+                gap: 6,
               }}
             >
               <Text variant="title" fontSize={18}>
@@ -80,8 +99,14 @@ export default function Likes({ navigation }: { navigation: any }) {
               </Text>
               <Ionicons name="chevron-down" size={26} color="black" />
             </TouchableOpacity>
+            <Ionicons name="link" size={24} color="black" />
           </Box>
-          <Box flex={1}>
+          {showFilter ? (
+            <Box paddingVertical="s">
+              <Filter />
+            </Box>
+          ) : null}
+          <Box flex={1} paddingHorizontal="xs">
             <FlatList
               data={
                 view === 'Likes'
@@ -109,6 +134,53 @@ export default function Likes({ navigation }: { navigation: any }) {
         </SafeAreaView>
       </Box>
     </BottomSheetModalProvider>
+  );
+}
+
+function Filter() {
+  return (
+    <FlatList
+      style={{ gap: 10 }}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      data={[
+        { label: 'Category' },
+        { label: 'Brand' },
+        { label: 'Website' },
+        { label: 'Price' },
+        { label: 'On sale' },
+        { label: 'Sort by' },
+      ]}
+      contentContainerStyle={{ paddingLeft: 12 }}
+      keyExtractor={(item, index) => `category-${index}`}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          onPress={() => {}}
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 3,
+            marginRight: 8,
+            borderWidth: 2,
+            borderRadius: 10,
+            padding: 8,
+            borderColor: 'black',
+          }}
+        >
+          <Text variant="body" fontWeight="600" fontSize={13} color="text">
+            {item.label}
+          </Text>
+          <Ionicons
+            name="chevron-down"
+            size={15}
+            color="black"
+            paddingTop={1}
+          />
+        </TouchableOpacity>
+      )}
+    />
   );
 }
 
