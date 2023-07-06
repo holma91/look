@@ -1,6 +1,6 @@
 import { Dimensions, SafeAreaView } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
@@ -12,6 +12,14 @@ import Animated, {
   FadeOut,
   ZoomIn,
 } from 'react-native-reanimated';
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetScrollView,
+  BottomSheetFlatList,
+  BottomSheetModalProvider,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -20,7 +28,7 @@ import { theme } from '../styling/theme';
 import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { Button } from '../components/Button';
+import { Button } from '../components/NewButton';
 import { baseExtractScript, baseInteractScript } from '../utils/scripts';
 import { fetchHistory, likeProduct, unlikeProduct } from '../api';
 import { Product, UserProduct } from '../utils/types';
@@ -213,6 +221,12 @@ function NavBar({
     },
   });
 
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
   let icon: 'heart' | 'heart-outline' = products?.find(
     (product) => product.url === currentProduct?.url && product.liked
   )
@@ -257,7 +271,7 @@ function NavBar({
               color="black"
               onPress={() => {
                 setExpandedMenu(false);
-                bottomSheetHeight.value = withTiming(MIN_HEIGHT);
+                // bottomSheetHeight.value = withTiming(MIN_HEIGHT);
               }}
             />
           ) : (
@@ -267,7 +281,8 @@ function NavBar({
               color="black"
               onPress={() => {
                 setExpandedMenu(true);
-                bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
+                handlePresentModalPress();
+                // bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
               }}
             />
           )}
@@ -296,6 +311,11 @@ function NavBar({
       <BottomSheet
         bottomSheetHeight={bottomSheetHeight}
         setExpandedMenu={setExpandedMenu}
+        currentProduct={currentProduct}
+        currentImage={currentImage}
+      />
+      <SheetModal
+        bottomSheetModalRef={bottomSheetModalRef}
         currentProduct={currentProduct}
         currentImage={currentImage}
       />
@@ -443,7 +463,7 @@ function BottomSheet({
               <Text variant="body">{currentProduct.brand}</Text>
 
               <Text variant="body">{`${currentProduct.price} ${currentProduct.currency}`}</Text>
-              {generating ? (
+              {/* {generating ? (
                 <Button
                   label="Generating..."
                   variant="tertiary"
@@ -458,7 +478,7 @@ function BottomSheet({
                   fontSize={14}
                   color="textOnBackground"
                 ></Button>
-              )}
+              )} */}
             </Box>
           </Animated.View>
         )}
@@ -494,13 +514,13 @@ function BottomSheet({
                 <Text variant="body">Tiger of Sweden</Text>
                 <Text variant="body">2 995.00kr</Text>
               </Box>
-              <Button
+              {/* <Button
                 label="Add to cart"
                 variant="tertiary"
                 fontSize={14}
                 color="textOnBackground"
                 paddingVertical="s"
-              ></Button>
+              ></Button> */}
             </Box>
           </Animated.View>
         )}
@@ -508,3 +528,145 @@ function BottomSheet({
     </GestureDetector>
   );
 }
+
+type SheetProps = {
+  bottomSheetModalRef: React.RefObject<BottomSheetModal>;
+  currentProduct: Product;
+  currentImage: string;
+};
+
+const SheetModal = ({
+  bottomSheetModalRef,
+  currentProduct,
+  currentImage,
+}: SheetProps) => {
+  const [expandedContent, setExpandedContent] = useState(false);
+  const snapPoints = useMemo(() => ['40%', '100%'], []);
+
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+    if (index === 1) {
+      setExpandedContent(true);
+    } else {
+      setExpandedContent(false);
+    }
+  }, []);
+
+  return (
+    <BottomSheetModal
+      ref={bottomSheetModalRef}
+      index={0}
+      snapPoints={snapPoints}
+      onChange={handleSheetChanges}
+      backdropComponent={(props) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+        />
+      )}
+    >
+      {expandedContent ? (
+        <Box
+          margin="m"
+          marginBottom="l"
+          flexDirection="column"
+          justifyContent="space-between"
+          gap="m"
+          flex={1}
+        >
+          <Box flex={1} borderWidth={1}>
+            {currentImage !== '' ? (
+              <ExpoImage
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+                source={currentImage}
+                contentFit="cover"
+              />
+            ) : null}
+          </Box>
+          <Box
+            flex={0}
+            justifyContent="space-between"
+            gap="m"
+            marginVertical="m"
+          >
+            <Box
+              padding="m"
+              borderWidth={1}
+              borderRadius={10}
+              borderColor="text"
+              flexDirection="row"
+              justifyContent="space-between"
+            >
+              <Text variant="body" fontWeight="bold">
+                Selected Model:
+              </Text>
+              <Text variant="body" fontWeight="bold">
+                White man
+              </Text>
+            </Box>
+            <Box flex={0}>
+              <Button
+                onPress={() => {}}
+                variant="primary"
+                backgroundColor="text"
+              >
+                <Text color="background" fontWeight="600" fontSize={15}>
+                  Test on model
+                </Text>
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      ) : (
+        <Box
+          margin="m"
+          flexDirection="row"
+          justifyContent="space-between"
+          gap="m"
+        >
+          <Box flex={1}>
+            {currentImage !== '' && (
+              <ExpoImage
+                style={{
+                  aspectRatio: 0.75, // todo: calculate this
+                }}
+                source={currentImage}
+                contentFit="contain"
+              />
+            )}
+          </Box>
+          <Box flex={1} justifyContent="space-between">
+            <Box gap="s" flex={1}>
+              <Text variant="body" fontWeight="bold" fontSize={20}>
+                {currentProduct.name}
+              </Text>
+              <Text variant="body" fontSize={17}>
+                {currentProduct.brand}
+              </Text>
+
+              <Text
+                variant="body"
+                fontSize={17}
+              >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
+            </Box>
+            <Box flex={0}>
+              <Button
+                onPress={() => {}}
+                variant="primary"
+                backgroundColor="text"
+              >
+                <Text color="background" fontWeight="600" fontSize={15}>
+                  Test on model
+                </Text>
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      )}
+    </BottomSheetModal>
+  );
+};

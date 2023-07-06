@@ -93,7 +93,11 @@ export const theme = createTheme({
       borderRadius: 10,
     },
     primary: {
-      backgroundColor: 'primary',
+      padding: 'm',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 10,
     },
     secondary: {
       backgroundColor: 'secondary',

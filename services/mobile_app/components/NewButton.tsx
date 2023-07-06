@@ -19,7 +19,7 @@ type RestyleProps = SpacingProps<Theme> &
 type Props = RestyleProps & {
   onPress: () => void;
   children: React.ReactNode;
-  variant: 'new';
+  variant: 'new' | 'primary' | 'secondary';
 };
 
 const buttonVariant: any = createVariant({ themeKey: 'buttonVariants' });
