@@ -28,6 +28,7 @@ look for image elements that are not wrapped in "a tags". Works on:
 
 THURSDAY:
 
+- do explore page
 - fix so that all chosen sites can be used
 - add filtering functionality on brand, website, price
 

@@ -121,6 +121,7 @@ function FakeSearchBar({ navigation }: { navigation: any }) {
     </Box>
   );
 }
+
 function FakeSearchBarBrowser({
   navigation,
   domain,
