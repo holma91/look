@@ -36,6 +36,7 @@ type ViewTypes = 'Likes' | 'History' | 'Purchases';
 
 export default function Likes({ navigation }: { navigation: any }) {
   const [view, setView] = useState<ViewTypes>('Likes');
+  const [outerChoice, setOuterChoice] = useState<string>('Likes');
   const [showFilter, setShowFilter] = useState(false);
   const { user } = useUser();
   const {
@@ -78,70 +79,83 @@ export default function Likes({ navigation }: { navigation: any }) {
     } else {
       return purchases;
     }
-  }, [view]);
+  }, [view, likes, history, purchases]);
 
   return (
-    <BottomSheetModalProvider>
-      <Box backgroundColor="background" flex={1}>
-        <SafeAreaView style={{ flex: 1 }}>
-          <Box
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems="center"
-            paddingTop="s"
-            paddingBottom="m"
-            paddingHorizontal="m"
-            gap="s"
-          >
-            <Ionicons
-              name={showFilter ? 'options' : 'options-outline'}
-              size={24}
-              color="black"
-              onPress={handleFilter}
-            />
-            <TouchableOpacity
-              onPress={handlePresentModalPress}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
-              }}
-            >
-              <Text variant="title" fontSize={18}>
-                {view}
-              </Text>
-              <Ionicons name="chevron-down" size={26} color="black" />
-            </TouchableOpacity>
-            <Ionicons name="link" size={24} color="black" />
-          </Box>
-          <Filter showFilter={showFilter} />
-          <Box flex={1} paddingHorizontal="xs">
-            <FlatList
-              data={displayedProducts?.slice().reverse()}
-              numColumns={2}
-              keyExtractor={(item) => item.url}
-              renderItem={({ item }) => (
-                <Product navigation={navigation} product={item} />
-              )}
-              refreshControl={
-                <RefreshControl refreshing={isFetching} onRefresh={refetch} />
-              }
-              showsVerticalScrollIndicator={false}
-            />
-          </Box>
-          <SheetModal
-            bottomSheetModalRef={bottomSheetModalRef}
-            view={view}
-            setView={setView}
+    <Box backgroundColor="background" flex={1}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Box
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="center"
+          paddingTop="s"
+          paddingBottom="m"
+          paddingHorizontal="m"
+          gap="s"
+        >
+          <Ionicons
+            name={showFilter ? 'options' : 'options-outline'}
+            size={24}
+            color="black"
+            onPress={handleFilter}
           />
-        </SafeAreaView>
-      </Box>
-    </BottomSheetModalProvider>
+          <TouchableOpacity
+            onPress={handlePresentModalPress}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+            }}
+          >
+            <Text variant="title" fontSize={18}>
+              {view}
+            </Text>
+            <Ionicons name="chevron-down" size={26} color="black" />
+          </TouchableOpacity>
+          <Ionicons name="link" size={24} color="black" />
+        </Box>
+        <Filter showFilter={showFilter} />
+        <Box flex={1} paddingHorizontal="xs">
+          <FlatList
+            data={displayedProducts?.slice().reverse()}
+            numColumns={2}
+            keyExtractor={(item) => item.url}
+            renderItem={({ item }) => (
+              <Product navigation={navigation} product={item} />
+            )}
+            refreshControl={
+              <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        </Box>
+        <SheetModal
+          bottomSheetModalRef={bottomSheetModalRef}
+          choice={view}
+          setChoice={setView}
+          choicesList={['Likes', 'History', 'Purchases']}
+          sheetHeader="View"
+        />
+      </SafeAreaView>
+    </Box>
   );
 }
 
+const filters: { label: string }[] = [
+  { label: 'Category' },
+  { label: 'Brand' },
+  { label: 'Website' },
+  { label: 'Price' },
+  { label: 'On sale' },
+  { label: 'Sort by' },
+];
+
 function Filter({ showFilter }: { showFilter: boolean }) {
+  // todo: useReducer for all the state here
+  const [outerChoice, setOuterChoice] = useState<string>('Category');
+  const [choice, setChoice] = useState<string>('');
+
   const animationValue = useSharedValue(0);
   useEffect(() => {
     animationValue.value = withTiming(showFilter ? 1 : 0, { duration: 250 });
@@ -152,51 +166,83 @@ function Filter({ showFilter }: { showFilter: boolean }) {
       height: animationValue.value * 42,
     };
   });
+
+  const filterSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentModalPress = useCallback(() => {
+    filterSheetModalRef.current?.present();
+  }, []);
+
+  const choicesList = useMemo(() => {
+    if (outerChoice === 'Category') {
+      return ['Hoodies', 'T-shirts', 'Suits'];
+    } else if (outerChoice === 'Brand') {
+      return ['Soft Goat', 'Filippa K', 'Lululemon', "A Day's March"];
+    } else if (outerChoice === 'Website') {
+      return [
+        'softgoat.com',
+        'zalando.com',
+        'adaysmarch.com',
+        'lululemon.com',
+        'farfetch.com',
+        'tomford.com',
+        'boozt.com',
+      ];
+    }
+
+    return [];
+  }, [outerChoice]);
+
   return (
-    <Animated.View style={[{ paddingBottom: 8 }, animatedStyles]}>
-      <FlatList
-        style={{ gap: 10 }}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        data={[
-          { label: 'Category' },
-          { label: 'Brand' },
-          { label: 'Website' },
-          { label: 'Price' },
-          { label: 'On sale' },
-          { label: 'Sort by' },
-        ]}
-        contentContainerStyle={{ paddingLeft: 12 }}
-        keyExtractor={(item, index) => `category-${index}`}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {}}
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 3,
-              marginRight: 8,
-              borderRadius: 10,
-              padding: 8,
-              paddingHorizontal: 10,
-              backgroundColor: '#ededed',
-            }}
-          >
-            <Text variant="body" fontWeight="600" fontSize={13} color="text">
-              {item.label}
-            </Text>
-            <Ionicons
-              name="chevron-down"
-              size={15}
-              color="black"
-              paddingTop={1}
-            />
-          </TouchableOpacity>
-        )}
+    <>
+      <Animated.View style={[{ paddingBottom: 8 }, animatedStyles]}>
+        <FlatList
+          style={{ gap: 10 }}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={filters}
+          contentContainerStyle={{ paddingLeft: 12 }}
+          keyExtractor={(item, index) => `category-${index}`}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => {
+                setOuterChoice(item.label);
+                handlePresentModalPress();
+              }}
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 3,
+                marginRight: 8,
+                borderRadius: 10,
+                padding: 8,
+                paddingHorizontal: 10,
+                backgroundColor: '#ededed',
+              }}
+            >
+              <Text variant="body" fontWeight="600" fontSize={13} color="text">
+                {item.label}
+              </Text>
+              <Ionicons
+                name="chevron-down"
+                size={15}
+                color="black"
+                paddingTop={1}
+              />
+            </TouchableOpacity>
+          )}
+        />
+      </Animated.View>
+      <SheetModal
+        bottomSheetModalRef={filterSheetModalRef}
+        choicesList={choicesList}
+        setChoice={setChoice}
+        choice={choice}
+        sheetHeader="Filter by"
       />
-    </Animated.View>
+    </>
   );
 }
 
@@ -239,52 +285,54 @@ function Product({
 
 type SheetModalProps = {
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;
-  view: ViewTypes;
-  setView: React.Dispatch<React.SetStateAction<ViewTypes>>;
+  choicesList: string[];
+  setChoice: React.Dispatch<React.SetStateAction<any>>;
+  choice: string;
+  sheetHeader: string;
 };
 
 const SheetModal = ({
   bottomSheetModalRef,
-  view,
-  setView,
+  choicesList,
+  setChoice,
+  choice,
+  sheetHeader,
 }: SheetModalProps) => {
   const snapPoints = useMemo(() => ['50%'], []);
-
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
-
-  const data = useMemo(() => ['Likes', 'History', 'Purchases'], []);
 
   const renderListItem = useCallback(
     ({ item }: { item: any }) => (
       <Button
-        onPress={() => setView(item)}
+        onPress={() => {
+          console.log('item', item);
+          console.log('choice', choice);
+
+          setChoice(item);
+        }}
         variant="new"
-        backgroundColor={item === view ? 'text' : 'background'}
-        margin="temporary_xxs"
+        backgroundColor={item === choice ? 'text' : 'grey'}
+        margin="xs"
       >
         <Text
           variant="body"
           fontWeight="bold"
           fontSize={16}
-          color={item === view ? 'background' : 'text'}
+          color={item === choice ? 'background' : 'text'}
         >
           {item}
         </Text>
-        {item === view ? (
+        {item === choice ? (
           <Ionicons name="checkmark" size={20} color="white" />
         ) : null}
       </Button>
     ),
-    [view]
+    [choice]
   );
 
   return (
     <BottomSheetModal
       ref={bottomSheetModalRef}
       snapPoints={snapPoints}
-      onChange={handleSheetChanges}
       backdropComponent={(props) => (
         <BottomSheetBackdrop
           {...props}
@@ -296,11 +344,11 @@ const SheetModal = ({
     >
       <Box justifyContent="center" alignItems="center" marginBottom="m">
         <Text variant="title" fontSize={22}>
-          View
+          {sheetHeader}
         </Text>
       </Box>
       <BottomSheetFlatList
-        data={data}
+        data={choicesList}
         renderItem={renderListItem}
         keyExtractor={(item) => item}
         contentContainerStyle={{ backgroundColor: 'white' }}

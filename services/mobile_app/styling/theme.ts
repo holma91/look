@@ -114,7 +114,7 @@ export const theme = createTheme({
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      borderWidth: 2,
+      // borderWidth: 2,
       borderRadius: 10,
     },
     new2: {
