@@ -1,4 +1,9 @@
-import { Dimensions, SafeAreaView } from 'react-native';
+import {
+  Dimensions,
+  SafeAreaView,
+  LayoutAnimation,
+  TouchableOpacity,
+} from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -14,11 +19,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import {
   BottomSheetModal,
-  BottomSheetView,
-  BottomSheetScrollView,
-  BottomSheetFlatList,
-  BottomSheetModalProvider,
   BottomSheetBackdrop,
+  BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
@@ -37,7 +39,6 @@ import {
   FakeSearchBar,
   FakeSearchBarBrowser,
 } from '../components/SearchBar';
-import { connectors } from '../utils/connectors';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -171,7 +172,7 @@ export default function Browser({
 type NavBarProps = {
   bottomSheetHeight: Animated.SharedValue<number>;
   expandedMenu: boolean;
-  setExpandedMenu: (expanded: boolean) => void;
+  setExpandedMenu: React.Dispatch<React.SetStateAction<boolean>>;
   navigate: (direction: 'back' | 'forward') => void;
   user: any;
   currentProduct: Product;
@@ -294,9 +295,6 @@ function NavBar({
             color="black"
             onPress={() => {
               if (activeProduct) {
-                // this is where we go when something has been liked
-                // what info do we have? the product, the url, the image
-                // want to map into a set of categories
                 mutation.mutate(activeProduct);
               }
             }}
@@ -309,13 +307,8 @@ function NavBar({
         </Box>
       </Box>
       <BottomSheet
-        bottomSheetHeight={bottomSheetHeight}
-        setExpandedMenu={setExpandedMenu}
-        currentProduct={currentProduct}
-        currentImage={currentImage}
-      />
-      <SheetModal
         bottomSheetModalRef={bottomSheetModalRef}
+        setExpandedMenu={setExpandedMenu}
         currentProduct={currentProduct}
         currentImage={currentImage}
       />
@@ -323,232 +316,34 @@ function NavBar({
   );
 }
 
-type BottomSheetProps = {
-  bottomSheetHeight: Animated.SharedValue<number>;
-  setExpandedMenu: (expanded: boolean) => void;
+type BottomSheetModalProps = {
+  bottomSheetModalRef: React.RefObject<BottomSheetModal>;
+  setExpandedMenu: React.Dispatch<React.SetStateAction<boolean>>;
   currentProduct: Product;
   currentImage: string;
 };
 
-function BottomSheet({
-  bottomSheetHeight,
+const BottomSheet = ({
+  bottomSheetModalRef,
   setExpandedMenu,
   currentProduct,
   currentImage,
-}: BottomSheetProps) {
-  const [sheetState, setSheetState] = useState<'MIN' | 'MEDIUM' | 'MAX'>('MIN');
-  const [generating, setGenerating] = useState(false);
-  const start = useSharedValue(0);
-
-  const handleGenerate = async () => {
-    const sleep = (ms: number) => {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    };
-    setGenerating(true);
-
-    console.log('generating image(s)');
-    await sleep(3000);
-    console.log('done generating image(s)');
-    setGenerating(false);
-    bottomSheetHeight.value = withTiming(MAX_HEIGHT);
-  };
-
-  const animatedStyleOuter = useAnimatedStyle(() => {
-    return {
-      height: bottomSheetHeight.value,
-    };
-  });
-
-  const gesture = Gesture.Pan()
-    .onBegin(() => {
-      start.value = bottomSheetHeight.value;
-    })
-    .onUpdate((e) => {
-      if (start.value === MAX_HEIGHT) {
-        // bottomSheetHeight.value = MAX_HEIGHT - e.translationY;
-      } else if (start.value === MEDIUM_HEIGHT) {
-        if (e.translationY > 0) {
-          bottomSheetHeight.value = MEDIUM_HEIGHT - e.translationY;
-        }
-      }
-    })
-    .onEnd((e) => {
-      if (start.value === MAX_HEIGHT) {
-        if (e.translationY > 150) {
-          // bottomSheetHeight.value = withTiming(MIN_HEIGHT);
-          // runOnJS(setExpandedMenu)(false);
-        } else if (e.translationY > 50) {
-          // bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
-        } else {
-          // bottomSheetHeight.value = withTiming(MAX_HEIGHT);
-        }
-      } else if (start.value === MEDIUM_HEIGHT) {
-        if (e.translationY > 50) {
-          bottomSheetHeight.value = withTiming(MIN_HEIGHT);
-          runOnJS(setExpandedMenu)(false);
-        } else if (e.translationY < -50) {
-          // bottomSheetHeight.value = withTiming(MAX_HEIGHT);
-        } else {
-          bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
-        }
-      }
-    })
-    .onFinalize(() => {});
-
-  useAnimatedReaction(
-    () => bottomSheetHeight.value,
-    (height) => {
-      if (height === MAX_HEIGHT) {
-        runOnJS(setSheetState)('MAX');
-      } else if (height === MEDIUM_HEIGHT) {
-        runOnJS(setSheetState)('MEDIUM');
-      } else {
-        runOnJS(setSheetState)('MIN');
-      }
-    }
-  );
-
-  return (
-    <GestureDetector gesture={gesture}>
-      <Animated.View
-        style={[
-          {
-            backgroundColor: 'white',
-            position: 'absolute',
-            bottom: 55,
-            left: 0,
-            right: 0,
-          },
-          animatedStyleOuter,
-        ]}
-      >
-        <Box
-          height={5}
-          width={40}
-          backgroundColor="grey"
-          borderRadius={2.5}
-          alignSelf="center"
-          margin="m"
-        ></Box>
-        {(sheetState === 'MEDIUM' || sheetState === 'MIN') && (
-          <Animated.View
-            style={[
-              {
-                flex: 1,
-                flexDirection: 'row',
-                paddingHorizontal: theme.spacing.m,
-                paddingVertical: theme.spacing.l,
-                justifyContent: 'space-between',
-              },
-            ]}
-            exiting={FadeOut.duration(500)}
-          >
-            <Box flex={1}>
-              {currentImage !== '' && (
-                <ExpoImage
-                  style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: 200,
-                  }}
-                  source={currentImage}
-                  contentFit="contain"
-                />
-              )}
-            </Box>
-            <Box flex={1} gap="s">
-              <Text variant="body" fontWeight="bold">
-                {currentProduct.name}
-              </Text>
-              <Text variant="body">{currentProduct.brand}</Text>
-
-              <Text variant="body">{`${currentProduct.price} ${currentProduct.currency}`}</Text>
-              {/* {generating ? (
-                <Button
-                  label="Generating..."
-                  variant="tertiary"
-                  fontSize={14}
-                  color="textOnBackground"
-                ></Button>
-              ) : (
-                <Button
-                  label="Generate"
-                  onPress={handleGenerate}
-                  variant="tertiary"
-                  fontSize={14}
-                  color="textOnBackground"
-                ></Button>
-              )} */}
-            </Box>
-          </Animated.View>
-        )}
-        {sheetState === 'MAX' && (
-          <Animated.View
-            style={[
-              {
-                flex: 1,
-                flexDirection: 'column',
-                paddingHorizontal: theme.spacing.m,
-                paddingVertical: theme.spacing.l,
-                justifyContent: 'space-between',
-                gap: theme.spacing.m,
-              },
-            ]}
-            entering={ZoomIn.duration(100)}
-            exiting={LightSpeedOutRight.duration(500)}
-          >
-            <Box flex={1}>
-              <ExpoImage
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: '100%',
-                }}
-                source={require('../assets/res4-1.png')}
-                contentFit="contain"
-              />
-            </Box>
-            <Box flex={0} gap="m">
-              <Box gap="s">
-                <Text fontWeight="bold">KORREN - Kofta</Text>
-                <Text variant="body">Tiger of Sweden</Text>
-                <Text variant="body">2 995.00kr</Text>
-              </Box>
-              {/* <Button
-                label="Add to cart"
-                variant="tertiary"
-                fontSize={14}
-                color="textOnBackground"
-                paddingVertical="s"
-              ></Button> */}
-            </Box>
-          </Animated.View>
-        )}
-      </Animated.View>
-    </GestureDetector>
-  );
-}
-
-type SheetProps = {
-  bottomSheetModalRef: React.RefObject<BottomSheetModal>;
-  currentProduct: Product;
-  currentImage: string;
-};
-
-const SheetModal = ({
-  bottomSheetModalRef,
-  currentProduct,
-  currentImage,
-}: SheetProps) => {
+}: BottomSheetModalProps) => {
   const [expandedContent, setExpandedContent] = useState(false);
+  const [modelChoice, setModelChoice] = useState('');
   const snapPoints = useMemo(() => ['40%', '100%'], []);
 
   const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-    if (index === 1) {
-      setExpandedContent(true);
-    } else {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (index === -1) {
       setExpandedContent(false);
+      setExpandedMenu(false);
+    } else if (index === 0) {
+      setExpandedContent(false);
+      setExpandedMenu(true);
+    } else if (index === 1) {
+      setExpandedContent(true);
+      setExpandedMenu(true);
     }
   }, []);
 
@@ -575,7 +370,7 @@ const SheetModal = ({
           gap="m"
           flex={1}
         >
-          <Box flex={1} borderWidth={1}>
+          <Box flex={1} borderWidth={0}>
             {currentImage !== '' ? (
               <ExpoImage
                 style={{
