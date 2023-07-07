@@ -1,97 +1,168 @@
-import { SafeAreaView, FlatList, Dimensions } from 'react-native';
+import {
+  SafeAreaView,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 import { FlashList, MasonryFlashList } from '@shopify/flash-list';
 import { Image as ExpoImage } from 'expo-image';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { FakeSearchBarBrowser } from '../components/SearchBar';
+import { UserProduct } from '../utils/types';
 
-const imagesData = [
+const products: UserProduct[] = [
   {
-    id: '1',
-    uri: 'https://softgoat.centracdn.net/client/dynamic/images/2151_a7dc7bd334-softgoat-ss23-nc3763-turtleneck-singlet-light-blue-1795-4-size1024.jpg',
-    size: 'big',
+    url: 'https://softgoat.com/p/mens-collar-navy/',
+    name: "MEN'S COLLAR",
+    brand: 'Soft Goat',
+    price: '2027',
+    currency: 'SEK',
+    images: [require('../assets/products/softgoat1/gen1.png')],
+    domain: 'softgoat.com',
   },
   {
-    id: '2',
-    uri: 'https://adaysmarch.centracdn.net/client/dynamic/images/8080_342601e6d9-102521-20_frankie_relaxed_hoodie_oyster0085-max.jpg',
-    size: 'small',
+    url: 'https://www.adaysmarch.com/se/kita-shirt-denim-light-blue',
+    name: 'Kita Shirt - Denim',
+    brand: "A Day's March",
+    price: '1077',
+    currency: 'SEK',
+    images: [
+      require('../assets/products/adaysmarch1/gen2.png'),
+      require('../assets/products/adaysmarch1/gen1.png'),
+    ],
+    domain: 'adaysmarch.com',
   },
   {
-    id: '3',
-    uri: 'https://images.lululemon.com/is/image/lululemon/LW3GAHS_059404_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
-    size: 'small',
+    url: 'https://shop.lululemon.com/p/jackets-and-hoodies-jackets/Define-Jacket/_/prod5020054?color=34563',
+    name: 'Define Jacket Luon',
+    brand: 'Lululemon',
+    price: '118',
+    currency: 'USD',
+    images: [
+      require('../assets/products/lululemon1/gen1.png'),
+      require('../assets/products/lululemon1/gen2.png'),
+    ],
+    domain: 'lululemon.com',
   },
   {
-    id: '4',
-    uri: 'https://softgoat.centracdn.net/client/dynamic/images/2202_8ee99fa254-softgoat-ss23-25030-mens-collar-navy-2895-2-size1024.jpg',
-    size: 'small',
+    url: 'https://softgoat.com/p/chunky-t-shirt-fragola/',
+    name: 'CHUNKY T-SHIRT',
+    brand: 'Soft Goat',
+    price: '1537',
+    currency: 'SEK',
+    images: [
+      require('../assets/products/softgoat3/gen1.png'),
+      require('../assets/products/softgoat3/gen2.png'),
+      require('../assets/products/softgoat3/gen3.png'),
+      require('../assets/products/softgoat3/gen4.png'),
+    ],
+    domain: 'softgoat.com',
   },
   {
-    id: '5',
-    uri: 'https://images.lululemon.com/is/image/lululemon/LW3GAHS_059404_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
-    size: 'small',
+    url: 'https://www.zalando.se/nn07-carlo-half-zip-sweatshirt-purple-rose-nn922s012-i11.html',
+    name: 'CARLO - Sweatshirt',
+    brand: 'NN07',
+    price: '1345',
+    currency: 'SEK',
+    images: [
+      require('../assets/products/zalando1/gen1.png'),
+      require('../assets/products/zalando1/gen2.png'),
+    ],
+    domain: 'zalando.se',
   },
   {
-    id: '6',
-    uri: 'https://images.lululemon.com/is/image/lululemon/LW3GS5S_027597_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
-    size: 'big',
+    url: 'https://se.loropiana.com/en/p/man/outerwear-jackets/nevado-bomber-jacket-FAM0063?colorCode=W000',
+    name: 'Nevado Bomber Jacket',
+    brand: 'Lululemon',
+    price: '14800',
+    currency: 'EUR',
+    images: [
+      require('../assets/products/lululemon2/gen3.png'),
+      require('../assets/products/lululemon2/gen2.png'),
+      require('../assets/products/lululemon2/gen1.png'),
+    ],
+    domain: 'loropiana.com',
   },
   {
-    id: '7',
-    uri: 'https://softgoat.centracdn.net/client/dynamic/images/2151_a7dc7bd334-softgoat-ss23-nc3763-turtleneck-singlet-light-blue-1795-4-size1024.jpg',
-    size: 'small',
+    url: 'https://se.loropiana.com/en/p/man/knitwear/falkville-crewneck-FAI0361?colorCode=J1GB',
+    name: 'Falkville Crewneck',
+    brand: 'Loro Piana',
+    price: '950',
+    currency: 'EUR',
+    images: [
+      require('../assets/products/loropiana1/gen1.png'),
+      require('../assets/products/loropiana1/gen2.png'),
+    ],
+    domain: 'loropiana.com',
   },
   {
-    id: '8',
-    uri: 'https://adaysmarch.centracdn.net/client/dynamic/images/8080_342601e6d9-102521-20_frankie_relaxed_hoodie_oyster0085-max.jpg',
-    size: 'small',
+    url: '',
+    name: '',
+    brand: 'Loro Piana',
+    price: '',
+    currency: '',
+    images: [require('../assets/products/loropiana2/gen1.png')],
+    domain: '',
   },
   {
-    id: '9',
-    uri: 'https://images.lululemon.com/is/image/lululemon/LW3GAHS_059404_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
-    size: 'small',
+    url: 'https://www.eu.lululemon.com/en-lu/p/perfectly-oversized-crew-pride/prod11090058.html?dwvar_prod11090058_color=0002',
+    name: 'Perfectly Oversized Crew Pride',
+    brand: 'Lululemon',
+    price: '118',
+    currency: 'EUR',
+    images: [
+      require('../assets/products/lululemon3/gen1.png'),
+      require('../assets/products/lululemon3/gen2.png'),
+    ],
+    domain: 'lululemon.com',
   },
   {
-    id: '10',
-    uri: 'https://softgoat.centracdn.net/client/dynamic/images/2202_8ee99fa254-softgoat-ss23-25030-mens-collar-navy-2895-2-size1024.jpg',
-    size: 'small',
+    url: '',
+    name: '',
+    brand: '',
+    price: '',
+    currency: '',
+    images: [
+      'https://softgoat.centracdn.net/client/dynamic/images/2202_8ee99fa254-softgoat-ss23-25030-mens-collar-navy-2895-2-size1024.jpg',
+    ],
+    domain: '',
   },
   {
-    id: '11',
-    uri: 'https://images.lululemon.com/is/image/lululemon/LW3GAHS_059404_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
-    size: 'small',
+    url: '',
+    name: '',
+    brand: '',
+    price: '',
+    currency: '',
+    images: [
+      'https://images.lululemon.com/is/image/lululemon/LM3CZPS_030956_1?wid=1600&op_usm=0.5,2,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
+    ],
+    domain: '',
   },
   {
-    id: '12',
-    uri: 'https://images.lululemon.com/is/image/lululemon/LW3GS5S_027597_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
-    size: 'small',
-  },
-  {
-    id: '13',
-    uri: 'https://softgoat.centracdn.net/client/dynamic/images/2202_8ee99fa254-softgoat-ss23-25030-mens-collar-navy-2895-2-size1024.jpg',
-    size: 'small',
-  },
-  {
-    id: '14',
-    uri: 'https://images.lululemon.com/is/image/lululemon/LW3GAHS_059404_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
-    size: 'small',
-  },
-  {
-    id: '15',
-    uri: 'https://images.lululemon.com/is/image/lululemon/LW3GS5S_027597_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
-    size: 'small',
-  },
-  {
-    id: '16',
-    uri: 'https://softgoat.centracdn.net/client/dynamic/images/2196_58f2100716-softgoat-ss23-ss1701-mens-t-shirt-white-1695-2-size1600.jpg',
-    size: 'small',
-  },
-  {
-    id: '17',
-    uri: 'https://softgoat.centracdn.net/client/dynamic/images/2196_58f2100716-softgoat-ss23-ss1701-mens-t-shirt-white-1695-2-size1600.jpg',
-    size: 'small',
+    url: '',
+    name: '',
+    brand: '',
+    price: '',
+    currency: '',
+    images: [
+      'https://images.lululemon.com/is/image/lululemon/LM3CV3S_057772_1?wid=1600&op_usm=0.5,2,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
+    ],
+    domain: '',
   },
 ];
+
+const testProduct = {
+  brand: 'Soft Goat Men',
+  currency: 'SEK',
+  domain: 'softgoat.com',
+  images: [
+    'https://softgoat.centracdn.net/client/dynamic/images/2140_7f77346899-softgoat-ss23-za520142-mens-o-neck-ocean-breeze-2295-1-size1024.jpg',
+  ],
+  name: "Men's O-neck",
+  price: 1607,
+  url: 'https://softgoat.com/p/mens-o-neck-ocean-breeze/',
+};
 
 const { height, width } = Dimensions.get('window');
 
@@ -101,20 +172,27 @@ export default function Explore({ navigation }: { navigation: any }) {
       <SafeAreaView style={{ flex: 1 }}>
         <FakeSearchBarBrowser navigation={navigation} domain="" />
         <MasonryFlashList
-          data={imagesData}
+          data={products}
           renderItem={({ item }) => {
             return (
-              <ExpoImage
-                source={{ uri: item.uri }}
-                style={{
-                  width: '100%',
-                  height: item.size === 'big' ? 400 : 200,
-                }}
-                contentFit="cover"
-              />
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('Product', { product: item })
+                }
+                style={{ flex: 1 }}
+              >
+                <ExpoImage
+                  source={item.images[0]}
+                  style={{
+                    width: '100%',
+                    height: 200,
+                  }}
+                  contentFit="cover"
+                />
+              </TouchableOpacity>
             );
           }}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.images[0]}
           numColumns={3}
           estimatedItemSize={200}
           showsVerticalScrollIndicator={false}

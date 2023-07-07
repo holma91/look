@@ -69,6 +69,7 @@ export default function Product({
   const imageHeight = useSharedValue(height * 0.62);
 
   const { product }: { product: UserProduct } = route.params;
+  console.log('product', product);
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,

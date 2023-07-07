@@ -16,6 +16,13 @@ when clicking create:
 
 Create.screen.tsx. Not necessarily bad if we disregard when creationMode is true.
 
+### models for demo
+
+- me (seed 3000 is good)
+- [woman: Ana de Armas: 0.5]
+- [black man: Jamie Foxx: 0.5]
+- [man: Leonardo DiCaprio: 0.75], 2786372404
+
 ### Demo step by step
 
 1. go to model creation
@@ -23,13 +30,10 @@ Create.screen.tsx. Not necessarily bad if we disregard when creationMode is true
    - generate on myself
 2. go to shopping, go to softgoat and try something with a base model, like it
 3. go to training screen, see it finish
-4. go to likes, sort by brand, pick an image, try it on myself, like it, buy it with apple pay, change status to bought
-5. make the generation public, go to the explore page and show what's there
+4. go to likes, sort by brand, pick an image, try it on myself, like it, share it,
+5. go to the explore page, find something we like, go to website, buy it, change status to bought
 
 so, the TODO right now is:
 
-- generate some images with auto1111
-  - both headshots for ModelPicker and Product tries
-- fix sheet stuff for the browser screen
-- fix all the fake animations for training a model
--
+- generate headshots for ModelPicker
+- fix search UI on explore
