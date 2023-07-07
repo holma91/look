@@ -10,8 +10,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Button } from '../components/Button';
+import { TrainingContext } from '../context/Training';
 
 type ImageProps = {
   uri: string;
@@ -21,6 +22,9 @@ type ImageProps = {
 const { height, width } = Dimensions.get('window');
 
 export default function Create({ navigation }: { navigation: any }) {
+  const trainingContext = useContext(TrainingContext);
+  console.log('trainingContext', trainingContext);
+
   const [selectedImages, setSelectedImages] = useState<ImageProps[]>([
     { uri: '', id: 'addButton' },
   ]);
@@ -79,7 +83,8 @@ export default function Create({ navigation }: { navigation: any }) {
   };
 
   const createModel = async () => {
-    // setCreationMode(true);
+    // do stuff
+    navigation.replace('Creating');
   };
 
   return (
@@ -171,7 +176,7 @@ export default function Create({ navigation }: { navigation: any }) {
       </Box>
 
       <TouchableOpacity
-        onPress={() => navigation.replace('Creating')}
+        onPress={createModel}
         disabled={!readyToCreate}
         activeOpacity={readyToCreate ? 0.2 : 1}
       >
