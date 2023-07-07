@@ -4,8 +4,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Button } from '../components/Button';
+import { TrainingContext } from '../context/Training';
+import EmojiSticker from '../components/EmojiSticker';
+import TrainingSticker from '../components/TrainingSticker';
 
 type Model = {
   id: string;
@@ -70,18 +73,19 @@ const startingModels: Model[] = [
 ];
 
 export default function ModelPickerV2({ navigation }: { navigation: any }) {
-  const [models, setModels] = useState<Model[]>(startingModels); // This should be your models data
+  const { isTraining, setIsTraining } = useContext(TrainingContext);
+  const [models, setModels] = useState<Model[]>(startingModels);
   const [selectedModel, setSelectedModel] = useState<Model>(startingModels[1]);
-  const [expanded, setExpanded] = useState(false);
+
+  console.log('isTraining', isTraining);
 
   return (
-    <Box backgroundColor="background" flex={1}>
+    <Box backgroundColor="background" flex={1} position="relative">
       <Box flex={9}>
         <ExpoImage
           style={{
             width: '100%',
             height: '100%',
-            // height: 512,
           }}
           source={selectedModel.imageUrl}
         />
@@ -145,6 +149,8 @@ export default function ModelPickerV2({ navigation }: { navigation: any }) {
           showsHorizontalScrollIndicator={false}
         />
       </Box>
+
+      {isTraining ? <TrainingSticker navigation={navigation} /> : null}
     </Box>
   );
 }

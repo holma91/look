@@ -22,8 +22,8 @@ type ImageProps = {
 const { height, width } = Dimensions.get('window');
 
 export default function Create({ navigation }: { navigation: any }) {
-  const trainingContext = useContext(TrainingContext);
-  console.log('trainingContext', trainingContext);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const { isTraining, setIsTraining } = useContext(TrainingContext);
 
   const [selectedImages, setSelectedImages] = useState<ImageProps[]>([
     { uri: '', id: 'addButton' },
@@ -84,7 +84,13 @@ export default function Create({ navigation }: { navigation: any }) {
 
   const createModel = async () => {
     // do stuff
-    navigation.replace('Creating');
+    // setIsTrai
+    setIsInitializing(true);
+    setTimeout(() => {
+      setIsTraining(true);
+      navigation.replace('Creating');
+      setIsInitializing(false);
+    }, 3000);
   };
 
   return (
@@ -191,7 +197,7 @@ export default function Create({ navigation }: { navigation: any }) {
             color="textOnBackground"
             padding="m"
           >
-            Create model
+            {isInitializing ? 'Initializing...' : 'Create Model'}
           </Text>
         </Box>
       </TouchableOpacity>
