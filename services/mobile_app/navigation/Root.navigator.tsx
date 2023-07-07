@@ -10,6 +10,7 @@ import Shop from '../screens/Shop.screen';
 import Likes from '../screens/Likes.screen';
 import Studio from '../screens/Studio.screen';
 import Create from '../screens/Create.screen';
+import Creating from '../screens/Creating.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +40,11 @@ export default function RootNavigator() {
             <Stack.Screen
               name="Create"
               component={Create}
+              options={{ animation: 'fade_from_bottom' }}
+            />
+            <Stack.Screen
+              name="Creating"
+              component={Creating}
               options={{ animation: 'fade_from_bottom' }}
             />
             {/* <Stack.Screen name="Studio" component={Studio} /> */}

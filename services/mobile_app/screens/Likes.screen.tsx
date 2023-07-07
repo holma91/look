@@ -304,9 +304,6 @@ const SheetModal = ({
     ({ item }: { item: any }) => (
       <Button
         onPress={() => {
-          console.log('item', item);
-          console.log('choice', choice);
-
           setChoice(item);
         }}
         variant="new"
