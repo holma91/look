@@ -3,34 +3,21 @@ import {
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
-  // Button,
-  View,
-  StyleSheet,
 } from 'react-native';
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
-import { useState, useEffect } from 'react';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import { useState } from 'react';
+import Animated from 'react-native-reanimated';
 import React, { useCallback, useMemo, useRef } from 'react';
-import BottomSheet, {
-  BottomSheetModal,
-  BottomSheetView,
-  BottomSheetScrollView,
-  BottomSheetFlatList,
-  BottomSheetModalProvider,
-  BottomSheetBackdrop,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { fetchHistory, fetchLikes, fetchPurchased } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
-import { Button } from '../components/NewButton';
+import SheetModal from '../components/SheetModal';
+import Filter from '../components/Filter';
 
 type ViewTypes = 'Likes' | 'History' | 'Purchases';
 
@@ -142,110 +129,6 @@ export default function Likes({ navigation }: { navigation: any }) {
   );
 }
 
-const filters: { label: string }[] = [
-  { label: 'Category' },
-  { label: 'Brand' },
-  { label: 'Website' },
-  { label: 'Price' },
-  { label: 'On sale' },
-  { label: 'Sort by' },
-];
-
-function Filter({ showFilter }: { showFilter: boolean }) {
-  // todo: useReducer for all the state here
-  const [outerChoice, setOuterChoice] = useState<string>('Category');
-  const [choice, setChoice] = useState<string>('');
-
-  const animationValue = useSharedValue(0);
-  useEffect(() => {
-    animationValue.value = withTiming(showFilter ? 1 : 0, { duration: 250 });
-  }, [showFilter, animationValue]);
-
-  const animatedStyles = useAnimatedStyle(() => {
-    return {
-      height: animationValue.value * 42,
-    };
-  });
-
-  const filterSheetModalRef = useRef<BottomSheetModal>(null);
-
-  const handlePresentModalPress = useCallback(() => {
-    filterSheetModalRef.current?.present();
-  }, []);
-
-  const choicesList = useMemo(() => {
-    if (outerChoice === 'Category') {
-      return ['Hoodies', 'T-shirts', 'Suits'];
-    } else if (outerChoice === 'Brand') {
-      return ['Soft Goat', 'Filippa K', 'Lululemon', "A Day's March"];
-    } else if (outerChoice === 'Website') {
-      return [
-        'softgoat.com',
-        'zalando.com',
-        'adaysmarch.com',
-        'lululemon.com',
-        'farfetch.com',
-        'tomford.com',
-        'boozt.com',
-      ];
-    }
-
-    return [];
-  }, [outerChoice]);
-
-  return (
-    <>
-      <Animated.View style={[{ paddingBottom: 8 }, animatedStyles]}>
-        <FlatList
-          style={{ gap: 10 }}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={filters}
-          contentContainerStyle={{ paddingLeft: 12 }}
-          keyExtractor={(item, index) => `category-${index}`}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => {
-                setOuterChoice(item.label);
-                handlePresentModalPress();
-              }}
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 3,
-                marginRight: 8,
-                borderRadius: 10,
-                padding: 8,
-                paddingHorizontal: 10,
-                backgroundColor: '#ededed',
-              }}
-            >
-              <Text variant="body" fontWeight="600" fontSize={13} color="text">
-                {item.label}
-              </Text>
-              <Ionicons
-                name="chevron-down"
-                size={15}
-                color="black"
-                paddingTop={1}
-              />
-            </TouchableOpacity>
-          )}
-        />
-      </Animated.View>
-      <SheetModal
-        bottomSheetModalRef={filterSheetModalRef}
-        choicesList={choicesList}
-        setChoice={setChoice}
-        choice={choice}
-        sheetHeader="Filter by"
-      />
-    </>
-  );
-}
-
 function Product({
   navigation,
   product,
@@ -282,76 +165,3 @@ function Product({
     </TouchableOpacity>
   );
 }
-
-type SheetModalProps = {
-  bottomSheetModalRef: React.RefObject<BottomSheetModal>;
-  choicesList: string[];
-  setChoice: React.Dispatch<React.SetStateAction<any>>;
-  choice: string;
-  sheetHeader: string;
-};
-
-const SheetModal = ({
-  bottomSheetModalRef,
-  choicesList,
-  setChoice,
-  choice,
-  sheetHeader,
-}: SheetModalProps) => {
-  const snapPoints = useMemo(() => ['50%'], []);
-
-  const renderListItem = useCallback(
-    ({ item }: { item: any }) => (
-      <Button
-        onPress={() => {
-          setChoice(item);
-        }}
-        variant="new"
-        backgroundColor={item === choice ? 'text' : 'grey'}
-        margin="xs"
-      >
-        <Text
-          variant="body"
-          fontWeight="bold"
-          fontSize={16}
-          color={item === choice ? 'background' : 'text'}
-        >
-          {item}
-        </Text>
-        {item === choice ? (
-          <Ionicons name="checkmark" size={20} color="white" />
-        ) : null}
-      </Button>
-    ),
-    [choice]
-  );
-
-  return (
-    <BottomSheetModal
-      ref={bottomSheetModalRef}
-      snapPoints={snapPoints}
-      backdropComponent={(props) => (
-        <BottomSheetBackdrop
-          {...props}
-          appearsOnIndex={0}
-          disappearsOnIndex={-1}
-        />
-      )}
-      handleIndicatorStyle={{ backgroundColor: 'white' }}
-    >
-      <Box justifyContent="center" alignItems="center" marginBottom="m">
-        <Text variant="title" fontSize={22}>
-          {sheetHeader}
-        </Text>
-      </Box>
-      <BottomSheetFlatList
-        data={choicesList}
-        renderItem={renderListItem}
-        keyExtractor={(item) => item}
-        contentContainerStyle={{ backgroundColor: 'white' }}
-        style={{ paddingHorizontal: 10 }}
-        showsVerticalScrollIndicator={false}
-      />
-    </BottomSheetModal>
-  );
-};

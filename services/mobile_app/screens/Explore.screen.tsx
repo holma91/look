@@ -6,10 +6,29 @@ import {
 } from 'react-native';
 import { FlashList, MasonryFlashList } from '@shopify/flash-list';
 import { Image as ExpoImage } from 'expo-image';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
+import { TextInput } from '../styling/TextInput';
 import { FakeSearchBarBrowser } from '../components/SearchBar';
 import { UserProduct } from '../utils/types';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetScrollView,
+  BottomSheetFlatList,
+  BottomSheetModalProvider,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
+import { Button } from '../components/NewButton';
+import Filter from '../components/Filter';
 
 const products: UserProduct[] = [
   {
@@ -152,25 +171,24 @@ const products: UserProduct[] = [
   },
 ];
 
-const testProduct = {
-  brand: 'Soft Goat Men',
-  currency: 'SEK',
-  domain: 'softgoat.com',
-  images: [
-    'https://softgoat.centracdn.net/client/dynamic/images/2140_7f77346899-softgoat-ss23-za520142-mens-o-neck-ocean-breeze-2295-1-size1024.jpg',
-  ],
-  name: "Men's O-neck",
-  price: 1607,
-  url: 'https://softgoat.com/p/mens-o-neck-ocean-breeze/',
-};
-
 const { height, width } = Dimensions.get('window');
 
 export default function Explore({ navigation }: { navigation: any }) {
+  const [showFilter, setShowFilter] = useState(false);
+
+  const handleFilter = () => {
+    setShowFilter(!showFilter);
+  };
+
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
-        <FakeSearchBarBrowser navigation={navigation} domain="" />
+        <ExploreSearchBar
+          navigation={navigation}
+          showFilter={showFilter}
+          setShowFilter={setShowFilter}
+        />
+        <Filter showFilter={showFilter} />
         <MasonryFlashList
           data={products}
           renderItem={({ item }) => {
@@ -198,6 +216,65 @@ export default function Explore({ navigation }: { navigation: any }) {
           showsVerticalScrollIndicator={false}
         />
       </SafeAreaView>
+    </Box>
+  );
+}
+
+type ExploreSearchBarProps = {
+  navigation: any;
+  showFilter: boolean;
+  setShowFilter: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+function ExploreSearchBar({
+  navigation,
+  showFilter,
+  setShowFilter,
+}: ExploreSearchBarProps) {
+  return (
+    <Box
+      flex={0}
+      flexDirection="row"
+      alignItems="center"
+      gap="s"
+      paddingBottom="s"
+      paddingHorizontal="s"
+    >
+      <Box
+        flex={1}
+        backgroundColor="grey"
+        borderRadius={10}
+        flexDirection="row"
+        alignItems="center"
+        paddingHorizontal="m"
+        paddingVertical="xxxs"
+      >
+        <TextInput
+          autoCapitalize="none"
+          autoComplete="off"
+          autoCorrect={false}
+          inputMode="url"
+          variant="secondary"
+          selectTextOnFocus={true}
+          placeholder="Explore other's looks"
+          placeholderTextColor="black"
+        />
+        <Ionicons
+          name="search"
+          size={18}
+          color="black"
+          style={{ position: 'absolute', left: 15 }}
+        />
+      </Box>
+      {/* <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs"> */}
+      <Ionicons
+        name={showFilter ? 'options' : 'options-outline'}
+        flex={0}
+        size={26}
+        color="black"
+        onPress={() => setShowFilter(!showFilter)}
+      />
+      {/* </Box> */}
     </Box>
   );
 }

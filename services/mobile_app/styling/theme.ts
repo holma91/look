@@ -23,6 +23,7 @@ export const theme = createTheme({
   },
   spacing: {
     none: 0,
+    xxxs: 1,
     xxs: 2,
     temporary_xxs: 4,
     xs: 6,
