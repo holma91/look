@@ -1,9 +1,4 @@
-import {
-  SafeAreaView,
-  FlatList,
-  Dimensions,
-  TouchableOpacity,
-} from 'react-native';
+import { SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
 import { FlashList, MasonryFlashList } from '@shopify/flash-list';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -11,23 +6,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { TextInput } from '../styling/TextInput';
-import { FakeSearchBarBrowser } from '../components/SearchBar';
 import { UserProduct } from '../utils/types';
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
-import BottomSheet, {
-  BottomSheetModal,
-  BottomSheetView,
-  BottomSheetScrollView,
-  BottomSheetFlatList,
-  BottomSheetModalProvider,
-  BottomSheetBackdrop,
-} from '@gorhom/bottom-sheet';
-import { Button } from '../components/NewButton';
+import { useState } from 'react';
 import Filter from '../components/Filter';
 
 const products: UserProduct[] = [
@@ -176,10 +156,6 @@ const { height, width } = Dimensions.get('window');
 export default function Explore({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);
 
-  const handleFilter = () => {
-    setShowFilter(!showFilter);
-  };
-
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -195,7 +171,9 @@ export default function Explore({ navigation }: { navigation: any }) {
             return (
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate('Product', { product: item })
+                  navigation.navigate('Product', {
+                    product: { ...item, creator: 'lapuerta' },
+                  })
                 }
                 style={{ flex: 1 }}
               >
@@ -238,7 +216,7 @@ function ExploreSearchBar({
       alignItems="center"
       gap="s"
       paddingBottom="s"
-      paddingHorizontal="s"
+      paddingHorizontal="sm"
     >
       <Box
         flex={1}

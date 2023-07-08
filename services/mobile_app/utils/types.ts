@@ -18,6 +18,7 @@ export type UserProduct = {
   updated_at?: string;
   liked?: boolean;
   domain?: string;
+  creator?: string;
 };
 
 export type Website = {

@@ -28,6 +28,7 @@ export const theme = createTheme({
     temporary_xxs: 4,
     xs: 6,
     s: 8,
+    sm: 12,
     m: 16,
     l: 24,
     xl: 40,

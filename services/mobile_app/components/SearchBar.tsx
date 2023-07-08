@@ -23,7 +23,7 @@ function SearchBar({
       alignItems="center"
       gap="s"
       paddingBottom="s"
-      paddingHorizontal="m"
+      paddingHorizontal="sm"
     >
       <Box
         flex={1}
@@ -32,7 +32,7 @@ function SearchBar({
         flexDirection="row"
         alignItems="center"
         paddingHorizontal="m"
-        paddingVertical="xxs"
+        paddingVertical="xxxs"
       >
         <TextInput
           onChangeText={setSearchText}
@@ -88,7 +88,7 @@ function FakeSearchBar({ navigation }: { navigation: any }) {
         flexDirection="row"
         alignItems="center"
         paddingHorizontal="m"
-        paddingVertical="xxs"
+        paddingVertical="xxxs"
       >
         <TextInput
           onTouchStart={handleOnPress}
@@ -139,7 +139,7 @@ function FakeSearchBarBrowser({
       alignItems="center"
       gap="s"
       paddingBottom="s"
-      paddingHorizontal="m"
+      paddingHorizontal="sm"
     >
       <Box
         flex={1}
@@ -148,7 +148,7 @@ function FakeSearchBarBrowser({
         flexDirection="row"
         alignItems="center"
         paddingHorizontal="m"
-        paddingVertical="xxs"
+        paddingVertical="xxxs"
       >
         <TextInput
           onTouchStart={handleOnPress}
