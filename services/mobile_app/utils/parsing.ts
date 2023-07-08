@@ -55,6 +55,24 @@ export function parseProduct(
     product['price'] = productData['offers']['price'];
     product['currency'] = productData['offers']['priceCurrency'];
     product['images'] = productData['image'];
+  } else if (domain === 'loropiana.com') {
+    product['name'] = productData['name'];
+    product['brand'] = productData['brand']['name'];
+    product['price'] = productData['offers']['price'];
+    product['currency'] = productData['offers']['priceCurrency'];
+    product['images'] = productData['image'];
+  } else if (domain === 'gucci.com') {
+    product['name'] = productData['name'];
+    product['brand'] = productData['brand']['name'];
+    product['price'] = productData['offers'][0]['price'];
+    product['currency'] = productData['offers'][0]['priceCurrency'];
+    product['images'] = productData['image'];
+  } else if (domain === 'moncler.com') {
+    product['name'] = productData['name'];
+    product['brand'] = productData['brand']['name'];
+    product['price'] = productData['offers']['price'];
+    product['currency'] = productData['offers']['priceCurrency'];
+    product['images'] = productData['image'];
   }
 
   return product;

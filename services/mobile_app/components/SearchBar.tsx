@@ -170,15 +170,15 @@ function FakeSearchBarBrowser({
           style={{ position: 'absolute', left: 15 }}
         />
       </Box>
-      <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs">
-        <Ionicons
-          name="close"
-          flex={0}
-          size={24}
-          color="black"
-          onPress={() => navigation.goBack()}
-        />
-      </Box>
+      {/* <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs"> */}
+      <Ionicons
+        name="ellipsis-vertical"
+        flex={0}
+        size={26}
+        color="black"
+        onPress={() => navigation.goBack()}
+      />
+      {/* </Box> */}
     </Box>
   );
 }

@@ -36,9 +36,9 @@ export default function Shop({ navigation }: { navigation: any }) {
               data={[
                 { label: 'Favorites' },
                 { label: 'All' },
-                { label: 'Multi' },
-                { label: 'Single' },
-                { label: '2nd hand' },
+                { label: 'High-end' },
+                { label: 'Multi-brand' },
+                { label: 'Second-hand' },
                 { label: 'Other' },
               ]}
               contentContainerStyle={{ paddingLeft: 18 }}
@@ -135,15 +135,15 @@ function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
     let filtered;
     if (selectedCategory === 'Favorites') {
       filtered = websites.filter((site: WebsiteItem) => site.favorited);
-    } else if (selectedCategory === 'Multi') {
+    } else if (selectedCategory === 'Multi-brand') {
       filtered = websites.filter(
         (site: WebsiteItem) => domainToInfo[site.domain].multiBrand
       );
-    } else if (selectedCategory === 'Single') {
+    } else if (selectedCategory === 'High-end') {
       filtered = websites.filter(
-        (site: WebsiteItem) => !domainToInfo[site.domain].multiBrand
+        (site: WebsiteItem) => domainToInfo[site.domain].highEnd
       );
-    } else if (selectedCategory === '2nd hand') {
+    } else if (selectedCategory === 'Second-hand') {
       filtered = websites.filter(
         (site: WebsiteItem) => domainToInfo[site.domain].secondHand
       );
