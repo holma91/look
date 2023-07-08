@@ -21,54 +21,37 @@ const startingModels: Model[] = [
   {
     id: '1',
     name: 'White woman',
-    imageUrl: require('../assets/models/whitewoman1.png'),
+    imageUrl: require('../assets/models/whitewoman/2.png'),
   },
   {
     id: '2',
     name: 'White man',
-    imageUrl: require('../assets/models/whiteman1.png'),
+    imageUrl: require('../assets/models/whiteman/1.png'),
   },
   {
     id: '3',
-    name: 'Brown woman',
-    imageUrl:
-      'https://softgoat.centracdn.net/client/dynamic/images/2151_a7dc7bd334-softgoat-ss23-nc3763-turtleneck-singlet-light-blue-1795-4-size1024.jpg',
+    name: 'Black man',
+    imageUrl: require('../assets/models/blackman/3.png'),
   },
   {
     id: '4',
-    name: 'Black man',
-    imageUrl:
-      'https://adaysmarch.centracdn.net/client/dynamic/images/8080_342601e6d9-102521-20_frankie_relaxed_hoodie_oyster0085-max.jpg',
+    name: 'Black woman',
+    imageUrl: require('../assets/models/blackwoman/2.png'),
   },
   {
     id: '5',
     name: 'Asian woman',
-    imageUrl:
-      'https://images.lululemon.com/is/image/lululemon/LW3GAHS_059404_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
+    imageUrl: require('../assets/models/asianwoman/4.png'),
   },
   {
     id: '6',
-    name: 'Black woman',
-    imageUrl:
-      'https://images.lululemon.com/is/image/lululemon/LW3GS5S_027597_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
+    name: 'Asian man',
+    imageUrl: require('../assets/models/asianman/2.png'),
   },
   {
     id: '7',
-    name: 'Black man 2',
-    imageUrl:
-      'https://adaysmarch.centracdn.net/client/dynamic/images/8080_342601e6d9-102521-20_frankie_relaxed_hoodie_oyster0085-max.jpg',
-  },
-  {
-    id: '8',
-    name: 'Asian woman 2',
-    imageUrl:
-      'https://images.lululemon.com/is/image/lululemon/LW3GAHS_059404_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
-  },
-  {
-    id: '9',
-    name: 'Black woman 2',
-    imageUrl:
-      'https://images.lululemon.com/is/image/lululemon/LW3GS5S_027597_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
+    name: 'me',
+    imageUrl: require('../assets/models/me/3.png'),
   },
 ];
 

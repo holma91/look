@@ -25,6 +25,7 @@ Create.screen.tsx. Not necessarily bad if we disregard when creationMode is true
 
 ### Demo step by step
 
+0. login with apple faceid
 1. go to model creation
    - scroll through base models
    - generate on myself
@@ -35,5 +36,7 @@ Create.screen.tsx. Not necessarily bad if we disregard when creationMode is true
 
 so, the TODO right now is:
 
-- generate headshots for ModelPicker
-- fix search UI on explore
+- generate headshots for ModelPicker (AND some inpainting with me)
+- create login screen (splash, icon etc)
+- fix animation and countdown for training screen
+- add some highend sites (loro, moncler, tomford etc)
