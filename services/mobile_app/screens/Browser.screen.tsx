@@ -3,6 +3,7 @@ import {
   SafeAreaView,
   LayoutAnimation,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -163,6 +164,7 @@ export default function Browser({
         user={user}
         currentProduct={currentProduct}
         currentImage={currentImage}
+        setCurrentImage={setCurrentImage}
         products={products}
       />
     </Box>
@@ -177,6 +179,7 @@ type NavBarProps = {
   user: any;
   currentProduct: Product;
   currentImage: string;
+  setCurrentImage: React.Dispatch<React.SetStateAction<string>>;
   products: UserProduct[];
 };
 
@@ -188,6 +191,7 @@ function NavBar({
   user,
   currentProduct,
   currentImage,
+  setCurrentImage,
   products,
 }: NavBarProps) {
   const queryClient = useQueryClient();
@@ -311,6 +315,7 @@ function NavBar({
         setExpandedMenu={setExpandedMenu}
         currentProduct={currentProduct}
         currentImage={currentImage}
+        setCurrentImage={setCurrentImage}
       />
     </Box>
   );
@@ -321,6 +326,7 @@ type BottomSheetModalProps = {
   setExpandedMenu: React.Dispatch<React.SetStateAction<boolean>>;
   currentProduct: Product;
   currentImage: string;
+  setCurrentImage: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const BottomSheet = ({
@@ -328,10 +334,12 @@ const BottomSheet = ({
   setExpandedMenu,
   currentProduct,
   currentImage,
+  setCurrentImage,
 }: BottomSheetModalProps) => {
   const [expandedContent, setExpandedContent] = useState(false);
   const [modelChoice, setModelChoice] = useState('');
-  const snapPoints = useMemo(() => ['40%', '100%'], []);
+  const [generatedImage, setGeneratedImage] = useState('');
+  const snapPoints = useMemo(() => ['45%', '100%'], []);
 
   const handleSheetChanges = useCallback((index: number) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -346,6 +354,13 @@ const BottomSheet = ({
       setExpandedMenu(true);
     }
   }, []);
+
+  console.log('currentProduct', currentProduct);
+
+  const handleTestOnModel = async () => {
+    // change current image progressively
+    // when at last image, snap to top
+  };
 
   return (
     <BottomSheetModal
@@ -417,49 +432,95 @@ const BottomSheet = ({
           </Box>
         </Box>
       ) : (
-        <Box
-          margin="m"
-          flexDirection="row"
-          justifyContent="space-between"
-          gap="m"
-        >
-          <Box flex={1}>
-            {currentImage !== '' && (
-              <ExpoImage
-                style={{
-                  aspectRatio: 0.75, // todo: calculate this
-                }}
-                source={currentImage}
-                contentFit="contain"
-              />
-            )}
-          </Box>
-          <Box flex={1} justifyContent="space-between">
-            <Box gap="s" flex={1}>
-              <Text variant="body" fontWeight="bold" fontSize={20}>
-                {currentProduct.name}
-              </Text>
-              <Text variant="body" fontSize={17}>
-                {currentProduct.brand}
-              </Text>
-
-              <Text
-                variant="body"
-                fontSize={17}
-              >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
+        <Box margin="m" gap="l">
+          <Box
+            flexDirection="row"
+            justifyContent="space-between"
+            gap="m"
+            // flex={1}
+          >
+            <Box flex={1}>
+              {currentImage !== '' && (
+                <ExpoImage
+                  style={{
+                    aspectRatio: 0.75, // todo: calculate this
+                  }}
+                  source={currentImage}
+                  contentFit="contain"
+                />
+              )}
             </Box>
-            <Box flex={0}>
-              <Button
-                onPress={() => {}}
-                variant="primary"
-                backgroundColor="text"
-              >
-                <Text color="background" fontWeight="600" fontSize={15}>
-                  Test on model
+            <Box flex={1} justifyContent="space-between">
+              <Box gap="s" flex={1}>
+                <Text variant="body" fontWeight="bold" fontSize={20}>
+                  {currentProduct.name}
                 </Text>
-              </Button>
+                <Text variant="body" fontSize={17}>
+                  {currentProduct.brand}
+                </Text>
+
+                <Text
+                  variant="body"
+                  fontSize={17}
+                >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
+              </Box>
+
+              <Box flex={0} gap="l">
+                <FlatList
+                  style={{ gap: 10, marginTop: 20 }}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  data={currentProduct.images}
+                  contentContainerStyle={{ paddingLeft: 5 }}
+                  keyExtractor={(item, index) => `category-${index}`}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setCurrentImage(item);
+                      }}
+                      style={{
+                        marginRight: 6,
+                      }}
+                    >
+                      <ExpoImage
+                        style={{
+                          height: 50,
+                          width: 50,
+                          borderWidth: item === currentImage ? 2 : 0,
+                        }}
+                        source={item}
+                        contentFit="cover"
+                      />
+                    </TouchableOpacity>
+                  )}
+                />
+                <Box
+                  flexDirection="row"
+                  borderWidth={1}
+                  padding="s"
+                  paddingVertical="sm"
+                  borderRadius={10}
+                  alignItems="center"
+                  justifyContent="center"
+                  gap="xs"
+                >
+                  <Text variant="body" fontWeight="bold" fontSize={16}>
+                    Black man
+                  </Text>
+                  <Ionicons name="chevron-down" size={20} color="black" />
+                </Box>
+              </Box>
             </Box>
           </Box>
+          <Button
+            onPress={handleTestOnModel}
+            variant="primary"
+            backgroundColor="text"
+          >
+            <Text color="background" fontWeight="600" fontSize={15}>
+              Test on model
+            </Text>
+          </Button>
         </Box>
       )}
     </BottomSheetModal>
