@@ -1,68 +1,86 @@
-import { View, Dimensions, TouchableOpacity } from 'react-native';
+import { useContext, useEffect, useRef } from 'react';
+import { View, Dimensions, TouchableOpacity, Animated } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import CircularProgress from 'react-native-circular-progress-indicator';
+
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { Image as ExpoImage } from 'expo-image';
 import { Button } from '../components/NewButton';
+import { TrainingContext } from '../context/Training';
 
 const images = [
   {
     id: '1',
     name: 'White woman',
-    imageUrl: require('../assets/models/whitewoman1.png'),
+    imageUrl: require('../assets/models/whitewoman/2.png'),
   },
   {
     id: '2',
     name: 'White man',
-    imageUrl: require('../assets/models/whiteman1.png'),
+    imageUrl: require('../assets/models/whiteman/1.png'),
   },
   {
     id: '3',
-    name: 'Brown woman',
-    imageUrl:
-      'https://softgoat.centracdn.net/client/dynamic/images/2151_a7dc7bd334-softgoat-ss23-nc3763-turtleneck-singlet-light-blue-1795-4-size1024.jpg',
+    name: 'Black man',
+    imageUrl: require('../assets/models/blackman/3.png'),
   },
   {
     id: '4',
-    name: 'Black man',
-    imageUrl:
-      'https://adaysmarch.centracdn.net/client/dynamic/images/8080_342601e6d9-102521-20_frankie_relaxed_hoodie_oyster0085-max.jpg',
+    name: 'Black woman',
+    imageUrl: require('../assets/models/blackwoman/2.png'),
   },
   {
     id: '5',
     name: 'Asian woman',
-    imageUrl:
-      'https://images.lululemon.com/is/image/lululemon/LW3GAHS_059404_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
+    imageUrl: require('../assets/models/asianwoman/4.png'),
   },
   {
     id: '6',
-    name: 'Black woman',
-    imageUrl:
-      'https://images.lululemon.com/is/image/lululemon/LW3GS5S_027597_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
+    name: 'Asian man',
+    imageUrl: require('../assets/models/asianman/2.png'),
   },
   {
     id: '7',
     name: 'Black man',
-    imageUrl:
-      'https://adaysmarch.centracdn.net/client/dynamic/images/8080_342601e6d9-102521-20_frankie_relaxed_hoodie_oyster0085-max.jpg',
+    imageUrl: require('../assets/models/blackman/2.png'),
   },
   {
     id: '8',
-    name: 'Asian woman',
-    imageUrl:
-      'https://images.lululemon.com/is/image/lululemon/LW3GAHS_059404_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
+    name: 'me',
+    imageUrl: require('../assets/models/me/3.png'),
   },
   {
     id: '9',
-    name: 'Black woman',
-    imageUrl:
-      'https://images.lululemon.com/is/image/lululemon/LW3GS5S_027597_4?wid=750&op_usm=0.8,1,10,0&fmt=webp&qlt=80,1&fit=constrain,0&op_sharpen=0&resMode=sharp2&iccEmbed=0&printRes=72',
+    name: 'me',
+    imageUrl: require('../assets/models/asianwoman/2.png'),
   },
 ];
 
 const { height, width } = Dimensions.get('window');
 
 export default function Creating({ navigation }: { navigation: any }) {
+  const { remainingTime } = useContext(TrainingContext);
+
+  const borderColorAnimation = useRef(
+    new Animated.Value(remainingTime)
+  ).current;
+
+  useEffect(() => {
+    Animated.timing(borderColorAnimation, {
+      toValue: remainingTime,
+      duration: 1000,
+      useNativeDriver: false,
+    }).start();
+  }, [remainingTime]);
+
+  const borderColor = borderColorAnimation.interpolate({
+    inputRange: [0, 15], // change the values according to your needs
+    outputRange: ['rgb(0, 255, 0)', 'rgb(255, 255, 255)'],
+  });
+
+  const progress = (remainingTime / 15) * 100; // Assuming total time is 15 minutes. Adjust it according to your needs.
+
   return (
     <Box flex={1} backgroundColor="background" position="relative">
       <TouchableOpacity
@@ -79,48 +97,30 @@ export default function Creating({ navigation }: { navigation: any }) {
       >
         <Ionicons name="close" size={30} color="black" />
       </TouchableOpacity>
+      {[
+        [0, 3],
+        [3, 6],
+        [6, 9],
+      ].map((range) => (
+        <Box flexDirection="row">
+          {images.slice(range[0], range[1]).map((image) => (
+            <ExpoImage
+              key={image.id}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                aspectRatio: 1,
+                width: '33.333%',
+              }}
+              source={image.imageUrl}
+            />
+          ))}
+        </Box>
+      ))}
       <Box flexDirection="row">
         {images.slice(0, 3).map((image) => (
           <ExpoImage
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              aspectRatio: 1,
-              width: '33.333%',
-            }}
-            source={image.imageUrl}
-          />
-        ))}
-      </Box>
-      <Box flexDirection="row">
-        {images.slice(3, 6).map((image) => (
-          <ExpoImage
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              aspectRatio: 1,
-              width: '33.333%',
-            }}
-            source={image.imageUrl}
-          />
-        ))}
-      </Box>
-      <Box flexDirection="row">
-        {images.slice(0, 3).map((image) => (
-          <ExpoImage
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              aspectRatio: 1,
-              width: '33.333%',
-            }}
-            source={image.imageUrl}
-          />
-        ))}
-      </Box>
-      <Box flexDirection="row">
-        {images.slice(6, 9).map((image) => (
-          <ExpoImage
+            key={image.id}
             style={{
               justifyContent: 'center',
               alignItems: 'center',
@@ -150,10 +150,26 @@ export default function Creating({ navigation }: { navigation: any }) {
           }}
         >
           <Text variant="title" color="textOnBackground" fontSize={44}>
-            39
+            {remainingTime}
           </Text>
           <Text color="textOnBackground">minutes left</Text>
         </View>
+        {/* <CircularProgress
+          value={15 - remainingTime}
+          radius={120}
+          maxValue={15}
+          initialValue={0}
+          progressValueColor={'#fff'}
+          activeStrokeWidth={15}
+          inActiveStrokeWidth={15}
+          duration={15000}
+          title={'minutes left'}
+          titleFontSize={20}
+          titleColor={'white'}
+          circleBackgroundColor="black"
+          titleStyle={{ fontWeight: 'bold' }}
+          onAnimationComplete={() => alert('time out')}
+        /> */}
       </Box>
       <Box
         justifyContent="space-between"

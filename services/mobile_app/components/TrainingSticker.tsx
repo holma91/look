@@ -7,12 +7,15 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { Text } from '../styling/Text';
+import { TrainingContext } from '../context/Training';
+import { useContext } from 'react';
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function TrainingSticker({ navigation }: { navigation: any }) {
+  const { remainingTime } = useContext(TrainingContext);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
@@ -62,7 +65,7 @@ export default function TrainingSticker({ navigation }: { navigation: any }) {
           }}
         >
           <Text variant="title" color="textOnBackground">
-            39
+            {remainingTime}
           </Text>
           <Text color="textOnBackground" fontSize={12}>
             min left

@@ -4,7 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Button } from '../components/Button';
 import { TrainingContext } from '../context/Training';
 import EmojiSticker from '../components/EmojiSticker';
@@ -18,6 +18,11 @@ type Model = {
 
 const startingModels: Model[] = [
   { id: 'addButton', name: '', imageUrl: '' },
+  {
+    id: 'me',
+    name: 'me',
+    imageUrl: require('../assets/models/me/3.png'),
+  },
   {
     id: '1',
     name: 'White woman',
@@ -48,19 +53,18 @@ const startingModels: Model[] = [
     name: 'Asian man',
     imageUrl: require('../assets/models/asianman/2.png'),
   },
-  {
-    id: '7',
-    name: 'me',
-    imageUrl: require('../assets/models/me/3.png'),
-  },
 ];
 
 export default function ModelPickerV2({ navigation }: { navigation: any }) {
-  const { isTraining, setIsTraining } = useContext(TrainingContext);
+  const { isTraining, trainedModels } = useContext(TrainingContext);
   const [models, setModels] = useState<Model[]>(startingModels);
-  const [selectedModel, setSelectedModel] = useState<Model>(startingModels[1]);
+  const [selectedModel, setSelectedModel] = useState<Model>(startingModels[2]);
 
   console.log('isTraining', isTraining);
+
+  useEffect(() => {
+    console.log(`Number of trained models: ${trainedModels}`);
+  }, [trainedModels]);
 
   return (
     <Box backgroundColor="background" flex={1} position="relative">
@@ -76,15 +80,11 @@ export default function ModelPickerV2({ navigation }: { navigation: any }) {
       <Box
         margin="s"
         padding="m"
-        borderWidth={1}
-        borderColor="grey"
         flexDirection="row"
-        justifyContent="space-between"
+        justifyContent="center"
+        alignItems="center"
       >
-        <Text variant="body" fontWeight="bold">
-          Selected Model:
-        </Text>
-        <Text variant="body" fontWeight="bold">
+        <Text variant="body" fontWeight="bold" fontSize={22}>
           {selectedModel.name}
         </Text>
       </Box>
@@ -125,6 +125,7 @@ export default function ModelPickerV2({ navigation }: { navigation: any }) {
                   model={item}
                   setSelectedModel={setSelectedModel}
                   selectedModel={selectedModel}
+                  trainedModels={trainedModels}
                 />
               )}
             </View>
@@ -142,9 +143,19 @@ type ModelProps = {
   model: Model;
   setSelectedModel: React.Dispatch<React.SetStateAction<Model>>;
   selectedModel: Model;
+  trainedModels?: number;
 };
 
-function Model({ model, setSelectedModel, selectedModel }: ModelProps) {
+function Model({
+  model,
+  setSelectedModel,
+  selectedModel,
+  trainedModels,
+}: ModelProps) {
+  if (model.id === 'me' && trainedModels === 0) {
+    return null;
+  }
+
   return (
     <TouchableOpacity
       onPress={() => {

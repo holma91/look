@@ -122,7 +122,7 @@ export const domainToInfo: { [key: string]: DomainProps } = {
     highEnd: true,
   },
   'hermes.com': {
-    name: 'Hermès`',
+    name: 'Hermès',
     icon: require('../assets/logos/hermes.png'),
     multiBrand: false,
     secondHand: false,

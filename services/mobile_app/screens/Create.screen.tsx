@@ -23,7 +23,13 @@ const { height, width } = Dimensions.get('window');
 
 export default function Create({ navigation }: { navigation: any }) {
   const [isInitializing, setIsInitializing] = useState(false);
-  const { isTraining, setIsTraining } = useContext(TrainingContext);
+  const {
+    isTraining,
+    setIsTraining,
+    remainingTime,
+    setRemainingTime,
+    setTrainedModels,
+  } = useContext(TrainingContext);
 
   const [selectedImages, setSelectedImages] = useState<ImageProps[]>([
     { uri: '', id: 'addButton' },
@@ -83,13 +89,29 @@ export default function Create({ navigation }: { navigation: any }) {
   };
 
   const createModel = async () => {
-    // do stuff
-    // setIsTrai
     setIsInitializing(true);
     setTimeout(() => {
       setIsTraining(true);
+      setRemainingTime(15); // start countdown from 5 seconds
       navigation.replace('Creating');
       setIsInitializing(false);
+
+      const timerId = setInterval(() => {
+        setRemainingTime((prevTime) => {
+          if (prevTime <= 1) {
+            // Time is up
+            clearInterval(timerId);
+            setIsTraining(false);
+            setTrainedModels((prevModels) => prevModels + 1);
+            return 0;
+          } else {
+            return prevTime - 1;
+          }
+        });
+      }, 1000);
+
+      // Save timerId for cleanup
+      return () => clearInterval(timerId);
     }, 3000);
   };
 
@@ -110,10 +132,12 @@ export default function Create({ navigation }: { navigation: any }) {
         <Ionicons name="close" size={30} color="black" />
       </TouchableOpacity>
       <Box gap="s" paddingHorizontal="s" marginTop="s" paddingTop="xl" flex={0}>
-        <Text variant="title">Pick 4-12 photos of yourself</Text>
+        <Text variant="title">
+          Upload between 5 and 15 pictures of yourself
+        </Text>
         <Text variant="body">
-          The more, the better. A higher number of good quality photos gives you
-          more chances for incredible results!
+          More images is better, and make sure your face is visible in all the
+          images.
         </Text>
       </Box>
       <Box minHeight={height * 0.64} maxHeight={height * 0.66} padding="xxs">
