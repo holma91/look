@@ -86,6 +86,13 @@ export const domainToInfo: { [key: string]: DomainProps } = {
     secondHand: false,
     highEnd: true,
   },
+  'eu.lululemon.com': {
+    name: 'Lululemon',
+    icon: require('../assets/logos/lululemon.png'),
+    multiBrand: false,
+    secondHand: false,
+    highEnd: false,
+  },
   'gucci.com': {
     name: 'Gucci',
     icon: require('../assets/logos/gucci.png'),

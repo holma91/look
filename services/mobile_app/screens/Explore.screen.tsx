@@ -33,6 +33,20 @@ const products: UserProduct[] = [
     domain: 'adaysmarch.com',
   },
   {
+    url: 'https://www.eu.lululemon.com/en-lu/p/city-sweat-full-zip-hoodie/prod8910005.html?dwvar_prod8910005_color=32798',
+    name: 'City Sweat Full Zip Hoodie',
+    brand: 'Lululemon',
+    price: '138',
+    currency: 'EUR',
+    images: [
+      require('../assets/products/lulubuy/black.png'),
+      require('../assets/products/lulubuy/blonde.png'),
+      require('../assets/products/lulubuy/indian.png'),
+      require('../assets/products/lulubuy/irish.png'),
+    ],
+    domain: 'eu.lululemon.com',
+  },
+  {
     url: 'https://shop.lululemon.com/p/jackets-and-hoodies-jackets/Define-Jacket/_/prod5020054?color=34563',
     name: 'Define Jacket Luon',
     brand: 'Lululemon',
@@ -43,6 +57,19 @@ const products: UserProduct[] = [
       require('../assets/products/lululemon1/gen2.png'),
     ],
     domain: 'lululemon.com',
+  },
+  {
+    url: 'https://www.hermes.com/se/en/product/rib-trim-jacket-H353220HD4J50/',
+    name: 'RIB-TRIM JACKET',
+    brand: 'Hermès',
+    price: '96500',
+    currency: 'SEK',
+    images: [
+      require('../assets/products/hermes1/gen1.png'),
+      require('../assets/products/hermes1/gen2.png'),
+      require('../assets/products/hermes1/gen3.png'),
+    ],
+    domain: 'hermes.com',
   },
   {
     url: 'https://softgoat.com/p/chunky-t-shirt-fragola/',
@@ -116,17 +143,7 @@ const products: UserProduct[] = [
     ],
     domain: 'lululemon.com',
   },
-  {
-    url: '',
-    name: '',
-    brand: '',
-    price: '',
-    currency: '',
-    images: [
-      'https://softgoat.centracdn.net/client/dynamic/images/2202_8ee99fa254-softgoat-ss23-25030-mens-collar-navy-2895-2-size1024.jpg',
-    ],
-    domain: '',
-  },
+
   {
     url: '',
     name: '',
@@ -150,8 +167,6 @@ const products: UserProduct[] = [
     domain: '',
   },
 ];
-
-const { height, width } = Dimensions.get('window');
 
 export default function Explore({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);

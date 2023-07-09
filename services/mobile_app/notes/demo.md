@@ -40,3 +40,6 @@ Create.screen.tsx. Not necessarily bad if we disregard when creationMode is true
 other TODOs are:
 
 - create login screen (splash, icon etc)
+  small ui improvements:
+- add checkmark when on a website
+- add list button

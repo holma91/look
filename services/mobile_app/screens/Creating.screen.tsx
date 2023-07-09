@@ -22,18 +22,19 @@ const images = [
   },
   {
     id: '3',
-    name: 'Black man',
-    imageUrl: require('../assets/models/blackman/3.png'),
+    name: 'Asian woman',
+    imageUrl: require('../assets/models/asianwoman/3.png'),
   },
+
   {
     id: '4',
-    name: 'Black woman',
-    imageUrl: require('../assets/models/blackwoman/2.png'),
+    name: 'Asian woman',
+    imageUrl: require('../assets/models/asianwoman/4.png'),
   },
   {
     id: '5',
-    name: 'Asian woman',
-    imageUrl: require('../assets/models/asianwoman/4.png'),
+    name: 'Black woman',
+    imageUrl: require('../assets/models/blackwoman/2.png'),
   },
   {
     id: '6',
@@ -42,18 +43,33 @@ const images = [
   },
   {
     id: '7',
-    name: 'Black man',
-    imageUrl: require('../assets/models/blackman/2.png'),
+    name: 'Black woman',
+    imageUrl: require('../assets/models/whiteman/2.png'),
   },
   {
     id: '8',
-    name: 'me',
-    imageUrl: require('../assets/models/me/3.png'),
+    name: 'Asian woman',
+    imageUrl: require('../assets/models/asianwoman/1.png'),
   },
   {
     id: '9',
-    name: 'me',
-    imageUrl: require('../assets/models/asianwoman/2.png'),
+    name: 'White woman',
+    imageUrl: require('../assets/models/whitewoman/3.png'),
+  },
+  {
+    id: '10',
+    name: 'Black woman',
+    imageUrl: require('../assets/models/blackwoman/3.png'),
+  },
+  {
+    id: '11',
+    name: 'White woman',
+    imageUrl: require('../assets/models/whitewoman/2.png'),
+  },
+  {
+    id: '12',
+    name: 'Black man',
+    imageUrl: require('../assets/models/blackman/3.png'),
   },
 ];
 
@@ -101,6 +117,7 @@ export default function Creating({ navigation }: { navigation: any }) {
         [0, 3],
         [3, 6],
         [6, 9],
+        [9, 12],
       ].map((range) => (
         <Box flexDirection="row">
           {images.slice(range[0], range[1]).map((image) => (
@@ -117,20 +134,7 @@ export default function Creating({ navigation }: { navigation: any }) {
           ))}
         </Box>
       ))}
-      <Box flexDirection="row">
-        {images.slice(0, 3).map((image) => (
-          <ExpoImage
-            key={image.id}
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              aspectRatio: 1,
-              width: '33.333%',
-            }}
-            source={image.imageUrl}
-          />
-        ))}
-      </Box>
+
       <Box
         justifyContent="center"
         alignItems="center"

@@ -73,7 +73,11 @@ export function parseProduct(
     product['price'] = productData['offers']['price'];
     product['currency'] = productData['offers']['priceCurrency'];
     product['images'] = productData['image'];
-  } else if (domain === 'lululemon.com' || domain === 'shop.lululemon.com') {
+  } else if (
+    domain === 'lululemon.com' ||
+    domain === 'shop.lululemon.com' ||
+    domain === 'eu.lululemon.com'
+  ) {
     product['name'] = productData['name'];
     product['brand'] = productData['brand'];
     product['price'] = '218';

@@ -3,6 +3,8 @@ import {
   Dimensions,
   TouchableOpacity,
   SafeAreaView,
+  View,
+  ScrollView,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -23,19 +25,24 @@ const { width, height } = Dimensions.get('window');
 
 const demoImages: { [key: string]: any } = {
   basic: [
-    require('../assets/generations/demo/basic/1.png'),
-    require('../assets/generations/demo/basic/2.png'),
-    require('../assets/generations/demo/basic/3.png'),
-    require('../assets/generations/demo/basic/4.png'),
-    require('../assets/generations/demo/basic/5.png'),
-    require('../assets/generations/demo/basic/6.png'),
-    require('../assets/generations/demo/basic/7.png'),
-    require('../assets/generations/demo/basic/8.png'),
-    require('../assets/generations/demo/basic/9.png'),
-    require('../assets/generations/demo/basic/10.png'),
-    require('../assets/generations/demo/basic/15.png'),
-    require('../assets/generations/demo/basic/20.png'),
-    require('../assets/generations/demo/basic/25.png'),
+    require('../assets/generations/demo/me/stepbystep/1.png'),
+    require('../assets/generations/demo/me/stepbystep/2.png'),
+    require('../assets/generations/demo/me/stepbystep/3.png'),
+    require('../assets/generations/demo/me/stepbystep/4.png'),
+    require('../assets/generations/demo/me/stepbystep/5.png'),
+    require('../assets/generations/demo/me/stepbystep/6.png'),
+    require('../assets/generations/demo/me/stepbystep/7.png'),
+    require('../assets/generations/demo/me/stepbystep/8.png'),
+    require('../assets/generations/demo/me/stepbystep/9.png'),
+    require('../assets/generations/demo/me/stepbystep/10.png'),
+    require('../assets/generations/demo/me/stepbystep/11.png'),
+    require('../assets/generations/demo/me/stepbystep/12.png'),
+    require('../assets/generations/demo/me/stepbystep/13.png'),
+    require('../assets/generations/demo/me/stepbystep/14.png'),
+    require('../assets/generations/demo/me/stepbystep/15.png'),
+    require('../assets/generations/demo/me/stepbystep/20.png'),
+    require('../assets/generations/demo/me/stepbystep/25.png'),
+    require('../assets/generations/demo/me/stepbystep/30.png'),
   ],
   other: [
     require('../assets/generations/demo/kitchen.png'),
@@ -61,12 +68,15 @@ export default function Product({
   navigation: any;
   route: any;
 }) {
+  const [originalImages, setOriginalImages] = useState<string[]>(
+    route.params.product.images
+  );
   const [generatedImages, setGeneratedImages] = useState<any[]>([]);
   const [hasGenerated, setHasGenerated] = useState(false);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
-  const imageHeight = useSharedValue(height * 0.62);
+  const imageHeight = useSharedValue(height * 0.6);
 
   const { product }: { product: UserProduct } = route.params;
   console.log('product', product);
@@ -86,121 +96,122 @@ export default function Product({
   });
 
   const handleStudioPress = () => {
-    imageHeight.value = expanded ? height * 0.62 : height * 0.73;
+    imageHeight.value = expanded ? height * 0.6 : height * 0.68;
     setExpanded(!expanded);
   };
 
   return (
-    <Box backgroundColor="background" flex={1}>
-      {!expanded ? (
-        <>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{
-              position: 'absolute',
-              top: 50,
-              left: 20,
-              zIndex: 2,
-              backgroundColor: 'rgba(128, 128, 128, 0.5)',
-              borderRadius: 5,
-              width: 45,
-              height: 45,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Ionicons name="chevron-back" size={30} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{
-              position: 'absolute',
-              top: 50,
-              right: 25,
-              zIndex: 2,
-              backgroundColor: 'rgba(128, 128, 128, 0.5)',
-              borderRadius: 5,
-              width: 45,
-              height: 45,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Ionicons
-              name={product?.liked ? 'heart' : 'heart-outline'}
-              size={26}
-              color="white"
-              style={{ marginTop: 2, marginLeft: 1 }}
-            />
-          </TouchableOpacity>
-        </>
-      ) : null}
-      <Box>
-        <Box>
-          <FlatList
-            data={
-              hasGenerated && expanded
-                ? generatedImages
-                : route.params.product.images
-            }
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => index.toString()}
-            onViewableItemsChanged={onViewableItemsChanged}
-            viewabilityConfig={viewabilityConfig}
-            renderItem={({ item }) => (
-              <Animated.Image
-                // sharedTransitionTag={`image-${product.url}`}
-                style={animatedStyle}
-                source={determineImage(item)}
-              />
-            )}
-          />
-          <TouchableOpacity
-            onPress={handleStudioPress}
-            style={{
-              position: 'absolute',
-              bottom: 25,
-              right: 25,
-              zIndex: 2,
-              backgroundColor: 'rgba(128, 128, 128, 0.5)',
-              borderRadius: 5,
-              borderWidth: expanded ? 2 : 0,
-              borderColor: 'white',
-              width: 45,
-              height: 45,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <MaterialCommunityIcons
-              name="human-handsdown"
-              size={30}
-              color="white"
-            />
-          </TouchableOpacity>
-        </Box>
-        <Carousel
-          images={
-            hasGenerated && expanded
-              ? generatedImages
-              : route.params.product.images
-          }
-          activeIndex={activeIndex}
-        />
-      </Box>
-      <TextBox
-        {...{
-          product,
-          expanded,
-          navigation,
-          setHasGenerated,
-          hasGenerated,
-          setGeneratedImages,
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor: 'white',
+          // marginTop: 8,
         }}
-      />
-    </Box>
+      >
+        {!expanded ? (
+          <>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{
+                position: 'absolute',
+                top: 10,
+                left: 10,
+                zIndex: 2,
+                backgroundColor: 'rgba(128, 128, 128, 0.5)',
+                borderRadius: 5,
+                width: 45,
+                height: 45,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Ionicons name="chevron-back" size={30} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{
+                position: 'absolute',
+                top: 10,
+                right: 10,
+                zIndex: 2,
+                backgroundColor: 'rgba(128, 128, 128, 0.5)',
+                borderRadius: 5,
+                width: 45,
+                height: 45,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Ionicons
+                name={product?.liked ? 'heart' : 'heart-outline'}
+                size={26}
+                color="white"
+                style={{ marginTop: 2, marginLeft: 1 }}
+              />
+            </TouchableOpacity>
+          </>
+        ) : null}
+        <Box>
+          <Box>
+            <FlatList
+              data={hasGenerated && expanded ? generatedImages : originalImages}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item, index) => index.toString()}
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={viewabilityConfig}
+              renderItem={({ item }) => (
+                <Animated.Image
+                  // sharedTransitionTag={`image-${product.url}`}
+                  style={animatedStyle}
+                  source={determineImage(item)}
+                />
+              )}
+            />
+            <TouchableOpacity
+              onPress={handleStudioPress}
+              style={{
+                position: 'absolute',
+                bottom: 25,
+                right: 25,
+                zIndex: 2,
+                backgroundColor: 'rgba(128, 128, 128, 0.5)',
+                borderRadius: 5,
+                borderWidth: expanded ? 2 : 0,
+                borderColor: 'white',
+                width: 45,
+                height: 45,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <MaterialCommunityIcons
+                name="human-handsdown"
+                size={30}
+                color="white"
+              />
+            </TouchableOpacity>
+          </Box>
+          <Carousel
+            images={hasGenerated && expanded ? generatedImages : originalImages}
+            activeIndex={activeIndex}
+          />
+        </Box>
+        <TextBox
+          {...{
+            product,
+            expanded,
+            navigation,
+            setHasGenerated,
+            hasGenerated,
+            setGeneratedImages,
+            setOriginalImages,
+          }}
+        />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -211,6 +222,7 @@ type TextBoxProps = {
   setHasGenerated: React.Dispatch<React.SetStateAction<boolean>>;
   hasGenerated: boolean;
   setGeneratedImages: React.Dispatch<React.SetStateAction<any[]>>;
+  setOriginalImages: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 function TextBox({
@@ -220,6 +232,7 @@ function TextBox({
   setHasGenerated,
   hasGenerated,
   setGeneratedImages,
+  setOriginalImages,
 }: TextBoxProps) {
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -234,12 +247,14 @@ function TextBox({
     }
     setIsGenerating(false);
 
-    setGeneratedImages(
-      [demoImages['basic'][demoImages['basic'].length - 1]].concat(
-        demoImages['other']
-      )
-    );
+    setGeneratedImages([demoImages['basic'][demoImages['basic'].length - 1]]);
+
+    setOriginalImages((prev) => [
+      ...prev,
+      demoImages['basic'][demoImages['basic'].length - 1],
+    ]);
   };
+
   return (
     <Box padding="m" flex={1} justifyContent="space-between">
       {!expanded ? (
@@ -307,7 +322,7 @@ function TextBox({
               Selected Model:
             </Text>
             <Text variant="body" fontWeight="bold">
-              White man
+              me
             </Text>
           </Box>
           <Button
