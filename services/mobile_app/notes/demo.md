@@ -30,16 +30,14 @@ Create.screen.tsx. Not necessarily bad if we disregard when creationMode is true
    - scroll through base models
    - generate on myself
 2. go to shopping, go to loro piana and try something with a base model, like it
-   - TODO: choose product, generate with auto1111
 3. go to training screen, see it finish
-4. go to likes, sort by brand, pick an image, try it on myself, like it, share it,
-   - TODO: sort by brand
+4. go to likes, sort by website, pick an image, try it on myself, like it, share it,
 5. go to the explore page, find something we like, go to website, buy it, change status to bought
-   - TODO choose image here, generate both with base model and me
 
-other TODOs are:
+TODO:
 
 - create login screen (splash, icon etc)
-  small ui improvements:
+
+possible small ui improvements:
+
 - add checkmark when on a website
-- add list button
