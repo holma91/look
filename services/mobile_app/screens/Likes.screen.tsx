@@ -23,8 +23,10 @@ type ViewTypes = 'Likes' | 'History' | 'Purchases';
 
 export default function Likes({ navigation }: { navigation: any }) {
   const [view, setView] = useState<ViewTypes>('Likes');
-  const [outerChoice, setOuterChoice] = useState<string>('Likes');
+  const [outerChoice, setOuterChoice] = useState<string>('Category');
+  const [choice, setChoice] = useState<string>('');
   const [showFilter, setShowFilter] = useState(false);
+
   const { user } = useUser();
   const {
     data: likes,
@@ -59,14 +61,24 @@ export default function Likes({ navigation }: { navigation: any }) {
   };
 
   const displayedProducts = useMemo(() => {
+    let list: any = [];
     if (view === 'Likes') {
-      return likes;
+      list = likes;
     } else if (view === 'History') {
-      return history;
+      list = history;
     } else {
-      return purchases;
+      list = purchases;
     }
-  }, [view, likes, history, purchases]);
+
+    if (outerChoice === 'Website' && choice !== '') {
+      list = list.filter((product: UserProduct) => product.domain === choice);
+    }
+
+    return list;
+  }, [view, likes, history, purchases, outerChoice, choice]);
+
+  console.log('outerChoice', outerChoice);
+  console.log('choice', choice);
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -102,7 +114,13 @@ export default function Likes({ navigation }: { navigation: any }) {
           </TouchableOpacity>
           <Ionicons name="link" size={24} color="black" />
         </Box>
-        <Filter showFilter={showFilter} />
+        <Filter
+          outerChoice={outerChoice}
+          setOuterChoice={setOuterChoice}
+          choice={choice}
+          setChoice={setChoice}
+          showFilter={showFilter}
+        />
         <Box flex={1} paddingHorizontal="xs">
           <FlatList
             data={displayedProducts?.slice().reverse()}
@@ -121,7 +139,7 @@ export default function Likes({ navigation }: { navigation: any }) {
           bottomSheetModalRef={bottomSheetModalRef}
           choice={view}
           setChoice={setView}
-          choicesList={['Likes', 'History', 'Purchases']}
+          choicesList={['Likes', 'History', 'Purchases', 'New List']}
           sheetHeader="View"
         />
       </SafeAreaView>

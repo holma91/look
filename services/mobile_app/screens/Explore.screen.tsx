@@ -169,6 +169,8 @@ const products: UserProduct[] = [
 ];
 
 export default function Explore({ navigation }: { navigation: any }) {
+  const [outerChoice, setOuterChoice] = useState<string>('Category');
+  const [choice, setChoice] = useState<string>('');
   const [showFilter, setShowFilter] = useState(false);
 
   return (
@@ -179,7 +181,13 @@ export default function Explore({ navigation }: { navigation: any }) {
           showFilter={showFilter}
           setShowFilter={setShowFilter}
         />
-        <Filter showFilter={showFilter} />
+        <Filter
+          outerChoice={outerChoice}
+          setOuterChoice={setOuterChoice}
+          choice={choice}
+          setChoice={setChoice}
+          showFilter={showFilter}
+        />
         <MasonryFlashList
           data={products}
           renderItem={({ item }) => {

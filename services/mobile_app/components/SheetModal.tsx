@@ -30,7 +30,11 @@ export default function SheetModal({
     ({ item }: { item: any }) => (
       <Button
         onPress={() => {
-          setChoice(item);
+          if (choice === item) {
+            setChoice('');
+          } else {
+            setChoice(item);
+          }
         }}
         variant="new"
         backgroundColor={item === choice ? 'text' : 'grey'}
@@ -46,6 +50,9 @@ export default function SheetModal({
         </Text>
         {item === choice ? (
           <Ionicons name="checkmark" size={20} color="white" />
+        ) : null}
+        {item === 'New List' ? (
+          <Ionicons name="add" size={20} color="black" />
         ) : null}
       </Button>
     ),

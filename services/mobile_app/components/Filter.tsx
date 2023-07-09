@@ -25,10 +25,22 @@ const filters: { label: string }[] = [
   { label: 'Sort by' },
 ];
 
-export default function Filter({ showFilter }: { showFilter: boolean }) {
+type FilterProps = {
+  outerChoice: string;
+  setOuterChoice: React.Dispatch<React.SetStateAction<string>>;
+  choice: string;
+  setChoice: React.Dispatch<React.SetStateAction<string>>;
+  showFilter: boolean;
+};
+
+export default function Filter({
+  outerChoice,
+  setOuterChoice,
+  choice,
+  setChoice,
+  showFilter,
+}: FilterProps) {
   // todo: useReducer for all the state here
-  const [outerChoice, setOuterChoice] = useState<string>('Category');
-  const [choice, setChoice] = useState<string>('');
 
   const animationValue = useSharedValue(0);
   useEffect(() => {
@@ -55,7 +67,7 @@ export default function Filter({ showFilter }: { showFilter: boolean }) {
     } else if (outerChoice === 'Website') {
       return [
         'softgoat.com',
-        'zalando.com',
+        'zalando.se',
         'adaysmarch.com',
         'lululemon.com',
         'farfetch.com',
