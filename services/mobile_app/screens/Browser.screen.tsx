@@ -142,7 +142,11 @@ export default function Browser({
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1}>
-          <FakeSearchBarBrowser navigation={navigation} domain={domain} />
+          <FakeSearchBarBrowser
+            navigation={navigation}
+            webViewNavigation={navigate}
+            domain={domain}
+          />
           <Box flex={1}>
             <WebViewBox
               webviewRef={webviewRef}
@@ -251,7 +255,6 @@ function NavBar({
         marginTop="s"
         paddingBottom="xl"
         justifyContent="space-between"
-        backgroundColor="background"
         zIndex={100}
       >
         <Box flex={0} flexDirection="row" gap="m" alignItems="center">
@@ -272,7 +275,7 @@ function NavBar({
           {expandedMenu ? (
             <Ionicons
               name="close-circle"
-              size={28}
+              size={26}
               color="black"
               onPress={() => {
                 setExpandedMenu(false);
@@ -282,7 +285,7 @@ function NavBar({
           ) : (
             <Ionicons
               name="arrow-up-circle"
-              size={28}
+              size={26}
               color="black"
               onPress={() => {
                 setExpandedMenu(true);
@@ -339,6 +342,7 @@ const BottomSheet = ({
   const [expandedContent, setExpandedContent] = useState(false);
   const [modelChoice, setModelChoice] = useState('');
   const [generatedImage, setGeneratedImage] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
   const snapPoints = useMemo(() => ['45%', '100%'], []);
 
   const handleSheetChanges = useCallback((index: number) => {
@@ -360,6 +364,13 @@ const BottomSheet = ({
   const handleTestOnModel = async () => {
     // change current image progressively
     // when at last image, snap to top
+    setIsGenerating(true);
+    for (let i = 0; i < demoImages['basic'].length; i++) {
+      setCurrentImage(demoImages['basic'][i]);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+    bottomSheetModalRef.current?.snapToIndex(1);
+    setIsGenerating(false);
   };
 
   return (
@@ -433,12 +444,7 @@ const BottomSheet = ({
         </Box>
       ) : (
         <Box margin="m" gap="l">
-          <Box
-            flexDirection="row"
-            justifyContent="space-between"
-            gap="m"
-            // flex={1}
-          >
+          <Box flexDirection="row" justifyContent="space-between" gap="m">
             <Box flex={1}>
               {currentImage !== '' && (
                 <ExpoImage
@@ -452,7 +458,13 @@ const BottomSheet = ({
             </Box>
             <Box flex={1} justifyContent="space-between">
               <Box gap="s" flex={1}>
-                <Text variant="body" fontWeight="bold" fontSize={20}>
+                <Text
+                  variant="body"
+                  fontWeight="bold"
+                  fontSize={20}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
                   {currentProduct.name}
                 </Text>
                 <Text variant="body" fontSize={17}>
@@ -525,4 +537,28 @@ const BottomSheet = ({
       )}
     </BottomSheetModal>
   );
+};
+
+const demoImages: { [key: string]: any } = {
+  basic: [
+    require('../assets/generations/demo/basic/1.png'),
+    require('../assets/generations/demo/basic/2.png'),
+    require('../assets/generations/demo/basic/3.png'),
+    require('../assets/generations/demo/basic/4.png'),
+    require('../assets/generations/demo/basic/5.png'),
+    require('../assets/generations/demo/basic/6.png'),
+    require('../assets/generations/demo/basic/7.png'),
+    require('../assets/generations/demo/basic/8.png'),
+    require('../assets/generations/demo/basic/9.png'),
+    require('../assets/generations/demo/basic/10.png'),
+    require('../assets/generations/demo/basic/15.png'),
+    require('../assets/generations/demo/basic/20.png'),
+    require('../assets/generations/demo/basic/25.png'),
+  ],
+  other: [
+    require('../assets/generations/demo/kitchen.png'),
+    require('../assets/generations/demo/park.png'),
+    require('../assets/generations/demo/timessquare.png'),
+    require('../assets/generations/demo/villa.png'),
+  ],
 };

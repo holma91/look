@@ -122,7 +122,7 @@ function FakeSearchBar({ navigation }: { navigation: any }) {
   );
 }
 
-function FakeSearchBarBrowser({
+function FakeSearchBarShop({
   navigation,
   domain,
 }: {
@@ -176,9 +176,79 @@ function FakeSearchBarBrowser({
         flex={0}
         size={26}
         color="black"
-        onPress={() => navigation.goBack()}
+        onPress={() => {}}
       />
       {/* </Box> */}
+    </Box>
+  );
+}
+function FakeSearchBarBrowser({
+  navigation,
+  webViewNavigation,
+  domain,
+}: {
+  navigation: any;
+  webViewNavigation: any;
+  domain: string;
+}) {
+  const handleOnPress = () => {
+    navigation.navigate('Search');
+  };
+  return (
+    <Box
+      flex={0}
+      flexDirection="row"
+      alignItems="center"
+      gap="s"
+      paddingBottom="s"
+      paddingHorizontal="sm"
+    >
+      <Box
+        flex={1}
+        backgroundColor="grey"
+        borderRadius={10}
+        flexDirection="row"
+        alignItems="center"
+        paddingHorizontal="m"
+        paddingVertical="xxxs"
+      >
+        <TextInput
+          onTouchStart={handleOnPress}
+          autoCapitalize="none"
+          autoComplete="off"
+          autoCorrect={false}
+          inputMode="url"
+          variant="secondary"
+          selectTextOnFocus={true}
+          placeholder="Search and shop anywhere"
+          placeholderTextColor="black"
+          autoFocus={false}
+          value={domain}
+        />
+        <Ionicons
+          name="search"
+          size={18}
+          color="black"
+          style={{ position: 'absolute', left: 12 }}
+        />
+        <Ionicons
+          name="refresh"
+          flex={0}
+          size={18}
+          color="black"
+          style={{ position: 'absolute', right: 12 }}
+          onPress={() => webViewNavigation('reload')}
+        />
+      </Box>
+      <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs">
+        <Ionicons
+          name="close"
+          flex={0}
+          size={24}
+          color="black"
+          onPress={() => navigation.goBack()}
+        />
+      </Box>
     </Box>
   );
 }
@@ -248,4 +318,10 @@ function BrowserSearchBar({
   );
 }
 
-export { SearchBar, FakeSearchBar, BrowserSearchBar, FakeSearchBarBrowser };
+export {
+  SearchBar,
+  FakeSearchBar,
+  BrowserSearchBar,
+  FakeSearchBarBrowser,
+  FakeSearchBarShop,
+};

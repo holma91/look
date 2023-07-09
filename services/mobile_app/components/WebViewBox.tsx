@@ -80,6 +80,7 @@ export function WebViewBox({
       }}
       onLoadEnd={handleLoadEnd}
       onMessage={handleMessage}
+      mediaPlaybackRequiresUserAction={true}
     />
   );
 }

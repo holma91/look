@@ -29,14 +29,14 @@ Create.screen.tsx. Not necessarily bad if we disregard when creationMode is true
 1. go to model creation
    - scroll through base models
    - generate on myself
-2. go to shopping, go to softgoat and try something with a base model, like it
+2. go to shopping, go to loro piana and try something with a base model, like it
+   - TODO: choose product, generate with auto1111
 3. go to training screen, see it finish
 4. go to likes, sort by brand, pick an image, try it on myself, like it, share it,
+   - TODO: sort by brand
 5. go to the explore page, find something we like, go to website, buy it, change status to bought
+   - TODO choose image here, generate both with base model and me
 
-so, the TODO right now is:
+other TODOs are:
 
-- generate headshots for ModelPicker (AND some inpainting with me)
 - create login screen (splash, icon etc)
-- fix animation and countdown for training screen
-- add some highend sites (loro, moncler, tomford etc)

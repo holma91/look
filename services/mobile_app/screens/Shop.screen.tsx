@@ -12,6 +12,7 @@ import {
   SearchBar,
   FakeSearchBar,
   FakeSearchBarBrowser,
+  FakeSearchBarShop,
 } from '../components/SearchBar';
 import { favoriteWebsite, fetchWebsites, unFavoriteWebsite } from '../api';
 
@@ -27,7 +28,7 @@ export default function Shop({ navigation }: { navigation: any }) {
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1} gap="s">
-          <FakeSearchBarBrowser navigation={navigation} domain="" />
+          <FakeSearchBarShop navigation={navigation} domain="" />
           <Box flexDirection="row" gap="m" marginVertical="s">
             <FlatList
               style={{ flex: 1, gap: 10 }}
