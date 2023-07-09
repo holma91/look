@@ -73,16 +73,21 @@ export function parseProduct(
     product['price'] = productData['offers']['price'];
     product['currency'] = productData['offers']['priceCurrency'];
     product['images'] = productData['image'];
-  } else if (
-    domain === 'lululemon.com' ||
-    domain === 'shop.lululemon.com' ||
-    domain === 'eu.lululemon.com'
-  ) {
+  } else if (domain === 'lululemon.com' || domain === 'shop.lululemon.com') {
     product['name'] = productData['name'];
     product['brand'] = productData['brand'];
     product['price'] = '218';
     product['currency'] = 'USD';
     product['images'] = productData['image'];
+  } else if (domain === 'eu.lululemon.com') {
+    product['name'] = productData['name'];
+    product['brand'] = productData['brand'];
+    product['price'] =
+      productData['offers']['price'] ||
+      productData['offers']['lowPrice'] ||
+      '200';
+    product['currency'] = productData['offers']['priceCurrency'];
+    product['images'] = [productData['image']];
   }
 
   return product;

@@ -10,6 +10,19 @@ import { UserProduct } from '../utils/types';
 import { useState } from 'react';
 import Filter from '../components/Filter';
 
+const names = [
+  'Alice',
+  'Bob',
+  'lapuerta',
+  'Dave',
+  'Eve',
+  'Frank',
+  'Grace',
+  'Heidi',
+  'Ivan',
+  'Judy',
+];
+
 const products: UserProduct[] = [
   {
     url: 'https://softgoat.com/p/mens-collar-navy/',
@@ -168,6 +181,14 @@ const products: UserProduct[] = [
   },
 ];
 
+const updatedProducts = products.map((product) => {
+  return {
+    ...product,
+    images: product.images, // Keep images as array of URIs
+    generatedBy: product.images.map((_, index) => names[index % names.length]), // Create a separate array for generatedBy
+  };
+});
+
 export default function Explore({ navigation }: { navigation: any }) {
   const [outerChoice, setOuterChoice] = useState<string>('Category');
   const [choice, setChoice] = useState<string>('');
@@ -189,13 +210,13 @@ export default function Explore({ navigation }: { navigation: any }) {
           showFilter={showFilter}
         />
         <MasonryFlashList
-          data={products}
+          data={updatedProducts}
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
                 onPress={() =>
                   navigation.navigate('Product', {
-                    product: { ...item, creator: 'lapuerta' },
+                    product: { ...item },
                   })
                 }
                 style={{ flex: 1 }}

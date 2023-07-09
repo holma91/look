@@ -6,7 +6,7 @@ import {
   FlatList,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
@@ -40,6 +40,7 @@ import {
   FakeSearchBar,
   FakeSearchBarBrowser,
 } from '../components/SearchBar';
+import { TrainingContext } from '../context/Training';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -340,8 +341,7 @@ const BottomSheet = ({
   setCurrentImage,
 }: BottomSheetModalProps) => {
   const [expandedContent, setExpandedContent] = useState(false);
-  const [modelChoice, setModelChoice] = useState('');
-  const [generatedImage, setGeneratedImage] = useState('');
+  const { activeModel, setActiveModel } = useContext(TrainingContext);
   const [isGenerating, setIsGenerating] = useState(false);
   const snapPoints = useMemo(() => ['45%', '100%'], []);
 
@@ -426,7 +426,7 @@ const BottomSheet = ({
                 Selected Model:
               </Text>
               <Text variant="body" fontWeight="bold">
-                White man
+                {activeModel.name}
               </Text>
             </Box>
             <Box flex={0}>
@@ -452,7 +452,7 @@ const BottomSheet = ({
                     aspectRatio: 0.75, // todo: calculate this
                   }}
                   source={currentImage}
-                  contentFit="contain"
+                  contentFit="cover"
                 />
               )}
             </Box>
@@ -517,7 +517,7 @@ const BottomSheet = ({
                   gap="xs"
                 >
                   <Text variant="body" fontWeight="bold" fontSize={16}>
-                    Black man
+                    {activeModel.name}
                   </Text>
                   <Ionicons name="chevron-down" size={20} color="black" />
                 </Box>

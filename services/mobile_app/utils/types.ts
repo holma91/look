@@ -19,6 +19,7 @@ export type UserProduct = {
   liked?: boolean;
   domain?: string;
   creator?: string;
+  generatedBy?: string[];
 };
 
 export type Website = {

@@ -9,6 +9,7 @@ import { Button } from '../components/Button';
 import { TrainingContext } from '../context/Training';
 import EmojiSticker from '../components/EmojiSticker';
 import TrainingSticker from '../components/TrainingSticker';
+import { set } from 'react-native-reanimated';
 
 type Model = {
   id: string;
@@ -56,9 +57,9 @@ const startingModels: Model[] = [
 ];
 
 export default function ModelPickerV2({ navigation }: { navigation: any }) {
-  const { isTraining, trainedModels } = useContext(TrainingContext);
+  const { isTraining, trainedModels, activeModel, setActiveModel } =
+    useContext(TrainingContext);
   const [models, setModels] = useState<Model[]>(startingModels);
-  const [selectedModel, setSelectedModel] = useState<Model>(startingModels[2]);
 
   console.log('isTraining', isTraining);
 
@@ -74,7 +75,7 @@ export default function ModelPickerV2({ navigation }: { navigation: any }) {
             width: '100%',
             height: '100%',
           }}
-          source={selectedModel.imageUrl}
+          source={activeModel.imageUrl}
         />
       </Box>
       <Box
@@ -85,7 +86,7 @@ export default function ModelPickerV2({ navigation }: { navigation: any }) {
         alignItems="center"
       >
         <Text variant="body" fontWeight="bold" fontSize={22}>
-          {selectedModel.name}
+          {activeModel.name}
         </Text>
       </Box>
       <Box flex={3} gap="m">
@@ -123,8 +124,8 @@ export default function ModelPickerV2({ navigation }: { navigation: any }) {
               ) : (
                 <Model
                   model={item}
-                  setSelectedModel={setSelectedModel}
-                  selectedModel={selectedModel}
+                  activeModel={activeModel}
+                  setActiveModel={setActiveModel}
                   trainedModels={trainedModels}
                 />
               )}
@@ -141,15 +142,15 @@ export default function ModelPickerV2({ navigation }: { navigation: any }) {
 
 type ModelProps = {
   model: Model;
-  setSelectedModel: React.Dispatch<React.SetStateAction<Model>>;
-  selectedModel: Model;
+  activeModel: Model;
+  setActiveModel: React.Dispatch<React.SetStateAction<Model>>;
   trainedModels?: number;
 };
 
 function Model({
   model,
-  setSelectedModel,
-  selectedModel,
+  activeModel,
+  setActiveModel,
   trainedModels,
 }: ModelProps) {
   if (model.id === 'me' && trainedModels === 0) {
@@ -159,7 +160,7 @@ function Model({
   return (
     <TouchableOpacity
       onPress={() => {
-        setSelectedModel(model);
+        setActiveModel(model);
       }}
       style={{ flex: 1 }}
     >
@@ -168,7 +169,7 @@ function Model({
           style={{
             width: 128,
             height: 128,
-            borderWidth: selectedModel.id === model.id ? 2 : 0,
+            borderWidth: activeModel.id === model.id ? 2 : 0,
           }}
           source={model.imageUrl}
         />

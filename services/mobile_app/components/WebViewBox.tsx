@@ -48,6 +48,9 @@ export function WebViewBox({
       }
 
       try {
+        console.log('product:', product);
+        console.log('domain:', domain);
+
         await createProduct(user?.id, product, domain);
         refetchProducts();
       } catch (error) {

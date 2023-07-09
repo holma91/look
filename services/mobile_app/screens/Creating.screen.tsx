@@ -90,13 +90,6 @@ export default function Creating({ navigation }: { navigation: any }) {
     }).start();
   }, [remainingTime]);
 
-  const borderColor = borderColorAnimation.interpolate({
-    inputRange: [0, 15], // change the values according to your needs
-    outputRange: ['rgb(0, 255, 0)', 'rgb(255, 255, 255)'],
-  });
-
-  const progress = (remainingTime / 15) * 100; // Assuming total time is 15 minutes. Adjust it according to your needs.
-
   return (
     <Box flex={1} backgroundColor="background" position="relative">
       <TouchableOpacity
@@ -119,7 +112,7 @@ export default function Creating({ navigation }: { navigation: any }) {
         [6, 9],
         [9, 12],
       ].map((range) => (
-        <Box flexDirection="row">
+        <Box key={'range: ' + range} flexDirection="row">
           {images.slice(range[0], range[1]).map((image) => (
             <ExpoImage
               key={image.id}
