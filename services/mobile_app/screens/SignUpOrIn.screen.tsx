@@ -15,33 +15,38 @@ const { width, height } = Dimensions.get('window');
 
 const originalImages = [
   [
-    require('../assets/generations/demo/me/stepbystep/1.png'),
-    require('../assets/generations/demo/me/stepbystep/2.png'),
-    require('../assets/generations/demo/me/stepbystep/3.png'),
-    require('../assets/generations/demo/me/stepbystep/4.png'),
-    require('../assets/generations/demo/me/stepbystep/5.png'),
-    require('../assets/generations/demo/me/stepbystep/6.png'),
-    require('../assets/generations/demo/me/stepbystep/7.png'),
-    require('../assets/generations/demo/me/stepbystep/8.png'),
-    require('../assets/generations/demo/me/stepbystep/9.png'),
-    require('../assets/generations/demo/me/stepbystep/10.png'),
-    require('../assets/generations/demo/me/stepbystep/11.png'),
-    require('../assets/generations/demo/me/stepbystep/12.png'),
-    require('../assets/generations/demo/me/stepbystep/13.png'),
-    require('../assets/generations/demo/me/stepbystep/14.png'),
-    require('../assets/generations/demo/me/stepbystep/15.png'),
-    require('../assets/generations/demo/me/stepbystep/20.png'),
-    require('../assets/generations/demo/me/stepbystep/25.png'),
-    require('../assets/generations/demo/me/stepbystep/30.png'),
+    require('../assets/generations/demo/login_screen/softgoat1/1.png'),
+    require('../assets/generations/demo/login_screen/softgoat1/2.png'),
+    require('../assets/generations/demo/login_screen/softgoat1/3.png'),
+    require('../assets/generations/demo/login_screen/softgoat1/4.png'),
+    require('../assets/generations/demo/login_screen/softgoat1/5.png'),
+    require('../assets/generations/demo/login_screen/softgoat1/6.png'),
+    require('../assets/generations/demo/login_screen/softgoat1/7.png'),
+    require('../assets/generations/demo/login_screen/softgoat1/8.png'),
+    require('../assets/generations/demo/login_screen/softgoat1/9.png'),
+    require('../assets/generations/demo/login_screen/softgoat1/10.png'),
   ],
   [
-    require('../assets/products/adaysmarch1/gen2.png'),
-    require('../assets/products/softgoat1/gen1.png'),
-    require('../assets/products/softgoat3/gen1.png'),
+    require('../assets/generations/demo/login_screen/softgoat3/1.png'),
+    require('../assets/generations/demo/login_screen/softgoat3/2.png'),
+    require('../assets/generations/demo/login_screen/softgoat3/3.png'),
+    require('../assets/generations/demo/login_screen/softgoat3/4.png'),
+  ],
+  [
+    require('../assets/generations/demo/login_screen/adaysmarch1/1.png'),
+    require('../assets/generations/demo/login_screen/adaysmarch1/2.png'),
+    require('../assets/generations/demo/login_screen/adaysmarch1/3.png'),
+    require('../assets/generations/demo/login_screen/adaysmarch1/4.png'),
+    require('../assets/generations/demo/login_screen/adaysmarch1/5.png'),
+    require('../assets/generations/demo/login_screen/adaysmarch1/6.png'),
+    require('../assets/generations/demo/login_screen/adaysmarch1/7.png'),
+    require('../assets/generations/demo/login_screen/adaysmarch1/8.png'),
+    require('../assets/generations/demo/login_screen/adaysmarch1/9.png'),
+    require('../assets/generations/demo/login_screen/adaysmarch1/10.png'),
   ],
 ];
 
-const intervals = [250, 3000];
+const intervals = [750, 750, 500];
 
 export default function SignUpOrIn() {
   const [imageIndices, setImageIndices] = useState(
