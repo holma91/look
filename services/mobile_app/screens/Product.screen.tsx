@@ -15,6 +15,7 @@ import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
 import { useContext, useRef, useState } from 'react';
 import Animated, {
+  set,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -25,7 +26,7 @@ import { TrainingContext } from '../context/Training';
 const { width, height } = Dimensions.get('window');
 
 const demoImages: { [key: string]: any } = {
-  basic: [
+  stepbystep: [
     require('../assets/generations/demo/me/stepbystep/1.png'),
     require('../assets/generations/demo/me/stepbystep/2.png'),
     require('../assets/generations/demo/me/stepbystep/3.png'),
@@ -44,6 +45,26 @@ const demoImages: { [key: string]: any } = {
     require('../assets/generations/demo/me/stepbystep/20.png'),
     require('../assets/generations/demo/me/stepbystep/25.png'),
     require('../assets/generations/demo/me/stepbystep/30.png'),
+  ],
+  stepbystep2: [
+    require('../assets/generations/demo/me/stepbystep2/1.png'),
+    require('../assets/generations/demo/me/stepbystep2/2.png'),
+    require('../assets/generations/demo/me/stepbystep2/3.png'),
+    require('../assets/generations/demo/me/stepbystep2/4.png'),
+    require('../assets/generations/demo/me/stepbystep2/5.png'),
+    require('../assets/generations/demo/me/stepbystep2/6.png'),
+    require('../assets/generations/demo/me/stepbystep2/7.png'),
+    require('../assets/generations/demo/me/stepbystep2/8.png'),
+    require('../assets/generations/demo/me/stepbystep2/9.png'),
+    require('../assets/generations/demo/me/stepbystep2/10.png'),
+    require('../assets/generations/demo/me/stepbystep2/11.png'),
+    require('../assets/generations/demo/me/stepbystep2/12.png'),
+    require('../assets/generations/demo/me/stepbystep2/13.png'),
+    require('../assets/generations/demo/me/stepbystep2/14.png'),
+    require('../assets/generations/demo/me/stepbystep2/15.png'),
+    require('../assets/generations/demo/me/stepbystep2/20.png'),
+    require('../assets/generations/demo/me/stepbystep2/25.png'),
+    require('../assets/generations/demo/me/stepbystep2/30.png'),
   ],
   other: [
     require('../assets/generations/demo/kitchen.png'),
@@ -74,6 +95,7 @@ export default function Product({
   );
   const [generatedImages, setGeneratedImages] = useState<any[]>([]);
   const [hasGenerated, setHasGenerated] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
@@ -107,6 +129,7 @@ export default function Product({
         style={{
           flex: 1,
           backgroundColor: 'white',
+          // borderWidth: 2,
           // marginTop: 8,
         }}
       >
@@ -156,7 +179,11 @@ export default function Product({
         <Box>
           <Box>
             <FlatList
-              data={hasGenerated && expanded ? generatedImages : originalImages}
+              data={
+                (isGenerating || hasGenerated) && expanded
+                  ? generatedImages
+                  : originalImages
+              }
               horizontal
               pagingEnabled
               showsHorizontalScrollIndicator={false}
@@ -200,18 +227,22 @@ export default function Product({
             activeIndex={activeIndex}
           />
         </Box>
-        <TextBox
-          {...{
-            product,
-            expanded,
-            navigation,
-            setHasGenerated,
-            hasGenerated,
-            setGeneratedImages,
-            setOriginalImages,
-            activeIndex,
-          }}
-        />
+        <Box>
+          <TextBox
+            {...{
+              product,
+              expanded,
+              navigation,
+              setHasGenerated,
+              hasGenerated,
+              setIsGenerating,
+              isGenerating,
+              setGeneratedImages,
+              setOriginalImages,
+              activeIndex,
+            }}
+          />
+        </Box>
       </ScrollView>
     </SafeAreaView>
   );
@@ -223,6 +254,8 @@ type TextBoxProps = {
   navigation: any;
   setHasGenerated: React.Dispatch<React.SetStateAction<boolean>>;
   hasGenerated: boolean;
+  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>;
+  isGenerating: boolean;
   setGeneratedImages: React.Dispatch<React.SetStateAction<any[]>>;
   setOriginalImages: React.Dispatch<React.SetStateAction<string[]>>;
   activeIndex: number;
@@ -234,30 +267,48 @@ function TextBox({
   navigation,
   setHasGenerated,
   hasGenerated,
+  setIsGenerating,
+  isGenerating,
   setGeneratedImages,
   setOriginalImages,
   activeIndex,
 }: TextBoxProps) {
   const { activeModel, setActiveModel } = useContext(TrainingContext);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isShared, setIsShared] = useState(false);
 
   const handleGenerate = async () => {
     if (isGenerating) return;
 
     setIsGenerating(true);
-    setHasGenerated(true);
-    for (let i = 0; i < demoImages['basic'].length; i++) {
-      setGeneratedImages([demoImages['basic'][i]]);
-      await new Promise((resolve) => setTimeout(resolve, 250));
+
+    console.log('product', product);
+
+    const imageSerie =
+      product.domain === 'softgoat.com' ? 'stepbystep2' : 'stepbystep';
+
+    for (let i = 0; i < demoImages[imageSerie].length; i++) {
+      setGeneratedImages([demoImages[imageSerie][i]]);
+      await new Promise((resolve) => setTimeout(resolve, 750));
     }
     setIsGenerating(false);
 
-    setGeneratedImages([demoImages['basic'][demoImages['basic'].length - 1]]);
+    setGeneratedImages([
+      demoImages[imageSerie][demoImages[imageSerie].length - 1],
+    ]);
 
     setOriginalImages((prev) => [
       ...prev,
-      demoImages['basic'][demoImages['basic'].length - 1],
+      demoImages[imageSerie][demoImages[imageSerie].length - 1],
     ]);
+    setHasGenerated(true);
+  };
+
+  const handleShare = () => {
+    setIsShared(true);
+  };
+
+  const handleExplore = () => {
+    navigation.navigate('ExploreNavigator');
   };
 
   return (
@@ -291,21 +342,23 @@ function TextBox({
                     Generated by
                   </Text>
                   <Text fontSize={20} fontWeight="600" marginLeft="xxs">
-                    @{product.generatedBy[activeIndex]}
+                    @{product.generatedBy[activeIndex] || 'me'}
                   </Text>
                 </Box>
               </Box>
             ) : null}
-            <Button
-              label={`Buy on ${product.domain}`}
-              onPress={() =>
-                navigation.navigate('Browser', { url: product.url })
-              }
-              variant="tertiary"
-              fontSize={17}
-              paddingVertical="s"
-              color="textOnBackground"
-            ></Button>
+            <Box marginTop={product?.generatedBy ? 'xs' : 'l'}>
+              <Button
+                label={`Buy on ${product.domain}`}
+                onPress={() =>
+                  navigation.navigate('Browser', { url: product.url })
+                }
+                variant="tertiary"
+                fontSize={17}
+                paddingVertical="s"
+                color="textOnBackground"
+              ></Button>
+            </Box>
           </Box>
         </>
       ) : (
@@ -330,20 +383,34 @@ function TextBox({
               {activeModel.name}
             </Text>
           </Box>
-          <Button
-            label={
-              hasGenerated && !isGenerating
-                ? 'Generated'
-                : isGenerating
-                ? 'is generating...'
-                : `Test on model`
-            }
-            onPress={handleGenerate}
-            variant="tertiary"
-            fontSize={17}
-            paddingVertical="s"
-            color="textOnBackground"
-          ></Button>
+          {!hasGenerated ? (
+            <Button
+              label={isGenerating ? 'is generating...' : `Test on model`}
+              onPress={handleGenerate}
+              variant="tertiary"
+              fontSize={17}
+              paddingVertical="s"
+              color="textOnBackground"
+            ></Button>
+          ) : !isShared ? (
+            <Button
+              label={'Share image'}
+              onPress={handleShare}
+              variant="tertiary"
+              fontSize={17}
+              paddingVertical="s"
+              color="textOnBackground"
+            ></Button>
+          ) : (
+            <Button
+              label={'Go to explore'}
+              onPress={handleExplore}
+              variant="tertiary"
+              fontSize={17}
+              paddingVertical="s"
+              color="textOnBackground"
+            ></Button>
+          )}
         </Box>
       )}
     </Box>

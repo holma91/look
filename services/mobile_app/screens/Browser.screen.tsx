@@ -343,6 +343,7 @@ const BottomSheet = ({
   const [expandedContent, setExpandedContent] = useState(false);
   const { activeModel, setActiveModel } = useContext(TrainingContext);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [hasGenerated, setHasGenerated] = useState(false);
   const snapPoints = useMemo(() => ['45%', '100%'], []);
 
   const handleSheetChanges = useCallback((index: number) => {
@@ -371,6 +372,7 @@ const BottomSheet = ({
     }
     bottomSheetModalRef.current?.snapToIndex(1);
     setIsGenerating(false);
+    setHasGenerated(true);
   };
 
   return (
@@ -436,7 +438,11 @@ const BottomSheet = ({
                 backgroundColor="text"
               >
                 <Text color="background" fontWeight="600" fontSize={15}>
-                  Test on model
+                  {isGenerating
+                    ? 'is generating...'
+                    : hasGenerated
+                    ? 'Share image'
+                    : `Test on model`}
                 </Text>
               </Button>
             </Box>
@@ -530,7 +536,7 @@ const BottomSheet = ({
             backgroundColor="text"
           >
             <Text color="background" fontWeight="600" fontSize={15}>
-              Test on model
+              {isGenerating ? 'is generating...' : `Test on model`}
             </Text>
           </Button>
         </Box>

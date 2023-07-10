@@ -8,8 +8,8 @@ type Model = {
 
 const startingModel: Model = {
   id: '1',
-  name: 'White woman',
-  imageUrl: require('../assets/models/whitewoman/2.png'),
+  name: 'White man',
+  imageUrl: require('../assets/models/whiteman/1.png'),
 };
 
 interface TrainingContextProps {

@@ -30,7 +30,10 @@ const products: UserProduct[] = [
     brand: 'Soft Goat',
     price: '2027',
     currency: 'SEK',
-    images: [require('../assets/products/softgoat1/gen1.png')],
+    images: [
+      require('../assets/products/softgoat1/gen1.png'),
+      require('../assets/generations/demo/me/stepbystep2/30.png'),
+    ],
     domain: 'softgoat.com',
   },
   {
@@ -185,7 +188,10 @@ const updatedProducts = products.map((product) => {
   return {
     ...product,
     images: product.images, // Keep images as array of URIs
-    generatedBy: product.images.map((_, index) => names[index % names.length]), // Create a separate array for generatedBy
+    generatedBy:
+      product.url === 'https://softgoat.com/p/mens-collar-navy/'
+        ? ['Bob', 'me']
+        : product.images.map((_, index) => names[index % names.length]), // Create a separate array for generatedBy
   };
 });
 

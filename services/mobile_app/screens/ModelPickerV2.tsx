@@ -26,13 +26,13 @@ const startingModels: Model[] = [
   },
   {
     id: '1',
-    name: 'White woman',
-    imageUrl: require('../assets/models/whitewoman/2.png'),
+    name: 'White man',
+    imageUrl: require('../assets/models/whiteman/1.png'),
   },
   {
     id: '2',
-    name: 'White man',
-    imageUrl: require('../assets/models/whiteman/1.png'),
+    name: 'White woman',
+    imageUrl: require('../assets/models/whitewoman/2.png'),
   },
   {
     id: '3',

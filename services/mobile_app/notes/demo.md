@@ -41,3 +41,35 @@ TODO:
 possible small ui improvements:
 
 - add checkmark when on a website
+
+### ACTUAL DEMO
+
+0. login screen:
+   - scroll through
+   - login with apple
+1. go to model creation
+   - scroll through models
+   - create model of myself
+   - wait for 20 min screen shows up
+2. go to shopping
+   - favorite some
+   - go to favs and unfavorite some
+   - go to loro piana
+     - choose one thing, don't generate
+     - choose the other thing, generate
+3. go back training screen, wait until it finishes
+4. go to likes
+   - show off purchases and history
+   - sort by website
+   - choose the blue softgoat, generate
+   - share
+5. go to explore
+6. click the newly generated
+   - show our shared image
+7. click on pink softgoat
+   - scroll trough
+8. click on lulu
+   - scroll through, then back to black
+   - generate
+   - go to site
+   - buy
