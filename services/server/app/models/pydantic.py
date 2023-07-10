@@ -44,6 +44,7 @@ class UserExtended(UserBase):
     likes: list[str]
 
 class UserLiked(ProductBase):
+    liked: bool
     images: list[str]
 
 class UserHistory(ProductBase):

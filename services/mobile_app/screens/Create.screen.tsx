@@ -92,7 +92,7 @@ export default function Create({ navigation }: { navigation: any }) {
     setIsInitializing(true);
     setTimeout(() => {
       setIsTraining(true);
-      setRemainingTime(20); // start countdown from 20 minutes
+      setRemainingTime(1); // start countdown from 20 minutes
       navigation.replace('Creating');
       setIsInitializing(false);
 

@@ -144,7 +144,8 @@ export default function SignUpOrIn() {
           </Text>
         </Box>
 
-        <SignInWithApple />
+        {/* <SignInWithApple /> */}
+        <SignInWithGoogle />
       </Box>
     </Box>
   );

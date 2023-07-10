@@ -49,7 +49,18 @@ VALUES
     ('adaysmarch.com'),
     ('sellpy.se'),
     ('na-kd.com'),
-    ('careofcarl.se');
+    ('careofcarl.se'),
+    ('loropiana.com'),
+    ('eu.lululemon.com'),
+    ('gucci.com'),
+    ('moncler.com'),
+    ('ysl.com'),
+    ('louisvuitton.com'),
+    ('farfetch.com'),
+    ('hermes.com'),
+    ('prada.com'),
+    ('valentino.com'),
+    ('mytheresa.com');
 
 INSERT INTO user_website (user_id, domain, favorited)
 VALUES
@@ -62,25 +73,39 @@ VALUES
     ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'adaysmarch.com', FALSE),
     ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'sellpy.se', TRUE),
     ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'na-kd.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'careofcarl.se', FALSE);
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'careofcarl.se', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'loropiana.com', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'eu.lululemon.com', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'moncler.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'gucci.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'ysl.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'louisvuitton.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','farfetch.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','hermes.com', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','prada.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','valentino.com', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','mytheresa.com', FALSE);
 
 
 INSERT INTO product (url, domain, brand, name, price, currency)
 VALUES 
 ('https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey', 'softgoat.com', 'Soft Goat', 'MEN''S FINE KNIT T-SHIRT', 1695.00, 'SEK'),
 ('https://softgoat.com/p/mens-fine-knit-t-shirt-white', 'softgoat.com', 'Soft Goat', 'MEN''S FINE KNIT T-SHIRT', 1695.00, 'SEK'),
+('https://softgoat.com/p/mens-waffle-knit-sea-foam', 'softgoat.com', 'Soft Goat', 'MEN''S WAFFLE KNIT', 2027.00, 'SEK'),
 ('https://softgoat.com/p/mens-collar-navy', 'softgoat.com', 'Soft Goat', 'MEN''S COLLAR', 2027.00, 'SEK');
 
 INSERT INTO product_image (product_url, image_url)
 VALUES
 ('https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey', 'https://softgoat.centracdn.net/client/dynamic/images/2196_d9c41cfa31-softgoat-ss23-ss1703-mens-t-shirt-navy-1695-2-size1024.jpg'),
 ('https://softgoat.com/p/mens-fine-knit-t-shirt-white', 'https://softgoat.centracdn.net/client/dynamic/images/2196_58f2100716-softgoat-ss23-ss1701-mens-t-shirt-white-1695-2-size1600.jpg'),
+('https://softgoat.com/p/mens-waffle-knit-sea-foam', 'https://softgoat.centracdn.net/client/dynamic/images/2177_49b9783922-3-size1024.jpg'),
 ('https://softgoat.com/p/mens-collar-navy', 'https://softgoat.centracdn.net/client/dynamic/images/2202_8ee99fa254-softgoat-ss23-25030-mens-collar-navy-2895-2-size1024.jpg');
 
 INSERT INTO user_product (user_id, product_url)
 VALUES
 ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey'),
 ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/mens-fine-knit-t-shirt-white'),
+('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/mens-waffle-knit-sea-foam'),
 ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/mens-collar-navy');
 
 UPDATE user_product SET liked = TRUE
@@ -89,5 +114,11 @@ WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://so
 UPDATE user_product SET liked = TRUE
 WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-collar-navy';
 
+UPDATE user_product SET liked = TRUE
+WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-waffle-knit-sea-foam';
+
 UPDATE user_product SET purchased = TRUE
 WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-collar-navy';
+
+UPDATE user_product SET purchased = TRUE
+WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-waffle-knit-sea-foam';

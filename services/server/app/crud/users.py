@@ -93,6 +93,7 @@ async def get_likes(user_id: str) -> list:
                 "name": row["name"],
                 "price": row["price"],
                 "currency": row["currency"],
+                "liked": row["liked"],
                 "images": []
             }
             products_dict[product_url] = product
