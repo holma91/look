@@ -10,10 +10,13 @@ import Create from '../screens/Create.screen';
 import Testing from '../screens/Testing.screen';
 import Explore from '../screens/Explore.screen';
 import ExploreNavigator from './Explore.navigator';
+import { useContext } from 'react';
+import { DemoContext } from '../context/Demo';
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
+  const { isDemo } = useContext(DemoContext);
   const activeTheme = useTheme();
 
   return (
@@ -58,8 +61,12 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="Shop" component={Shop} />
-      <Tab.Screen name="ExploreNavigator" component={ExploreNavigator} />
-      <Tab.Screen name="ModelPicker" component={ModelPickerV2} />
+      {isDemo ? (
+        <>
+          <Tab.Screen name="ExploreNavigator" component={ExploreNavigator} />
+          <Tab.Screen name="ModelPicker" component={ModelPickerV2} />
+        </>
+      ) : null}
       <Tab.Screen name="LikesNavigator" component={LikesNavigator} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
