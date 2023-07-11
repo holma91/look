@@ -1,5 +1,7 @@
 import { FlatList, TouchableOpacity } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useUser } from '@clerk/clerk-expo';
+
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -15,6 +17,10 @@ import React, {
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Text } from '../styling/Text';
 import SheetModal from './SheetModal';
+import { useQuery } from '@tanstack/react-query';
+import { UserProduct } from '../utils/types';
+import { fetchLikes, fetchWebsites } from '../api';
+import { Website } from '../utils/types';
 
 const filters: { label: string }[] = [
   { label: 'Category' },
@@ -42,6 +48,14 @@ export default function Filter({
 }: FilterProps) {
   // todo: useReducer for all the state here
 
+  const { user } = useUser();
+  const { data: websites } = useQuery<string[]>({
+    queryKey: ['websites', user?.id],
+    queryFn: () => fetchWebsites(user?.id as string),
+    enabled: !!user?.id,
+    select: (data) => data.map((website: any) => website.domain),
+  });
+
   const animationValue = useSharedValue(0);
   useEffect(() => {
     animationValue.value = withTiming(showFilter ? 1 : 0, { duration: 250 });
@@ -61,23 +75,20 @@ export default function Filter({
 
   const choicesList = useMemo(() => {
     if (outerChoice === 'Category') {
+      // this should be fetched from the backend depending on the categories the user has viewed
       return ['Hoodies', 'T-shirts', 'Suits'];
     } else if (outerChoice === 'Brand') {
+      // same as above
       return ['Soft Goat', 'Filippa K', 'Lululemon', "A Day's March"];
     } else if (outerChoice === 'Website') {
-      return [
-        'softgoat.com',
-        'zalando.se',
-        'adaysmarch.com',
-        'lululemon.com',
-        'farfetch.com',
-        'tomford.com',
-        'boozt.com',
-      ];
+      // same as above
+      return websites || [];
     }
 
     return [];
   }, [outerChoice]);
+
+  console.log('websites', websites);
 
   return (
     <>
@@ -126,7 +137,7 @@ export default function Filter({
         choicesList={choicesList}
         setChoice={setChoice}
         choice={choice}
-        sheetHeader="Filter by"
+        sheetHeader={outerChoice}
       />
     </>
   );

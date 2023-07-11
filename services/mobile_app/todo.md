@@ -1,13 +1,29 @@
+### thoughts
+
+What do with brand?
+
+1. strip whitespace
+2. make lowercase
+3. replace " " with "-"
+
+**image extraction**:
+so the plan is to first make a guess, and try to extract images.
+
+1. try getting from schema.org
+2. all images that's not nested in a link and in a certain size
+3. always allow the user to to click by themselves
+
 ### TODO rn
 
-- deep dive into useReducer
-- finish tabular data video
+- extract all images from page that are not link embed AND in same size
 
 ### TODO
 
 - Clean up demoware
 - Separate app into V1 and Demo (toggleable between)
 - do last things for V1, launch
+- deep dive into useReducer
+- finish tabular data video
 
 ### TODO far away
 
