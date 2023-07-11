@@ -8,12 +8,7 @@ import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { useMemo, useState } from 'react';
 import { domainToInfo } from '../utils/utils';
-import {
-  SearchBar,
-  FakeSearchBar,
-  FakeSearchBarBrowser,
-  FakeSearchBarShop,
-} from '../components/SearchBar';
+import { FakeSearchBarShop } from '../components/SearchBar';
 import { favoriteWebsite, fetchWebsites, unFavoriteWebsite } from '../api';
 
 type WebsiteItem = {
@@ -65,7 +60,7 @@ export default function Shop({ navigation }: { navigation: any }) {
               )}
             />
           </Box>
-          <Box>
+          <Box flex={1}>
             <WebsiteList
               navigation={navigation}
               selectedCategory={selectedCategory}
@@ -167,7 +162,6 @@ function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
       data={filteredSites}
       renderItem={({ item, index }) => (
         <Box
-          flex={1}
           flexDirection="row"
           alignItems="center"
           borderColor="grey"

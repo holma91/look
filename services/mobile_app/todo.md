@@ -1,5 +1,8 @@
 ### TODO rn
 
+- deep dive into useReducer
+- finish tabular data video
+
 ### TODO
 
 - Clean up demoware
