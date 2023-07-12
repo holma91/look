@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserBase, UserExtended, UserLiked, UserHistory, UserPurchased, ProductExtended, POSTResponse, LikeProduct, FavoriteWebsite, WebsiteBase, ProductImage
+from app.models.pydantic import UserBase, FavoriteCompany, UserExtended, UserLiked, UserHistory, UserPurchased, ProductExtended, POSTResponse, LikeProduct, FavoriteWebsite, WebsiteBase, ProductImage
 from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
@@ -58,6 +58,12 @@ async def read_user_favorites(user_id: str) -> list[Any]:
     sites = await crud.get_favorites(user_id)
     return sites
 
+### COMPANY INFO ###
+@router.get("/{user_id}/companies", response_model=list[Any])
+async def read_user_companies(user_id: str) -> list[Any]:
+    companies = await crud.get_companies(user_id)
+    return companies
+
 ### POST & DELETE REQUESTS ###
 
 ### PRODUCT INFO ###
@@ -106,18 +112,18 @@ async def add_product(user_id: str, website: WebsiteBase) -> POSTResponse:
     return SUCCESSFUL_POST_RESPONSE
     
 @router.post("/{user_id}/favorites", status_code=201, response_model=POSTResponse)
-async def add_favorite(user_id: str, website: FavoriteWebsite) -> POSTResponse:
-    product = await crud.add_favorite(user_id, website.domain)
+async def add_favorite(user_id: str, company: FavoriteCompany) -> POSTResponse:
+    product = await crud.add_favorite(user_id, company.id)
     if product is None:
-        raise HTTPException(status_code=404, detail="User or Website not found!")
+        raise HTTPException(status_code=404, detail="User or Company not found!")
 
     return SUCCESSFUL_POST_RESPONSE
 
 @router.delete("/{user_id}/favorites", status_code=204)
-async def delete_like(user_id: str, website: FavoriteWebsite):
-    result = await crud.un_favorite(user_id, website.domain)
+async def delete_like(user_id: str, company: FavoriteCompany):
+    result = await crud.un_favorite(user_id, company.id)
     if result is None:
-        raise HTTPException(status_code=404, detail="User or Website not found!")
+        raise HTTPException(status_code=404, detail="User or Company not found!")
 
 ### CLERK WEBHOOK ROUTES ###
 

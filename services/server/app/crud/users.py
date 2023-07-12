@@ -176,13 +176,29 @@ async def get_purchased(user_id: str) -> list:
     return products
 
 
-async def get_websites(user_id: str) -> list:
+async def get_companies(user_id: str) -> list:
     async with get_db_connection() as conn:
         query = """
-            select * from user_website uw where uw.user_id = $1;
+            select uc.company_id, favorited, domain from user_company uc
+            join website w on w.company_id = uc.company_id
+            where uc.user_id = $1;
         """
         sites = await conn.execute_query_dict(query, [user_id])
-    return sites
+
+    processed_data = {}
+    for site in sites:
+        company_id = site['company_id']
+
+        if company_id not in processed_data:
+            processed_data[company_id] = {
+                "id": site["company_id"],
+                "favorited": site["favorited"],
+                "domains": []
+            }
+
+        processed_data[company_id]["domains"].append(site["domain"])
+
+    return list(processed_data.values())
 
 async def get_favorites(user_id: str) -> list:
     async with get_db_connection() as conn:
@@ -213,47 +229,24 @@ async def un_like(user_id: str, product_url: str) -> Optional[str]:
 
     return product_url
 
-async def add_favorite(user_id: str, domain: str) -> Optional[str]:
+async def add_favorite(user_id: str, id: str) -> Optional[str]:
     async with get_db_connection() as conn:
         query = """
-        update user_website set favorited = TRUE where user_id = $1 and domain = $2;
+        update user_company set favorited = TRUE where user_id = $1 and company_id = $2;
         """
-        await conn.execute_query_dict(query, [user_id, domain])
+        await conn.execute_query_dict(query, [user_id, id])
 
-    return domain
+    return id
 
-async def un_favorite(user_id: str, domain: str) -> Optional[str]:
+async def un_favorite(user_id: str, id: str) -> Optional[str]:
     async with get_db_connection() as conn:
         query = """
-        update user_website set favorited = FALSE where user_id = $1 and domain = $2;
+        update user_company set favorited = FALSE where user_id = $1 and company_id = $2;
         """
 
-        await conn.execute_query_dict(query, [user_id, domain])
+        await conn.execute_query_dict(query, [user_id, id])
 
-    return domain
-
-
-# async def add_favorite(user_id: str, website_id: str) -> Optional[str]:
-#     async with get_db_connection() as conn:
-#         query = """
-#         insert into user_website (user_id, website_id)
-#         values ($1, $2);
-#         """
-#         await conn.execute_query_dict(query, [user_id, website_id])
-
-#     return website_id
-
-
-
-# async def un_favorite(user_id: str, website_id: str) -> Optional[str]:
-#     async with get_db_connection() as conn:
-#         query = """
-#         delete from user_website where user_id = $1 and website_id = $2;
-#         """
-
-#         await conn.execute_query_dict(query, [user_id, website_id])
-
-#     return website_id
+    return id
 
 
 ### CLERK WEBHOOK FUNCTIONS ###

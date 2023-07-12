@@ -9,147 +9,147 @@ type DomainProps = {
 // Predefined domains
 
 export const domainToInfo: { [key: string]: DomainProps } = {
-  'zalando.se': {
+  zalando: {
     name: 'Zalando',
     icon: require('../assets/logos/zalando.png'),
     multiBrand: true,
     secondHand: false,
     highEnd: false,
   },
-  'zara.com': {
+  zara: {
     name: 'Zara',
     icon: require('../assets/logos/zara.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: false,
   },
-  'asos.com': {
+  asos: {
     name: 'Asos',
     icon: require('../assets/logos/asos.png'),
     multiBrand: true,
     secondHand: false,
     highEnd: false,
   },
-  'hm.com': {
+  hm: {
     name: 'H&M',
     icon: require('../assets/logos/hm.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: false,
   },
-  'boozt.com': {
+  boozt: {
     name: 'Boozt',
     icon: require('../assets/logos/boozt.png'),
     multiBrand: true,
     secondHand: false,
     highEnd: false,
   },
-  'sellpy.se': {
+  sellpy: {
     name: 'Sellpy',
     icon: require('../assets/logos/sellpy.png'),
     multiBrand: true,
     secondHand: true,
     highEnd: false,
   },
-  'na-kd.com': {
+  'na-kd': {
     name: 'NA-KD',
     icon: require('../assets/logos/nakd.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: false,
   },
-  'softgoat.com': {
+  softgoat: {
     name: 'Softgoat',
     icon: require('../assets/logos/softgoat.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: false,
   },
-  'careofcarl.se': {
+  careofcarl: {
     name: 'Care of Carl',
     icon: require('../assets/logos/careofcarl.png'),
     multiBrand: true,
     secondHand: false,
     highEnd: false,
   },
-  'adaysmarch.com': {
+  adaysmarch: {
     name: "A Day's March",
     icon: require('../assets/logos/adaysmarch.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: false,
   },
-  'loropiana.com': {
+  loropiana: {
     name: 'Loro Piana',
     icon: require('../assets/logos/loropiana.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: true,
   },
-  'eu.lululemon.com': {
+  lululemon: {
     name: 'Lululemon',
     icon: require('../assets/logos/lululemon.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: false,
   },
-  'gucci.com': {
+  gucci: {
     name: 'Gucci',
     icon: require('../assets/logos/gucci.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: true,
   },
-  'moncler.com': {
+  moncler: {
     name: 'Moncler',
     icon: require('../assets/logos/moncler.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: true,
   },
-  'louisvuitton.com': {
+  louisvuitton: {
     name: 'Louis Vuitton',
     icon: require('../assets/logos/louisvuitton.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: true,
   },
-  'ysl.com': {
+  ysl: {
     name: 'Yves Saint Laurent',
     icon: require('../assets/logos/ysl.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: true,
   },
-  'farfetch.com': {
+  farfetch: {
     name: 'Farfetch',
     icon: require('../assets/logos/farfetch.png'),
     multiBrand: true,
     secondHand: false,
     highEnd: true,
   },
-  'hermes.com': {
+  hermes: {
     name: 'Hermès',
     icon: require('../assets/logos/hermes.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: true,
   },
-  'prada.com': {
+  prada: {
     name: 'Prada',
     icon: require('../assets/logos/prada.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: true,
   },
-  'valentino.com': {
+  valentino: {
     name: 'Valentino',
     icon: require('../assets/logos/valentino.png'),
     multiBrand: false,
     secondHand: false,
     highEnd: true,
   },
-  'mytheresa.com': {
+  mytheresa: {
     name: 'Mytheresa',
     icon: require('../assets/logos/mytheresa.png'),
     multiBrand: true,

@@ -19,7 +19,7 @@ import { Text } from '../styling/Text';
 import SheetModal from './SheetModal';
 import { useQuery } from '@tanstack/react-query';
 import { UserProduct } from '../utils/types';
-import { fetchLikes, fetchWebsites } from '../api';
+import { fetchCompanies, fetchLikes, fetchWebsites } from '../api';
 import { Website } from '../utils/types';
 
 const filters: { label: string }[] = [
@@ -49,11 +49,11 @@ export default function Filter({
   // todo: useReducer for all the state here
 
   const { user } = useUser();
-  const { data: websites } = useQuery<string[]>({
-    queryKey: ['websites', user?.id],
-    queryFn: () => fetchWebsites(user?.id as string),
+  const { data: companies } = useQuery<string[]>({
+    queryKey: ['companies', user?.id],
+    queryFn: () => fetchCompanies(user?.id as string),
     enabled: !!user?.id,
-    select: (data) => data.map((website: any) => website.domain),
+    select: (data) => data.map((company: any) => company.id),
   });
 
   const animationValue = useSharedValue(0);
@@ -82,13 +82,13 @@ export default function Filter({
       return ['Soft Goat', 'Filippa K', 'Lululemon', "A Day's March"];
     } else if (outerChoice === 'Website') {
       // same as above
-      return websites || [];
+      return companies || [];
     }
 
     return [];
   }, [outerChoice]);
 
-  console.log('websites', websites);
+  console.log('companies', companies);
 
   return (
     <>

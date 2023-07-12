@@ -9,10 +9,11 @@ import { Text } from '../styling/Text';
 import { useMemo, useState } from 'react';
 import { domainToInfo } from '../utils/utils';
 import { FakeSearchBarShop } from '../components/SearchBar';
-import { favoriteWebsite, fetchWebsites, unFavoriteWebsite } from '../api';
+import { favoriteCompany, fetchCompanies, unFavoriteCompany } from '../api';
 
-type WebsiteItem = {
-  domain: string;
+type CompanyItem = {
+  id: string;
+  domains: string[];
   favorited: boolean;
 };
 
@@ -61,7 +62,7 @@ export default function Shop({ navigation }: { navigation: any }) {
             />
           </Box>
           <Box flex={1}>
-            <WebsiteList
+            <CompanyList
               navigation={navigation}
               selectedCategory={selectedCategory}
             />
@@ -72,93 +73,93 @@ export default function Shop({ navigation }: { navigation: any }) {
   );
 }
 
-type WebsiteListProps = {
+type CompanyListProps = {
   navigation: any;
   selectedCategory: string;
 };
 
-function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
+function CompanyList({ navigation, selectedCategory }: CompanyListProps) {
   const [renderToggle, setRenderToggle] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useUser();
 
-  const { status, data: websites } = useQuery({
-    queryKey: ['websites', user?.id],
-    queryFn: () => fetchWebsites(user?.id as string),
+  const { status, data: companies } = useQuery({
+    queryKey: ['companies', user?.id],
+    queryFn: () => fetchCompanies(user?.id as string),
     enabled: !!user?.id,
     onSuccess: () => {},
   });
 
   const mutation = useMutation({
-    mutationFn: async (website: WebsiteItem) => {
+    mutationFn: async (company: CompanyItem) => {
       if (!user?.id) return;
 
-      if (!website.favorited) {
-        return unFavoriteWebsite(user.id, website.domain);
+      if (!company.favorited) {
+        return unFavoriteCompany(user.id, company.id);
       } else {
-        return favoriteWebsite(user.id, website.domain);
+        return favoriteCompany(user.id, company.id);
       }
     },
-    onMutate: async (website: WebsiteItem) => {
-      website.favorited = !website.favorited;
+    onMutate: async (company: CompanyItem) => {
+      company.favorited = !company.favorited;
 
-      await queryClient.cancelQueries({ queryKey: ['websites', user?.id] });
+      await queryClient.cancelQueries({ queryKey: ['companies', user?.id] });
 
-      const previousWebsite = queryClient.getQueryData([
-        'websites',
-        website.domain,
+      const previousCompany = queryClient.getQueryData([
+        'companies',
+        company.id,
       ]);
 
-      queryClient.setQueryData(['websites', website.domain], website);
+      queryClient.setQueryData(['companies', company.id], company);
 
-      return { previousWebsite, website };
+      return { previousCompany, company };
     },
-    onError: (err, website, context) => {
-      console.log('mutation error', err, website, context);
+    onError: (err, company, context) => {
+      console.log('mutation error', err, company, context);
       queryClient.setQueryData(
-        ['websites', context?.website.domain],
-        context?.previousWebsite
+        ['companies', context?.company.id],
+        context?.previousCompany
       );
     },
     onSettled: async () => {
       setRenderToggle(!renderToggle);
 
-      queryClient.invalidateQueries({ queryKey: ['websites', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['companies', user?.id] });
     },
   });
 
   const filteredSites = useMemo(() => {
     let filtered;
     if (selectedCategory === 'Favorites') {
-      filtered = websites.filter((site: WebsiteItem) => site.favorited);
+      filtered = companies.filter((company: CompanyItem) => company.favorited);
     } else if (selectedCategory === 'Multi-brand') {
-      filtered = websites.filter(
-        (site: WebsiteItem) => domainToInfo[site.domain].multiBrand
+      filtered = companies.filter(
+        (company: CompanyItem) => domainToInfo[company.id].multiBrand
       );
     } else if (selectedCategory === 'High-end') {
-      filtered = websites.filter(
-        (site: WebsiteItem) => domainToInfo[site.domain].highEnd
+      filtered = companies.filter(
+        (company: CompanyItem) => domainToInfo[company.id].highEnd
       );
     } else if (selectedCategory === 'Second-hand') {
-      filtered = websites.filter(
-        (site: WebsiteItem) => domainToInfo[site.domain].secondHand
+      filtered = companies.filter(
+        (company: CompanyItem) => domainToInfo[company.id].secondHand
       );
     } else {
-      filtered = websites;
+      filtered = companies;
     }
     return filtered;
-  }, [selectedCategory, websites, renderToggle]);
+  }, [selectedCategory, companies, renderToggle]);
 
   if (status === 'loading') {
     return <Text>Loading...</Text>;
   }
 
   if (status === 'error') {
-    return <Text>Error when getting websites</Text>;
+    return <Text>Error when getting companies</Text>;
   }
 
   return (
-    <FlatList<WebsiteItem>
+    <FlatList<CompanyItem>
       data={filteredSites}
       renderItem={({ item, index }) => (
         <Box
@@ -169,7 +170,9 @@ function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
           paddingVertical="s"
         >
           <TouchableOpacity
-            onPress={() => navigation.navigate('Browser', { url: item.domain })}
+            onPress={() =>
+              navigation.navigate('Browser', { url: item.domains[0] })
+            }
             style={{ flex: 1 }}
           >
             <Box flexDirection="row" alignItems="center" gap="l" flex={1}>
@@ -180,14 +183,14 @@ function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
                   height: 40,
                   width: 40,
                 }}
-                source={domainToInfo[item.domain].icon}
+                source={domainToInfo[item.id].icon}
                 contentFit="contain"
               />
               <Box gap="s">
                 <Text variant="body" fontWeight={'bold'}>
-                  {domainToInfo[item.domain].name}
+                  {domainToInfo[item.id].name}
                 </Text>
-                <Text variant="body">{item.domain}</Text>
+                <Text variant="body">{item.domains[0]}</Text>
               </Box>
             </Box>
           </TouchableOpacity>
@@ -202,7 +205,7 @@ function WebsiteList({ navigation, selectedCategory }: WebsiteListProps) {
           />
         </Box>
       )}
-      keyExtractor={(site) => site.domain}
+      keyExtractor={(company) => company.id}
     />
   );
 }

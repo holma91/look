@@ -15,7 +15,9 @@ so the plan is to first make a guess, and try to extract images.
 
 ### TODO rn
 
-- extract all images from page that are not link embed AND in same size
+- new db schema
+- restart everything
+- fix routes
 
 ### TODO
 

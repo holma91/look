@@ -13,6 +13,18 @@ export const fetchWebsites = async (id: string) => {
   return response.json();
 };
 
+export const fetchCompanies = async (id: string) => {
+  const completeUrl = `${URL}/users/${id}/companies`;
+  const response = await fetch(completeUrl);
+
+  if (!response.ok) {
+    throw new Error(
+      `Network response was not ok. Status code: ${response.status}`
+    );
+  }
+  return response.json();
+};
+
 export const fetchFavorites = async (id: string) => {
   const completeUrl = `${URL}/users/${id}/favorites`;
   const response = await fetch(completeUrl);
@@ -25,24 +37,24 @@ export const fetchFavorites = async (id: string) => {
   return response.json();
 };
 
-export const favoriteWebsite = async (userId: string, domain: string) => {
+export const favoriteCompany = async (userId: string, company: string) => {
   const response = await fetch(`${URL}/users/${userId}/favorites`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ domain: domain }),
+    body: JSON.stringify({ id: company }),
   });
   return response;
 };
 
-export const unFavoriteWebsite = async (userId: string, domain: string) => {
+export const unFavoriteCompany = async (userId: string, company: string) => {
   const response = await fetch(`${URL}/users/${userId}/favorites`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ domain: domain }),
+    body: JSON.stringify({ id: company }),
   });
   return response;
 };

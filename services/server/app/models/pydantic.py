@@ -25,6 +25,9 @@ class ProductBase(BaseModel):
 class WebsiteBase(BaseModel):
     domain: str
 
+class CompanyBase(BaseModel):
+    id: str
+
 ### REQUEST MODELS ###
 
 class LikeProduct(BaseModel):
@@ -32,6 +35,9 @@ class LikeProduct(BaseModel):
 
 class FavoriteWebsite(BaseModel):
     domain: str
+
+class FavoriteCompany(BaseModel):
+    id: str
 
 class ProductImage(BaseModel):
     product_url: str

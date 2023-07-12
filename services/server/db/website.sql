@@ -1,15 +1,21 @@
 CREATE TABLE IF NOT EXISTS "user" (
     "id" TEXT NOT NULL PRIMARY KEY
 );
+
+CREATE TABLE IF NOT EXISTS "company" (
+    "id" TEXT NOT NULL PRIMARY KEY
+);
+
 CREATE TABLE IF NOT EXISTS "website" (
+    "company_id" TEXT NOT NULL REFERENCES "company" ("id") ON DELETE CASCADE,
     "domain" TEXT NOT NULL PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS "user_website" (
+CREATE TABLE IF NOT EXISTS "user_company" (
     "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
-    "domain" TEXT NOT NULL REFERENCES "website" ("domain") ON DELETE CASCADE,
+    "company_id" TEXT NOT NULL REFERENCES "company" ("id") ON DELETE CASCADE,
     "favorited" BOOL NOT NULL DEFAULT FALSE,
-    UNIQUE(user_id, domain)
+    UNIQUE(user_id, company_id)
 );
 
 CREATE TABLE IF NOT EXISTS "product" (
@@ -37,54 +43,82 @@ CREATE TABLE IF NOT EXISTS "user_product" (
 
 insert into "user" (id) values ('user_2RYsQv4W7NG9YYHaOId6Tq599SV');
 
--- all preconfigured websites
-INSERT INTO Website (domain)
+INSERT INTO company (id)
 VALUES
-    ('zara.com'),
-    ('zalando.se'),
-    ('boozt.com'),
-    ('hm.com'),
-    ('asos.com'),
-    ('softgoat.com'),
-    ('adaysmarch.com'),
-    ('sellpy.se'),
-    ('na-kd.com'),
-    ('careofcarl.se'),
-    ('loropiana.com'),
-    ('eu.lululemon.com'),
-    ('gucci.com'),
-    ('moncler.com'),
-    ('ysl.com'),
-    ('louisvuitton.com'),
-    ('farfetch.com'),
-    ('hermes.com'),
-    ('prada.com'),
-    ('valentino.com'),
-    ('mytheresa.com');
+    ('zara'),
+    ('zalando'),
+    ('boozt'),
+    ('hm'),
+    ('asos'),
+    ('softgoat'),
+    ('adaysmarch'),
+    ('sellpy'),
+    ('na-kd'),
+    ('careofcarl'),
+    ('loropiana'),
+    ('lululemon'),
+    ('gucci' ),
+    ('moncler' ),
+    ('ysl' ),
+    ('louisvuitton' ),
+    ('farfetch' ),
+    ('hermes' ),
+    ('prada' ),
+    ('valentino' ),
+    ('mytheresa' );
 
-INSERT INTO user_website (user_id, domain, favorited)
+INSERT INTO website (company_id, domain)
 VALUES
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'zara.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'zalando.se', TRUE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'boozt.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'hm.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'asos.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'softgoat.com', TRUE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'adaysmarch.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'sellpy.se', TRUE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'na-kd.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'careofcarl.se', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'loropiana.com', TRUE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'eu.lululemon.com', TRUE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'moncler.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'gucci.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'ysl.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'louisvuitton.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','farfetch.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','hermes.com', TRUE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','prada.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','valentino.com', FALSE),
-    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','mytheresa.com', FALSE);
+    ('zara', 'zara.com'),
+    ('zalando', 'zalando.se'),
+    ('zalando', 'zalando.com'),
+    ('boozt', 'boozt.com'),
+    ('hm', 'hm.com'),
+    ('asos', 'asos.com'),
+    ('softgoat', 'softgoat.com'),
+    ('adaysmarch', 'adaysmarch.com'),
+    ('sellpy', 'sellpy.se'),
+    ('sellpy', 'sellpy.com'),
+    ('na-kd', 'na-kd.com'),
+    ('careofcarl', 'careofcarl.se'),
+    ('careofcarl', 'careofcarl.com'),
+    ('loropiana', 'se.loropiana.com'),
+    ('loropiana', 'us.loropiana.com'),
+    ('lululemon', 'shop.lululemon.com'),
+    ('lululemon', 'eu.lululemon.com'),
+    ('gucci', 'gucci.com'),
+    ('moncler', 'moncler.com'),
+    ('ysl', 'ysl.com'),
+    ('louisvuitton', 'louisvuitton.com'),
+    ('farfetch', 'farfetch.com'),
+    ('hermes', 'hermes.com'),
+    ('prada', 'prada.com'),
+    ('valentino', 'valentino.com'),
+    ('mytheresa', 'mytheresa.com');
+
+INSERT INTO user_company (user_id, company_id, favorited)
+VALUES
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'zara', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'zalando', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'boozt', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'hm', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'asos', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'softgoat', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'adaysmarch', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'sellpy', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'na-kd', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'careofcarl', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'loropiana', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'lululemon', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'moncler', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'gucci', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'ysl', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'louisvuitton', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','farfetch', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','hermes', TRUE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','prada', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','valentino', FALSE),
+    ('user_2RYsQv4W7NG9YYHaOId6Tq599SV','mytheresa', FALSE);
 
 
 INSERT INTO product (url, domain, brand, name, price, currency)
