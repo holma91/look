@@ -13,11 +13,16 @@ so the plan is to first make a guess, and try to extract images.
 2. all images that's not nested in a link and in a certain size
 3. always allow the user to to click by themselves
 
+injection & extraction process:
+
+1. handleLoadend injects
+2. handleMessage receives
+
+- updates sheet AND sends product to server
+
 ### TODO rn
 
-- new db schema
-- restart everything
-- fix routes
+- fix injection and extraction on all given sites
 
 ### TODO
 

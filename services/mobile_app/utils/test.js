@@ -54,3 +54,39 @@ function filterImagesBySize(images, minWidth, minHeight) {
 let [allImages, imagesWithoutLink, imagesFiltered] = getProductImages();
 
 console.log(allImages.length, imagesWithoutLink.length, imagesFiltered.length);
+
+function sendProductData() {
+  var elements = document.querySelectorAll(
+    'script[type="application/ld+json"]'
+  );
+
+  for (let i = 0; i < elements.length; i++) {
+    var parsed = JSON.parse(elements[i].textContent);
+    if (Array.isArray(parsed)) {
+      // for zara
+      for (let j = 0; j < parsed.length; j++) {
+        if (parsed[j]['@type'] === 'Product') {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: 'product', data: JSON.stringify(parsed[j]) })
+          );
+          return;
+        }
+      }
+    } else {
+      if (parsed['@type'] === 'Product') {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({ type: 'product', data: elements[i].textContent })
+        );
+        return;
+      }
+    }
+  }
+}
+
+try {
+  setInterval(() => {
+    sendProductData();
+  }, 1000);
+} catch (e) {
+  alert(e);
+}

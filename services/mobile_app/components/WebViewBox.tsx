@@ -26,19 +26,23 @@ export function WebViewBox({
   const { user } = useUser();
 
   const handleMessage = async (event: any) => {
-    console.log('got da message:', event.nativeEvent.data);
+    console.log('got da message');
     if (!user?.id) return;
 
     const productUrl = event.nativeEvent.url;
 
     // message type 1: product data
     const parsedData = JSON.parse(event.nativeEvent.data);
+    // console.log('parsedData:', parsedData);
+
     if (parsedData.type === 'product') {
       const product: Product = parseProduct(
         domain,
         productUrl,
         JSON.parse(parsedData.data)
       );
+
+      console.log('product:', product);
 
       setCurrentProduct(product);
       if (product.images.length > 0) {
@@ -48,7 +52,7 @@ export function WebViewBox({
       }
 
       try {
-        console.log('product:', product);
+        // console.log('product:', product);
         console.log('domain:', domain);
 
         await createProduct(user?.id, product, domain);

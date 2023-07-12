@@ -95,8 +95,6 @@ export default function Filter({
     return [];
   }, [outerChoice]);
 
-  console.log('companies', companies);
-
   return (
     <>
       <Animated.View style={[{ paddingBottom: 8 }, animatedStyles]}>

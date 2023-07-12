@@ -44,14 +44,33 @@ async def get(id: str) -> dict:
 
 async def add_product(user_id: str, product: ProductExtended) -> bool:
     # Adding a product from a user's perspective
-    # 1. add the actual product if it doesn't exist and it's images
-    result = await product_crud.add(product)
-    if not result:
-        return False
-    
 
-    # 3. add the user_product relationship
     async with get_db_connection() as conn:
+        # 1. add the actual product if it doesn't exist and it's images
+        check_query = """select * from product where url = $1;"""
+        check_result = await conn.execute_query_dict(check_query, [product.url])
+        if check_result:
+            return True
+        
+        # Insert product
+
+        query = """
+        insert into product (url, domain, brand, name, price, currency)
+        values ($1, $2, $3, $4, $5, $6) returning *;
+        """
+        result = await conn.execute_query_dict(query, [
+            product.url, product.domain, product.brand, product.name, product.price, product.currency
+        ])
+
+        # Insert images
+        query = """
+        insert into product_image (product_url, image_url)
+        values ($1, $2) returning *;
+        """
+        for image in product.images:
+            await conn.execute_query_dict(query, [product.url, image])
+    
+        # 3. add the user_product relationship
         check_query = """select * from user_product where user_id = $1 and product_url = $2;"""
         check_result = await conn.execute_query_dict(check_query, [user_id, product.url])
         if check_result:

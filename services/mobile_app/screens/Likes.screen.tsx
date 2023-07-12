@@ -81,9 +81,6 @@ export default function Likes({ navigation }: { navigation: any }) {
     return list;
   }, [view, likes, history, purchases, outerChoice, choice]);
 
-  console.log('outerChoice', outerChoice);
-  console.log('choice', choice);
-
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>

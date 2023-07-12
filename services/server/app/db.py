@@ -38,7 +38,8 @@ async def get_db_connection():
     try:
         yield conn
     finally:
-        await conn.close()
+        pass
+        # await conn.close()
 
 
 async def generate_schema() -> None:

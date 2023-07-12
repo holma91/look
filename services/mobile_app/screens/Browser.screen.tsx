@@ -32,7 +32,11 @@ import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Button } from '../components/NewButton';
-import { baseExtractScript, baseInteractScript } from '../utils/scripts';
+import {
+  baseExtractScript,
+  baseInteractScript,
+  newBaseExtractScript,
+} from '../utils/scripts';
 import { fetchHistory, likeProduct, unlikeProduct } from '../api';
 import { Product, UserProduct } from '../utils/types';
 import {
@@ -121,16 +125,22 @@ export default function Browser({
     console.log('handleLoadEnd:', navState.nativeEvent);
     if (!webviewRef.current) return;
 
-    webviewRef.current.injectJavaScript(baseExtractScript);
-    const slowSites = ['sellpy.se', 'softgoat.com', 'hm.com', 'zara.com'];
-    if (slowSites.includes(domain)) {
-      setTimeout(() => {
-        if (webviewRef.current) {
-          webviewRef.current.injectJavaScript(baseExtractScript);
-          webviewRef.current.injectJavaScript(baseInteractScript);
-        }
-      }, 500);
-    }
+    webviewRef.current.injectJavaScript(newBaseExtractScript);
+    // const slowSites = [
+    //   'shop.lululemon.com',
+    //   'sellpy.se',
+    //   'softgoat.com',
+    //   'hm.com',
+    //   'zara.com',
+    // ];
+    // if (slowSites.includes(domain)) {
+    //   setTimeout(() => {
+    //     if (webviewRef.current) {
+    //       webviewRef.current.injectJavaScript(baseExtractScript);
+    //       webviewRef.current.injectJavaScript(baseInteractScript);
+    //     }
+    //   }, 500);
+    // }
   };
 
   const { data: products, refetch: refetchProducts } = useQuery({
@@ -360,7 +370,7 @@ const BottomSheet = ({
     }
   }, []);
 
-  console.log('currentProduct', currentProduct);
+  // console.log('currentProduct', currentProduct);
 
   const handleTestOnModel = async () => {
     // change current image progressively
