@@ -64,6 +64,13 @@ async def read_user_companies(user_id: str) -> list[Any]:
     companies = await crud.get_companies(user_id)
     return companies
 
+
+### BRAND INFO ###
+@router.get("/{user_id}/brands", response_model=list[Any])
+async def read_user_brands(user_id: str) -> list[Any]:
+    brands = await crud.get_brands(user_id)
+    return brands
+
 ### POST & DELETE REQUESTS ###
 
 ### PRODUCT INFO ###

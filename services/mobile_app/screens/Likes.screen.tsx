@@ -74,6 +74,10 @@ export default function Likes({ navigation }: { navigation: any }) {
       list = list.filter((product: UserProduct) => product.domain === choice);
     }
 
+    if (outerChoice === 'Brand' && choice !== '') {
+      list = list.filter((product: UserProduct) => product.brand === choice);
+    }
+
     return list;
   }, [view, likes, history, purchases, outerChoice, choice]);
 

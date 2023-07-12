@@ -123,10 +123,10 @@ VALUES
 
 INSERT INTO product (url, domain, brand, name, price, currency)
 VALUES 
-('https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey', 'softgoat.com', 'Soft Goat', 'MEN''S FINE KNIT T-SHIRT', 1695.00, 'SEK'),
-('https://softgoat.com/p/mens-fine-knit-t-shirt-white', 'softgoat.com', 'Soft Goat', 'MEN''S FINE KNIT T-SHIRT', 1695.00, 'SEK'),
-('https://softgoat.com/p/mens-waffle-knit-sea-foam', 'softgoat.com', 'Soft Goat', 'MEN''S WAFFLE KNIT', 2027.00, 'SEK'),
-('https://softgoat.com/p/mens-collar-navy', 'softgoat.com', 'Soft Goat', 'MEN''S COLLAR', 2027.00, 'SEK');
+('https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey', 'softgoat.com', 'Soft Goat Men', 'Men''s Fine Knit T-shirt', 1695.00, 'SEK'),
+('https://softgoat.com/p/mens-fine-knit-t-shirt-white', 'softgoat.com', 'Soft Goat Men', 'Men''s Fine Knit T-shirt', 1695.00, 'SEK'),
+('https://softgoat.com/p/mens-waffle-knit-sea-foam', 'softgoat.com', 'Soft Goat Men', 'Men''s Waffle Knit', 2027.00, 'SEK'),
+('https://softgoat.com/p/mens-collar-navy', 'softgoat.com', 'Soft Goat Men', 'Men''s Collar', 2027.00, 'SEK');
 
 INSERT INTO product_image (product_url, image_url)
 VALUES

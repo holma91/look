@@ -175,7 +175,6 @@ async def get_purchased(user_id: str) -> list:
 
     return products
 
-
 async def get_companies(user_id: str) -> list:
     async with get_db_connection() as conn:
         query = """
@@ -199,6 +198,17 @@ async def get_companies(user_id: str) -> list:
         processed_data[company_id]["domains"].append(site["domain"])
 
     return list(processed_data.values())
+
+async def get_brands(user_id: str) -> list:
+    async with get_db_connection() as conn:
+        query = """
+            SELECT DISTINCT brand FROM product 
+            join user_product up on up.product_url = product.url where up.user_id = $1;
+        """
+        brands = await conn.execute_query_dict(query, [user_id])
+    
+    return brands
+
 
 async def get_favorites(user_id: str) -> list:
     async with get_db_connection() as conn:

@@ -24,6 +24,17 @@ export const fetchCompanies = async (id: string) => {
   }
   return response.json();
 };
+export const fetchBrands = async (id: string) => {
+  const completeUrl = `${URL}/users/${id}/brands`;
+  const response = await fetch(completeUrl);
+
+  if (!response.ok) {
+    throw new Error(
+      `Network response was not ok. Status code: ${response.status}`
+    );
+  }
+  return response.json();
+};
 
 export const fetchFavorites = async (id: string) => {
   const completeUrl = `${URL}/users/${id}/favorites`;
@@ -110,6 +121,7 @@ export const createProduct = async (
   product: Product,
   domain: string
 ) => {
+  // fix the brand name here
   const backendProduct = {
     ...product,
     domain: domain,

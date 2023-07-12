@@ -19,7 +19,7 @@ import { Text } from '../styling/Text';
 import SheetModal from './SheetModal';
 import { useQuery } from '@tanstack/react-query';
 import { UserProduct } from '../utils/types';
-import { fetchCompanies, fetchLikes, fetchWebsites } from '../api';
+import { fetchBrands, fetchCompanies, fetchLikes, fetchWebsites } from '../api';
 import { Website } from '../utils/types';
 
 const filters: { label: string }[] = [
@@ -56,6 +56,13 @@ export default function Filter({
     select: (data) => data.map((company: any) => company.id),
   });
 
+  const { data: brands } = useQuery<string[]>({
+    queryKey: ['brands', user?.id],
+    queryFn: () => fetchBrands(user?.id as string),
+    enabled: !!user?.id,
+    select: (data) => data.map((brand: any) => brand.brand),
+  });
+
   const animationValue = useSharedValue(0);
   useEffect(() => {
     animationValue.value = withTiming(showFilter ? 1 : 0, { duration: 250 });
@@ -79,7 +86,7 @@ export default function Filter({
       return ['Hoodies', 'T-shirts', 'Suits'];
     } else if (outerChoice === 'Brand') {
       // same as above
-      return ['Soft Goat', 'Filippa K', 'Lululemon', "A Day's March"];
+      return brands || [];
     } else if (outerChoice === 'Website') {
       // same as above
       return companies || [];
