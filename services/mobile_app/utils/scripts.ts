@@ -1,6 +1,9 @@
 export const newBaseExtractScript2 = `
   if (typeof lastProductInfo === 'undefined') {
     var lastProductInfo = { url: '', images: [] };
+    window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'init', data: 'just initialized lastProductInfo'}));
+  } else {
+    window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'not init', data: 'did not just initialize lastProductInfo'}));
   }
 
   function sendProductData() {
@@ -59,9 +62,9 @@ export const newBaseExtractScript = `
 
   try {
     sendProductData();
-    setInterval(() => {
+    setTimeout(() => {
       sendProductData();
-    }, 1000);
+    }, 5000);
   } catch (e) {
     alert(e);
   }

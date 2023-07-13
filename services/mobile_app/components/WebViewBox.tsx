@@ -3,6 +3,7 @@ import { useUser } from '@clerk/clerk-expo';
 import { parseImageSrc, parseProduct } from '../utils/parsing';
 import { Product } from '../utils/types';
 import { addProductImages, createProduct } from '../api';
+import { useQueryClient } from '@tanstack/react-query';
 
 type WebViewBoxProps = {
   webviewRef: any;
@@ -24,6 +25,7 @@ export function WebViewBox({
   refetchProducts,
 }: WebViewBoxProps) {
   const { user } = useUser();
+  const queryClient = useQueryClient();
 
   const handleMessage = async (event: any) => {
     console.log('got da message');
@@ -43,9 +45,6 @@ export function WebViewBox({
         JSON.parse(parsedData.data)
       );
 
-      console.log('url from here:', productUrl);
-      console.log('url from the inside:', url);
-
       console.log('product:', product);
 
       setCurrentProduct(product);
@@ -60,7 +59,10 @@ export function WebViewBox({
         console.log('domain:', domain);
 
         await createProduct(user?.id, product, domain);
-        refetchProducts();
+        // refetchProducts();
+        // queryClient.invalidateQueries(['brands', user?.id]);
+        queryClient.invalidateQueries({ queryKey: ['brands', user?.id] }); // no idea why it's not working
+        queryClient.invalidateQueries({ queryKey: ['history', user?.id] });
       } catch (error) {
         console.error(error);
       }

@@ -6,7 +6,7 @@ export function parseProduct(
   productData: any
 ): Product {
   let product: Product = {
-    url: product_url,
+    url: product_url, // alternatively, use the URL from the productData?
     name: '',
     brand: '',
     price: '',
@@ -16,8 +16,6 @@ export function parseProduct(
 
   // console.log('productData', productData);
   console.log('domain', domain);
-
-  // plug in ML model here in future, go from productData to product
 
   try {
     if (domain === 'zalando.se') {
@@ -41,18 +39,18 @@ export function parseProduct(
       product['price'] = productData['offers'][0]['price'];
       product['currency'] = productData['offers'][0]['priceCurrency'];
       product['images'] = ['https://' + productData['image'].slice(2)];
-    } else if (domain === 'sellpy.se') {
-      product['name'] = productData['name'];
-      product['brand'] = productData['brand'] || '?';
-      product['price'] = productData['offers']['price'];
-      product['currency'] = productData['offers']['priceCurrency'];
-      product['images'] = [productData['image']];
     } else if (domain === 'softgoat.com') {
       product['name'] = productData['name'];
       product['brand'] = productData['brand']['name'];
       product['price'] = productData['offers']['price'].replace(/\s/g, '');
       product['currency'] = productData['offers']['priceCurrency'];
       product['images'] = [];
+    } else if (domain === 'sellpy.se') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand'] || '?';
+      product['price'] = productData['offers']['price'];
+      product['currency'] = productData['offers']['priceCurrency'];
+      product['images'] = [productData['image']];
     } else if (domain === 'zara.com') {
       product['name'] = productData['name'];
       product['brand'] = productData['brand'];

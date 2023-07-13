@@ -37,6 +37,7 @@ type FilterProps = {
   choice: string;
   setChoice: React.Dispatch<React.SetStateAction<string>>;
   showFilter: boolean;
+  brands: string[];
 };
 
 export default function Filter({
@@ -45,6 +46,7 @@ export default function Filter({
   choice,
   setChoice,
   showFilter,
+  brands,
 }: FilterProps) {
   // todo: useReducer for all the state here
 
@@ -54,13 +56,6 @@ export default function Filter({
     queryFn: () => fetchCompanies(user?.id as string),
     enabled: !!user?.id,
     select: (data) => data.map((company: any) => company.id),
-  });
-
-  const { data: brands } = useQuery<string[]>({
-    queryKey: ['brands', user?.id],
-    queryFn: () => fetchBrands(user?.id as string),
-    enabled: !!user?.id,
-    select: (data) => data.map((brand: any) => brand.brand),
   });
 
   const animationValue = useSharedValue(0);

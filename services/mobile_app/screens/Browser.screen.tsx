@@ -123,10 +123,10 @@ export default function Browser({
   };
 
   const handleLoadEnd = (navState: any) => {
-    console.log('handleLoadEnd:', navState.nativeEvent);
+    // console.log('handleLoadEnd:', navState.nativeEvent);
     if (!webviewRef.current) return;
 
-    webviewRef.current.injectJavaScript(newBaseExtractScript);
+    webviewRef.current.injectJavaScript(newBaseExtractScript2);
     // const slowSites = [
     //   'shop.lululemon.com',
     //   'sellpy.se',
