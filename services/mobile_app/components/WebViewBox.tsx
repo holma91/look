@@ -33,6 +33,7 @@ export function WebViewBox({
 
     // message type 1: product data
     const parsedData = JSON.parse(event.nativeEvent.data);
+    const url = event.nativeEvent.url;
     // console.log('parsedData:', parsedData);
 
     if (parsedData.type === 'product') {
@@ -41,6 +42,9 @@ export function WebViewBox({
         productUrl,
         JSON.parse(parsedData.data)
       );
+
+      console.log('url from here:', productUrl);
+      console.log('url from the inside:', url);
 
       console.log('product:', product);
 
@@ -74,7 +78,7 @@ export function WebViewBox({
         console.error(error);
       }
     } else {
-      console.log('unknown message type:', parsedData.data);
+      console.log('unknown message type:', parsedData.type, parsedData.data);
     }
   };
 

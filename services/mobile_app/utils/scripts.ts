@@ -1,3 +1,36 @@
+export const newBaseExtractScript2 = `
+  if (typeof lastProductInfo === 'undefined') {
+    var lastProductInfo = { url: '', images: [] };
+  }
+
+  function sendProductData() {
+    var elements = document.querySelectorAll(
+      'script[type="application/ld+json"]'
+    );
+
+    for (let i = 0; i < elements.length; i++) {
+      var parsed = JSON.parse(elements[i].textContent);
+      if (parsed['@type'] === 'Product') {
+        if (window.location.href !== lastProductInfo.url && parsed.image[0] !== lastProductInfo.images[0]) {
+          lastProductInfo.url = window.location.href;
+          lastProductInfo.images = parsed.image;
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: elements[i].textContent, url: window.location.href }));
+          return;
+        }
+      }
+    }
+  }
+
+  try {
+    sendProductData();
+    setInterval(() => {
+      sendProductData();
+    }, 1000);
+  } catch (e) {
+    alert(e);
+  }
+`;
+
 export const newBaseExtractScript = `
   function sendProductData() {
     var elements = document.querySelectorAll(
@@ -10,13 +43,14 @@ export const newBaseExtractScript = `
         // for zara
         for (let j = 0; j < parsed.length; j++) {
           if (parsed[j]['@type'] === 'Product') {
-            window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: JSON.stringify(parsed[j]) }));
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: JSON.stringify(parsed[j]), url: window.location.href  }));
             return;
           }
         }
       } else {
         if (parsed['@type'] === 'Product') {
-          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: elements[i].textContent }));
+          // elements[i] should be cached here
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: elements[i].textContent, url: window.location.href  }));
           return;
         }
       }
@@ -24,9 +58,10 @@ export const newBaseExtractScript = `
   }
 
   try {
+    sendProductData();
     setInterval(() => {
       sendProductData();
-    }, 5000);
+    }, 1000);
   } catch (e) {
     alert(e);
   }
@@ -61,30 +96,26 @@ export const baseExtractScript = `
 `;
 
 const copyPasteScript = `
-try {
+if (typeof lastProductInfo === 'undefined') {
+  var lastProductInfo = { url: '', images: [] };
+}
+
+function sendProductData() {
   var elements = document.querySelectorAll(
     'script[type="application/ld+json"]'
   );
 
   for (let i = 0; i < elements.length; i++) {
-    parsed = JSON.parse(elements[i].textContent);
-    console.log(parsed);
-    if (Array.isArray(parsed)) {
-      for (let j = 0; j < parsed.length; j++) {
-        if (parsed[j]['@type'] === 'Product') {
-          console.log(JSON.stringify({ type: 'product', data: JSON.stringify(parsed[j]) }));
-          break;
-        }
-      }
-    } else {
-      if (parsed['@type'] === 'Product') {
-        console.log(JSON.stringify({ type: 'product', data: elements[i].textContent }));
-        break;
+    var parsed = JSON.parse(elements[i].textContent);
+    if (parsed['@type'] === 'Product') {
+      if (window.location.href !== lastProductInfo.url && parsed.image[0] !== lastProductInfo.images[0]) {
+        lastProductInfo.url = window.location.href;
+        lastProductInfo.images = parsed.image;
+        console.log(JSON.stringify({ type: 'product', data: elements[i].textContent, url: window.location.href }));
+        return;
       }
     }
   }
-} catch (e) {
-  alert(e);
 }
 `;
 

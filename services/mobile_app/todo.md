@@ -15,10 +15,28 @@ so the plan is to first make a guess, and try to extract images.
 
 injection & extraction process:
 
-1. handleLoadend injects
-2. handleMessage receives
+1. handleLoadend
+2. handleMessage
 
-- updates sheet AND sends product to server
+- receives product data
+- parses it with parseProduct
+- updates sheet AND sends structured product to server
+
+As long as handleLoadEnd is called for every new product, this is fine.
+
+the questions is, should the baseExtractScript include include an interval, and get called every x ms?
+
+Yes, this was a very good idea. Next up, create a caching layer in the webview, that checks diffs between page loads. Like, if it's a new url, the images can't be the same.
+
+at time x:
+url = a, image = b
+
+at time y:
+if url is different, then image HAVE to be different.
+
+so, we store that last url and last image in the browser storage.
+
+fix cache!
 
 ### TODO rn
 

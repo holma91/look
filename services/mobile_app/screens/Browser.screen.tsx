@@ -36,6 +36,7 @@ import {
   baseExtractScript,
   baseInteractScript,
   newBaseExtractScript,
+  newBaseExtractScript2,
 } from '../utils/scripts';
 import { fetchHistory, likeProduct, unlikeProduct } from '../api';
 import { Product, UserProduct } from '../utils/types';
