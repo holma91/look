@@ -72,7 +72,7 @@ function EmailSignUp() {
           </button>
         </form>
       ) : (
-        <p className="text-black">You're on the waitlist!</p>
+        <p className="text-black">You&apos;re on the waitlist!</p>
       )}
     </div>
   );
