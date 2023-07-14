@@ -92,7 +92,7 @@ export default function Create({ navigation }: { navigation: any }) {
     setIsInitializing(true);
     setTimeout(() => {
       setIsTraining(true);
-      setRemainingTime(1); // start countdown from 20 minutes
+      setRemainingTime(30); // start countdown from 20 minutes
       navigation.replace('Creating');
       setIsInitializing(false);
 
@@ -108,7 +108,7 @@ export default function Create({ navigation }: { navigation: any }) {
             return prevTime - 1;
           }
         });
-      }, 1000 * 60);
+      }, 1000);
 
       // Save timerId for cleanup
       return () => clearInterval(timerId);

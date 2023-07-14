@@ -149,7 +149,7 @@ export default function Creating({ navigation }: { navigation: any }) {
           <Text variant="title" color="textOnBackground" fontSize={44}>
             {remainingTime}
           </Text>
-          <Text color="textOnBackground">minutes left</Text>
+          <Text color="textOnBackground">seconds left</Text>
         </View>
         {/* <CircularProgress
           value={15 - remainingTime}
@@ -182,7 +182,7 @@ export default function Creating({ navigation }: { navigation: any }) {
           </Text>
           <Text variant="body">Your model is currently being created! </Text>
           <Text variant="body" fontSize={14}>
-            Estimated finish time: 17:00
+            {/* Estimated finish time: 17:00 */}
           </Text>
         </Box>
         <TouchableOpacity onPress={() => navigation.goBack()} activeOpacity={1}>
