@@ -12,24 +12,24 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { SearchBar } from '../components/SearchBar';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { fetchWebsites } from '../api';
+import { fetchCompanies, fetchWebsites } from '../api';
 import { useState } from 'react';
-import { Website } from '../utils/types';
+import { Website, Company } from '../utils/types';
 import { domainToInfo } from '../utils/utils';
 
 export default function Search({ navigation }: { navigation: any }) {
   const [searchText, setSearchText] = useState('');
   const { user } = useUser();
-  const { status, data: websites } = useQuery<Website[]>({
-    queryKey: ['websites', user?.id],
-    queryFn: () => fetchWebsites(user?.id as string),
+  const { status, data: companies } = useQuery<Company[]>({
+    queryKey: ['companies', user?.id],
+    queryFn: () => fetchCompanies(user?.id as string),
     enabled: !!user?.id,
     onSuccess: () => {},
   });
 
   const handleSearch = () => {
     // If the search text isn't found in the preconfigured websites
-    if (!websites?.some((website) => website.domain.includes(searchText))) {
+    if (!companies?.some((company) => company.id.includes(searchText))) {
       // Navigate to the new domain
       navigation.navigate('Browser', { url: searchText });
     }
@@ -37,8 +37,8 @@ export default function Search({ navigation }: { navigation: any }) {
 
   // console.log('websites', websites);
 
-  const filteredWebsites = websites?.filter((website) =>
-    website.domain.includes(searchText)
+  const filteredWebsites = companies?.filter((company) =>
+    company.id.includes(searchText)
   );
 
   return (
@@ -55,7 +55,7 @@ export default function Search({ navigation }: { navigation: any }) {
             {status === 'success' ? (
               <FlatList
                 data={filteredWebsites}
-                keyExtractor={(item) => item.domain}
+                keyExtractor={(item) => item.id}
                 keyboardShouldPersistTaps="handled"
                 renderItem={({ item }) => (
                   <Box
@@ -69,7 +69,9 @@ export default function Search({ navigation }: { navigation: any }) {
                       onPress={() => {
                         console.log('item', item);
 
-                        navigation.navigate('Browser', { url: item.domain });
+                        navigation.navigate('Browser', {
+                          url: item.domains[0],
+                        });
                       }}
                       style={{ flex: 1 }}
                     >
@@ -86,14 +88,14 @@ export default function Search({ navigation }: { navigation: any }) {
                             height: 40,
                             width: 40,
                           }}
-                          source={domainToInfo[item.domain].icon}
+                          source={domainToInfo[item.id].icon}
                           contentFit="contain"
                         />
                         <Box gap="s">
                           <Text variant="body" fontWeight={'bold'}>
-                            {domainToInfo[item.domain].name}
+                            {domainToInfo[item.id].name}
                           </Text>
-                          <Text variant="body">{item.domain}</Text>
+                          <Text variant="body">{item.domains[0]}</Text>
                         </Box>
                       </Box>
                     </TouchableOpacity>

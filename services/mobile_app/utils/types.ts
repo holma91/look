@@ -26,3 +26,9 @@ export type Website = {
   domain: string;
   favorited: boolean;
 };
+
+export type Company = {
+  id: string;
+  domains: string;
+  favorited: boolean;
+};

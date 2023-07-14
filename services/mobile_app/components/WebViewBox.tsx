@@ -61,6 +61,7 @@ export function WebViewBox({
         await createProduct(user?.id, product, domain);
         // refetchProducts();
         // queryClient.invalidateQueries(['brands', user?.id]);
+        // fix invalidation issue https://codesandbox.io/p/sandbox/peaceful-gwen-mwqryx?embed=1&file=%2Fsrc%2Fpages%2Findex.js%3A40%2C59
         queryClient.invalidateQueries({ queryKey: ['brands', user?.id] }); // no idea why it's not working
         queryClient.invalidateQueries({ queryKey: ['history', user?.id] });
       } catch (error) {

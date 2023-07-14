@@ -7,17 +7,7 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useCallback, useContext, useMemo, useRef, useState } from 'react';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  runOnJS,
-  LightSpeedOutRight,
-  useAnimatedReaction,
-  FadeOut,
-  ZoomIn,
-} from 'react-native-reanimated';
+import Animated, { useSharedValue } from 'react-native-reanimated';
 import {
   BottomSheetModal,
   BottomSheetBackdrop,
@@ -38,14 +28,17 @@ import {
   newBaseExtractScript,
   newBaseExtractScript2,
 } from '../utils/scripts';
-import { fetchHistory, likeProduct, unlikeProduct } from '../api';
-import { Product, UserProduct } from '../utils/types';
 import {
-  BrowserSearchBar,
-  FakeSearchBar,
-  FakeSearchBarBrowser,
-} from '../components/SearchBar';
+  fetchCompanies,
+  fetchHistory,
+  likeProduct,
+  unlikeProduct,
+} from '../api';
+import { Company, Product, UserProduct } from '../utils/types';
+import { WebviewSearchBar } from '../components/SearchBar';
 import { TrainingContext } from '../context/Training';
+import { domainToInfo } from '../utils/utils';
+import SearchList from '../components/SearchList';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -90,6 +83,8 @@ export default function Browser({
   navigation: any;
   route: any;
 }) {
+  const [searchText, setSearchText] = useState('');
+  const [focus, setFocus] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product>({
     url: 'https://www.zara.com/se/en/rak-blazer-p08068001.html?v1=78861699&v2=1718127',
@@ -127,21 +122,6 @@ export default function Browser({
     if (!webviewRef.current) return;
 
     webviewRef.current.injectJavaScript(newBaseExtractScript2);
-    // const slowSites = [
-    //   'shop.lululemon.com',
-    //   'sellpy.se',
-    //   'softgoat.com',
-    //   'hm.com',
-    //   'zara.com',
-    // ];
-    // if (slowSites.includes(domain)) {
-    //   setTimeout(() => {
-    //     if (webviewRef.current) {
-    //       webviewRef.current.injectJavaScript(baseExtractScript);
-    //       webviewRef.current.injectJavaScript(baseInteractScript);
-    //     }
-    //   }, 500);
-    // }
   };
 
   const { data: products, refetch: refetchProducts } = useQuery({
@@ -154,21 +134,36 @@ export default function Browser({
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1}>
-          <FakeSearchBarBrowser
+          <WebviewSearchBar
             navigation={navigation}
-            webViewNavigation={navigate}
-            domain={domain}
+            webviewNavigation={navigate}
+            searchText={searchText}
+            setSearchText={setSearchText}
+            handleSearch={() => {}}
+            setFocus={setFocus}
+            focus={focus}
           />
           <Box flex={1}>
-            <WebViewBox
-              webviewRef={webviewRef}
-              handleLoadEnd={handleLoadEnd}
-              url={url}
-              domain={domain}
-              setCurrentProduct={setCurrentProduct}
-              setCurrentImage={setCurrentImage}
-              refetchProducts={refetchProducts}
-            />
+            {focus ? (
+              <Box flex={1}>
+                <SearchList
+                  navigation={navigation}
+                  searchText={searchText}
+                  setFocus={setFocus}
+                />
+              </Box>
+            ) : null}
+            <Box flex={focus ? 0 : 1}>
+              <WebViewBox
+                webviewRef={webviewRef}
+                handleLoadEnd={handleLoadEnd}
+                url={url}
+                domain={domain}
+                setCurrentProduct={setCurrentProduct}
+                setCurrentImage={setCurrentImage}
+                refetchProducts={refetchProducts}
+              />
+            </Box>
           </Box>
         </Box>
       </SafeAreaView>

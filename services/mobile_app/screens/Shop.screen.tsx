@@ -1,4 +1,9 @@
-import { FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
+import {
+  FlatList,
+  SafeAreaView,
+  TouchableOpacity,
+  Keyboard,
+} from 'react-native';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
@@ -8,8 +13,12 @@ import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { useMemo, useState } from 'react';
 import { domainToInfo } from '../utils/utils';
-import { FakeSearchBarShop } from '../components/SearchBar';
+import { FakeSearchBarShop, SearchBar } from '../components/SearchBar';
 import { favoriteCompany, fetchCompanies, unFavoriteCompany } from '../api';
+import Search from '../components/Search';
+import { Company } from '../utils/types';
+import { TextInput } from '../styling/TextInput';
+import SearchList from '../components/SearchList';
 
 type CompanyItem = {
   id: string;
@@ -19,54 +28,98 @@ type CompanyItem = {
 
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchText, setSearchText] = useState('');
+  const [focus, setFocus] = useState(false);
+  const { user } = useUser();
+
+  const { status, data: companies } = useQuery<Company[]>({
+    queryKey: ['companies', user?.id],
+    queryFn: () => fetchCompanies(user?.id as string),
+    enabled: !!user?.id,
+    onSuccess: () => {},
+  });
+
+  const handleSearch = () => {
+    // If the search text isn't found in the preconfigured websites
+    if (!companies?.some((company) => company.id.includes(searchText))) {
+      // Navigate to the new domain
+      navigation.navigate('Browser', { url: searchText });
+    }
+  };
+
+  const filteredWebsites = companies?.filter((company) =>
+    company.id.includes(searchText)
+  );
 
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1} gap="s">
-          <FakeSearchBarShop navigation={navigation} domain="" />
-          <Box flexDirection="row" gap="m" marginVertical="s">
-            <FlatList
-              style={{ flex: 1, gap: 10 }}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              data={[
-                { label: 'Favorites' },
-                { label: 'All' },
-                { label: 'High-end' },
-                { label: 'Multi-brand' },
-                { label: 'Second-hand' },
-                { label: 'Other' },
-              ]}
-              contentContainerStyle={{ paddingLeft: 18 }}
-              keyExtractor={(item, index) => `category-${index}`}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => setSelectedCategory(item.label)}
-                  style={{
-                    marginRight: 16,
-                    borderBottomWidth: selectedCategory === item.label ? 2 : 0,
-                    borderColor: 'black',
-                  }}
-                >
-                  <Text
-                    variant="body"
-                    fontWeight={'bold'}
-                    paddingBottom="s"
-                    color={selectedCategory === item.label ? 'text' : 'text'}
-                  >
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-          </Box>
-          <Box flex={1}>
-            <CompanyList
-              navigation={navigation}
-              selectedCategory={selectedCategory}
-            />
-          </Box>
+          <SearchBar
+            navigation={navigation}
+            searchText={searchText}
+            setSearchText={setSearchText}
+            handleSearch={handleSearch}
+            setFocus={setFocus}
+            focus={focus}
+          />
+          {!focus ? (
+            <>
+              <Box flexDirection="row" gap="m" marginVertical="s">
+                <FlatList
+                  style={{ flex: 1, gap: 10 }}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  data={[
+                    { label: 'Favorites' },
+                    { label: 'All' },
+                    { label: 'High-end' },
+                    { label: 'Multi-brand' },
+                    { label: 'Second-hand' },
+                    { label: 'Other' },
+                  ]}
+                  contentContainerStyle={{ paddingLeft: 18 }}
+                  keyExtractor={(item, index) => `category-${index}`}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      onPress={() => setSelectedCategory(item.label)}
+                      style={{
+                        marginRight: 16,
+                        borderBottomWidth:
+                          selectedCategory === item.label ? 2 : 0,
+                        borderColor: 'black',
+                      }}
+                    >
+                      <Text
+                        variant="body"
+                        fontWeight={'bold'}
+                        paddingBottom="s"
+                        color={
+                          selectedCategory === item.label ? 'text' : 'text'
+                        }
+                      >
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              </Box>
+              <Box flex={1}>
+                <CompanyList
+                  navigation={navigation}
+                  selectedCategory={selectedCategory}
+                />
+              </Box>
+            </>
+          ) : (
+            <Box flex={1}>
+              <SearchList
+                navigation={navigation}
+                searchText={searchText}
+                setFocus={setFocus}
+              />
+            </Box>
+          )}
         </Box>
       </SafeAreaView>
     </Box>
