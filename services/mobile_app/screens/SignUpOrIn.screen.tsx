@@ -7,11 +7,10 @@ import { Text } from '../styling/Text';
 import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { FlatList, Dimensions, TouchableOpacity } from 'react-native';
+import { FlatList, Dimensions } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
-import { AppleButton, GoogleButton } from '../components/Button';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const originalImages = [
   [
@@ -65,31 +64,24 @@ export default function SignUpOrIn() {
   ).current;
 
   useEffect(() => {
-    // Create an array to store all the timers
     const timers: any[] = [];
 
     originalImages.forEach((_, i) => {
       const timer = setInterval(() => {
         setImageIndices((prevIndices) =>
           prevIndices.map((prevIndex, j) => {
-            // If this is the current spot
             if (j === i) {
-              // Return the index of the next image, or 0 if we're at the end of the sub-array
               return (prevIndex + 1) % originalImages[j].length;
-            }
-            // For other spots, just return the previous index
-            else {
+            } else {
               return prevIndex;
             }
           })
         );
-      }, intervals[i]); // Use the desired interval for this spot
+      }, intervals[i]);
 
-      // Add this timer to the timers array
       timers.push(timer);
     });
 
-    // Clean up the timers when the component unmounts
     return () => timers.forEach(clearInterval);
   }, []);
 
@@ -144,8 +136,8 @@ export default function SignUpOrIn() {
           </Text>
         </Box>
 
-        <SignInWithApple />
-        {/* <SignInWithGoogle /> */}
+        {/* <SignInWithApple /> */}
+        <SignInWithGoogle />
       </Box>
     </Box>
   );

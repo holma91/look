@@ -1,9 +1,8 @@
 import React from 'react';
 import * as WebBrowser from 'expo-web-browser';
-import { Button } from 'react-native';
 import { useOAuth } from '@clerk/clerk-expo';
 import { useWarmUpBrowser } from '../hooks/useWarmUpBrowser';
-import { AppleButton, GoogleButton } from './Button';
+import { AppleButton, GoogleButton } from './Buttons';
 // import { useOAuth } from '../hooks/useOAuth';
 
 WebBrowser.maybeCompleteAuthSession();

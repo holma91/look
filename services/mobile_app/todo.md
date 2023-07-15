@@ -40,7 +40,10 @@ fix cache!
 
 ### TODO rn
 
-- fix injection and extraction on all given sites
+- clean up everything on mobile
+- clean up everything on the server
+- start designing the API better
+  then we are ready to move fast
 
 ### TODO
 

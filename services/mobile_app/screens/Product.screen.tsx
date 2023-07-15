@@ -3,22 +3,24 @@ import {
   Dimensions,
   TouchableOpacity,
   SafeAreaView,
-  View,
   ScrollView,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import {
+  VariantProps,
+  createRestyleComponent,
+  createVariant,
+} from '@shopify/restyle';
 
-import { Button } from '../components/Button';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
+import { Theme } from '../styling/theme';
 import { UserProduct } from '../utils/types';
 import { useContext, useRef, useState } from 'react';
 import Animated, {
-  set,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { TrainingContext } from '../context/Training';
@@ -102,7 +104,6 @@ export default function Product({
   const imageHeight = useSharedValue(height * 0.6);
 
   const { product }: { product: UserProduct } = route.params;
-  console.log('product', product);
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,
@@ -129,8 +130,6 @@ export default function Product({
         style={{
           flex: 1,
           backgroundColor: 'white',
-          // borderWidth: 2,
-          // marginTop: 8,
         }}
       >
         {!expanded ? (
@@ -348,7 +347,7 @@ function TextBox({
               </Box>
             ) : null}
             <Box marginTop={product?.generatedBy ? 'xs' : 'l'}>
-              <Button
+              <LegacyButton
                 label={`Buy on ${product.domain}`}
                 onPress={() =>
                   navigation.navigate('Browser', { url: product.url })
@@ -357,7 +356,7 @@ function TextBox({
                 fontSize={17}
                 paddingVertical="s"
                 color="textOnBackground"
-              ></Button>
+              ></LegacyButton>
             </Box>
           </Box>
         </>
@@ -384,32 +383,32 @@ function TextBox({
             </Text>
           </Box>
           {!hasGenerated ? (
-            <Button
+            <LegacyButton
               label={isGenerating ? 'is generating...' : `Test on model`}
               onPress={handleGenerate}
               variant="tertiary"
               fontSize={17}
               paddingVertical="s"
               color="textOnBackground"
-            ></Button>
+            ></LegacyButton>
           ) : !isShared ? (
-            <Button
+            <LegacyButton
               label={'Share image'}
               onPress={handleShare}
               variant="tertiary"
               fontSize={17}
               paddingVertical="s"
               color="textOnBackground"
-            ></Button>
+            ></LegacyButton>
           ) : (
-            <Button
+            <LegacyButton
               label={'Go to explore'}
               onPress={handleExplore}
               variant="tertiary"
               fontSize={17}
               paddingVertical="s"
               color="textOnBackground"
-            ></Button>
+            ></LegacyButton>
           )}
         </Box>
       )}
@@ -448,3 +447,27 @@ function Carousel({
     </Box>
   );
 }
+
+const buttonVariant: any = createVariant({ themeKey: 'buttonVariants' });
+const ButtonContainer = createRestyleComponent<
+  VariantProps<Theme, 'buttonVariants'> & React.ComponentProps<typeof Box>,
+  Theme
+>([buttonVariant], Box);
+
+type Props = {
+  onPress: () => void;
+  label: string;
+  variant: 'primary' | 'secondary' | 'tertiary';
+};
+
+const LegacyButton = ({ label, onPress, variant, ...rest }: Props | any) => {
+  return (
+    <TouchableOpacity onPress={onPress}>
+      <ButtonContainer variant={variant}>
+        <Text textAlign="center" fontWeight="bold" {...rest}>
+          {label}
+        </Text>
+      </ButtonContainer>
+    </TouchableOpacity>
+  );
+};

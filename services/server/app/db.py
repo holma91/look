@@ -39,7 +39,7 @@ async def get_db_connection():
         yield conn
     finally:
         pass
-        # await conn.close()
+        # await conn.close(), apparently this is done by Tortoise?
 
 
 async def generate_schema() -> None:

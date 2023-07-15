@@ -7,7 +7,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { Button } from '../components/NewButton';
+import { Button } from './Buttons';
 
 type SheetModalProps = {
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;

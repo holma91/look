@@ -4,13 +4,9 @@ import { ClerkLoaded, useUser } from '@clerk/clerk-expo';
 import TabNavigator from './Tabs.navigator';
 import Browser from '../screens/Browser.screen';
 import SignUpOrIn from '../screens/SignUpOrIn.screen';
-import Search from '../screens/Search.screen';
-import Product from '../screens/Product.screen';
-import Shop from '../screens/Shop.screen';
-import Likes from '../screens/Likes.screen';
-import Studio from '../screens/Studio.screen';
-import Create from '../screens/Create.screen';
-import Creating from '../screens/Creating.screen';
+import Search from '../legacy/Search.screen';
+import Create from '../screens/demo/Create.screen';
+import Creating from '../screens/demo/Creating.screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,7 +43,6 @@ export default function RootNavigator() {
               component={Creating}
               options={{ animation: 'fade_from_bottom' }}
             />
-            {/* <Stack.Screen name="Studio" component={Studio} /> */}
           </>
         ) : (
           <Stack.Screen name="SignUpOrIn" component={SignUpOrIn} />

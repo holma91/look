@@ -1,5 +1,4 @@
 import {
-  Dimensions,
   SafeAreaView,
   LayoutAnimation,
   TouchableOpacity,
@@ -7,7 +6,6 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useCallback, useContext, useMemo, useRef, useState } from 'react';
-import Animated, { useSharedValue } from 'react-native-reanimated';
 import {
   BottomSheetModal,
   BottomSheetBackdrop,
@@ -17,11 +15,10 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
-import { theme } from '../styling/theme';
 import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { Button } from '../components/NewButton';
+import { Button } from '../components/Buttons';
 import {
   baseExtractScript,
   baseInteractScript,
@@ -34,18 +31,10 @@ import {
   likeProduct,
   unlikeProduct,
 } from '../api';
-import { Company, Product, UserProduct } from '../utils/types';
+import { Product, UserProduct } from '../utils/types';
 import { WebviewSearchBar } from '../components/SearchBar';
 import { TrainingContext } from '../context/Training';
-import { domainToInfo } from '../utils/utils';
 import SearchList from '../components/SearchList';
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-// The minimum and maximum heights for our bottom sheet
-const MIN_HEIGHT = 0;
-const MEDIUM_HEIGHT = 300;
-const MAX_HEIGHT = SCREEN_HEIGHT - 115;
 
 function getDomain(url: string) {
   let domain;
@@ -103,7 +92,6 @@ export default function Browser({
   const { user } = useUser();
 
   const webviewRef = useRef<WebView>(null);
-  const bottomSheetHeight = useSharedValue(0);
 
   const navigate = (direction: 'back' | 'forward' | 'reload') => {
     if (!webviewRef.current) return;
@@ -168,7 +156,6 @@ export default function Browser({
         </Box>
       </SafeAreaView>
       <NavBar
-        bottomSheetHeight={bottomSheetHeight}
         expandedMenu={expandedMenu}
         setExpandedMenu={setExpandedMenu}
         navigate={navigate}
@@ -183,7 +170,6 @@ export default function Browser({
 }
 
 type NavBarProps = {
-  bottomSheetHeight: Animated.SharedValue<number>;
   expandedMenu: boolean;
   setExpandedMenu: React.Dispatch<React.SetStateAction<boolean>>;
   navigate: (direction: 'back' | 'forward') => void;
@@ -195,7 +181,6 @@ type NavBarProps = {
 };
 
 function NavBar({
-  bottomSheetHeight,
   expandedMenu,
   setExpandedMenu,
   navigate,
@@ -286,7 +271,6 @@ function NavBar({
               color="black"
               onPress={() => {
                 setExpandedMenu(false);
-                // bottomSheetHeight.value = withTiming(MIN_HEIGHT);
               }}
             />
           ) : (
@@ -297,7 +281,6 @@ function NavBar({
               onPress={() => {
                 setExpandedMenu(true);
                 handlePresentModalPress();
-                // bottomSheetHeight.value = withTiming(MEDIUM_HEIGHT);
               }}
             />
           )}
@@ -366,11 +349,8 @@ const BottomSheet = ({
     }
   }, []);
 
-  // console.log('currentProduct', currentProduct);
-
   const handleTestOnModel = async () => {
-    // change current image progressively
-    // when at last image, snap to top
+    // change current image progressively, when at last image, snap to top
     setIsGenerating(true);
     for (let i = 0; i < demoImages['basic'].length; i++) {
       setCurrentImage(demoImages['basic'][i]);

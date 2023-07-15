@@ -4,17 +4,16 @@ import {
   Keyboard,
   SafeAreaView,
 } from 'react-native';
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
 import { Image as ExpoImage } from 'expo-image';
-import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { SearchBar } from '../components/SearchBar';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { fetchCompanies, fetchWebsites } from '../api';
+import { fetchCompanies } from '../api';
 import { useState } from 'react';
-import { Website, Company } from '../utils/types';
+import { Company } from '../utils/types';
 import { domainToInfo } from '../utils/utils';
 
 export default function Search({ navigation }: { navigation: any }) {
@@ -27,14 +26,6 @@ export default function Search({ navigation }: { navigation: any }) {
     onSuccess: () => {},
   });
 
-  const handleSearch = () => {
-    // If the search text isn't found in the preconfigured websites
-    if (!companies?.some((company) => company.id.includes(searchText))) {
-      // Navigate to the new domain
-      navigation.navigate('Browser', { url: searchText });
-    }
-  };
-
   // console.log('websites', websites);
 
   const filteredWebsites = companies?.filter((company) =>
@@ -45,12 +36,12 @@ export default function Search({ navigation }: { navigation: any }) {
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1} gap="s">
-          <SearchBar
+          {/* <SearchBar
             navigation={navigation}
             searchText={searchText}
             setSearchText={setSearchText}
             handleSearch={handleSearch}
-          />
+          /> */}
           <Box flex={1}>
             {status === 'success' ? (
               <FlatList

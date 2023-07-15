@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   TouchableOpacity,
   FlatList,
   View,
@@ -8,28 +7,22 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
-import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
+import { Box } from '../../styling/Box';
+import { Text } from '../../styling/Text';
 import { useContext, useState } from 'react';
-import { Button } from '../components/Button';
-import { TrainingContext } from '../context/Training';
+import { TrainingContext } from '../../context/Training';
 
 type ImageProps = {
   uri: string;
   id: string;
 };
 
-const { height, width } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 export default function Create({ navigation }: { navigation: any }) {
   const [isInitializing, setIsInitializing] = useState(false);
-  const {
-    isTraining,
-    setIsTraining,
-    remainingTime,
-    setRemainingTime,
-    setTrainedModels,
-  } = useContext(TrainingContext);
+  const { setIsTraining, setRemainingTime, setTrainedModels } =
+    useContext(TrainingContext);
 
   const [selectedImages, setSelectedImages] = useState<ImageProps[]>([
     { uri: '', id: 'addButton' },
@@ -92,7 +85,7 @@ export default function Create({ navigation }: { navigation: any }) {
     setIsInitializing(true);
     setTimeout(() => {
       setIsTraining(true);
-      setRemainingTime(30); // start countdown from 20 minutes
+      setRemainingTime(30); // start countdown from this
       navigation.replace('Creating');
       setIsInitializing(false);
 
@@ -116,7 +109,7 @@ export default function Create({ navigation }: { navigation: any }) {
   };
 
   return (
-    <Box marginTop={'xl'} paddingHorizontal={'m'} gap="m" position="relative">
+    <Box marginTop="xl" paddingHorizontal="m" gap="m" position="relative">
       <TouchableOpacity
         onPress={() => navigation.goBack()}
         style={{

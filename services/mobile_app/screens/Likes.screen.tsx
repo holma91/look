@@ -12,7 +12,7 @@ import { useState } from 'react';
 import Animated from 'react-native-reanimated';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { fetchBrands, fetchHistory, fetchLikes, fetchPurchased } from '../api';
+import { fetchHistory, fetchLikes, fetchPurchased } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
@@ -48,13 +48,6 @@ export default function Likes({ navigation }: { navigation: any }) {
     queryKey: ['purchased', user?.id],
     queryFn: () => fetchPurchased(user?.id as string),
     enabled: !!user?.id,
-  });
-
-  const { data: brands } = useQuery<string[]>({
-    queryKey: ['brands', user?.id],
-    queryFn: () => fetchBrands(user?.id as string),
-    enabled: !!user?.id,
-    select: (data) => data.map((brand: any) => brand.brand),
   });
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -128,7 +121,7 @@ export default function Likes({ navigation }: { navigation: any }) {
           choice={choice}
           setChoice={setChoice}
           showFilter={showFilter}
-          brands={brands || []}
+          // brands={brands || []}
         />
         <Box flex={1} paddingHorizontal="xs">
           <FlatList

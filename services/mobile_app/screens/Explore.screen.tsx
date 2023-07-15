@@ -1,10 +1,9 @@
 import { SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
-import { FlashList, MasonryFlashList } from '@shopify/flash-list';
+import { MasonryFlashList } from '@shopify/flash-list';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
 import { TextInput } from '../styling/TextInput';
 import { UserProduct } from '../utils/types';
 import { useState } from 'react';

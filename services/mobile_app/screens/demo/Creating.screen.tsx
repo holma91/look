@@ -2,78 +2,76 @@ import { useContext, useEffect, useRef } from 'react';
 import { View, Dimensions, TouchableOpacity, Animated } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import CircularProgress from 'react-native-circular-progress-indicator';
 
-import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
-import { Button } from '../components/NewButton';
-import { TrainingContext } from '../context/Training';
+import { Box } from '../../styling/Box';
+import { Text } from '../../styling/Text';
+import { TrainingContext } from '../../context/Training';
 
 const images = [
   {
     id: '1',
     name: 'White woman',
-    imageUrl: require('../assets/models/whitewoman/2.png'),
+    imageUrl: require('../../assets/models/whitewoman/2.png'),
   },
   {
     id: '2',
     name: 'White man',
-    imageUrl: require('../assets/models/whiteman/1.png'),
+    imageUrl: require('../../assets/models/whiteman/1.png'),
   },
   {
     id: '3',
     name: 'Asian woman',
-    imageUrl: require('../assets/models/asianwoman/3.png'),
+    imageUrl: require('../../assets/models/asianwoman/3.png'),
   },
 
   {
     id: '4',
     name: 'Asian woman',
-    imageUrl: require('../assets/models/asianwoman/4.png'),
+    imageUrl: require('../../assets/models/asianwoman/4.png'),
   },
   {
     id: '5',
     name: 'Black woman',
-    imageUrl: require('../assets/models/blackwoman/2.png'),
+    imageUrl: require('../../assets/models/blackwoman/2.png'),
   },
   {
     id: '6',
     name: 'Asian man',
-    imageUrl: require('../assets/models/asianman/2.png'),
+    imageUrl: require('../../assets/models/asianman/2.png'),
   },
   {
     id: '7',
     name: 'Black woman',
-    imageUrl: require('../assets/models/whiteman/2.png'),
+    imageUrl: require('../../assets/models/whiteman/2.png'),
   },
   {
     id: '8',
     name: 'Asian woman',
-    imageUrl: require('../assets/models/asianwoman/1.png'),
+    imageUrl: require('../../assets/models/asianwoman/1.png'),
   },
   {
     id: '9',
     name: 'White woman',
-    imageUrl: require('../assets/models/whitewoman/3.png'),
+    imageUrl: require('../../assets/models/whitewoman/3.png'),
   },
   {
     id: '10',
     name: 'Black woman',
-    imageUrl: require('../assets/models/blackwoman/3.png'),
+    imageUrl: require('../../assets/models/blackwoman/3.png'),
   },
   {
     id: '11',
     name: 'White woman',
-    imageUrl: require('../assets/models/whitewoman/2.png'),
+    imageUrl: require('../../assets/models/whitewoman/2.png'),
   },
   {
     id: '12',
     name: 'Black man',
-    imageUrl: require('../assets/models/blackman/3.png'),
+    imageUrl: require('../../assets/models/blackman/3.png'),
   },
 ];
 
-const { height, width } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function Creating({ navigation }: { navigation: any }) {
   const { remainingTime } = useContext(TrainingContext);
@@ -151,22 +149,6 @@ export default function Creating({ navigation }: { navigation: any }) {
           </Text>
           <Text color="textOnBackground">seconds left</Text>
         </View>
-        {/* <CircularProgress
-          value={15 - remainingTime}
-          radius={120}
-          maxValue={15}
-          initialValue={0}
-          progressValueColor={'#fff'}
-          activeStrokeWidth={15}
-          inActiveStrokeWidth={15}
-          duration={15000}
-          title={'minutes left'}
-          titleFontSize={20}
-          titleColor={'white'}
-          circleBackgroundColor="black"
-          titleStyle={{ fontWeight: 'bold' }}
-          onAnimationComplete={() => alert('time out')}
-        /> */}
       </Box>
       <Box
         justifyContent="space-between"

@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Likes from '../screens/Likes.screen';
 import Product from '../screens/Product.screen';
-import Studio from '../screens/Studio.screen';
+import Studio from '../legacy/Studio.screen';
 
 // Individual stack navigator for the Shop tab
 const ShopStack = createNativeStackNavigator();

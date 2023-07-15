@@ -13,11 +13,9 @@ import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { useMemo, useState } from 'react';
 import { domainToInfo } from '../utils/utils';
-import { FakeSearchBarShop, SearchBar } from '../components/SearchBar';
+import { SearchBar } from '../components/SearchBar';
 import { favoriteCompany, fetchCompanies, unFavoriteCompany } from '../api';
-import Search from '../components/Search';
 import { Company } from '../utils/types';
-import { TextInput } from '../styling/TextInput';
 import SearchList from '../components/SearchList';
 
 type CompanyItem = {
@@ -32,7 +30,7 @@ export default function Shop({ navigation }: { navigation: any }) {
   const [focus, setFocus] = useState(false);
   const { user } = useUser();
 
-  const { status, data: companies } = useQuery<Company[]>({
+  const { data: companies } = useQuery<Company[]>({
     queryKey: ['companies', user?.id],
     queryFn: () => fetchCompanies(user?.id as string),
     enabled: !!user?.id,
@@ -46,10 +44,6 @@ export default function Shop({ navigation }: { navigation: any }) {
       navigation.navigate('Browser', { url: searchText });
     }
   };
-
-  const filteredWebsites = companies?.filter((company) =>
-    company.id.includes(searchText)
-  );
 
   return (
     <Box backgroundColor="background" flex={1}>

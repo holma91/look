@@ -20,20 +20,12 @@ export default function SearchList({
 }) {
   const { user } = useUser();
 
-  const { status, data: companies } = useQuery<Company[]>({
+  const { data: companies } = useQuery<Company[]>({
     queryKey: ['companies', user?.id],
     queryFn: () => fetchCompanies(user?.id as string),
     enabled: !!user?.id,
     onSuccess: () => {},
   });
-
-  const handleSearch = () => {
-    // If the search text isn't found in the preconfigured websites
-    if (!companies?.some((company) => company.id.includes(searchText))) {
-      // Navigate to the new domain
-      navigation.navigate('Browser', { url: searchText });
-    }
-  };
 
   const filteredWebsites = companies?.filter((company) =>
     company.id.includes(searchText)
