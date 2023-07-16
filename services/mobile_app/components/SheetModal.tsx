@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   BottomSheetModal,
   BottomSheetFlatList,
@@ -8,32 +8,36 @@ import {
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Button } from './Buttons';
+import { Filters } from '../utils/types';
 
 type SheetModalProps = {
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;
-  choicesList: string[];
-  setChoice: React.Dispatch<React.SetStateAction<any>>;
-  choice: string;
-  sheetHeader: string;
+  choices: Filters;
+  outerChoice: 'view' | 'category' | 'website' | 'brand';
+  handleFilterSelection: (
+    filterType: 'view' | 'category' | 'website' | 'brand',
+    filterValue: string
+  ) => void;
 };
 
 export default function SheetModal({
   bottomSheetModalRef,
-  choicesList,
-  setChoice,
-  choice,
-  sheetHeader,
+  choices,
+  outerChoice,
+  handleFilterSelection,
 }: SheetModalProps) {
+  const [choice, setChoice] = useState<string>('');
   const snapPoints = useMemo(() => ['50%'], []);
 
   const renderListItem = useCallback(
-    ({ item }: { item: any }) => (
+    ({ item }: { item: string }) => (
       <Button
         onPress={() => {
           if (choice === item) {
             setChoice('');
           } else {
             setChoice(item);
+            handleFilterSelection(outerChoice, item);
           }
         }}
         variant="new"
@@ -56,7 +60,7 @@ export default function SheetModal({
         ) : null}
       </Button>
     ),
-    [choice]
+    [outerChoice, choice]
   );
 
   return (
@@ -74,11 +78,11 @@ export default function SheetModal({
     >
       <Box justifyContent="center" alignItems="center" marginBottom="m">
         <Text variant="title" fontSize={22}>
-          {sheetHeader}
+          {outerChoice}
         </Text>
       </Box>
       <BottomSheetFlatList
-        data={choicesList}
+        data={choices[outerChoice]}
         renderItem={renderListItem}
         keyExtractor={(item) => item}
         contentContainerStyle={{ backgroundColor: 'white' }}

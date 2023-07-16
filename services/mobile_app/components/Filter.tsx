@@ -18,35 +18,38 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Text } from '../styling/Text';
 import SheetModal from './SheetModal';
 import { useQuery } from '@tanstack/react-query';
-import { UserProduct } from '../utils/types';
+import { Filters, UserProduct } from '../utils/types';
 import { fetchBrands, fetchCompanies, fetchLikes, fetchWebsites } from '../api';
 import { Website } from '../utils/types';
 
-const filters: { label: string }[] = [
-  { label: 'Category' },
-  { label: 'Brand' },
-  { label: 'Website' },
-  { label: 'Price' },
-  { label: 'On sale' },
-  { label: 'Sort by' },
+const possibleFilters: { label: 'category' | 'website' | 'brand' }[] = [
+  { label: 'category' },
+  { label: 'brand' },
+  { label: 'website' },
+  // { label: 'Price' },
+  // { label: 'On sale' },
+  // { label: 'Sort by' },
 ];
 
 type FilterProps = {
-  outerChoice: string;
-  setOuterChoice: React.Dispatch<React.SetStateAction<string>>;
-  choice: string;
-  setChoice: React.Dispatch<React.SetStateAction<string>>;
+  filters: Filters;
+  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   showFilter: boolean;
+  handleFilterSelection: (
+    filterType: 'view' | 'category' | 'website' | 'brand',
+    filterValue: string
+  ) => void;
 };
 
 export default function Filter({
-  outerChoice,
-  setOuterChoice,
-  choice,
-  setChoice,
+  filters,
+  setFilters,
   showFilter,
+  handleFilterSelection,
 }: FilterProps) {
-  // todo: useReducer for all the state here
+  const [outerChoice, setOuterChoice] = useState<
+    'category' | 'website' | 'brand'
+  >('brand');
 
   const { user } = useUser();
   const { data: companies } = useQuery<string[]>({
@@ -76,18 +79,31 @@ export default function Filter({
 
   const filterSheetModalRef = useRef<BottomSheetModal>(null);
 
-  const handlePresentModalPress = useCallback(() => {
-    filterSheetModalRef.current?.present();
-  }, []);
+  const handlePresentModalPress = useCallback(
+    (label: 'category' | 'website' | 'brand') => {
+      console.log('setting outer choice', label);
+      setOuterChoice(label);
+
+      filterSheetModalRef.current?.present();
+    },
+    []
+  );
+
+  const choices: Filters = {
+    view: ['Likes', 'History', 'Purchases', 'New List'],
+    category: ['Hoodies', 'T-shirts', 'Suits'],
+    brand: brands || [],
+    website: companies || [],
+  };
 
   const choicesList = useMemo(() => {
-    if (outerChoice === 'Category') {
+    if (outerChoice === 'category') {
       // this should be fetched from the backend depending on the categories the user has viewed
       return ['Hoodies', 'T-shirts', 'Suits'];
-    } else if (outerChoice === 'Brand') {
+    } else if (outerChoice === 'brand') {
       // same as above
       return brands || [];
-    } else if (outerChoice === 'Website') {
+    } else if (outerChoice === 'website') {
       // same as above
       return companies || [];
     }
@@ -102,14 +118,13 @@ export default function Filter({
           style={{ gap: 10 }}
           horizontal
           showsHorizontalScrollIndicator={false}
-          data={filters}
+          data={possibleFilters}
           contentContainerStyle={{ paddingLeft: 12 }}
           keyExtractor={(item, index) => `category-${index}`}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
-                setOuterChoice(item.label);
-                handlePresentModalPress();
+                handlePresentModalPress(item.label);
               }}
               style={{
                 display: 'flex',
@@ -139,10 +154,9 @@ export default function Filter({
       </Animated.View>
       <SheetModal
         bottomSheetModalRef={filterSheetModalRef}
-        choicesList={choicesList}
-        setChoice={setChoice}
-        choice={choice}
-        sheetHeader={outerChoice}
+        choices={choices}
+        outerChoice={outerChoice}
+        handleFilterSelection={handleFilterSelection}
       />
     </>
   );

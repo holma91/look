@@ -15,7 +15,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { fetchHistory, fetchLikes, fetchPurchased } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { UserProduct } from '../utils/types';
+import { Filters, UserProduct } from '../utils/types';
 import SheetModal from '../components/SheetModal';
 import Filter from '../components/Filter';
 
@@ -23,14 +23,15 @@ type ViewTypes = 'Likes' | 'History' | 'Purchases';
 
 export default function Likes({ navigation }: { navigation: any }) {
   const [view, setView] = useState<ViewTypes>('Likes');
-  const [outerChoice, setOuterChoice] = useState<string>('Category');
+  // const [outerChoice, setOuterChoice] = useState<string>('category');
   const [choice, setChoice] = useState<string>('');
   const [showFilter, setShowFilter] = useState(false);
+  const [filters, setFilters] = useState<Filters>({});
 
   const { user } = useUser();
   const likesQuery = useQuery({
-    queryKey: ['likes', user?.id],
-    queryFn: () => fetchLikes(user?.id as string),
+    queryKey: ['likes', user?.id, filters],
+    queryFn: () => fetchLikes(user?.id as string, filters),
     enabled: !!user?.id,
   });
 
@@ -52,9 +53,31 @@ export default function Likes({ navigation }: { navigation: any }) {
     bottomSheetModalRef.current?.present();
   }, []);
 
-  const handleFilter = () => {
-    setShowFilter(!showFilter);
+  const handleFilter = (filter: { [key: string]: string }) => {
+    console.log('setting filter', filter);
+
+    setFilters({ ...filters, ...filter });
   };
+
+  const handleFilterSelection = useCallback(
+    (
+      filterType: 'view' | 'category' | 'website' | 'brand',
+      filterValue: string
+    ) => {
+      console.log('in handleFilterSelection', filterType, filterValue);
+
+      setFilters((prevFilters) => {
+        // Ensure the filterType key exists and is an array.
+        const currentFilterValues = prevFilters[filterType] || [];
+
+        return {
+          ...prevFilters,
+          [filterType]: [...currentFilterValues, filterValue],
+        };
+      });
+    },
+    [setFilters]
+  );
 
   const displayedProducts = useMemo(() => {
     let list: any = [];
@@ -66,23 +89,12 @@ export default function Likes({ navigation }: { navigation: any }) {
       list = purchasesQuery.data;
     }
 
-    if (outerChoice === 'Website' && choice !== '') {
-      list = list.filter((product: UserProduct) => product.domain === choice);
-    }
-
-    if (outerChoice === 'Brand' && choice !== '') {
-      list = list.filter((product: UserProduct) => product.brand === choice);
-    }
-
     return list;
-  }, [
-    view,
-    likesQuery.data,
-    historyQuery.data,
-    purchasesQuery.data,
-    outerChoice,
-    choice,
-  ]);
+  }, [view, likesQuery.data, historyQuery.data, purchasesQuery.data, choice]);
+
+  const choices: Filters = {
+    view: ['Likes', 'History', 'Purchases', 'New List'],
+  };
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -100,7 +112,7 @@ export default function Likes({ navigation }: { navigation: any }) {
             name={showFilter ? 'options' : 'options-outline'}
             size={24}
             color="black"
-            onPress={handleFilter}
+            onPress={() => setShowFilter(!showFilter)}
           />
           <TouchableOpacity
             onPress={handlePresentModalPress}
@@ -119,11 +131,10 @@ export default function Likes({ navigation }: { navigation: any }) {
           <Ionicons name="link" size={24} color="black" />
         </Box>
         <Filter
-          outerChoice={outerChoice}
-          setOuterChoice={setOuterChoice}
-          choice={choice}
-          setChoice={setChoice}
+          filters={filters}
+          setFilters={setFilters}
           showFilter={showFilter}
+          handleFilterSelection={handleFilterSelection}
         />
         <Box flex={1} paddingHorizontal="xs">
           <FlatList
@@ -154,10 +165,9 @@ export default function Likes({ navigation }: { navigation: any }) {
         </Box>
         <SheetModal
           bottomSheetModalRef={bottomSheetModalRef}
-          choice={view}
-          setChoice={setView}
-          choicesList={['Likes', 'History', 'Purchases', 'New List']}
-          sheetHeader="View"
+          choices={choices}
+          outerChoice="view"
+          handleFilterSelection={handleFilterSelection}
         />
       </SafeAreaView>
     </Box>

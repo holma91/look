@@ -32,3 +32,10 @@ export type Company = {
   domains: string;
   favorited: boolean;
 };
+
+export type Filters = {
+  view?: string[];
+  category?: string[];
+  brand?: string[];
+  website?: string[];
+};

@@ -1,4 +1,4 @@
-import { UserProduct } from '../utils/types';
+import { Filters, UserProduct } from '../utils/types';
 
 // api.ts
 const URL = 'https://ad0e-83-255-121-67.ngrok-free.app';
@@ -73,8 +73,27 @@ export const unFavoriteCompany = async (userId: string, company: string) => {
   return response;
 };
 
-export const fetchLikes = async (id: string): Promise<UserProduct[]> => {
-  const completeUrl = `${URL}/users/${id}/likes`;
+export const fetchLikes = async (
+  id: string,
+  filters: Filters
+): Promise<UserProduct[]> => {
+  console.log('filters:', filters);
+  let completeUrl = '';
+  try {
+    const queryString = Object.entries(filters)
+      .flatMap(([key, values]) =>
+        values?.map(
+          (value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+        )
+      )
+      .join('&');
+    completeUrl = `${URL}/users/${id}/likes?${queryString}`;
+  } catch (e) {
+    console.log('error:', e);
+  }
+
+  console.log('completeUrl:', completeUrl);
+
   const response = await fetch(completeUrl);
 
   if (!response.ok) {
