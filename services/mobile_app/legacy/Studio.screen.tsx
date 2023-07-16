@@ -10,7 +10,6 @@ import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-import { Button } from '../components/Button';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';

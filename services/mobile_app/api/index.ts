@@ -1,3 +1,5 @@
+import { UserProduct } from '../utils/types';
+
 // api.ts
 const URL = 'https://ad0e-83-255-121-67.ngrok-free.app';
 
@@ -24,6 +26,7 @@ export const fetchCompanies = async (id: string) => {
   }
   return response.json();
 };
+
 export const fetchBrands = async (id: string) => {
   const completeUrl = `${URL}/users/${id}/brands`;
   const response = await fetch(completeUrl);
@@ -70,7 +73,7 @@ export const unFavoriteCompany = async (userId: string, company: string) => {
   return response;
 };
 
-export const fetchLikes = async (id: string) => {
+export const fetchLikes = async (id: string): Promise<UserProduct[]> => {
   const completeUrl = `${URL}/users/${id}/likes`;
   const response = await fetch(completeUrl);
 
@@ -82,7 +85,7 @@ export const fetchLikes = async (id: string) => {
   return response.json();
 };
 
-export const fetchHistory = async (id: string) => {
+export const fetchHistory = async (id: string): Promise<UserProduct[]> => {
   const completeUrl = `${URL}/users/${id}/history`;
   const response = await fetch(completeUrl);
 
@@ -94,7 +97,7 @@ export const fetchHistory = async (id: string) => {
   return response.json();
 };
 
-export const fetchPurchased = async (id: string) => {
+export const fetchPurchased = async (id: string): Promise<UserProduct[]> => {
   const completeUrl = `${URL}/users/${id}/purchased`;
   const response = await fetch(completeUrl);
 

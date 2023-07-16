@@ -15,7 +15,6 @@ import { useMemo, useState } from 'react';
 import { domainToInfo } from '../utils/utils';
 import { SearchBar } from '../components/SearchBar';
 import { favoriteCompany, fetchCompanies, unFavoriteCompany } from '../api';
-import { Company } from '../utils/types';
 import SearchList from '../components/SearchList';
 
 type CompanyItem = {
@@ -30,17 +29,14 @@ export default function Shop({ navigation }: { navigation: any }) {
   const [focus, setFocus] = useState(false);
   const { user } = useUser();
 
-  const { data: companies } = useQuery<Company[]>({
+  const { data: companies } = useQuery<CompanyItem[]>({
     queryKey: ['companies', user?.id],
     queryFn: () => fetchCompanies(user?.id as string),
     enabled: !!user?.id,
-    onSuccess: () => {},
   });
 
   const handleSearch = () => {
-    // If the search text isn't found in the preconfigured websites
     if (!companies?.some((company) => company.id.includes(searchText))) {
-      // Navigate to the new domain
       navigation.navigate('Browser', { url: searchText });
     }
   };
@@ -102,6 +98,8 @@ export default function Shop({ navigation }: { navigation: any }) {
                 <CompanyList
                   navigation={navigation}
                   selectedCategory={selectedCategory}
+                  companies={companies || []}
+                  user={user}
                 />
               </Box>
             </>
@@ -123,19 +121,18 @@ export default function Shop({ navigation }: { navigation: any }) {
 type CompanyListProps = {
   navigation: any;
   selectedCategory: string;
+  companies: CompanyItem[];
+  user?: any;
 };
 
-function CompanyList({ navigation, selectedCategory }: CompanyListProps) {
+function CompanyList({
+  navigation,
+  selectedCategory,
+  companies,
+  user,
+}: CompanyListProps) {
   const [renderToggle, setRenderToggle] = useState(false);
   const queryClient = useQueryClient();
-  const { user } = useUser();
-
-  const { status, data: companies } = useQuery({
-    queryKey: ['companies', user?.id],
-    queryFn: () => fetchCompanies(user?.id as string),
-    enabled: !!user?.id,
-    onSuccess: () => {},
-  });
 
   const mutation = useMutation({
     mutationFn: async (company: CompanyItem) => {
@@ -178,32 +175,24 @@ function CompanyList({ navigation, selectedCategory }: CompanyListProps) {
   const filteredSites = useMemo(() => {
     let filtered;
     if (selectedCategory === 'Favorites') {
-      filtered = companies.filter((company: CompanyItem) => company.favorited);
+      filtered = companies.filter((company) => company.favorited);
     } else if (selectedCategory === 'Multi-brand') {
       filtered = companies.filter(
-        (company: CompanyItem) => domainToInfo[company.id].multiBrand
+        (company) => domainToInfo[company.id].multiBrand
       );
     } else if (selectedCategory === 'High-end') {
       filtered = companies.filter(
-        (company: CompanyItem) => domainToInfo[company.id].highEnd
+        (company) => domainToInfo[company.id].highEnd
       );
     } else if (selectedCategory === 'Second-hand') {
       filtered = companies.filter(
-        (company: CompanyItem) => domainToInfo[company.id].secondHand
+        (company) => domainToInfo[company.id].secondHand
       );
     } else {
       filtered = companies;
     }
     return filtered;
   }, [selectedCategory, companies, renderToggle]);
-
-  if (status === 'loading') {
-    return <Text>Loading...</Text>;
-  }
-
-  if (status === 'error') {
-    return <Text>Error when getting companies</Text>;
-  }
 
   return (
     <FlatList<CompanyItem>

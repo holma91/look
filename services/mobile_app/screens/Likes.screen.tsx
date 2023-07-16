@@ -28,23 +28,19 @@ export default function Likes({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);
 
   const { user } = useUser();
-  const {
-    data: likes,
-    refetch,
-    isFetching,
-  } = useQuery<UserProduct[]>({
+  const likesQuery = useQuery({
     queryKey: ['likes', user?.id],
     queryFn: () => fetchLikes(user?.id as string),
     enabled: !!user?.id,
   });
 
-  const { data: history } = useQuery<UserProduct[]>({
+  const historyQuery = useQuery({
     queryKey: ['history', user?.id],
     queryFn: () => fetchHistory(user?.id as string),
     enabled: !!user?.id,
   });
 
-  const { data: purchases } = useQuery<UserProduct[]>({
+  const purchasesQuery = useQuery({
     queryKey: ['purchased', user?.id],
     queryFn: () => fetchPurchased(user?.id as string),
     enabled: !!user?.id,
@@ -63,11 +59,11 @@ export default function Likes({ navigation }: { navigation: any }) {
   const displayedProducts = useMemo(() => {
     let list: any = [];
     if (view === 'Likes') {
-      list = likes;
+      list = likesQuery.data;
     } else if (view === 'History') {
-      list = history;
+      list = historyQuery.data;
     } else {
-      list = purchases;
+      list = purchasesQuery.data;
     }
 
     if (outerChoice === 'Website' && choice !== '') {
@@ -79,7 +75,14 @@ export default function Likes({ navigation }: { navigation: any }) {
     }
 
     return list;
-  }, [view, likes, history, purchases, outerChoice, choice]);
+  }, [
+    view,
+    likesQuery.data,
+    historyQuery.data,
+    purchasesQuery.data,
+    outerChoice,
+    choice,
+  ]);
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -121,7 +124,6 @@ export default function Likes({ navigation }: { navigation: any }) {
           choice={choice}
           setChoice={setChoice}
           showFilter={showFilter}
-          // brands={brands || []}
         />
         <Box flex={1} paddingHorizontal="xs">
           <FlatList
@@ -132,7 +134,20 @@ export default function Likes({ navigation }: { navigation: any }) {
               <Product navigation={navigation} product={item} />
             )}
             refreshControl={
-              <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+              <RefreshControl
+                refreshing={
+                  likesQuery.isFetching ||
+                  historyQuery.isFetching ||
+                  purchasesQuery.isFetching
+                }
+                onRefresh={() => {
+                  Promise.all([
+                    likesQuery.refetch(),
+                    historyQuery.refetch(),
+                    purchasesQuery.refetch(),
+                  ]);
+                }}
+              />
             }
             showsVerticalScrollIndicator={false}
           />
