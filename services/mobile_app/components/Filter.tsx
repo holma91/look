@@ -19,13 +19,13 @@ import { Text } from '../styling/Text';
 import SheetModal from './SheetModal';
 import { useQuery } from '@tanstack/react-query';
 import { Filters, UserProduct } from '../utils/types';
-import { fetchBrands, fetchCompanies, fetchLikes, fetchWebsites } from '../api';
+import { fetchBrands, fetchCompanies, fetchWebsites } from '../api';
 import { Website } from '../utils/types';
 
 const possibleFilters: { label: 'category' | 'website' | 'brand' }[] = [
-  { label: 'category' },
   { label: 'brand' },
   { label: 'website' },
+  // { label: 'category' },
   // { label: 'Price' },
   // { label: 'On sale' },
   // { label: 'Sort by' },

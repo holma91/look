@@ -12,38 +12,22 @@ import { useState } from 'react';
 import Animated from 'react-native-reanimated';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { fetchHistory, fetchLikes, fetchPurchased } from '../api';
+import { fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Filters, UserProduct } from '../utils/types';
 import SheetModal from '../components/SheetModal';
 import Filter from '../components/Filter';
 
-type ViewTypes = 'Likes' | 'History' | 'Purchases';
-
-export default function Likes({ navigation }: { navigation: any }) {
-  const [view, setView] = useState<ViewTypes>('Likes');
-  // const [outerChoice, setOuterChoice] = useState<string>('category');
-  const [choice, setChoice] = useState<string>('');
+export default function Products({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);
   const [filters, setFilters] = useState<Filters>({});
 
   const { user } = useUser();
-  const likesQuery = useQuery({
-    queryKey: ['likes', user?.id, filters],
-    queryFn: () => fetchLikes(user?.id as string, filters),
-    enabled: !!user?.id,
-  });
 
-  const historyQuery = useQuery({
-    queryKey: ['history', user?.id],
-    queryFn: () => fetchHistory(user?.id as string),
-    enabled: !!user?.id,
-  });
-
-  const purchasesQuery = useQuery({
-    queryKey: ['purchased', user?.id],
-    queryFn: () => fetchPurchased(user?.id as string),
+  const productsQuery = useQuery({
+    queryKey: ['products', user?.id, filters],
+    queryFn: () => fetchProducts(user?.id as string, filters),
     enabled: !!user?.id,
   });
 
@@ -53,18 +37,20 @@ export default function Likes({ navigation }: { navigation: any }) {
     bottomSheetModalRef.current?.present();
   }, []);
 
-  const handleFilter = (filter: { [key: string]: string }) => {
-    console.log('setting filter', filter);
-
-    setFilters({ ...filters, ...filter });
-  };
-
   const handleFilterSelection = useCallback(
     (
       filterType: 'view' | 'category' | 'website' | 'brand',
       filterValue: string
     ) => {
       setFilters((prevFilters) => {
+        if (filterType === 'view') {
+          // we only allow single selection for the view
+          return {
+            ...prevFilters,
+            [filterType]: [filterValue],
+          };
+        }
+
         const currentFilterValues = [...(prevFilters[filterType] || [])];
         const filterIndex = currentFilterValues.indexOf(filterValue);
 
@@ -84,20 +70,12 @@ export default function Likes({ navigation }: { navigation: any }) {
   );
 
   const displayedProducts = useMemo(() => {
-    let list: any = [];
-    if (view === 'Likes') {
-      list = likesQuery.data;
-    } else if (view === 'History') {
-      list = historyQuery.data;
-    } else {
-      list = purchasesQuery.data;
-    }
-
+    let list = productsQuery.data || [];
     return list;
-  }, [view, likesQuery.data, historyQuery.data, purchasesQuery.data, choice]);
+  }, [productsQuery.data]);
 
-  const choices: Filters = {
-    view: ['Likes', 'History', 'Purchases', 'New List'],
+  const viewChoices: Filters = {
+    view: ['likes', 'history', 'purchases', 'New List'],
   };
 
   return (
@@ -128,7 +106,7 @@ export default function Likes({ navigation }: { navigation: any }) {
             }}
           >
             <Text variant="title" fontSize={18}>
-              {view}
+              {filters['view']?.[0] || 'likes'}
             </Text>
             <Ionicons name="chevron-down" size={26} color="black" />
           </TouchableOpacity>
@@ -150,17 +128,9 @@ export default function Likes({ navigation }: { navigation: any }) {
             )}
             refreshControl={
               <RefreshControl
-                refreshing={
-                  likesQuery.isFetching ||
-                  historyQuery.isFetching ||
-                  purchasesQuery.isFetching
-                }
+                refreshing={productsQuery.isFetching}
                 onRefresh={() => {
-                  Promise.all([
-                    likesQuery.refetch(),
-                    historyQuery.refetch(),
-                    purchasesQuery.refetch(),
-                  ]);
+                  productsQuery.refetch();
                 }}
               />
             }
@@ -169,7 +139,7 @@ export default function Likes({ navigation }: { navigation: any }) {
         </Box>
         <SheetModal
           bottomSheetModalRef={bottomSheetModalRef}
-          choices={choices}
+          choices={viewChoices}
           outerChoice="view"
           handleFilterSelection={handleFilterSelection}
           filters={filters}

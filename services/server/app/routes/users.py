@@ -2,11 +2,11 @@ import logging
 import os
 from typing import Optional, Any
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserBase, FavoriteCompany, UserExtended, UserLiked, UserHistory, UserPurchased, ProductExtended, POSTResponse, LikeProduct, FavoriteWebsite, WebsiteBase, ProductImage
+from app.models.pydantic import UserBase, UserProduct, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage
 from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
@@ -31,19 +31,24 @@ async def read_user(id: str) -> UserExtended:
 
 ### PRODUCT INFO ###
 
-@router.get("/{user_id}/likes", response_model=list[UserLiked])
-async def read_user_likes(user_id: str) -> UserLiked:
-    products = await crud.get_likes(user_id)
-    return products
+def get_filters(request: Request):
+    return dict(request.query_params)
 
-@router.get("/{user_id}/history", response_model=list[UserHistory])
-async def read_user_history(user_id: str) -> UserHistory:
-    products = await crud.get_history(user_id)
-    return products
 
-@router.get("/{user_id}/purchased", response_model=list[UserPurchased])
-async def read_user_history(user_id: str) -> UserPurchased:
-    products = await crud.get_purchased(user_id)
+@router.get("/{user_id}/products", response_model=list[UserProduct])
+async def read_user_products(
+    user_id: str, 
+    view: str = "likes",
+    brand: list[str] = Query(None),
+    website: list[str] = Query(None)
+) -> UserProduct:
+    print("brand:",brand)
+    filters = {"view": view, "brand": brand, "website": website}
+    print(filters)
+    try:
+        products = await crud.get_products(user_id, filters)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     return products
 
 ### WEBSITE INFO ###

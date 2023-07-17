@@ -2,7 +2,6 @@ from typing import Optional
 
 from app.models.pydantic import ProductExtended, ProductImage
 
-from app.crud import products as product_crud
 from app.db import get_db_connection
 
 
@@ -91,15 +90,42 @@ async def add_product_image(product_image: ProductImage) -> bool:
     
     return True
 
-async def get_likes(user_id: str) -> list:
+async def get_products(user_id: str, filters: Optional[dict[str, str]] = None):
     async with get_db_connection() as conn:
         query = """
             select * from user_product up
             join product p on up.product_url = p.url
             join product_image pi on p.url = pi.product_url
-            where up.user_id = $1 and liked = TRUE;
-        """
-        rows = await conn.execute_query_dict(query, [user_id])
+            join website w on p.domain = w.domain
+            where up.user_id = $1"""
+        query_params = [user_id]
+        
+        if filters:
+            for key, value in filters.items():
+                if key == "view":
+                    if value == "likes":
+                        query += " and liked = TRUE"
+                    elif value == "purchases":
+                        query += " and purchased = TRUE"
+                    elif value != "history":
+                        raise ValueError(f"Invalid 'view' filter: {value}")
+                elif key == "brand":
+                    if value:
+                        brand_placeholders = ', '.join(f"${i+len(query_params)+1}" for i in range(len(value)))
+                        query += f" and brand = ANY(ARRAY[{brand_placeholders}])"
+                        query_params.extend(value)
+                elif key == "website":
+                    if value:
+                        website_placeholders = ', '.join(f"${i+len(query_params)+1}" for i in range(len(value)))
+                        query += f" and company_id = ANY(ARRAY[{website_placeholders}])"
+                        query_params.extend(value)
+                elif key == "category":
+                    pass # category functionality is not yet implemented
+                
+        query += ";"
+        print(query)
+
+        rows = await conn.execute_query_dict(query, query_params)
 
     products_dict = {}
     for row in rows:
@@ -107,74 +133,7 @@ async def get_likes(user_id: str) -> list:
         if product_url not in products_dict:
             product = {
                 "url": product_url,
-                "domain": row["domain"],
-                "brand": row["brand"],
-                "name": row["name"],
-                "price": row["price"],
-                "currency": row["currency"],
-                "liked": row["liked"],
-                "images": []
-            }
-            products_dict[product_url] = product
-
-        # Add the image URL to the product's image list
-        products_dict[product_url]["images"].append(row["image_url"])
-
-    # Get a list of the products
-    products = list(products_dict.values())
-
-    return products
-
-async def get_history(user_id: str) -> list:
-    async with get_db_connection() as conn:
-        query = """
-            select * from user_product up
-            join product p on up.product_url = p.url
-            join product_image pi on p.url = pi.product_url
-            where up.user_id = $1;
-        """
-        rows = await conn.execute_query_dict(query, [user_id])
-
-    products_dict = {}
-    for row in rows:
-        product_url = row["product_url"]
-        if product_url not in products_dict:
-            product = {
-                "url": product_url,
-                "domain": row["domain"],
-                "brand": row["brand"],
-                "name": row["name"],
-                "price": row["price"],
-                "currency": row["currency"],
-                "liked": row["liked"],
-                "images": []
-            }
-            products_dict[product_url] = product
-
-        # Add the image URL to the product's image list
-        products_dict[product_url]["images"].append(row["image_url"])
-
-    # Get a list of the products
-    products = list(products_dict.values())
-
-    return products
-
-async def get_purchased(user_id: str) -> list:
-    async with get_db_connection() as conn:
-        query = """
-            select * from user_product up
-            join product p on up.product_url = p.url
-            join product_image pi on p.url = pi.product_url
-            where up.user_id = $1 and purchased = TRUE;
-        """
-        rows = await conn.execute_query_dict(query, [user_id])
-
-    products_dict = {}
-    for row in rows:
-        product_url = row["product_url"]
-        if product_url not in products_dict:
-            product = {
-                "url": product_url,
+                "company": row["company_id"],
                 "domain": row["domain"],
                 "brand": row["brand"],
                 "name": row["name"],
@@ -193,6 +152,7 @@ async def get_purchased(user_id: str) -> list:
     products = list(products_dict.values())
 
     return products
+
 
 async def get_companies(user_id: str) -> list:
     async with get_db_connection() as conn:

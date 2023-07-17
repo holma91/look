@@ -73,11 +73,10 @@ export const unFavoriteCompany = async (userId: string, company: string) => {
   return response;
 };
 
-export const fetchLikes = async (
+export const fetchProducts = async (
   id: string,
   filters: Filters
 ): Promise<UserProduct[]> => {
-  console.log('filters:', filters);
   let completeUrl = '';
   try {
     const queryString = Object.entries(filters)
@@ -87,37 +86,13 @@ export const fetchLikes = async (
         )
       )
       .join('&');
-    completeUrl = `${URL}/users/${id}/likes?${queryString}`;
+    completeUrl = `${URL}/users/${id}/products?${queryString}`;
   } catch (e) {
     console.log('error:', e);
   }
 
   console.log('completeUrl:', completeUrl);
 
-  const response = await fetch(completeUrl);
-
-  if (!response.ok) {
-    throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
-    );
-  }
-  return response.json();
-};
-
-export const fetchHistory = async (id: string): Promise<UserProduct[]> => {
-  const completeUrl = `${URL}/users/${id}/history`;
-  const response = await fetch(completeUrl);
-
-  if (!response.ok) {
-    throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
-    );
-  }
-  return response.json();
-};
-
-export const fetchPurchased = async (id: string): Promise<UserProduct[]> => {
-  const completeUrl = `${URL}/users/${id}/purchased`;
   const response = await fetch(completeUrl);
 
   if (!response.ok) {

@@ -4,7 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Shop from '../screens/Shop.screen';
 import Profile from '../screens/Profile.screen';
-import LikesNavigator from './Likes.navigator';
+import LikesNavigator from './Products.navigator';
 import ModelPickerV2 from '../screens/demo/ModelPickerV2';
 import Create from '../screens/demo/Create.screen';
 import Testing from '../screens/Testing.screen';
@@ -12,6 +12,7 @@ import Explore from '../screens/Explore.screen';
 import ExploreNavigator from './Explore.navigator';
 import { useContext } from 'react';
 import { DemoContext } from '../context/Demo';
+import ProductsNavigator from './Products.navigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -37,7 +38,7 @@ export default function TabNavigator() {
           } else if (route.name === 'ModelPicker') {
             iconName = focused ? 'ios-add-circle' : 'ios-add-circle-outline';
             return <Ionicons name={iconName} size={size * 1.1} color={color} />;
-          } else if (route.name === 'LikesNavigator') {
+          } else if (route.name === 'ProductsNavigator') {
             iconName = focused ? 'heart' : 'heart-outline';
             return (
               <MaterialCommunityIcons
@@ -67,7 +68,7 @@ export default function TabNavigator() {
           <Tab.Screen name="ModelPicker" component={ModelPickerV2} />
         </>
       ) : null}
-      <Tab.Screen name="LikesNavigator" component={LikesNavigator} />
+      <Tab.Screen name="ProductsNavigator" component={ProductsNavigator} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );

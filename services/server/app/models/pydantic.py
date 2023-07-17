@@ -45,6 +45,12 @@ class ProductImage(BaseModel):
 
 ### RESPONSE MODELS ###
 
+class UserProduct(ProductBase):
+    company: str
+    liked: bool
+    purchased: bool
+    images: list[str]
+
 class UserExtended(UserBase):
     favorites: list[str]
     likes: list[str]
