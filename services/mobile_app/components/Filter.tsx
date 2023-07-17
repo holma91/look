@@ -157,6 +157,7 @@ export default function Filter({
         choices={choices}
         outerChoice={outerChoice}
         handleFilterSelection={handleFilterSelection}
+        filters={filters}
       />
     </>
   );

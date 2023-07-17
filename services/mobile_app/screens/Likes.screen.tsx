@@ -64,15 +64,19 @@ export default function Likes({ navigation }: { navigation: any }) {
       filterType: 'view' | 'category' | 'website' | 'brand',
       filterValue: string
     ) => {
-      console.log('in handleFilterSelection', filterType, filterValue);
-
       setFilters((prevFilters) => {
-        // Ensure the filterType key exists and is an array.
-        const currentFilterValues = prevFilters[filterType] || [];
+        const currentFilterValues = [...(prevFilters[filterType] || [])];
+        const filterIndex = currentFilterValues.indexOf(filterValue);
+
+        if (filterIndex === -1) {
+          currentFilterValues.push(filterValue);
+        } else {
+          currentFilterValues.splice(filterIndex, 1);
+        }
 
         return {
           ...prevFilters,
-          [filterType]: [...currentFilterValues, filterValue],
+          [filterType]: currentFilterValues,
         };
       });
     },
@@ -168,6 +172,7 @@ export default function Likes({ navigation }: { navigation: any }) {
           choices={choices}
           outerChoice="view"
           handleFilterSelection={handleFilterSelection}
+          filters={filters}
         />
       </SafeAreaView>
     </Box>

@@ -18,6 +18,7 @@ type SheetModalProps = {
     filterType: 'view' | 'category' | 'website' | 'brand',
     filterValue: string
   ) => void;
+  filters: Filters;
 };
 
 export default function SheetModal({
@@ -25,42 +26,41 @@ export default function SheetModal({
   choices,
   outerChoice,
   handleFilterSelection,
+  filters,
 }: SheetModalProps) {
-  const [choice, setChoice] = useState<string>('');
   const snapPoints = useMemo(() => ['50%'], []);
 
   const renderListItem = useCallback(
-    ({ item }: { item: string }) => (
-      <Button
-        onPress={() => {
-          if (choice === item) {
-            setChoice('');
-          } else {
-            setChoice(item);
+    ({ item }: { item: string }) => {
+      const isSelected = filters[outerChoice]?.includes(item);
+
+      return (
+        <Button
+          onPress={() => {
             handleFilterSelection(outerChoice, item);
-          }
-        }}
-        variant="new"
-        backgroundColor={item === choice ? 'text' : 'grey'}
-        margin="xs"
-      >
-        <Text
-          variant="body"
-          fontWeight="bold"
-          fontSize={16}
-          color={item === choice ? 'background' : 'text'}
+          }}
+          variant="new"
+          backgroundColor={isSelected ? 'text' : 'grey'}
+          margin="xs"
         >
-          {item}
-        </Text>
-        {item === choice ? (
-          <Ionicons name="checkmark" size={20} color="white" />
-        ) : null}
-        {item === 'New List' ? (
-          <Ionicons name="add" size={20} color="black" />
-        ) : null}
-      </Button>
-    ),
-    [outerChoice, choice]
+          <Text
+            variant="body"
+            fontWeight="bold"
+            fontSize={16}
+            color={isSelected ? 'background' : 'text'}
+          >
+            {item}
+          </Text>
+          {isSelected ? (
+            <Ionicons name="checkmark" size={20} color="white" />
+          ) : null}
+          {item === 'New List' ? (
+            <Ionicons name="add" size={20} color="black" />
+          ) : null}
+        </Button>
+      );
+    },
+    [outerChoice, filters, handleFilterSelection]
   );
 
   return (
