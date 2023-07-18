@@ -27,7 +27,7 @@ import {
 } from '../utils/scripts';
 import {
   fetchCompanies,
-  fetchHistory,
+  fetchProducts,
   likeProduct,
   unlikeProduct,
 } from '../api';
@@ -113,8 +113,8 @@ export default function Browser({
   };
 
   const { data: products, refetch: refetchProducts } = useQuery({
-    queryKey: ['history', user?.id],
-    queryFn: () => fetchHistory(user?.id as string),
+    queryKey: ['products', user?.id],
+    queryFn: () => fetchProducts(user?.id as string, { view: ['history'] }),
     enabled: !!user?.id,
   });
 
@@ -163,7 +163,7 @@ export default function Browser({
         currentProduct={currentProduct}
         currentImage={currentImage}
         setCurrentImage={setCurrentImage}
-        products={products}
+        products={products || []}
       />
     </Box>
   );
@@ -200,25 +200,27 @@ function NavBar({
       return product;
     },
     onMutate: async (product: UserProduct) => {
+      console.log('onMutate', product);
+
       product.liked = !product.liked;
-      await queryClient.cancelQueries(['history', user?.id]);
+      await queryClient.cancelQueries(['products', user?.id]);
       const previousProducts = queryClient.getQueryData([
-        'history',
+        'products',
         product.url,
       ]);
-      queryClient.setQueryData(['history', product.url], product);
+      queryClient.setQueryData(['products', product.url], product);
 
       return { previousProducts, product };
     },
     onError: (err, product, context) => {
       console.log('error', err, product, context);
       queryClient.setQueryData(
-        ['history', context?.product.url],
+        ['products', context?.product.url],
         context?.previousProducts
       );
     },
     onSettled: async () => {
-      queryClient.invalidateQueries({ queryKey: ['history', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['products', user?.id] });
     },
   });
 
@@ -235,6 +237,7 @@ function NavBar({
     : 'heart-outline';
 
   let activeProduct = products?.find((p) => p.url === currentProduct?.url);
+  console.log('activeProduct', activeProduct);
 
   return (
     <Box>
