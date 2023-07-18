@@ -11,7 +11,11 @@ import { useUser } from '@clerk/clerk-expo';
 import { useState } from 'react';
 import Animated from 'react-native-reanimated';
 import React, { useCallback, useMemo, useRef } from 'react';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModal,
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
+} from '@gorhom/bottom-sheet';
 import { fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
@@ -21,7 +25,7 @@ import Filter from '../components/Filter';
 
 export default function Products({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);
-  const [filters, setFilters] = useState<Filters>({});
+  const [filters, setFilters] = useState<Filters>({ view: ['likes'] });
 
   const { user } = useUser();
 
@@ -35,6 +39,12 @@ export default function Products({ navigation }: { navigation: any }) {
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
+  }, []);
+
+  const pasteLinkSheetRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentPasteLinkSheetPress = useCallback(() => {
+    pasteLinkSheetRef.current?.present();
   }, []);
 
   const handleFilterSelection = useCallback(
@@ -110,7 +120,12 @@ export default function Products({ navigation }: { navigation: any }) {
             </Text>
             <Ionicons name="chevron-down" size={26} color="black" />
           </TouchableOpacity>
-          <Ionicons name="link" size={24} color="black" />
+          <Ionicons
+            onPress={handlePresentPasteLinkSheetPress}
+            name="link"
+            size={24}
+            color="black"
+          />
         </Box>
         <Filter
           filters={filters}
@@ -144,6 +159,7 @@ export default function Products({ navigation }: { navigation: any }) {
           handleFilterSelection={handleFilterSelection}
           filters={filters}
         />
+        <PasteLinkSheet pasteLinkSheetRef={pasteLinkSheetRef} />
       </SafeAreaView>
     </Box>
   );
@@ -183,5 +199,32 @@ function Product({
         </Box>
       </Box>
     </TouchableOpacity>
+  );
+}
+
+type PasteLinkSheetProps = {
+  pasteLinkSheetRef: React.RefObject<BottomSheetModal>;
+};
+
+function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
+  const snapPoints = useMemo(() => ['45%', '100%'], []);
+
+  return (
+    <BottomSheetModal
+      ref={pasteLinkSheetRef}
+      index={0}
+      snapPoints={snapPoints}
+      backdropComponent={(props) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+        />
+      )}
+    >
+      <Box flex={1}>
+        <Text>Hey</Text>
+      </Box>
+    </BottomSheetModal>
   );
 }

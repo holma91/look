@@ -206,9 +206,10 @@ function CompanyList({
           paddingVertical="s"
         >
           <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('Browser', { url: item.domains[0] })
-            }
+            onPress={() => {
+              console.log('item.domains[0]:', item.domains[0]);
+              navigation.navigate('Browser', { url: item.domains[0] });
+            }}
             style={{ flex: 1 }}
           >
             <Box flexDirection="row" alignItems="center" gap="l" flex={1}>

@@ -58,7 +58,12 @@ function getDomain(url: string) {
 }
 
 function getUrl(urlParam: string) {
-  if (urlParam.startsWith('http://') || urlParam.startsWith('https://')) {
+  if (urlParam === 'gucci.com') {
+    return 'https://www.gucci.com';
+  } else if (
+    urlParam.startsWith('http://') ||
+    urlParam.startsWith('https://')
+  ) {
     return urlParam;
   } else {
     return 'https://' + urlParam;
@@ -86,6 +91,7 @@ export default function Browser({
   const [currentImage, setCurrentImage] = useState<string>('');
 
   const url = getUrl(route.params.url);
+  console.log('url:', url);
 
   const domain = getDomain(route.params.url);
 
