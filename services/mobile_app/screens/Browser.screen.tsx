@@ -129,6 +129,7 @@ export default function Browser({
     if (!webviewRef.current) return;
 
     webviewRef.current.injectJavaScript(newBaseExtractScript2);
+    // webviewRef.current.injectJavaScript(baseInteractScript);
   };
 
   const { data: products, refetch: refetchProducts } = useQuery({

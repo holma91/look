@@ -1,7 +1,7 @@
 import { Filters, UserProduct } from '../utils/types';
 
 // api.ts
-const URL = 'https://71a4-83-255-121-67.ngrok-free.app';
+const URL = 'https://bb0c-83-255-121-67.ngrok-free.app';
 
 export const fetchWebsites = async (id: string) => {
   const completeUrl = `${URL}/users/${id}/websites`;
@@ -96,6 +96,8 @@ export const fetchProducts = async (
   const response = await fetch(completeUrl);
 
   if (!response.ok) {
+    console.log('response:', response);
+
     throw new Error(
       `Network response was not ok. Status code: ${response.status}`
     );

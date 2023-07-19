@@ -123,7 +123,6 @@ async def get_products(user_id: str, filters: Optional[dict[str, str]] = None):
                     pass # category functionality is not yet implemented
                 
         query += ";"
-        print(query)
 
         rows = await conn.execute_query_dict(query, query_params)
 

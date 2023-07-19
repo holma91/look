@@ -33,6 +33,12 @@ export function parseProduct(
           );
         }
       }
+    } else if (domain === 'boozt.com') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers']['price'];
+      product['currency'] = productData['offers']['priceCurrency'];
+      product['images'] = [productData['image']];
     } else if (domain === 'hm.com' || domain === 'www2.hm.com') {
       product['name'] = productData['name'];
       product['brand'] = productData['brand']['name'];
@@ -90,6 +96,52 @@ export function parseProduct(
         '200';
       product['currency'] = productData['offers']['priceCurrency'];
       product['images'] = [productData['image']];
+    } else if (domain === 'mytheresa.com') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers']['PriceSpecification']['price'];
+      product['currency'] = productData['offers']['priceCurrency'];
+      product['images'] = [productData['image']];
+    } else if (domain === 'valentino.com') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers']['price'];
+      product['currency'] = productData['offers']['priceCurrency'];
+      product['images'] = [productData['image']];
+    } else if (domain === 'farfetch.com') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers']['price'];
+      product['currency'] = productData['offers']['priceCurrency'];
+      product['images'] = productData['image'].map(
+        (image: any) => image.contentUrl
+      );
+    } else if (domain === 'louisvuitton.com') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers']['price'];
+      product['currency'] = productData['offers']['priceCurrency'];
+      product['images'] = productData['image'].map(
+        (image: any) => image.contentUrl
+      );
+    } else if (domain === 'ysl.com') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers']['price'];
+      product['currency'] = productData['offers']['priceCurrency'];
+      product['images'] = [productData['image']];
+    } else if (domain === 'careofcarl.se') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers'][0]['price'];
+      product['currency'] = productData['offers'][0]['priceCurrency'];
+      product['images'] = productData['image'];
+    } else if (domain === 'adaysmarch.com') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers']['price'];
+      product['currency'] = productData['offers']['priceCurrency'];
+      product['images'] = productData['image'];
     }
   } catch (e) {
     console.log(`couldn't parse on domain:${domain} with error: ${e}`);

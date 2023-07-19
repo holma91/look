@@ -1,12 +1,3 @@
-function getImageFilterFunction(domain) {
-  switch (domain) {
-    case 'softgoat.com':
-      return (url) => true; //url.startsWith('https://softgoat');
-    default:
-      return (url) => true;
-  }
-}
-
 function getProductImages() {
   function hasLinkAncestor(node) {
     while (node) {
@@ -18,15 +9,51 @@ function getProductImages() {
     return false;
   }
 
+  function getMostCommonImages(images) {
+    // Create an object to count occurrences of each dimension
+    var dimensionCounts = imagesFiltered.reduce((counts, img) => {
+      var dimension = img.naturalWidth + 'x' + img.naturalHeight;
+      counts[dimension] = (counts[dimension] || 0) + 1;
+      return counts;
+    }, {});
+
+    // Find the dimension with the most occurrences
+    var maxCount = 0;
+    var mostCommonDimension;
+    for (var dimension in dimensionCounts) {
+      if (dimensionCounts[dimension] > maxCount) {
+        maxCount = dimensionCounts[dimension];
+        mostCommonDimension = dimension;
+      }
+    }
+
+    // Filter images to include only those with the most common dimension
+    var mostCommonImages = imagesFiltered.filter((img) => {
+      var dimension = img.naturalWidth + 'x' + img.naturalHeight;
+      return dimension === mostCommonDimension;
+    });
+
+    return mostCommonImages;
+  }
+
   var allImages = Array.from(document.querySelectorAll('img'));
-  var imagesWithoutLink = allImages
-    .filter((img) => !hasLinkAncestor(img))
-    .map((img) => img.src);
+  var imagesWithoutLink = allImages.filter((img) => !hasLinkAncestor(img));
+  var imagesFiltered = imagesWithoutLink.filter(
+    (img) => img.naturalHeight > 10 * img.height
+  );
+  var mostCommonImages = getMostCommonImages(imagesWithoutLink);
 
-  // we have a list of images, choose the first one that fills a specific criteria for the domain
-  let imagesFiltered = imagesWithoutLink; //imagesWithoutLink.filter(filterFunction);
+  return [allImages, imagesWithoutLink, imagesFiltered, mostCommonImages];
+}
 
-  return [allImages, imagesWithoutLink, imagesFiltered];
+let [allImages, imagesWithoutLink, imagesFiltered, mostCommonImages] =
+  getProductImages();
+
+function logSizes(images) {
+  images.forEach((img) => {
+    console.log('nw:', img.naturalWidth, 'nh:', img.naturalHeight);
+    console.log('w:', img.width, 'h:', img.height);
+  });
 }
 
 function filterImagesBySize(images, minWidth, minHeight) {
@@ -50,8 +77,6 @@ function filterImagesBySize(images, minWidth, minHeight) {
     });
   });
 }
-
-let [allImages, imagesWithoutLink, imagesFiltered] = getProductImages();
 
 console.log(allImages.length, imagesWithoutLink.length, imagesFiltered.length);
 
@@ -90,3 +115,7 @@ try {
 } catch (e) {
   alert(e);
 }
+
+// lululemon
+// nh: 1317, h: 36, 1317/36 ~= 37
+// imagesWithoutLink with a certain natural quality?
