@@ -1,4 +1,4 @@
-import { Keyboard } from 'react-native';
+import { TouchableOpacity, Keyboard } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Box } from '../styling/Box';
@@ -63,16 +63,14 @@ function SearchBar({
       </Box>
       {focus ? (
         <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs">
-          <Ionicons
-            name="close"
-            flex={0}
-            size={24}
-            color="black"
+          <TouchableOpacity
             onPress={() => {
               setFocus(false);
               Keyboard.dismiss();
             }}
-          />
+          >
+            <Ionicons name="close" flex={0} size={24} color="black" />
+          </TouchableOpacity>
         </Box>
       ) : (
         <Ionicons
@@ -145,28 +143,25 @@ function WebviewSearchBar({
           color="black"
           style={{ position: 'absolute', left: 15 }}
         />
-        <Ionicons
-          name="refresh"
-          flex={0}
-          size={18}
-          color="black"
-          style={{ position: 'absolute', right: 12 }}
+
+        <TouchableOpacity
           onPress={() => webviewNavigation('reload')}
-        />
+          style={{ position: 'absolute', right: 12 }}
+        >
+          <Ionicons name="refresh" flex={0} size={18} color="black" />
+        </TouchableOpacity>
       </Box>
 
       {focus ? (
         <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs">
-          <Ionicons
-            name="close"
-            flex={0}
-            size={24}
-            color="black"
+          <TouchableOpacity
             onPress={() => {
               setFocus(false);
               Keyboard.dismiss();
             }}
-          />
+          >
+            <Ionicons name="close" flex={0} size={24} color="black" />
+          </TouchableOpacity>
         </Box>
       ) : (
         <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs">

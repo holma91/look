@@ -19,11 +19,8 @@ import {
   BottomSheetBackdropProps,
   BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
-import Animated, {
-  Extrapolate,
-  interpolate,
-  useAnimatedStyle,
-} from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
+
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -125,7 +122,6 @@ export default function Browser({
   };
 
   const handleLoadEnd = (navState: any) => {
-    // console.log('handleLoadEnd:', navState.nativeEvent);
     if (!webviewRef.current) return;
 
     webviewRef.current.injectJavaScript(newBaseExtractScript2);
@@ -277,53 +273,45 @@ function NavBar({
         zIndex={100}
       >
         <Box flex={0} flexDirection="row" gap="m" alignItems="center">
-          <Ionicons
-            name="arrow-back"
-            size={28}
-            color="black"
-            onPress={() => navigate('back')}
-          />
-          <Ionicons
-            name="arrow-forward"
-            size={28}
-            color="black"
-            onPress={() => navigate('forward')}
-          />
+          <TouchableOpacity onPress={() => navigate('back')}>
+            <Ionicons name="arrow-back" size={28} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigate('forward')}>
+            <Ionicons name="arrow-forward" size={28} color="black" />
+          </TouchableOpacity>
         </Box>
         <Box flex={0} flexDirection="row" alignItems="center">
           {expandedMenu ? (
-            <Ionicons
-              name="close-circle"
-              size={26}
-              color="black"
+            <TouchableOpacity
               onPress={() => {
                 setExpandedMenu(false);
                 handleDismissModalPress();
               }}
-            />
+            >
+              <Ionicons name="close-circle" size={26} color="black" />
+            </TouchableOpacity>
           ) : (
-            <Ionicons
-              name="arrow-up-circle"
-              size={26}
-              color="black"
+            <TouchableOpacity
               onPress={() => {
                 setExpandedMenu(true);
                 handlePresentModalPress();
               }}
-            />
+            >
+              <Ionicons name="arrow-up-circle" size={26} color="black" />
+            </TouchableOpacity>
           )}
         </Box>
         <Box flex={0} flexDirection="row" gap="m" alignItems="center">
-          <Ionicons
-            name={icon}
-            size={24}
-            color="black"
+          <TouchableOpacity
             onPress={() => {
               if (activeProduct) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 mutation.mutate(activeProduct);
               }
             }}
-          />
+          >
+            <Ionicons name={icon} size={24} color="black" />
+          </TouchableOpacity>
           <Ionicons
             name="md-ellipsis-horizontal-sharp"
             size={24}

@@ -100,12 +100,13 @@ export default function Products({ navigation }: { navigation: any }) {
           paddingHorizontal="m"
           gap="s"
         >
-          <Ionicons
-            name={showFilter ? 'options' : 'options-outline'}
-            size={24}
-            color="black"
-            onPress={() => setShowFilter(!showFilter)}
-          />
+          <TouchableOpacity onPress={() => setShowFilter(!showFilter)}>
+            <Ionicons
+              name={showFilter ? 'options' : 'options-outline'}
+              size={24}
+              color="black"
+            />
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={handlePresentModalPress}
             style={{
@@ -120,12 +121,9 @@ export default function Products({ navigation }: { navigation: any }) {
             </Text>
             <Ionicons name="chevron-down" size={26} color="black" />
           </TouchableOpacity>
-          <Ionicons
-            onPress={handlePresentPasteLinkSheetPress}
-            name="link"
-            size={24}
-            color="black"
-          />
+          <TouchableOpacity onPress={handlePresentPasteLinkSheetPress}>
+            <Ionicons name="link" size={24} color="black" />
+          </TouchableOpacity>
         </Box>
         <Filter
           filters={filters}

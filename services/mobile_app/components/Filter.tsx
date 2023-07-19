@@ -1,7 +1,7 @@
 import { FlatList, TouchableOpacity } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
-
+import * as Haptics from 'expo-haptics';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -124,6 +124,7 @@ export default function Filter({
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
+                Haptics.selectionAsync();
                 handlePresentModalPress(item.label);
               }}
               style={{

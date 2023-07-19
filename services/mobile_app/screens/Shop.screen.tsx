@@ -8,6 +8,7 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import { Image as ExpoImage } from 'expo-image';
+import * as Haptics from 'expo-haptics';
 
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
@@ -231,15 +232,22 @@ function CompanyList({
               </Box>
             </Box>
           </TouchableOpacity>
-          <Ionicons
-            name={item.favorited ? 'ios-star' : 'ios-star-outline'}
-            flex={0}
-            size={24}
-            color="black"
+          <TouchableOpacity
             onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               mutation.mutate(item);
             }}
-          />
+          >
+            <Ionicons
+              name={item.favorited ? 'ios-star' : 'ios-star-outline'}
+              size={24}
+              color="black"
+              accessibilityRole="button"
+              accessibilityLabel={
+                item.favorited ? 'Unfavorite company' : 'Favorite company'
+              }
+            />
+          </TouchableOpacity>
         </Box>
       )}
       keyExtractor={(company) => company.id}

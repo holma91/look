@@ -46,6 +46,10 @@ fix cache!
 - fix upload link feature
 - ui fixes in navbar
 
+also:
+
+- chill with the deployment for a few days to see if any accelerator is interested
+
 ### TODO
 
 - Clean up demoware

@@ -51,9 +51,11 @@ export default function SheetModal({
           >
             {item}
           </Text>
-          {isSelected ? (
-            <Ionicons name="checkmark" size={20} color="white" />
-          ) : null}
+          <Ionicons
+            name="checkmark"
+            size={20}
+            color={isSelected ? 'white' : 'transparent'}
+          />
           {item === 'New List' ? (
             <Ionicons name="add" size={20} color="black" />
           ) : null}
