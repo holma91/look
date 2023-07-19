@@ -40,10 +40,11 @@ fix cache!
 
 ### TODO rn
 
-- clean up everything on mobile
-- clean up everything on the server
-- start designing the API better
-  then we are ready to move fast
+- fix everything with the browser sheet ui
+  - automatically select images
+  - make images selectable
+- fix upload link feature
+- ui fixes in navbar
 
 ### TODO
 

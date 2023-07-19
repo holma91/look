@@ -3,14 +3,27 @@ import {
   LayoutAnimation,
   TouchableOpacity,
   FlatList,
+  View,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { useCallback, useContext, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   BottomSheetModal,
   BottomSheetBackdrop,
+  BottomSheetBackdropProps,
   BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
+import Animated, {
+  Extrapolate,
+  interpolate,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -236,6 +249,10 @@ function NavBar({
     bottomSheetModalRef.current?.present();
   }, []);
 
+  const handleDismissModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
+
   let icon: 'heart' | 'heart-outline' = products?.find(
     (product) => product.url === currentProduct?.url && product.liked
   )
@@ -246,7 +263,7 @@ function NavBar({
   console.log('activeProduct', activeProduct);
 
   return (
-    <Box>
+    <Box zIndex={100}>
       <Box
         flex={0}
         borderWidth={0}
@@ -280,6 +297,7 @@ function NavBar({
               color="black"
               onPress={() => {
                 setExpandedMenu(false);
+                handleDismissModalPress();
               }}
             />
           ) : (
@@ -342,7 +360,7 @@ const BottomSheet = ({
   const { activeModel, setActiveModel } = useContext(TrainingContext);
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
-  const snapPoints = useMemo(() => ['45%', '100%'], []);
+  const snapPoints = useMemo(() => ['46%', '100%'], []);
 
   const handleSheetChanges = useCallback((index: number) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -372,6 +390,9 @@ const BottomSheet = ({
 
   return (
     <BottomSheetModal
+      style={{}}
+      backgroundStyle={{}}
+      bottomInset={85}
       ref={bottomSheetModalRef}
       index={0}
       snapPoints={snapPoints}
@@ -381,6 +402,7 @@ const BottomSheet = ({
           {...props}
           appearsOnIndex={0}
           disappearsOnIndex={-1}
+          opacity={0}
         />
       )}
     >
