@@ -3,7 +3,7 @@ import { Image as ExpoImage } from 'expo-image';
 import { useUser } from '@clerk/clerk-expo';
 
 import { Box } from '../styling/Box';
-import { domainToInfo } from '../utils/utils';
+import { companyToInfo } from '../utils/utils';
 import { Text } from '../styling/Text';
 import { fetchCompanies } from '../api';
 import { useQuery } from '@tanstack/react-query';
@@ -14,7 +14,7 @@ export default function SearchList({
   searchText,
   setFocus,
 }: {
-  navigateToSite: (domain: string) => Promise<void>;
+  navigateToSite: (company: Company) => Promise<void>;
   searchText: string;
   setFocus: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -49,10 +49,7 @@ export default function SearchList({
               onPress={() => {
                 setFocus(false);
                 Keyboard.dismiss();
-
-                const domain = item.domains[0];
-
-                navigateToSite(domain);
+                navigateToSite(item);
               }}
               style={{ flex: 1 }}
             >
@@ -64,12 +61,12 @@ export default function SearchList({
                     height: 40,
                     width: 40,
                   }}
-                  source={domainToInfo[item.id].icon}
+                  source={companyToInfo[item.id].icon}
                   contentFit="contain"
                 />
                 <Box gap="s">
                   <Text variant="body" fontWeight={'bold'}>
-                    {domainToInfo[item.id].name}
+                    {companyToInfo[item.id].name}
                   </Text>
                   <Text variant="body">{item.domains[0]}</Text>
                 </Box>

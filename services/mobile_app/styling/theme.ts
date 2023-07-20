@@ -7,6 +7,7 @@ const palette = {
   white: '#FFF',
   grey: '#DDDFE9',
   darkGrey: '#A4A6B3',
+  lightGrey: '#fafafa',
 };
 
 export const theme = createTheme({

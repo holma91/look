@@ -13,49 +13,55 @@ import * as Haptics from 'expo-haptics';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { domainToInfo } from '../utils/utils';
+import { companyToInfo } from '../utils/utils';
 import { SearchBar } from '../components/SearchBar';
 import { favoriteCompany, fetchCompanies, unFavoriteCompany } from '../api';
 import { Company } from '../utils/types';
-import { useNavigation } from '@react-navigation/native';
 import SearchList from '../components/SearchList';
 import { getHistory, saveHistory } from '../utils/history';
 
-type CompanyItem = {
-  id: string;
-  domains: string[];
-  favorited: boolean;
-};
-
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [currentDomain, setCurrentDomain] = useState<string>('');
+  const [history, setHistory] = useState<string[]>([]);
   const [searchText, setSearchText] = useState('');
   const [focus, setFocus] = useState(false);
   const { user } = useUser();
 
-  const { data: companies } = useQuery<CompanyItem[]>({
+  const { data: companies } = useQuery<Company[]>({
     queryKey: ['companies', user?.id],
     queryFn: () => fetchCompanies(user?.id as string),
     enabled: !!user?.id,
   });
 
-  const navigateToSite = async (domain: string) => {
-    await saveHistory(domain);
+  const navigateToSite = async (company: Company) => {
+    await saveHistory(company.id);
+    const domain = company.domains[0];
     navigation.navigate('Browser', { url: domain });
+    setCurrentDomain(domain);
   };
 
   const handleSearch = () => {
     if (!companies?.some((company) => company.id.includes(searchText))) {
-      navigateToSite(searchText);
+      const company = companies?.find((company) =>
+        company.id.includes(searchText)
+      );
+      if (company) {
+        navigateToSite(company);
+      }
     }
   };
 
   useEffect(() => {
-    (async () => {
-      const history = await getHistory();
-      console.log('history:', history);
-    })();
-  }, [selectedCategory]);
+    async function fetchHistory() {
+      const fetchedHistory = await getHistory();
+      setHistory(fetchedHistory);
+    }
+
+    fetchHistory();
+  }, [currentDomain]);
+
+  console.log('history', history);
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -70,6 +76,66 @@ export default function Shop({ navigation }: { navigation: any }) {
           />
           {!focus ? (
             <>
+              {history.length > 0 ? (
+                <Box gap="m" paddingBottom="s" paddingTop="s">
+                  <Box
+                    flexDirection="row"
+                    justifyContent="space-between"
+                    paddingHorizontal="m"
+                  >
+                    <Text variant="title">History</Text>
+                    <Text variant="body" fontWeight="600">
+                      See all
+                    </Text>
+                  </Box>
+                  <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={history}
+                    contentContainerStyle={{ paddingLeft: 18 }}
+                    keyExtractor={(item, index) => `history-${index}`}
+                    renderItem={({ item }) => {
+                      // get company from domain
+                      // get info from company with companyToInfo
+                      const companyInfo = companyToInfo[item];
+                      const company = companies?.find((c) => c.id === item);
+                      return (
+                        <TouchableOpacity
+                          onPress={() => navigateToSite(company as Company)}
+                          style={{
+                            paddingRight: 10,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: 10,
+                          }}
+                        >
+                          <ExpoImage
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              height: 45,
+                              width: 45,
+                            }}
+                            source={companyToInfo[item].icon}
+                            contentFit="contain"
+                          />
+                          {/* <Text fontSize={14} fontWeight="500">
+                            {item}
+                          </Text> */}
+                        </TouchableOpacity>
+                      );
+                    }}
+                  />
+                </Box>
+              ) : null}
+              <Text
+                variant="title"
+                paddingLeft="m"
+                paddingTop="s"
+                paddingBottom="s"
+              >
+                Websites
+              </Text>
               <Box flexDirection="row" gap="m" marginVertical="s">
                 <FlatList
                   style={{ flex: 1, gap: 10 }}
@@ -136,7 +202,7 @@ export default function Shop({ navigation }: { navigation: any }) {
 type CompanyListProps = {
   navigateToSite: any;
   selectedCategory: string;
-  companies: CompanyItem[];
+  companies: Company[];
   user?: any;
 };
 
@@ -150,7 +216,7 @@ function CompanyList({
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (company: CompanyItem) => {
+    mutationFn: async (company: Company) => {
       if (!user?.id) return;
 
       if (!company.favorited) {
@@ -159,7 +225,7 @@ function CompanyList({
         return favoriteCompany(user.id, company.id);
       }
     },
-    onMutate: async (company: CompanyItem) => {
+    onMutate: async (company: Company) => {
       company.favorited = !company.favorited;
 
       await queryClient.cancelQueries({ queryKey: ['companies', user?.id] });
@@ -193,15 +259,15 @@ function CompanyList({
       filtered = companies.filter((company) => company.favorited);
     } else if (selectedCategory === 'Multi-brand') {
       filtered = companies.filter(
-        (company) => domainToInfo[company.id].multiBrand
+        (company) => companyToInfo[company.id].multiBrand
       );
     } else if (selectedCategory === 'High-end') {
       filtered = companies.filter(
-        (company) => domainToInfo[company.id].highEnd
+        (company) => companyToInfo[company.id].highEnd
       );
     } else if (selectedCategory === 'Second-hand') {
       filtered = companies.filter(
-        (company) => domainToInfo[company.id].secondHand
+        (company) => companyToInfo[company.id].secondHand
       );
     } else {
       filtered = companies;
@@ -209,10 +275,8 @@ function CompanyList({
     return filtered;
   }, [selectedCategory, companies, renderToggle]);
 
-  console.log('navigateToSite', navigateToSite);
-
   return (
-    <FlatList<CompanyItem>
+    <FlatList<Company>
       data={filteredSites}
       renderItem={({ item, index }) => (
         <Box
@@ -224,9 +288,7 @@ function CompanyList({
         >
           <TouchableOpacity
             onPress={async () => {
-              console.log('item.domains[0]:', item.domains[0]);
-              const domain = item.domains[0];
-              navigateToSite(domain);
+              navigateToSite(item);
             }}
             style={{ flex: 1 }}
           >
@@ -238,12 +300,12 @@ function CompanyList({
                   height: 40,
                   width: 40,
                 }}
-                source={domainToInfo[item.id].icon}
+                source={companyToInfo[item.id].icon}
                 contentFit="contain"
               />
               <Box gap="s">
                 <Text variant="body" fontWeight={'bold'}>
-                  {domainToInfo[item.id].name}
+                  {companyToInfo[item.id].name}
                 </Text>
                 <Text variant="body">{item.domains[0]}</Text>
               </Box>

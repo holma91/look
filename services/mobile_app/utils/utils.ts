@@ -1,4 +1,4 @@
-type DomainProps = {
+type CompanyProps = {
   name: string;
   icon: any;
   multiBrand: boolean;
@@ -8,7 +8,7 @@ type DomainProps = {
 
 // Predefined domains
 
-export const domainToInfo: { [key: string]: DomainProps } = {
+export const companyToInfo: { [key: string]: CompanyProps } = {
   zalando: {
     name: 'Zalando',
     icon: require('../assets/logos/zalando.png'),

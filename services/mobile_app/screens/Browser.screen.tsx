@@ -41,7 +41,7 @@ import {
   likeProduct,
   unlikeProduct,
 } from '../api';
-import { Product, UserProduct } from '../utils/types';
+import { Company, Product, UserProduct } from '../utils/types';
 import { WebviewSearchBar } from '../components/SearchBar';
 import { TrainingContext } from '../context/Training';
 import SearchList from '../components/SearchList';
@@ -122,8 +122,9 @@ export default function Browser({
     }
   };
 
-  const navigateToSite = async (domain: string) => {
-    await saveHistory(domain);
+  const navigateToSite = async (company: Company) => {
+    await saveHistory(company.id);
+    const domain = company.domains[0];
     navigation.navigate('Browser', { url: domain });
   };
 

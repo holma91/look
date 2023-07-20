@@ -29,7 +29,7 @@ export type Website = {
 
 export type Company = {
   id: string;
-  domains: string;
+  domains: string[];
   favorited: boolean;
 };
 

@@ -15,7 +15,7 @@ import { Text } from '../styling/Text';
 import { fetchCompanies, fetchWebsites } from '../api';
 import { useState } from 'react';
 import { Website, Company } from '../utils/types';
-import { domainToInfo } from '../utils/utils';
+import { companyToInfo } from '../utils/utils';
 
 export default function Search({ navigation }: { navigation: any }) {
   const [searchText, setSearchText] = useState('');
@@ -83,12 +83,12 @@ export default function Search({ navigation }: { navigation: any }) {
                         height: 40,
                         width: 40,
                       }}
-                      source={domainToInfo[item.id].icon}
+                      source={companyToInfo[item.id].icon}
                       contentFit="contain"
                     />
                     <Box gap="s">
                       <Text variant="body" fontWeight={'bold'}>
-                        {domainToInfo[item.id].name}
+                        {companyToInfo[item.id].name}
                       </Text>
                       <Text variant="body">{item.domains[0]}</Text>
                     </Box>
