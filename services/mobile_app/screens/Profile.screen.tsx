@@ -5,6 +5,7 @@ import { Box } from '../styling/Box';
 import { useContext } from 'react';
 import { DemoContext } from '../context/Demo';
 import { Text } from '../styling/Text';
+import { clearHistory } from '../utils/history';
 
 const SignOut = () => {
   const { isLoaded, signOut } = useAuth();
@@ -30,6 +31,16 @@ export default function Profile() {
 
   const toggleSwitch = () => setIsDemo((previousState) => !previousState);
 
+  const handleClearCache = async () => {
+    try {
+      await clearHistory();
+      alert('Cache cleared successfully.');
+    } catch (e) {
+      console.error(e);
+      alert('Failed to clear cache.');
+    }
+  };
+
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -45,6 +56,7 @@ export default function Profile() {
             />
             <Text variant="title">{isDemo ? 'Demo is on' : 'Demo is off'}</Text>
           </Box>
+          <Button title="Clear Cache" onPress={handleClearCache} />
         </Box>
       </SafeAreaView>
     </Box>

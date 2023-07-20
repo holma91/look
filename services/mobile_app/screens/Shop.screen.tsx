@@ -12,11 +12,14 @@ import * as Haptics from 'expo-haptics';
 
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { domainToInfo } from '../utils/utils';
 import { SearchBar } from '../components/SearchBar';
 import { favoriteCompany, fetchCompanies, unFavoriteCompany } from '../api';
+import { Company } from '../utils/types';
+import { useNavigation } from '@react-navigation/native';
 import SearchList from '../components/SearchList';
+import { getHistory, saveHistory } from '../utils/history';
 
 type CompanyItem = {
   id: string;
@@ -36,18 +39,29 @@ export default function Shop({ navigation }: { navigation: any }) {
     enabled: !!user?.id,
   });
 
+  const navigateToSite = async (domain: string) => {
+    await saveHistory(domain);
+    navigation.navigate('Browser', { url: domain });
+  };
+
   const handleSearch = () => {
     if (!companies?.some((company) => company.id.includes(searchText))) {
-      navigation.navigate('Browser', { url: searchText });
+      navigateToSite(searchText);
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      const history = await getHistory();
+      console.log('history:', history);
+    })();
+  }, [selectedCategory]);
 
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1} gap="s">
           <SearchBar
-            navigation={navigation}
             searchText={searchText}
             setSearchText={setSearchText}
             handleSearch={handleSearch}
@@ -97,7 +111,7 @@ export default function Shop({ navigation }: { navigation: any }) {
               </Box>
               <Box flex={1}>
                 <CompanyList
-                  navigation={navigation}
+                  navigateToSite={navigateToSite}
                   selectedCategory={selectedCategory}
                   companies={companies || []}
                   user={user}
@@ -107,7 +121,7 @@ export default function Shop({ navigation }: { navigation: any }) {
           ) : (
             <Box flex={1}>
               <SearchList
-                navigation={navigation}
+                navigateToSite={navigateToSite}
                 searchText={searchText}
                 setFocus={setFocus}
               />
@@ -120,14 +134,14 @@ export default function Shop({ navigation }: { navigation: any }) {
 }
 
 type CompanyListProps = {
-  navigation: any;
+  navigateToSite: any;
   selectedCategory: string;
   companies: CompanyItem[];
   user?: any;
 };
 
 function CompanyList({
-  navigation,
+  navigateToSite,
   selectedCategory,
   companies,
   user,
@@ -195,6 +209,8 @@ function CompanyList({
     return filtered;
   }, [selectedCategory, companies, renderToggle]);
 
+  console.log('navigateToSite', navigateToSite);
+
   return (
     <FlatList<CompanyItem>
       data={filteredSites}
@@ -207,9 +223,10 @@ function CompanyList({
           paddingVertical="s"
         >
           <TouchableOpacity
-            onPress={() => {
+            onPress={async () => {
               console.log('item.domains[0]:', item.domains[0]);
-              navigation.navigate('Browser', { url: item.domains[0] });
+              const domain = item.domains[0];
+              navigateToSite(domain);
             }}
             style={{ flex: 1 }}
           >

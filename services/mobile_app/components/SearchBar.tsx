@@ -5,14 +5,12 @@ import { Box } from '../styling/Box';
 import { TextInput } from '../styling/TextInput';
 
 function SearchBar({
-  navigation,
   searchText,
   setSearchText,
   handleSearch,
   setFocus,
   focus,
 }: {
-  navigation: any;
   searchText: string;
   setSearchText: React.Dispatch<React.SetStateAction<string>>;
   handleSearch: () => void;

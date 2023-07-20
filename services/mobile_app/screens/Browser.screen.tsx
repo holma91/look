@@ -45,6 +45,7 @@ import { Product, UserProduct } from '../utils/types';
 import { WebviewSearchBar } from '../components/SearchBar';
 import { TrainingContext } from '../context/Training';
 import SearchList from '../components/SearchList';
+import { saveHistory } from '../utils/history';
 
 function getDomain(url: string) {
   let domain;
@@ -121,6 +122,11 @@ export default function Browser({
     }
   };
 
+  const navigateToSite = async (domain: string) => {
+    await saveHistory(domain);
+    navigation.navigate('Browser', { url: domain });
+  };
+
   const handleLoadEnd = (navState: any) => {
     if (!webviewRef.current) return;
 
@@ -151,7 +157,7 @@ export default function Browser({
             {focus ? (
               <Box flex={1}>
                 <SearchList
-                  navigation={navigation}
+                  navigateToSite={navigateToSite}
                   searchText={searchText}
                   setFocus={setFocus}
                 />

@@ -10,11 +10,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Company } from '../utils/types';
 
 export default function SearchList({
-  navigation,
+  navigateToSite,
   searchText,
   setFocus,
 }: {
-  navigation: any;
+  navigateToSite: (domain: string) => Promise<void>;
   searchText: string;
   setFocus: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -30,6 +30,7 @@ export default function SearchList({
   const filteredWebsites = companies?.filter((company) =>
     company.id.includes(searchText)
   );
+
   return (
     <Box flex={1}>
       <FlatList
@@ -46,12 +47,12 @@ export default function SearchList({
           >
             <TouchableOpacity
               onPress={() => {
-                console.log('item', item);
                 setFocus(false);
                 Keyboard.dismiss();
-                navigation.navigate('Browser', {
-                  url: item.domains[0],
-                });
+
+                const domain = item.domains[0];
+
+                navigateToSite(domain);
               }}
               style={{ flex: 1 }}
             >

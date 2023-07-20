@@ -45,6 +45,10 @@ fix cache!
   - make images selectable
 - fix upload link feature
 - ui fixes in navbar
+- history functionality on Shop screen
+  - take UI from coinbase
+- make lists swipeable
+  https://reactnavigation.org/docs/tab-view/
 
 also:
 
