@@ -128,14 +128,14 @@ export default function Shop({ navigation }: { navigation: any }) {
                   />
                 </Box>
               ) : null}
-              <Text
+              {/* <Text
                 variant="title"
                 paddingLeft="m"
                 paddingTop="s"
                 paddingBottom="s"
               >
                 Websites
-              </Text>
+              </Text> */}
               <Box flexDirection="row" gap="m" marginVertical="s">
                 <FlatList
                   style={{ flex: 1, gap: 10 }}

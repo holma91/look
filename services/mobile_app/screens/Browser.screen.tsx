@@ -92,11 +92,11 @@ export default function Browser({
   const [focus, setFocus] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product>({
-    url: 'https://www.zara.com/se/en/rak-blazer-p08068001.html?v1=78861699&v2=1718127',
-    name: 'NAME',
-    brand: 'BRAND',
-    price: 'PRICE',
-    currency: 'CURRENCY',
+    url: '',
+    name: '',
+    brand: '',
+    price: '',
+    currency: '',
     images: [],
   });
   const [currentImage, setCurrentImage] = useState<string>('');
@@ -170,6 +170,7 @@ export default function Browser({
                 handleLoadEnd={handleLoadEnd}
                 url={url}
                 domain={domain}
+                currentProduct={currentProduct}
                 setCurrentProduct={setCurrentProduct}
                 setCurrentImage={setCurrentImage}
                 refetchProducts={refetchProducts}
@@ -264,7 +265,7 @@ function NavBar({
     : 'heart-outline';
 
   let activeProduct = products?.find((p) => p.url === currentProduct?.url);
-  console.log('activeProduct', activeProduct);
+  // console.log('activeProduct', activeProduct);
 
   return (
     <Box zIndex={100}>
@@ -332,6 +333,7 @@ function NavBar({
         currentProduct={currentProduct}
         currentImage={currentImage}
         setCurrentImage={setCurrentImage}
+        products={products}
       />
     </Box>
   );
@@ -343,6 +345,7 @@ type BottomSheetModalProps = {
   currentProduct: Product;
   currentImage: string;
   setCurrentImage: React.Dispatch<React.SetStateAction<string>>;
+  products: UserProduct[];
 };
 
 const BottomSheet = ({
@@ -351,9 +354,9 @@ const BottomSheet = ({
   currentProduct,
   currentImage,
   setCurrentImage,
+  products,
 }: BottomSheetModalProps) => {
   const [expandedContent, setExpandedContent] = useState(false);
-  const { activeModel, setActiveModel } = useContext(TrainingContext);
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
   const snapPoints = useMemo(() => ['46%', '100%'], []);
@@ -372,6 +375,66 @@ const BottomSheet = ({
     }
   }, []);
 
+  return (
+    <BottomSheetModal
+      style={{}}
+      backgroundStyle={{}}
+      // bottomInset={85}
+      ref={bottomSheetModalRef}
+      index={0}
+      snapPoints={snapPoints}
+      onChange={handleSheetChanges}
+      backdropComponent={(props) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+        />
+      )}
+    >
+      <BottomSheetContent
+        bottomSheetModalRef={bottomSheetModalRef}
+        isGenerating={isGenerating}
+        setIsGenerating={setIsGenerating}
+        hasGenerated={hasGenerated}
+        setHasGenerated={setHasGenerated}
+        currentProduct={currentProduct}
+        currentImage={currentImage}
+        setCurrentImage={setCurrentImage}
+        expandedContent={expandedContent}
+        products={products}
+      />
+    </BottomSheetModal>
+  );
+};
+
+type BottomSheetContentProps = {
+  bottomSheetModalRef: React.RefObject<BottomSheetModal>;
+  isGenerating: boolean;
+  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>;
+  hasGenerated: boolean;
+  setHasGenerated: React.Dispatch<React.SetStateAction<boolean>>;
+  currentProduct: Product;
+  currentImage: string;
+  setCurrentImage: React.Dispatch<React.SetStateAction<string>>;
+  expandedContent: boolean;
+  products: UserProduct[];
+};
+
+const BottomSheetContent = ({
+  bottomSheetModalRef,
+  isGenerating,
+  setIsGenerating,
+  hasGenerated,
+  setHasGenerated,
+  currentProduct,
+  currentImage,
+  setCurrentImage,
+  expandedContent,
+  products,
+}: BottomSheetContentProps) => {
+  const { activeModel, setActiveModel } = useContext(TrainingContext);
+
   const handleTestOnModel = async () => {
     // change current image progressively, when at last image, snap to top
     setIsGenerating(true);
@@ -384,178 +447,199 @@ const BottomSheet = ({
     setHasGenerated(true);
   };
 
-  return (
-    <BottomSheetModal
-      style={{}}
-      backgroundStyle={{}}
-      bottomInset={85}
-      ref={bottomSheetModalRef}
-      index={0}
-      snapPoints={snapPoints}
-      onChange={handleSheetChanges}
-      backdropComponent={(props) => (
-        <BottomSheetBackdrop
-          {...props}
-          appearsOnIndex={0}
-          disappearsOnIndex={-1}
-          opacity={0}
+  if (currentProduct.url === '') {
+    return (
+      <Box justifyContent="center" alignItems="center" marginTop="l" gap="m">
+        <Text variant="title">We can't find a product!</Text>
+        <Text>Go to a product page, and you'll see it right here. </Text>
+        <Text>Or, you can go to some of your earlier viewed products:</Text>
+        {/* insert horizontal flatlist of product history */}
+        <FlatList
+          style={{ gap: 10, marginTop: 20 }}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={products}
+          contentContainerStyle={{ paddingLeft: 5 }}
+          keyExtractor={(item, index) => `category-${index}`}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => {}}
+              style={{
+                marginRight: 6,
+              }}
+            >
+              <ExpoImage
+                style={{
+                  height: 125,
+                  width: 90,
+                }}
+                source={item.images[0]}
+                contentFit="cover"
+              />
+            </TouchableOpacity>
+          )}
         />
-      )}
-    >
-      {expandedContent ? (
-        <Box
-          margin="m"
-          marginBottom="l"
-          flexDirection="column"
-          justifyContent="space-between"
-          gap="m"
-          flex={1}
-        >
-          <Box flex={1} borderWidth={0}>
+      </Box>
+    );
+  }
+
+  if (expandedContent) {
+    return (
+      <Box
+        margin="m"
+        marginBottom="l"
+        flexDirection="column"
+        justifyContent="space-between"
+        gap="m"
+        flex={1}
+      >
+        <Box flex={1} borderWidth={0}>
+          {currentImage !== '' ? (
+            <ExpoImage
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              source={currentImage}
+              contentFit="cover"
+            />
+          ) : null}
+        </Box>
+        <Box flex={0} justifyContent="space-between" gap="m" marginVertical="m">
+          <Box
+            padding="m"
+            borderWidth={1}
+            borderRadius={10}
+            borderColor="text"
+            flexDirection="row"
+            justifyContent="space-between"
+          >
+            <Text variant="body" fontWeight="bold">
+              Selected Model:
+            </Text>
+            <Text variant="body" fontWeight="bold">
+              {activeModel.name}
+            </Text>
+          </Box>
+          <Box flex={0}>
+            <Button onPress={() => {}} variant="primary" backgroundColor="text">
+              <Text color="background" fontWeight="600" fontSize={15}>
+                {isGenerating
+                  ? 'is generating...'
+                  : hasGenerated
+                  ? 'Share image'
+                  : `Test on model`}
+              </Text>
+            </Button>
+          </Box>
+        </Box>
+      </Box>
+    );
+  } else {
+    return (
+      <Box margin="m" gap="l">
+        <Box flexDirection="row" justifyContent="space-between" gap="m">
+          <Box flex={1}>
             {currentImage !== '' ? (
               <ExpoImage
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  aspectRatio: 0.75, // todo: calculate this
                 }}
                 source={currentImage}
                 contentFit="cover"
               />
-            ) : null}
+            ) : (
+              <ExpoImage
+                style={{
+                  aspectRatio: 0.75,
+                }}
+                source={
+                  'https://i0.wp.com/roadmap-tech.com/wp-content/uploads/2019/04/placeholder-image.jpg?resize=400%2C400&ssl=1'
+                }
+                contentFit="cover"
+              />
+            )}
           </Box>
-          <Box
-            flex={0}
-            justifyContent="space-between"
-            gap="m"
-            marginVertical="m"
-          >
-            <Box
-              padding="m"
-              borderWidth={1}
-              borderRadius={10}
-              borderColor="text"
-              flexDirection="row"
-              justifyContent="space-between"
-            >
-              <Text variant="body" fontWeight="bold">
-                Selected Model:
-              </Text>
-              <Text variant="body" fontWeight="bold">
-                {activeModel.name}
-              </Text>
-            </Box>
-            <Box flex={0}>
-              <Button
-                onPress={() => {}}
-                variant="primary"
-                backgroundColor="text"
+          <Box flex={1} justifyContent="space-between">
+            <Box gap="s" flex={1}>
+              <Text
+                variant="body"
+                fontWeight="bold"
+                fontSize={20}
+                numberOfLines={1}
+                ellipsizeMode="tail"
               >
-                <Text color="background" fontWeight="600" fontSize={15}>
-                  {isGenerating
-                    ? 'is generating...'
-                    : hasGenerated
-                    ? 'Share image'
-                    : `Test on model`}
-                </Text>
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      ) : (
-        <Box margin="m" gap="l">
-          <Box flexDirection="row" justifyContent="space-between" gap="m">
-            <Box flex={1}>
-              {currentImage !== '' && (
-                <ExpoImage
-                  style={{
-                    aspectRatio: 0.75, // todo: calculate this
-                  }}
-                  source={currentImage}
-                  contentFit="cover"
-                />
-              )}
-            </Box>
-            <Box flex={1} justifyContent="space-between">
-              <Box gap="s" flex={1}>
-                <Text
-                  variant="body"
-                  fontWeight="bold"
-                  fontSize={20}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {currentProduct.name}
-                </Text>
-                <Text variant="body" fontSize={17}>
-                  {currentProduct.brand}
-                </Text>
+                {currentProduct.name}
+              </Text>
+              <Text variant="body" fontSize={17}>
+                {currentProduct.brand}
+              </Text>
 
-                <Text
-                  variant="body"
-                  fontSize={17}
-                >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
-              </Box>
+              <Text
+                variant="body"
+                fontSize={17}
+              >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
+            </Box>
 
-              <Box flex={0} gap="l">
-                <FlatList
-                  style={{ gap: 10, marginTop: 20 }}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  data={currentProduct.images}
-                  contentContainerStyle={{ paddingLeft: 5 }}
-                  keyExtractor={(item, index) => `category-${index}`}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setCurrentImage(item);
-                      }}
+            <Box flex={0} gap="l">
+              <FlatList
+                style={{ gap: 10, marginTop: 20 }}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={currentProduct.images}
+                contentContainerStyle={{ paddingLeft: 5 }}
+                keyExtractor={(item, index) => `category-${index}`}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setCurrentImage(item);
+                    }}
+                    style={{
+                      marginRight: 6,
+                    }}
+                  >
+                    <ExpoImage
                       style={{
-                        marginRight: 6,
+                        height: 50,
+                        width: 50,
+                        borderWidth: item === currentImage ? 2 : 0,
                       }}
-                    >
-                      <ExpoImage
-                        style={{
-                          height: 50,
-                          width: 50,
-                          borderWidth: item === currentImage ? 2 : 0,
-                        }}
-                        source={item}
-                        contentFit="cover"
-                      />
-                    </TouchableOpacity>
-                  )}
-                />
-                <Box
-                  flexDirection="row"
-                  borderWidth={1}
-                  padding="s"
-                  paddingVertical="sm"
-                  borderRadius={10}
-                  alignItems="center"
-                  justifyContent="center"
-                  gap="xs"
-                >
-                  <Text variant="body" fontWeight="bold" fontSize={16}>
-                    {activeModel.name}
-                  </Text>
-                  <Ionicons name="chevron-down" size={20} color="black" />
-                </Box>
-              </Box>
+                      source={item}
+                      contentFit="cover"
+                    />
+                  </TouchableOpacity>
+                )}
+              />
+              {/* <Box
+                flexDirection="row"
+                borderWidth={1}
+                padding="s"
+                paddingVertical="sm"
+                borderRadius={10}
+                alignItems="center"
+                justifyContent="center"
+                gap="xs"
+              >
+                <Text variant="body" fontWeight="bold" fontSize={16}>
+                  {activeModel.name}
+                </Text>
+                <Ionicons name="chevron-down" size={20} color="black" />
+              </Box> */}
             </Box>
           </Box>
-          <Button
-            onPress={handleTestOnModel}
-            variant="primary"
-            backgroundColor="text"
-          >
-            <Text color="background" fontWeight="600" fontSize={15}>
-              {isGenerating ? 'is generating...' : `Test on model`}
-            </Text>
-          </Button>
         </Box>
-      )}
-    </BottomSheetModal>
-  );
+        <Button
+          onPress={handleTestOnModel}
+          variant="primary"
+          backgroundColor="text"
+        >
+          <Text color="background" fontWeight="600" fontSize={15}>
+            {isGenerating ? 'is generating...' : `Test on model`}
+          </Text>
+        </Button>
+      </Box>
+    );
+  }
 };
 
 const demoImages: { [key: string]: any } = {

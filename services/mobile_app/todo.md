@@ -40,27 +40,40 @@ fix cache!
 
 ### TODO rn
 
+Time to start doing more important stuff.
+Experiment with inpainting
+Experiment with SDXL
+Start thinking of in app segmentation?
+
+## research todos
+
+- try out replicate
+- play around with the diffusion models
+
+## client todos
+
+**small**:
+
 - fix everything with the browser sheet ui
   - automatically select images
   - make images selectable
 - fix upload link feature
 - ui fixes in navbar
-- history functionality on Shop screen
-  - take UI from coinbase
 - make lists swipeable
   https://reactnavigation.org/docs/tab-view/
+- fix dark mode
+- make it impossible to swipe back a screen when in a webview
 
-also:
+**big**:
 
-- chill with the deployment for a few days to see if any accelerator is interested
+- start designing the "studio" screen
+  - skia?
+- start designing the "scan your face" stuff
 
-### TODO
+**what would it take to add dark mode?**
 
-- Clean up demoware
-- Separate app into V1 and Demo (toggleable between)
-- do last things for V1, launch
-- deep dive into useReducer
-- finish tabular data video
+- add a theme, switch out the context
+  keep in mind that ALWAYS try to do color with restyle components
 
 ### TODO far away
 

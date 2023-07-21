@@ -10,6 +10,7 @@ type WebViewBoxProps = {
   handleLoadEnd: (navState: any) => void;
   url: string;
   domain: string;
+  currentProduct: Product;
   setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
   setCurrentImage: React.Dispatch<React.SetStateAction<string>>;
   refetchProducts: () => void;
@@ -20,6 +21,7 @@ export function WebViewBox({
   handleLoadEnd,
   url,
   domain,
+  currentProduct,
   setCurrentProduct,
   setCurrentImage,
   refetchProducts,
@@ -36,7 +38,7 @@ export function WebViewBox({
     // message type 1: product data
     const parsedData = JSON.parse(event.nativeEvent.data);
     const url = event.nativeEvent.url;
-    // console.log('parsedData:', parsedData);
+    console.log('parsedData:', parsedData);
 
     if (parsedData.type === 'product') {
       const product: Product = parseProduct(
@@ -56,6 +58,7 @@ export function WebViewBox({
 
       try {
         console.log('domain:', domain);
+        console.log('full product:', product);
 
         await createProduct(user?.id, product, domain);
         queryClient.invalidateQueries({ queryKey: ['brands', user?.id] });
@@ -75,6 +78,18 @@ export function WebViewBox({
         refetchProducts();
       } catch (error) {
         console.error(error);
+      }
+    } else if (parsedData.type === 'no product') {
+      if (currentProduct.url !== '') {
+        setCurrentProduct({
+          url: '',
+          name: '',
+          brand: '',
+          price: '',
+          currency: '',
+          images: [],
+        });
+        setCurrentImage('');
       }
     } else {
       console.log('unknown message type:', parsedData.type, parsedData.data);

@@ -142,6 +142,18 @@ export function parseProduct(
       product['price'] = productData['offers']['price'];
       product['currency'] = productData['offers']['priceCurrency'];
       product['images'] = productData['image'];
+    } else if (domain === 'hermes.com') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers']['price'];
+      product['currency'] = productData['offers']['priceCurrency'];
+      product['images'] = productData['image'];
+    } else if (domain === 'na-kd.com') {
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers'][0]['price'];
+      product['currency'] = productData['offers'][0]['priceCurrency'];
+      product['images'] = [];
     }
   } catch (e) {
     console.log(`couldn't parse on domain:${domain} with error: ${e}`);

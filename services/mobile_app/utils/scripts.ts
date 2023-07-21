@@ -11,16 +11,23 @@ export const newBaseExtractScript2 = `
       'script[type="application/ld+json"]'
     );
 
+    let productFound = false;
+
     for (let i = 0; i < elements.length; i++) {
       var parsed = JSON.parse(elements[i].textContent);
       if (parsed['@type'] === 'Product') {
+        productFound = true;
         if (window.location.href !== lastProductInfo.url && parsed.image[0] !== lastProductInfo.images[0]) {
           lastProductInfo.url = window.location.href;
           lastProductInfo.images = parsed.image;
           window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: elements[i].textContent, url: window.location.href }));
           return;
-        }
+        } 
       }
+    }
+
+    if (!productFound) {
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'no product', data: 'no product found' }));
     }
   }
 
@@ -28,9 +35,10 @@ export const newBaseExtractScript2 = `
     sendProductData();
     setInterval(() => {
       sendProductData();
-    }, 1000);
+    }, 2000);
   } catch (e) {
-    alert(e);
+    window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'error', data: e }));
+    window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'no product', data: 'no product found' }));
   }
 `;
 
