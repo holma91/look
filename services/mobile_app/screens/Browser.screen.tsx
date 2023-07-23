@@ -453,12 +453,11 @@ const BottomSheetContent = ({
         <Text variant="title">We can't find a product!</Text>
         <Text>Go to a product page, and you'll see it right here. </Text>
         <Text>Or, you can go to some of your earlier viewed products:</Text>
-        {/* insert horizontal flatlist of product history */}
         <FlatList
           style={{ gap: 10, marginTop: 20 }}
           horizontal
           showsHorizontalScrollIndicator={false}
-          data={products}
+          data={products.slice().reverse()}
           contentContainerStyle={{ paddingLeft: 5 }}
           keyExtractor={(item, index) => `category-${index}`}
           renderItem={({ item }) => (
