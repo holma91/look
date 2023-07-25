@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS "product" (
 
 CREATE TABLE IF NOT EXISTS "product_image" (
     product_url TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,
-    image_url TEXT NOT NULL
+    image_url TEXT NOT NULL,
+    UNIQUE(product_url, image_url)
 );
 
 CREATE TABLE IF NOT EXISTS "user_product" (

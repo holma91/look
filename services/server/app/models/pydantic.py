@@ -9,6 +9,10 @@ class POSTResponse(BaseModel):
     status: str
     message: str
 
+class POSTResponseAddImage(BaseModel):
+    success: bool
+    message: str
+
 ### BASE MODELS ###
 
 class UserBase(BaseModel):

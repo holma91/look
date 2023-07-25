@@ -83,12 +83,16 @@ async def add_product(user_id: str, product: ProductExtended) -> bool:
 
     return True
 
-async def add_product_image(product_image: ProductImage) -> bool:
-    async with get_db_connection() as conn:
-        query = """insert into product_image (product_url, image_url) values ($1, $2);"""
-        result = await conn.execute_query_dict(query, [product_image.product_url, product_image.image_url])
-    
-    return True
+async def add_product_image(product_image: ProductImage) -> dict:
+    try:
+        async with get_db_connection() as conn:
+            query = """insert into product_image (product_url, image_url) values ($1, $2);"""
+            result = await conn.execute_query_dict(query, [product_image.product_url, product_image.image_url])
+        
+        return {"success": True, "message": "Image added successfully"}
+    except Exception as e:
+        # todo: more specific error handling
+        return {"success": False, "message": "Image already exists"}
 
 async def get_products(user_id: str, filters: Optional[dict[str, str]] = None):
     async with get_db_connection() as conn:
