@@ -67,12 +67,16 @@ export function WebViewBox({
         console.error(error);
       }
     } else if (parsedData.type === 'imageSrc') {
+      console.log('got imageSrc:', parsedData.data);
+
       const imageSrc: string = parsedData.data;
       const parsedImageSrc = parseImageSrc(domain, imageSrc);
 
-      // setCurrentProduct((prev) => ({ ...prev, images: [parsedImageSrc] }));
+      setCurrentProduct((prev) => ({
+        ...prev,
+        images: [...prev.images, parsedImageSrc],
+      }));
       setCurrentImage(parsedImageSrc);
-      // insert images here
       try {
         await addProductImages(user?.id, productUrl, parsedImageSrc);
         refetchProducts();

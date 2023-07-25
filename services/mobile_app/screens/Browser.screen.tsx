@@ -29,12 +29,7 @@ import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Button } from '../components/Buttons';
-import {
-  baseExtractScript,
-  baseInteractScript,
-  newBaseExtractScript,
-  newBaseExtractScript2,
-} from '../utils/scripts';
+import { baseExtractScript, baseInteractScript } from '../utils/scripts';
 import {
   fetchCompanies,
   fetchProducts,
@@ -131,8 +126,8 @@ export default function Browser({
   const handleLoadEnd = (navState: any) => {
     if (!webviewRef.current) return;
 
-    webviewRef.current.injectJavaScript(newBaseExtractScript2);
-    // webviewRef.current.injectJavaScript(baseInteractScript);
+    webviewRef.current.injectJavaScript(baseExtractScript);
+    webviewRef.current.injectJavaScript(baseInteractScript);
   };
 
   const { data: products, refetch: refetchProducts } = useQuery({

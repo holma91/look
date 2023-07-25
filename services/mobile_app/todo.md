@@ -45,6 +45,8 @@ fix cache!
 - hide test model stuff
 - build and deploy
 
+**replace all flatlists with flashlists**:
+
 ## research todos
 
 - try out replicate

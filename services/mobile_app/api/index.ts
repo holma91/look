@@ -1,7 +1,7 @@
 import { Filters, UserProduct } from '../utils/types';
 
 // api.ts
-const URL = 'https://bb0c-83-255-121-67.ngrok-free.app';
+const URL = 'https://77f8-85-230-9-36.ngrok-free.app';
 
 export const fetchWebsites = async (id: string) => {
   const completeUrl = `${URL}/users/${id}/websites`;
