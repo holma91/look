@@ -19,3 +19,6 @@ ControlNet models are not that expensive to train.
 T2I-Adapter supports more than one model for one time input guidance, for example, it can use both sketch and segmentation map as input condition or guided by sketch input in a masked area (inpaint) at the same time. This gives even more control than either mode alone.
 
 ## with ComfyUI
+
+**reference-only**:
+Doesn't require any control models, guides the diffusion directly using images as references. This method is similar to inpaint-based reference but it doesn't make your image disordered. Reference-only CN can directly link the attention layers of your SD to any independent images.

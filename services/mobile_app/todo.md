@@ -40,10 +40,10 @@ fix cache!
 
 ### TODO rn
 
-Time to start doing more important stuff.
-Experiment with inpainting
-Experiment with SDXL
-Start thinking of in app segmentation?
+- replace all flatlists with flashlists
+- make image selection work
+- hide test model stuff
+- build and deploy
 
 ## research todos
 

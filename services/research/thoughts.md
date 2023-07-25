@@ -24,3 +24,7 @@ what we need to do:
 - have a raw product image
 
 Maybe a generation should give the user some examples of both?
+
+reference only controlnet of the clothing
+openpose of a pose
+canny? depth? soft edge? lineart?
