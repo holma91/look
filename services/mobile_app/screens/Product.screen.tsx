@@ -24,6 +24,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { TrainingContext } from '../context/Training';
+import { DemoContext } from '../context/Demo';
 
 const { width, height } = Dimensions.get('window');
 
@@ -273,10 +274,11 @@ function TextBox({
   activeIndex,
 }: TextBoxProps) {
   const { activeModel, setActiveModel } = useContext(TrainingContext);
+  const { isDemo } = useContext(DemoContext);
   const [isShared, setIsShared] = useState(false);
 
   const handleGenerate = async () => {
-    if (isGenerating) return;
+    if (isGenerating || !isDemo) return;
 
     setIsGenerating(true);
 

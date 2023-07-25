@@ -125,6 +125,8 @@ export default function Browser({
   };
 
   const handleLoadEnd = (navState: any) => {
+    // console.log('handleLoadEnd', navState.nativeEvent.url);
+
     if (!webviewRef.current) return;
 
     if (route.params?.baseProductUrl) {
@@ -132,6 +134,8 @@ export default function Browser({
         return;
       }
     }
+
+    // console.log('injecting');
 
     webviewRef.current.injectJavaScript(baseExtractScript);
     webviewRef.current.injectJavaScript(baseInteractScript);

@@ -6,43 +6,17 @@ What do with brand?
 2. make lowercase
 3. replace " " with "-"
 
-**image extraction**:
+### image extraction feature
+
 so the plan is to first make a guess, and try to extract images.
 
 1. try getting from schema.org
 2. all images that's not nested in a link and in a certain size
 3. always allow the user to to click by themselves
 
-injection & extraction process:
-
-1. handleLoadend
-2. handleMessage
-
-- receives product data
-- parses it with parseProduct
-- updates sheet AND sends structured product to server
-
-As long as handleLoadEnd is called for every new product, this is fine.
-
-the questions is, should the baseExtractScript include include an interval, and get called every x ms?
-
-Yes, this was a very good idea. Next up, create a caching layer in the webview, that checks diffs between page loads. Like, if it's a new url, the images can't be the same.
-
-at time x:
-url = a, image = b
-
-at time y:
-if url is different, then image HAVE to be different.
-
-so, we store that last url and last image in the browser storage.
-
-fix cache!
-
 ### TODO rn
 
-- replace all flatlists with flashlists
-- make image selection work
-- hide test model stuff
+- hide all test model stuff
 - build and deploy
 
 **replace all flatlists with flashlists**:
@@ -59,15 +33,17 @@ fix cache!
 - fix everything with the browser sheet ui
   - automatically select images
   - make images selectable
-- fix upload link feature
 - ui fixes in navbar
 - make lists swipeable
   https://reactnavigation.org/docs/tab-view/
 - fix dark mode
 - make it impossible to swipe back a screen when in a webview
+- replace all flatlists with flashlists
 
 **big**:
 
+- fix upload link feature
+  - this is where we look into gpt-4 for extraction
 - start designing the "studio" screen
   - skia?
 - start designing the "scan your face" stuff

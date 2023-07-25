@@ -1,12 +1,18 @@
 export const baseExtractScript = `
   if (typeof lastProductInfo === 'undefined') {
-    var lastProductInfo = { url: '', images: [] };
+    var lastProductInfo = { url: '', images: [], firstImage: '' };
     window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'init', data: 'just initialized lastProductInfo'}));
   } else {
     window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'not init', data: 'did not just initialize lastProductInfo'}));
   }
 
   function isReady(parsed) {
+    // fix hm bs
+    // window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'lastProductInfo.url', data: lastProductInfo.url }));
+    // window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'lastProductInfo.images', data: lastProductInfo.images }));
+    // window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'window.location.href', data: window.location.href }));
+    // window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'parsed.image[0]', data: parsed.image[0] }));
+
     return window.location.href !== lastProductInfo.url && (parsed.image[0] !== lastProductInfo.images[0] || parsed.image.length === 0);
   }
 
@@ -22,11 +28,13 @@ export const baseExtractScript = `
       if (parsed['@type'] === 'Product') {
         productFound = true;
         if (isReady(parsed)) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'ready', data: 'is ready' }));
           lastProductInfo.url = window.location.href;
           lastProductInfo.images = parsed.image;
+          lastProductInfo.firstImage = Array.isArray(parsed.image) ? parsed.image[0] : parsed.image;
           window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: elements[i].textContent, url: window.location.href }));
           return;
-        } 
+        }
       }
     }
 

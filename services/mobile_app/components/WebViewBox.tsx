@@ -56,17 +56,8 @@ export function WebViewBox({
         console.error(error);
       }
     } else if (parsedData.type === 'imageSrc') {
-      console.log('got imageSrc:', parsedData.data);
-
       const imageSrc: string = parsedData.data;
       const parsedImageSrc = parseImageSrc(domain, imageSrc);
-
-      console.log('parsedImageSrc:', parsedImageSrc);
-      console.log('currentProduct.images:', currentProduct.images);
-      console.log(
-        'currentProduct.images.includes(parsedImageSrc)',
-        currentProduct.images.includes(parsedImageSrc)
-      );
 
       if (!currentProduct.images.includes(parsedImageSrc)) {
         // If not, add the image to the array and make the API call
@@ -91,7 +82,6 @@ export function WebViewBox({
           currency: '',
           images: [],
         });
-        // setCurrentImage('');
       }
     } else {
       console.log('unknown message type:', parsedData.type, parsedData.data);
