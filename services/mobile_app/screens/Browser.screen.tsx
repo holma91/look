@@ -76,6 +76,9 @@ function getUrl(urlParam: string) {
   }
 }
 
+const defaultImage =
+  'https://i0.wp.com/roadmap-tech.com/wp-content/uploads/2019/04/placeholder-image.jpg?resize=400%2C400&ssl=1';
+
 export default function Browser({
   navigation,
   route,
@@ -96,18 +99,10 @@ export default function Browser({
       images: [],
     }
   );
-  const [currentImage, setCurrentImage] = useState<string>(
-    route.params?.product?.images[0] || ''
-  );
+  const { user } = useUser();
 
   const url = getUrl(route.params.url);
-  const product = route.params.product;
-  console.log('url:', url);
-  console.log('product!:', product);
-
   const domain = getDomain(route.params.url);
-
-  const { user } = useUser();
 
   const webviewRef = useRef<WebView>(null);
 
@@ -179,7 +174,6 @@ export default function Browser({
                 domain={domain}
                 currentProduct={currentProduct}
                 setCurrentProduct={setCurrentProduct}
-                setCurrentImage={setCurrentImage}
                 refetchProducts={refetchProducts}
               />
             </Box>
@@ -192,8 +186,7 @@ export default function Browser({
         navigate={navigate}
         user={user}
         currentProduct={currentProduct}
-        currentImage={currentImage}
-        setCurrentImage={setCurrentImage}
+        setCurrentProduct={setCurrentProduct}
         products={products || []}
       />
     </Box>
@@ -206,8 +199,7 @@ type NavBarProps = {
   navigate: (direction: 'back' | 'forward') => void;
   user: any;
   currentProduct: Product;
-  currentImage: string;
-  setCurrentImage: React.Dispatch<React.SetStateAction<string>>;
+  setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
   products: UserProduct[];
 };
 
@@ -217,8 +209,7 @@ function NavBar({
   navigate,
   user,
   currentProduct,
-  currentImage,
-  setCurrentImage,
+  setCurrentProduct,
   products,
 }: NavBarProps) {
   const queryClient = useQueryClient();
@@ -272,7 +263,6 @@ function NavBar({
     : 'heart-outline';
 
   let activeProduct = products?.find((p) => p.url === currentProduct?.url);
-  // console.log('activeProduct', activeProduct);
 
   return (
     <Box zIndex={100}>
@@ -338,8 +328,7 @@ function NavBar({
         bottomSheetModalRef={bottomSheetModalRef}
         setExpandedMenu={setExpandedMenu}
         currentProduct={currentProduct}
-        currentImage={currentImage}
-        setCurrentImage={setCurrentImage}
+        setCurrentProduct={setCurrentProduct}
         products={products}
       />
     </Box>
@@ -350,8 +339,7 @@ type BottomSheetModalProps = {
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;
   setExpandedMenu: React.Dispatch<React.SetStateAction<boolean>>;
   currentProduct: Product;
-  currentImage: string;
-  setCurrentImage: React.Dispatch<React.SetStateAction<string>>;
+  setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
   products: UserProduct[];
 };
 
@@ -359,13 +347,10 @@ const BottomSheet = ({
   bottomSheetModalRef,
   setExpandedMenu,
   currentProduct,
-  currentImage,
-  setCurrentImage,
+  setCurrentProduct,
   products,
 }: BottomSheetModalProps) => {
   const [expandedContent, setExpandedContent] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [hasGenerated, setHasGenerated] = useState(false);
   const snapPoints = useMemo(() => ['46%', '100%'], []);
 
   const handleSheetChanges = useCallback((index: number) => {
@@ -386,7 +371,6 @@ const BottomSheet = ({
     <BottomSheetModal
       style={{}}
       backgroundStyle={{}}
-      // bottomInset={85}
       ref={bottomSheetModalRef}
       index={0}
       snapPoints={snapPoints}
@@ -400,59 +384,44 @@ const BottomSheet = ({
       )}
     >
       <BottomSheetContent
-        bottomSheetModalRef={bottomSheetModalRef}
-        isGenerating={isGenerating}
-        setIsGenerating={setIsGenerating}
-        hasGenerated={hasGenerated}
-        setHasGenerated={setHasGenerated}
         currentProduct={currentProduct}
-        currentImage={currentImage}
-        setCurrentImage={setCurrentImage}
         expandedContent={expandedContent}
         products={products}
+        setCurrentProduct={setCurrentProduct}
       />
     </BottomSheetModal>
   );
 };
 
 type BottomSheetContentProps = {
-  bottomSheetModalRef: React.RefObject<BottomSheetModal>;
-  isGenerating: boolean;
-  setIsGenerating: React.Dispatch<React.SetStateAction<boolean>>;
-  hasGenerated: boolean;
-  setHasGenerated: React.Dispatch<React.SetStateAction<boolean>>;
   currentProduct: Product;
-  currentImage: string;
-  setCurrentImage: React.Dispatch<React.SetStateAction<string>>;
   expandedContent: boolean;
   products: UserProduct[];
+  setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
 };
 
 const BottomSheetContent = ({
-  bottomSheetModalRef,
-  isGenerating,
-  setIsGenerating,
-  hasGenerated,
-  setHasGenerated,
   currentProduct,
-  currentImage,
-  setCurrentImage,
+  setCurrentProduct,
   expandedContent,
   products,
 }: BottomSheetContentProps) => {
   const { activeModel, setActiveModel } = useContext(TrainingContext);
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
   const handleTestOnModel = async () => {
-    // change current image progressively, when at last image, snap to top
-    setIsGenerating(true);
-    for (let i = 0; i < demoImages['basic'].length; i++) {
-      setCurrentImage(demoImages['basic'][i]);
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    }
-    bottomSheetModalRef.current?.snapToIndex(1);
-    setIsGenerating(false);
-    setHasGenerated(true);
+    console.log('test on model');
   };
+
+  const handleRemoveImage = (image: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    console.log('remove image:', image);
+    const newImages = currentProduct.images.filter((img) => img !== image);
+    setCurrentProduct({ ...currentProduct, images: newImages });
+    setCurrentImageIndex(0);
+  };
+
+  const img = currentProduct.images[currentImageIndex];
 
   if (currentProduct.url === '') {
     return (
@@ -500,16 +469,14 @@ const BottomSheetContent = ({
         flex={1}
       >
         <Box flex={1} borderWidth={0}>
-          {currentImage !== '' ? (
-            <ExpoImage
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-              source={currentImage}
-              contentFit="cover"
-            />
-          ) : null}
+          <ExpoImage
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+            source={img ? img : defaultImage}
+            contentFit="cover"
+          />
         </Box>
         <Box flex={0} justifyContent="space-between" gap="m" marginVertical="m">
           <Box
@@ -530,11 +497,7 @@ const BottomSheetContent = ({
           <Box flex={0}>
             <Button onPress={() => {}} variant="primary" backgroundColor="text">
               <Text color="background" fontWeight="600" fontSize={15}>
-                {isGenerating
-                  ? 'is generating...'
-                  : hasGenerated
-                  ? 'Share image'
-                  : `Test on model`}
+                {`Test on model`}
               </Text>
             </Button>
           </Box>
@@ -545,26 +508,29 @@ const BottomSheetContent = ({
     return (
       <Box margin="m" gap="l">
         <Box flexDirection="row" justifyContent="space-between" gap="m">
-          <Box flex={1}>
-            {currentImage !== '' ? (
-              <ExpoImage
+          <Box flex={1} position="relative">
+            <ExpoImage
+              style={{
+                aspectRatio: 0.75,
+              }}
+              source={img ? img : defaultImage}
+              contentFit="cover"
+            />
+            {img ? (
+              <TouchableOpacity
                 style={{
-                  aspectRatio: 0.75, // todo: calculate this
+                  position: 'absolute',
+                  top: 10,
+                  right: 10,
+                  backgroundColor: 'rgba(150,150,150,0.6)',
+                  padding: 2,
+                  borderRadius: 5,
                 }}
-                source={currentImage}
-                contentFit="cover"
-              />
-            ) : (
-              <ExpoImage
-                style={{
-                  aspectRatio: 0.75,
-                }}
-                source={
-                  'https://i0.wp.com/roadmap-tech.com/wp-content/uploads/2019/04/placeholder-image.jpg?resize=400%2C400&ssl=1'
-                }
-                contentFit="cover"
-              />
-            )}
+                onPress={() => handleRemoveImage(img)}
+              >
+                <Ionicons name="close" size={20} color="white" />
+              </TouchableOpacity>
+            ) : null}
           </Box>
           <Box flex={1} justifyContent="space-between">
             <Box gap="s" flex={1}>
@@ -595,25 +561,27 @@ const BottomSheetContent = ({
                 data={currentProduct.images}
                 contentContainerStyle={{ paddingLeft: 5 }}
                 keyExtractor={(item, index) => `category-${index}`}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setCurrentImage(item);
-                    }}
-                    style={{
-                      marginRight: 6,
-                    }}
-                  >
-                    <ExpoImage
-                      style={{
-                        height: 50,
-                        width: 50,
-                        borderWidth: item === currentImage ? 2 : 0,
+                renderItem={({ item, index }) => (
+                  <Box position="relative">
+                    <TouchableOpacity
+                      onPress={() => {
+                        setCurrentImageIndex(index);
                       }}
-                      source={item}
-                      contentFit="cover"
-                    />
-                  </TouchableOpacity>
+                      style={{
+                        marginRight: 6,
+                      }}
+                    >
+                      <ExpoImage
+                        style={{
+                          height: 60,
+                          width: 60,
+                          borderWidth: item === img ? 2 : 0,
+                        }}
+                        source={item}
+                        contentFit="cover"
+                      />
+                    </TouchableOpacity>
+                  </Box>
                 )}
               />
               {/* <Box
@@ -640,7 +608,7 @@ const BottomSheetContent = ({
           backgroundColor="text"
         >
           <Text color="background" fontWeight="600" fontSize={15}>
-            {isGenerating ? 'is generating...' : `Test on model`}
+            {`Test on model`}
           </Text>
         </Button>
       </Box>

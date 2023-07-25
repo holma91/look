@@ -91,8 +91,6 @@ export const fetchProducts = async (
     console.log('error:', e);
   }
 
-  console.log('completeUrl:', completeUrl);
-
   const response = await fetch(completeUrl);
 
   if (!response.ok) {
@@ -162,9 +160,13 @@ export const addProductImages = async (
   });
 
   if (!response.ok) {
-    throw new Error(
-      `HTTP error! status: ${response.status}, error: ${response.statusText}`
-    );
+    if (response.status === 409) {
+      console.log('Image already exists');
+    } else {
+      throw new Error(
+        `HTTP error! status: ${response.status}, error: ${response.statusText}`
+      );
+    }
   }
 
   return response.json();

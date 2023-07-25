@@ -203,3 +203,15 @@ function BottomSheet({
     </GestureDetector>
   );
 }
+
+const handleTestOnModel = async () => {
+  // change current image progressively, when at last image, snap to top
+  setIsGenerating(true);
+  for (let i = 0; i < demoImages['basic'].length; i++) {
+    setCurrentImage(demoImages['basic'][i]);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  bottomSheetModalRef.current?.snapToIndex(1);
+  setIsGenerating(false);
+  setHasGenerated(true);
+};

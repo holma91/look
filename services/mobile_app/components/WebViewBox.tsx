@@ -12,7 +12,6 @@ type WebViewBoxProps = {
   domain: string;
   currentProduct: Product;
   setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
-  setCurrentImage: React.Dispatch<React.SetStateAction<string>>;
   refetchProducts: () => void;
 };
 
@@ -23,7 +22,6 @@ export function WebViewBox({
   domain,
   currentProduct,
   setCurrentProduct,
-  setCurrentImage,
   refetchProducts,
 }: WebViewBoxProps) {
   const { user } = useUser();
@@ -37,7 +35,7 @@ export function WebViewBox({
     // message type 1: product data
     const parsedData = JSON.parse(event.nativeEvent.data);
     const url = event.nativeEvent.url;
-    console.log('parsedData.type:', parsedData.type);
+    console.log('got message, parsedData.type:', parsedData.type);
 
     if (parsedData.type === 'product') {
       const product: Product = parseProduct(
@@ -47,14 +45,8 @@ export function WebViewBox({
       );
 
       setCurrentProduct(product);
-      if (product.images.length > 0) {
-        setCurrentImage(product.images[0]);
-      } else {
-        setCurrentImage('');
-      }
 
       try {
-        console.log('domain:', domain);
         console.log('full product:', product);
 
         await createProduct(user?.id, product, domain);
@@ -69,16 +61,25 @@ export function WebViewBox({
       const imageSrc: string = parsedData.data;
       const parsedImageSrc = parseImageSrc(domain, imageSrc);
 
-      setCurrentProduct((prev) => ({
-        ...prev,
-        images: [...prev.images, parsedImageSrc],
-      }));
-      setCurrentImage(parsedImageSrc);
-      try {
-        await addProductImages(user?.id, productUrl, parsedImageSrc);
-        refetchProducts();
-      } catch (error) {
-        console.error(error);
+      console.log('parsedImageSrc:', parsedImageSrc);
+      console.log('currentProduct.images:', currentProduct.images);
+      console.log(
+        'currentProduct.images.includes(parsedImageSrc)',
+        currentProduct.images.includes(parsedImageSrc)
+      );
+
+      if (!currentProduct.images.includes(parsedImageSrc)) {
+        // If not, add the image to the array and make the API call
+        setCurrentProduct((prev) => ({
+          ...prev,
+          images: [...prev.images, parsedImageSrc],
+        }));
+
+        try {
+          await addProductImages(user.id, url, parsedImageSrc);
+        } catch (e) {
+          console.error(e);
+        }
       }
     } else if (parsedData.type === 'no product') {
       if (currentProduct.url !== '') {
@@ -90,7 +91,7 @@ export function WebViewBox({
           currency: '',
           images: [],
         });
-        setCurrentImage('');
+        // setCurrentImage('');
       }
     } else {
       console.log('unknown message type:', parsedData.type, parsedData.data);

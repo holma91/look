@@ -61,8 +61,6 @@ export default function Shop({ navigation }: { navigation: any }) {
     fetchHistory();
   }, [currentDomain]);
 
-  console.log('history', history);
-
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
