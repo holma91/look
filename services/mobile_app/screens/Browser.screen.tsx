@@ -86,18 +86,24 @@ export default function Browser({
   const [searchText, setSearchText] = useState('');
   const [focus, setFocus] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState<Product>({
-    url: '',
-    name: '',
-    brand: '',
-    price: '',
-    currency: '',
-    images: [],
-  });
-  const [currentImage, setCurrentImage] = useState<string>('');
+  const [currentProduct, setCurrentProduct] = useState<Product>(
+    route.params?.product || {
+      url: '',
+      name: '',
+      brand: '',
+      price: '',
+      currency: '',
+      images: [],
+    }
+  );
+  const [currentImage, setCurrentImage] = useState<string>(
+    route.params?.product?.images[0] || ''
+  );
 
   const url = getUrl(route.params.url);
+  const product = route.params.product;
   console.log('url:', url);
+  console.log('product!:', product);
 
   const domain = getDomain(route.params.url);
 
@@ -125,6 +131,12 @@ export default function Browser({
 
   const handleLoadEnd = (navState: any) => {
     if (!webviewRef.current) return;
+
+    if (route.params?.baseProductUrl) {
+      if (navState.nativeEvent.url === route.params.baseProductUrl) {
+        return;
+      }
+    }
 
     webviewRef.current.injectJavaScript(baseExtractScript);
     webviewRef.current.injectJavaScript(baseInteractScript);

@@ -350,7 +350,11 @@ function TextBox({
               <LegacyButton
                 label={`Buy on ${product.domain}`}
                 onPress={() =>
-                  navigation.navigate('Browser', { url: product.url })
+                  navigation.navigate('Browser', {
+                    url: product.url,
+                    product,
+                    baseProductUrl: product.url,
+                  })
                 }
                 variant="tertiary"
                 fontSize={17}
