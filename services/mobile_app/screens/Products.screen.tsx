@@ -16,12 +16,15 @@ import {
   BottomSheetBackdrop,
   BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
+import { WebView } from 'react-native-webview';
+
 import { fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Filters, UserProduct } from '../utils/types';
 import SheetModal from '../components/SheetModal';
 import Filter from '../components/Filter';
+import { TextInput } from '../styling/TextInput';
 
 export default function Products({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);
@@ -205,7 +208,19 @@ type PasteLinkSheetProps = {
 };
 
 function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
-  const snapPoints = useMemo(() => ['45%', '100%'], []);
+  const [linkText, setLinkText] = useState('');
+  const snapPoints = useMemo(() => ['45%'], []);
+  const webViewRef = useRef(null);
+
+  const handleUpload = async () => {
+    console.log('uploading');
+    /*
+    1. user uploads link
+    2. load the page
+    3. inject js depending on the domain
+    4. get the product data and images
+    */
+  };
 
   return (
     <BottomSheetModal
@@ -220,9 +235,42 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
         />
       )}
     >
-      <Box flex={1}>
-        <Text>Hey</Text>
+      <Box padding="m">
+        <Box
+          backgroundColor="grey"
+          borderRadius={10}
+          flexDirection="row"
+          alignItems="center"
+          paddingHorizontal="m"
+          paddingVertical="xxxs"
+        >
+          <TextInput
+            onChangeText={setLinkText}
+            value={linkText}
+            onSubmitEditing={handleUpload}
+            autoCapitalize="none"
+            autoComplete="off"
+            autoCorrect={false}
+            autoFocus={true}
+            inputMode="url"
+            variant="secondary"
+            selectTextOnFocus={true}
+            placeholder="Paste product link here"
+            placeholderTextColor="black"
+          />
+          <Ionicons
+            name="link"
+            size={18}
+            color="black"
+            style={{ position: 'absolute', left: 15 }}
+          />
+        </Box>
       </Box>
+      <WebView
+        ref={webViewRef}
+        source={{ uri: 'https://github.com/' }}
+        style={{ height: 0, width: 0 }}
+      />
     </BottomSheetModal>
   );
 }

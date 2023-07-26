@@ -84,8 +84,8 @@ export function WebViewBox({
         });
       }
     } else if (parsedData.type === 'imagesWithoutLink') {
-      console.log('imagesWithoutLink', parsedData.data);
-      console.log('imagesWithoutLink.length', parsedData.data.length);
+      // console.log('imagesWithoutLink', parsedData.data);
+      // console.log('imagesWithoutLink.length', parsedData.data.length);
     } else {
       console.log('unknown message type:', parsedData.type, parsedData.data);
     }
