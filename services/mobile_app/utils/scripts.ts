@@ -1,19 +1,14 @@
 export const baseExtractScript = `
   if (typeof lastProductInfo === 'undefined') {
-    var lastProductInfo = { url: '', images: [], firstImage: '' };
+    var lastProductInfo = { url: '', firstImage: '' };
     window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'init', data: 'just initialized lastProductInfo'}));
   } else {
     window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'not init', data: 'did not just initialize lastProductInfo'}));
   }
 
   function isReady(parsed) {
-    // fix hm bs
-    // window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'lastProductInfo.url', data: lastProductInfo.url }));
-    // window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'lastProductInfo.images', data: lastProductInfo.images }));
-    // window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'window.location.href', data: window.location.href }));
-    // window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'parsed.image[0]', data: parsed.image[0] }));
-
-    return window.location.href !== lastProductInfo.url && (parsed.image[0] !== lastProductInfo.images[0] || parsed.image.length === 0);
+    const currentFirstImage = Array.isArray(parsed.image) ? parsed.image[0] : parsed.image
+    return window.location.href !== lastProductInfo.url && (currentFirstImage !== lastProductInfo.firstImage || parsed.image.length === 0);
   }
 
   function sendProductData() {
@@ -30,7 +25,6 @@ export const baseExtractScript = `
         if (isReady(parsed)) {
           window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'ready', data: 'is ready' }));
           lastProductInfo.url = window.location.href;
-          lastProductInfo.images = parsed.image;
           lastProductInfo.firstImage = Array.isArray(parsed.image) ? parsed.image[0] : parsed.image;
           window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'product', data: elements[i].textContent, url: window.location.href }));
           return;
@@ -52,6 +46,56 @@ export const baseExtractScript = `
     window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'error', data: e }));
     window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'no product', data: 'no product found' }));
   }
+`;
+
+export const baseImageExtractScript = `
+function hasLinkAncestor(node) {
+  while (node) {
+    if (node.tagName && node.tagName.toLowerCase() === 'a') {
+      return true;
+    }
+    node = node.parentNode;
+  }
+  return false;
+}
+
+function getMostCommonImages(images) {
+  var dimensionCounts = images.reduce((counts, img) => {
+    var dimension = img.naturalWidth + 'x' + img.naturalHeight;
+    counts[dimension] = (counts[dimension] || 0) + 1;
+    return counts;
+  }, {});
+
+  var maxCount = 0;
+  var mostCommonDimension;
+  for (var dimension in dimensionCounts) {
+    if (dimensionCounts[dimension] > maxCount) {
+      maxCount = dimensionCounts[dimension];
+      mostCommonDimension = dimension;
+    }
+  }
+
+  var mostCommonImages = images.filter((img) => {
+    var dimension = img.naturalWidth + 'x' + img.naturalHeight;
+    return dimension === mostCommonDimension;
+  });
+
+  return mostCommonImages;
+}
+
+function getProductImages() {
+  var allImages = Array.from(document.querySelectorAll('img'));
+  var imagesWithoutLink = allImages.filter((img) => !hasLinkAncestor(img));
+  var mostCommonImages = getMostCommonImages(imagesWithoutLink);
+
+  return imagesWithoutLink;
+}
+
+getProductImages();
+
+window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'imagesWithoutLink', data: getProductImages().map(img => img.src) }));
+// window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'allImages', data: allImages.map(img => img.src) }));
+// window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'mostCommonImages', data: mostCommonImages.map(img => img.src) }));
 `;
 
 const baseExtractScriptCopy = `

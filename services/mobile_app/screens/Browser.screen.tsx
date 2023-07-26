@@ -29,7 +29,11 @@ import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Button } from '../components/Buttons';
-import { baseExtractScript, baseInteractScript } from '../utils/scripts';
+import {
+  baseExtractScript,
+  baseImageExtractScript,
+  baseInteractScript,
+} from '../utils/scripts';
 import {
   fetchCompanies,
   fetchProducts,
@@ -135,10 +139,12 @@ export default function Browser({
       }
     }
 
-    // console.log('injecting');
-
+    // make decisions here based on the url
     webviewRef.current.injectJavaScript(baseExtractScript);
     webviewRef.current.injectJavaScript(baseInteractScript);
+
+    // image extract should be used when the Image field in the schema.org is not enough
+    webviewRef.current.injectJavaScript(baseImageExtractScript);
   };
 
   const { data: products, refetch: refetchProducts } = useQuery({
