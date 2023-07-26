@@ -45,6 +45,7 @@ import { WebviewSearchBar } from '../components/SearchBar';
 import { TrainingContext } from '../context/Training';
 import SearchList from '../components/SearchList';
 import { saveHistory } from '../utils/history';
+import { useLikeMutation } from '../hooks/useLikeMutation';
 
 function getDomain(url: string) {
   let domain;
@@ -222,39 +223,7 @@ function NavBar({
   setCurrentProduct,
   products,
 }: NavBarProps) {
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation({
-    mutationFn: async (product: UserProduct) => {
-      !product.liked
-        ? await unlikeProduct(user?.id, product.url)
-        : await likeProduct(user?.id, product.url);
-      return product;
-    },
-    onMutate: async (product: UserProduct) => {
-      console.log('onMutate', product);
-
-      product.liked = !product.liked;
-      await queryClient.cancelQueries(['products', user?.id]);
-      const previousProducts = queryClient.getQueryData([
-        'products',
-        product.url,
-      ]);
-      queryClient.setQueryData(['products', product.url], product);
-
-      return { previousProducts, product };
-    },
-    onError: (err, product, context) => {
-      console.log('error', err, product, context);
-      queryClient.setQueryData(
-        ['products', context?.product.url],
-        context?.previousProducts
-      );
-    },
-    onSettled: async () => {
-      queryClient.invalidateQueries({ queryKey: ['products', user?.id] });
-    },
-  });
+  const likeMutation = useLikeMutation();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -321,7 +290,7 @@ function NavBar({
             onPress={() => {
               if (activeProduct) {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                mutation.mutate(activeProduct);
+                likeMutation.mutate(activeProduct);
               }
             }}
           >

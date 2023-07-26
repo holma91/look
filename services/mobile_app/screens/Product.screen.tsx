@@ -25,6 +25,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { TrainingContext } from '../context/Training';
 import { DemoContext } from '../context/Demo';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { likeProduct, unlikeProduct } from '../api';
+import { useUser } from '@clerk/clerk-expo';
+import { useLikeMutation } from '../hooks/useLikeMutation';
 
 const { width, height } = Dimensions.get('window');
 
@@ -125,6 +129,8 @@ export default function Product({
     setExpanded(!expanded);
   };
 
+  const likeMutation = useLikeMutation();
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
@@ -153,7 +159,9 @@ export default function Product({
               <Ionicons name="chevron-back" size={30} color="white" />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigation.goBack()}
+              onPress={() => {
+                likeMutation.mutate(product);
+              }}
               style={{
                 position: 'absolute',
                 top: 10,
