@@ -4,7 +4,7 @@ import {
   RefreshControl,
   SafeAreaView,
 } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
@@ -18,7 +18,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { WebView } from 'react-native-webview';
 
-import { fetchProducts } from '../api';
+import { createProduct, fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Filters, Product as ProductType, UserProduct } from '../utils/types';
@@ -164,7 +164,10 @@ export default function Products({ navigation }: { navigation: any }) {
           handleFilterSelection={handleFilterSelection}
           filters={filters}
         />
-        <PasteLinkSheet pasteLinkSheetRef={pasteLinkSheetRef} />
+        <PasteLinkSheet
+          navigation={navigation}
+          pasteLinkSheetRef={pasteLinkSheetRef}
+        />
       </SafeAreaView>
     </Box>
   );
@@ -208,12 +211,16 @@ function Product({
 }
 
 type PasteLinkSheetProps = {
+  navigation: any;
   pasteLinkSheetRef: React.RefObject<BottomSheetModal>;
 };
 
 const DEFAULT_SOURCE = 'https://github.com';
 
-function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
+function PasteLinkSheet({
+  navigation,
+  pasteLinkSheetRef,
+}: PasteLinkSheetProps) {
   const [currentProduct, setCurrentProduct] = useState<ProductType>({
     url: '',
     name: '',
@@ -225,8 +232,10 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
   const [linkText, setLinkText] = useState('');
   const [webViewSource, setWebViewSource] = useState(DEFAULT_SOURCE);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const snapPoints = useMemo(() => ['50%'], []);
+  const snapPoints = useMemo(() => ['56%'], []);
   const webViewRef = useRef<WebView>(null);
+  const { user } = useUser();
+  const queryClient = useQueryClient();
 
   const handleUpload = async () => {
     console.log('1. handleUpload');
@@ -253,11 +262,13 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
     }
   };
 
-  const handleMessage = (event: any) => {
+  const handleMessage = async (event: any) => {
     console.log('3. handleMessage');
     const domain = getDomain(linkText);
+    if (!domain || !user) return;
+
     let product;
-    if (knownDomains.includes(domain as string)) {
+    if (knownDomains.includes(domain)) {
       product = parseProductData(event.nativeEvent.url, event.nativeEvent.data);
     } else {
       // call openai api
@@ -273,6 +284,15 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
 
     console.log('product:', product);
     setCurrentProduct(product);
+    try {
+      await createProduct(user?.id, product, domain); // sends a request to the server with the product
+      queryClient.invalidateQueries({ queryKey: ['brands', user?.id] });
+      queryClient.invalidateQueries({
+        queryKey: ['products', user?.id, { view: ['history'] }],
+      });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const img = currentProduct.images[currentImageIndex];
@@ -379,7 +399,6 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
                   fontSize={17}
                 >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
               </Box>
-
               <Box flex={0} gap="l">
                 <FlatList
                   style={{ gap: 10, marginTop: 20 }}
@@ -414,6 +433,20 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
               </Box>
             </Box>
           </Box>
+          {currentProduct.images.length > 0 ? (
+            <Button
+              onPress={() => {
+                pasteLinkSheetRef?.current?.dismiss();
+                navigation.navigate('Product', { product: currentProduct });
+              }}
+              variant="primary"
+              backgroundColor="text"
+            >
+              <Text color="background" fontWeight="600" fontSize={15}>
+                Go to product
+              </Text>
+            </Button>
+          ) : null}
         </Box>
       </Box>
       <WebView
