@@ -25,6 +25,7 @@ import { Filters, UserProduct } from '../utils/types';
 import SheetModal from '../components/SheetModal';
 import Filter from '../components/Filter';
 import { TextInput } from '../styling/TextInput';
+import { getInjectScripts } from '../utils/inject';
 
 export default function Products({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);
@@ -207,19 +208,44 @@ type PasteLinkSheetProps = {
   pasteLinkSheetRef: React.RefObject<BottomSheetModal>;
 };
 
+const DEFAULT_SOURCE = 'https://github.com';
+
 function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
   const [linkText, setLinkText] = useState('');
+  const [webViewSource, setWebViewSource] = useState(DEFAULT_SOURCE);
   const snapPoints = useMemo(() => ['45%'], []);
-  const webViewRef = useRef(null);
+  const webViewRef = useRef<WebView>(null);
 
   const handleUpload = async () => {
-    console.log('uploading');
-    /*
-    1. user uploads link
-    2. load the page
-    3. inject js depending on the domain
-    4. get the product data and images
-    */
+    console.log('1. handleUpload');
+    const domain = getDomain(linkText);
+    if (!domain) {
+      console.error('Invalid link');
+      return;
+    }
+
+    setWebViewSource(linkText);
+  };
+
+  const handleLoadEnd = (navState: any) => {
+    console.log('2. handleLoadEnd');
+    if (webViewSource === DEFAULT_SOURCE) return;
+
+    const domain = getDomain(linkText);
+    let scripts = getInjectScripts(domain as string);
+
+    if (!webViewRef.current) return;
+
+    for (let script of scripts) {
+      webViewRef.current.injectJavaScript(script);
+    }
+  };
+
+  const handleMessage = (event: any) => {
+    console.log('3. handleMessage');
+    const parsedData = JSON.parse(event.nativeEvent.data);
+    console.log('got message, parsedData.type:', parsedData.type);
+    console.log('parsedData.data:', parsedData.data);
   };
 
   return (
@@ -234,6 +260,11 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
           disappearsOnIndex={-1}
         />
       )}
+      onDismiss={() => {
+        console.log('onDismiss');
+        setLinkText('');
+        setWebViewSource(DEFAULT_SOURCE);
+      }}
     >
       <Box padding="m">
         <Box
@@ -268,9 +299,21 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
       </Box>
       <WebView
         ref={webViewRef}
-        source={{ uri: 'https://github.com/' }}
+        source={{ uri: webViewSource }}
         style={{ height: 0, width: 0 }}
+        onMessage={handleMessage}
+        mediaPlaybackRequiresUserAction={true}
+        onLoadEnd={handleLoadEnd}
       />
     </BottomSheetModal>
   );
+}
+
+function getDomain(url: string): string | null {
+  try {
+    return new URL(url).hostname;
+  } catch (error) {
+    console.error('Invalid URL');
+    return null;
+  }
 }
