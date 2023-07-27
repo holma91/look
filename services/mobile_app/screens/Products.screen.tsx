@@ -9,7 +9,7 @@ import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import { useState } from 'react';
-import Animated from 'react-native-reanimated';
+import Animated, { set } from 'react-native-reanimated';
 import React, { useCallback, useMemo, useRef } from 'react';
 import {
   BottomSheetModal,
@@ -21,11 +21,14 @@ import { WebView } from 'react-native-webview';
 import { fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { Filters, UserProduct } from '../utils/types';
+import { Filters, Product as ProductType, UserProduct } from '../utils/types';
 import SheetModal from '../components/SheetModal';
 import Filter from '../components/Filter';
 import { TextInput } from '../styling/TextInput';
-import { getInjectScripts } from '../utils/inject';
+import { getInjectScripts, parseProductData } from '../utils/inject';
+import { parseProduct } from '../utils/parsing';
+import { getDomain } from '../utils/helpers';
+import { Button } from '../components/Buttons';
 
 export default function Products({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);
@@ -211,9 +214,18 @@ type PasteLinkSheetProps = {
 const DEFAULT_SOURCE = 'https://github.com';
 
 function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
+  const [currentProduct, setCurrentProduct] = useState<ProductType>({
+    url: '',
+    name: '',
+    brand: '',
+    price: '',
+    currency: '',
+    images: [],
+  });
   const [linkText, setLinkText] = useState('');
   const [webViewSource, setWebViewSource] = useState(DEFAULT_SOURCE);
-  const snapPoints = useMemo(() => ['45%'], []);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const snapPoints = useMemo(() => ['50%'], []);
   const webViewRef = useRef<WebView>(null);
 
   const handleUpload = async () => {
@@ -243,10 +255,27 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
 
   const handleMessage = (event: any) => {
     console.log('3. handleMessage');
-    const parsedData = JSON.parse(event.nativeEvent.data);
-    console.log('got message, parsedData.type:', parsedData.type);
-    console.log('parsedData.data:', parsedData.data);
+    const domain = getDomain(linkText);
+    let product;
+    if (knownDomains.includes(domain as string)) {
+      product = parseProductData(event.nativeEvent.url, event.nativeEvent.data);
+    } else {
+      // call openai api
+      product = {
+        url: linkText,
+        name: '',
+        brand: '',
+        price: '',
+        currency: '',
+        images: [],
+      };
+    }
+
+    console.log('product:', product);
+    setCurrentProduct(product);
   };
+
+  const img = currentProduct.images[currentImageIndex];
 
   return (
     <BottomSheetModal
@@ -264,6 +293,14 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
         console.log('onDismiss');
         setLinkText('');
         setWebViewSource(DEFAULT_SOURCE);
+        setCurrentProduct({
+          url: '',
+          name: '',
+          brand: '',
+          price: '',
+          currency: '',
+          images: [],
+        });
       }}
     >
       <Box padding="m">
@@ -296,6 +333,88 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
             style={{ position: 'absolute', left: 15 }}
           />
         </Box>
+        <Box marginTop="m" gap="l">
+          <Box flexDirection="row" justifyContent="space-between" gap="m">
+            <Box flex={1} position="relative">
+              <ExpoImage
+                style={{
+                  aspectRatio: 0.65,
+                }}
+                source={img ? img : ''}
+                contentFit="cover"
+              />
+              {img ? (
+                <TouchableOpacity
+                  style={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 10,
+                    backgroundColor: 'rgba(150,150,150,0.6)',
+                    padding: 2,
+                    borderRadius: 5,
+                  }}
+                  // onPress={() => handleRemoveImage(img)}
+                >
+                  <Ionicons name="close" size={20} color="white" />
+                </TouchableOpacity>
+              ) : null}
+            </Box>
+            <Box flex={1} justifyContent="space-between">
+              <Box gap="s" flex={1}>
+                <Text
+                  variant="body"
+                  fontWeight="bold"
+                  fontSize={20}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {currentProduct.name}
+                </Text>
+                <Text variant="body" fontSize={17}>
+                  {currentProduct.brand}
+                </Text>
+
+                <Text
+                  variant="body"
+                  fontSize={17}
+                >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
+              </Box>
+
+              <Box flex={0} gap="l">
+                <FlatList
+                  style={{ gap: 10, marginTop: 20 }}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  data={currentProduct.images}
+                  contentContainerStyle={{ paddingLeft: 5 }}
+                  keyExtractor={(item, index) => `category-${index}`}
+                  renderItem={({ item, index }) => (
+                    <Box position="relative">
+                      <TouchableOpacity
+                        onPress={() => {
+                          setCurrentImageIndex(index);
+                        }}
+                        style={{
+                          marginRight: 6,
+                        }}
+                      >
+                        <ExpoImage
+                          style={{
+                            height: 60,
+                            width: 60,
+                            // borderWidth: item === img ? 2 : 0,
+                          }}
+                          source={item}
+                          contentFit="cover"
+                        />
+                      </TouchableOpacity>
+                    </Box>
+                  )}
+                />
+              </Box>
+            </Box>
+          </Box>
+        </Box>
       </Box>
       <WebView
         ref={webViewRef}
@@ -309,11 +428,7 @@ function PasteLinkSheet({ pasteLinkSheetRef }: PasteLinkSheetProps) {
   );
 }
 
-function getDomain(url: string): string | null {
-  try {
-    return new URL(url).hostname;
-  } catch (error) {
-    console.error('Invalid URL');
-    return null;
-  }
-}
+const knownDomains = ['zalando.se', 'se.loropiana.com'];
+
+const defaultImage =
+  'https://i0.wp.com/roadmap-tech.com/wp-content/uploads/2019/04/placeholder-image.jpg?resize=400%2C400&ssl=1';
