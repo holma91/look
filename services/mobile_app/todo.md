@@ -16,8 +16,8 @@ so the plan is to first make a guess, and try to extract images.
 
 ### TODO rn
 
-- hide all test model stuff
-- build and deploy
+- fix upload by link feature for all chosen websites
+- fix error handling for link feature
 
 **replace all flatlists with flashlists**:
 
@@ -47,6 +47,7 @@ so the plan is to first make a guess, and try to extract images.
 - start designing the "studio" screen
   - skia?
 - start designing the "scan your face" stuff
+- redo browser screen
 
 **what would it take to add dark mode?**
 

@@ -3,6 +3,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
@@ -17,6 +18,7 @@ import {
   BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
 import { WebView } from 'react-native-webview';
+import * as Haptics from 'expo-haptics';
 
 import { createProduct, fetchProducts } from '../api';
 import { Box } from '../styling/Box';
@@ -232,6 +234,13 @@ function PasteLinkSheet({
   const [linkText, setLinkText] = useState('');
   const [webViewSource, setWebViewSource] = useState(DEFAULT_SOURCE);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [unsupportedDomain, setUnsupportedDomain] = useState<string | null>(
+    null
+  );
+  const [forceRenderKey, setForceRenderKey] = useState(
+    Math.random().toString()
+  );
   const snapPoints = useMemo(() => ['56%'], []);
   const webViewRef = useRef<WebView>(null);
   const { user } = useUser();
@@ -239,12 +248,19 @@ function PasteLinkSheet({
 
   const handleUpload = async () => {
     console.log('1. handleUpload');
+    setUnsupportedDomain(null);
     const domain = getDomain(linkText);
     if (!domain) {
       console.error('Invalid link');
       return;
+    } else if (!knownDomains.includes(domain)) {
+      console.log('domain not known');
+      setUnsupportedDomain(domain);
+      return;
     }
 
+    setIsLoading(true);
+    setForceRenderKey(Math.random().toString());
     setWebViewSource(linkText);
   };
 
@@ -282,10 +298,11 @@ function PasteLinkSheet({
       };
     }
 
-    console.log('product:', product);
+    // console.log('product:', product);
     setCurrentProduct(product);
+    setIsLoading(false);
     try {
-      await createProduct(user?.id, product, domain); // sends a request to the server with the product
+      await createProduct(user?.id, product, domain);
       queryClient.invalidateQueries({ queryKey: ['brands', user?.id] });
       queryClient.invalidateQueries({
         queryKey: ['products', user?.id, { view: ['history'] }],
@@ -293,6 +310,13 @@ function PasteLinkSheet({
     } catch (e) {
       console.error(e);
     }
+  };
+
+  const handleRemoveImage = (image: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const newImages = currentProduct.images.filter((img) => img !== image);
+    setCurrentProduct({ ...currentProduct, images: newImages });
+    setCurrentImageIndex(0);
   };
 
   const img = currentProduct.images[currentImageIndex];
@@ -310,7 +334,6 @@ function PasteLinkSheet({
         />
       )}
       onDismiss={() => {
-        console.log('onDismiss');
         setLinkText('');
         setWebViewSource(DEFAULT_SOURCE);
         setCurrentProduct({
@@ -321,6 +344,7 @@ function PasteLinkSheet({
           currency: '',
           images: [],
         });
+        setUnsupportedDomain(null);
       }}
     >
       <Box padding="m">
@@ -354,86 +378,110 @@ function PasteLinkSheet({
           />
         </Box>
         <Box marginTop="m" gap="l">
-          <Box flexDirection="row" justifyContent="space-between" gap="m">
-            <Box flex={1} position="relative">
-              <ExpoImage
-                style={{
-                  aspectRatio: 0.65,
-                }}
-                source={img ? img : ''}
-                contentFit="cover"
-              />
-              {img ? (
-                <TouchableOpacity
+          {isLoading ? (
+            <Box marginTop="m">
+              <ActivityIndicator size="large" color="#808080" />
+            </Box>
+          ) : unsupportedDomain ? (
+            <Box marginTop="s" gap="l">
+              <Text
+                variant="title"
+                textAlign="center"
+              >{`We are sorry, ${unsupportedDomain} is not supported yet.`}</Text>
+              <Button
+                onPress={() => {}}
+                variant="primary"
+                backgroundColor="text"
+              >
+                <Text color="background" fontWeight="600" fontSize={15}>
+                  I want {unsupportedDomain} to be supported
+                </Text>
+              </Button>
+            </Box>
+          ) : (
+            <Box flexDirection="row" justifyContent="space-between" gap="m">
+              <Box flex={1} position="relative">
+                <ExpoImage
                   style={{
-                    position: 'absolute',
-                    top: 10,
-                    right: 10,
-                    backgroundColor: 'rgba(150,150,150,0.6)',
-                    padding: 2,
-                    borderRadius: 5,
+                    aspectRatio: 0.65,
                   }}
-                  // onPress={() => handleRemoveImage(img)}
-                >
-                  <Ionicons name="close" size={20} color="white" />
-                </TouchableOpacity>
-              ) : null}
-            </Box>
-            <Box flex={1} justifyContent="space-between">
-              <Box gap="s" flex={1}>
-                <Text
-                  variant="body"
-                  fontWeight="bold"
-                  fontSize={20}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {currentProduct.name}
-                </Text>
-                <Text variant="body" fontSize={17}>
-                  {currentProduct.brand}
-                </Text>
-
-                <Text
-                  variant="body"
-                  fontSize={17}
-                >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
-              </Box>
-              <Box flex={0} gap="l">
-                <FlatList
-                  style={{ gap: 10, marginTop: 20 }}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  data={currentProduct.images}
-                  contentContainerStyle={{ paddingLeft: 5 }}
-                  keyExtractor={(item, index) => `category-${index}`}
-                  renderItem={({ item, index }) => (
-                    <Box position="relative">
-                      <TouchableOpacity
-                        onPress={() => {
-                          setCurrentImageIndex(index);
-                        }}
-                        style={{
-                          marginRight: 6,
-                        }}
-                      >
-                        <ExpoImage
-                          style={{
-                            height: 60,
-                            width: 60,
-                            // borderWidth: item === img ? 2 : 0,
-                          }}
-                          source={item}
-                          contentFit="cover"
-                        />
-                      </TouchableOpacity>
-                    </Box>
-                  )}
+                  source={img ? img : ''}
+                  contentFit="cover"
                 />
+                {img ? (
+                  <TouchableOpacity
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      backgroundColor: 'rgba(150,150,150,0.6)',
+                      padding: 2,
+                      borderRadius: 5,
+                    }}
+                    onPress={() => handleRemoveImage(img)}
+                  >
+                    <Ionicons name="close" size={20} color="white" />
+                  </TouchableOpacity>
+                ) : null}
+              </Box>
+              <Box flex={1} justifyContent="space-between">
+                <Box gap="s" flex={1}>
+                  <Text
+                    variant="body"
+                    fontWeight="bold"
+                    fontSize={20}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {currentProduct.name}
+                  </Text>
+                  <Text variant="body" fontSize={17}>
+                    {currentProduct.brand}
+                  </Text>
+
+                  <Text
+                    variant="body"
+                    fontSize={17}
+                  >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
+                </Box>
+                <Box flex={0} gap="l">
+                  <FlatList
+                    style={{ gap: 10, marginTop: 20 }}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={currentProduct.images}
+                    contentContainerStyle={{ paddingLeft: 5 }}
+                    keyExtractor={(item, index) => `category-${index}`}
+                    renderItem={({ item, index }) => (
+                      <Box position="relative">
+                        <TouchableOpacity
+                          onPress={() => {
+                            setCurrentImageIndex(index);
+                          }}
+                          style={{
+                            marginRight: 6,
+                          }}
+                        >
+                          <ExpoImage
+                            style={{
+                              height: 60,
+                              width: 60,
+                              // borderWidth: item === img ? 2 : 0,
+                            }}
+                            source={item}
+                            contentFit="cover"
+                          />
+                        </TouchableOpacity>
+                      </Box>
+                    )}
+                  />
+                </Box>
               </Box>
             </Box>
-          </Box>
-          {currentProduct.images.length > 0 ? (
+          )}
+          {!unsupportedDomain &&
+          !isLoading &&
+          currentProduct.images.length > 0 ? (
             <Button
               onPress={() => {
                 pasteLinkSheetRef?.current?.dismiss();
@@ -450,6 +498,7 @@ function PasteLinkSheet({
         </Box>
       </Box>
       <WebView
+        key={forceRenderKey}
         ref={webViewRef}
         source={{ uri: webViewSource }}
         style={{ height: 0, width: 0 }}
