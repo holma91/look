@@ -20,6 +20,7 @@ type SheetModalProps = {
     filterType: 'view' | 'category' | 'website' | 'brand',
     filterValue: string
   ) => void;
+  resetFilter: () => void;
   filters: Filters;
 };
 
@@ -28,6 +29,7 @@ export default function SheetModal({
   choices,
   outerChoice,
   handleFilterSelection,
+  resetFilter,
   filters,
 }: SheetModalProps) {
   const snapPoints = useMemo(() => ['65%'], []);
@@ -86,8 +88,22 @@ export default function SheetModal({
         paddingTop="m"
         paddingHorizontal="m"
       >
-        <SecondaryButton label="Reset" flex={1}></SecondaryButton>
-        <PrimaryButton label="Done" flex={1}></PrimaryButton>
+        <SecondaryButton
+          label="Reset"
+          flex={1}
+          onPress={() => {
+            resetFilter();
+            bottomSheetModalRef?.current?.close();
+          }}
+        />
+
+        <PrimaryButton
+          label="Done"
+          flex={1}
+          onPress={() => {
+            bottomSheetModalRef?.current?.close();
+          }}
+        />
       </Box>
     </BottomSheetModal>
   );

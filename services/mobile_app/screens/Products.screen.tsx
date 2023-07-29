@@ -87,6 +87,10 @@ export default function Products({ navigation }: { navigation: any }) {
     [setFilters]
   );
 
+  const resetFilter = useCallback(() => {
+    setFilters({ view: ['likes'] });
+  }, []);
+
   const displayedProducts = useMemo(() => {
     let list = productsQuery.data || [];
     return list;
@@ -136,6 +140,7 @@ export default function Products({ navigation }: { navigation: any }) {
         <Filter
           filters={filters}
           setFilters={setFilters}
+          resetFilter={resetFilter}
           showFilter={showFilter}
           handleFilterSelection={handleFilterSelection}
         />
@@ -163,6 +168,7 @@ export default function Products({ navigation }: { navigation: any }) {
           choices={viewChoices}
           outerChoice="view"
           handleFilterSelection={handleFilterSelection}
+          resetFilter={resetFilter}
           filters={filters}
         />
         <PasteLinkSheet

@@ -34,6 +34,7 @@ const possibleFilters: { label: 'category' | 'website' | 'brand' }[] = [
 type FilterProps = {
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  resetFilter: () => void;
   showFilter: boolean;
   handleFilterSelection: (
     filterType: 'view' | 'category' | 'website' | 'brand',
@@ -44,6 +45,7 @@ type FilterProps = {
 export default function Filter({
   filters,
   setFilters,
+  resetFilter,
   showFilter,
   handleFilterSelection,
 }: FilterProps) {
@@ -157,6 +159,7 @@ export default function Filter({
         bottomSheetModalRef={filterSheetModalRef}
         choices={choices}
         outerChoice={outerChoice}
+        resetFilter={resetFilter}
         handleFilterSelection={handleFilterSelection}
         filters={filters}
       />
