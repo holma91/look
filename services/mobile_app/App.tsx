@@ -11,6 +11,7 @@ import { tokenCache } from './utils/tokenCache';
 import Navigation from './navigation';
 import { TrainingContext, TrainingProvider } from './context/Training';
 import { DemoProvider } from './context/Demo';
+import { DarkModeProvider } from './context/DarkMode';
 
 LogBox.ignoreLogs([
   'Did not receive response to shouldStartLoad in time, defaulting to YES', // https://github.com/react-native-webview/react-native-webview/issues/124
@@ -27,13 +28,15 @@ export default function App() {
         publishableKey={Constants?.expoConfig?.extra?.clerkApiKey}
       >
         <BottomSheetModalProvider>
-          <DemoProvider>
-            <TrainingProvider>
-              <QueryClientProvider client={queryClient}>
-                <Navigation />
-              </QueryClientProvider>
-            </TrainingProvider>
-          </DemoProvider>
+          <DarkModeProvider>
+            <DemoProvider>
+              <TrainingProvider>
+                <QueryClientProvider client={queryClient}>
+                  <Navigation />
+                </QueryClientProvider>
+              </TrainingProvider>
+            </DemoProvider>
+          </DarkModeProvider>
         </BottomSheetModalProvider>
       </ClerkProvider>
     </ThemeProvider>

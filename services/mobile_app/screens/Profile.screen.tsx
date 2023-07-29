@@ -1,35 +1,33 @@
-import { Button, SafeAreaView, Switch } from 'react-native';
+import { SafeAreaView, Switch } from 'react-native';
 import { useAuth } from '@clerk/clerk-expo';
 
 import { Box } from '../styling/Box';
 import { useContext } from 'react';
 import { DemoContext } from '../context/Demo';
+import { DarkModeContext } from '../context/DarkMode';
 import { Text } from '../styling/Text';
 import { clearHistory } from '../utils/history';
-
-const SignOut = () => {
-  const { isLoaded, signOut } = useAuth();
-
-  if (!isLoaded) {
-    return null;
-  }
-
-  return (
-    <Box>
-      <Button
-        title="Sign Out"
-        onPress={() => {
-          signOut();
-        }}
-      />
-    </Box>
-  );
-};
+import { Button } from '../components/Buttons';
 
 export default function Profile() {
+  const { isLoaded, signOut } = useAuth();
   const { isDemo, setIsDemo } = useContext(DemoContext);
+  const { isDarkMode, setIsDarkMode } = useContext(DarkModeContext);
 
-  const toggleSwitch = () => setIsDemo((previousState) => !previousState);
+  const toggles = [
+    {
+      title: 'Enable dark mode',
+      description: 'Use Look with a dark interface.',
+      function: () => setIsDarkMode((previousState) => !previousState),
+      value: isDarkMode,
+    },
+    {
+      title: 'Enable demo',
+      description: 'Use the demo features of Look.',
+      function: () => setIsDemo((previousState) => !previousState),
+      value: isDemo,
+    },
+  ];
 
   const handleClearCache = async () => {
     try {
@@ -44,19 +42,54 @@ export default function Profile() {
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
-        <Box flex={1} alignItems="center" justifyContent="center" gap="m">
-          <SignOut />
-          <Box flexDirection="row" gap="m" alignItems="center">
-            <Switch
-              trackColor={{ false: '#767577', true: 'green' }}
-              thumbColor={'#f4f3f4'}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSwitch}
-              value={isDemo}
-            />
-            <Text variant="title">{isDemo ? 'Demo is on' : 'Demo is off'}</Text>
+        <Box flex={1} paddingVertical="s" paddingHorizontal="m" gap="m">
+          <Box
+            gap="xs"
+            borderBottomWidth={1}
+            borderBottomColor="grey"
+            paddingBottom="sm"
+          >
+            <Text variant="title">Account</Text>
+            <Text variant="body">alexanderholmberg91@gmail.com</Text>
           </Box>
-          <Button title="Clear Cache" onPress={handleClearCache} />
+          <Box flex={1} justifyContent="space-between">
+            <Box gap="m">
+              {toggles.map((toggle) => (
+                <Box
+                  flexDirection="row"
+                  key={toggle.title}
+                  alignItems="center"
+                  justifyContent="space-between"
+                  // borderBottomWidth={1}
+                  // borderBottomColor="grey"
+                >
+                  <Box paddingBottom="s" gap="xs">
+                    <Text variant="smallTitle">{toggle.title}</Text>
+                    <Text variant="body">{toggle.description}</Text>
+                  </Box>
+                  <Switch
+                    trackColor={{ false: '#767577', true: 'green' }}
+                    thumbColor={'#f4f3f4'}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={toggle.function}
+                    value={toggle.value}
+                  />
+                </Box>
+              ))}
+            </Box>
+            <Box>
+              {/* <Button title="Clear Cache" onPress={handleClearCache} /> */}
+              <Button
+                onPress={signOut}
+                variant="primary"
+                backgroundColor="text"
+              >
+                <Text color="background" fontWeight="600" fontSize={18}>
+                  Sign out
+                </Text>
+              </Button>
+            </Box>
+          </Box>
         </Box>
       </SafeAreaView>
     </Box>
