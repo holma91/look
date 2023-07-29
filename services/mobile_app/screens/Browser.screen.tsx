@@ -13,39 +13,29 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  BottomSheetModal,
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-  BottomSheetFlatList,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
 
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { Button } from '../components/Buttons';
 import {
   baseExtractScript,
   baseImageExtractScript,
   baseInteractScript,
 } from '../utils/scripts';
-import {
-  fetchCompanies,
-  fetchProducts,
-  likeProduct,
-  unlikeProduct,
-} from '../api';
+import { fetchProducts } from '../api';
 import { Company, Product, UserProduct } from '../utils/types';
 import { WebviewSearchBar } from '../components/SearchBar';
 import { TrainingContext } from '../context/Training';
 import SearchList from '../components/SearchList';
 import { saveHistory } from '../utils/history';
 import { useLikeMutation } from '../hooks/useLikeMutation';
+import { PrimaryButton } from '../components/Button';
 
 function getDomain(url: string) {
   let domain;
@@ -474,11 +464,12 @@ const BottomSheetContent = ({
             </Text>
           </Box>
           <Box flex={0}>
-            <Button onPress={() => {}} variant="primary" backgroundColor="text">
+            <PrimaryButton label="Test on model" onPress={() => {}} />
+            {/* <Button onPress={() => {}} variant="primary" backgroundColor="text">
               <Text color="background" fontWeight="600" fontSize={15}>
                 {`Test on model`}
               </Text>
-            </Button>
+            </Button> */}
           </Box>
         </Box>
       </Box>
@@ -581,15 +572,7 @@ const BottomSheetContent = ({
             </Box>
           </Box>
         </Box>
-        <Button
-          onPress={handleTestOnModel}
-          variant="primary"
-          backgroundColor="text"
-        >
-          <Text color="background" fontWeight="600" fontSize={15}>
-            {`Test on model`}
-          </Text>
-        </Button>
+        <PrimaryButton label="Test on model" onPress={() => {}} />
       </Box>
     );
   }

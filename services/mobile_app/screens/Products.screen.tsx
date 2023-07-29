@@ -10,7 +10,7 @@ import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import { useState } from 'react';
-import Animated, { set } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import React, { useCallback, useMemo, useRef } from 'react';
 import {
   BottomSheetModal,
@@ -28,9 +28,8 @@ import SheetModal from '../components/SheetModal';
 import Filter from '../components/Filter';
 import { TextInput } from '../styling/TextInput';
 import { getInjectScripts, parseProductData } from '../utils/inject';
-import { parseProduct } from '../utils/parsing';
 import { getDomain } from '../utils/helpers';
-import { Button } from '../components/Buttons';
+import { PrimaryButton } from '../components/Button';
 
 export default function Products({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);
@@ -400,15 +399,9 @@ function PasteLinkSheet({
                 variant="title"
                 textAlign="center"
               >{`We are sorry, ${unsupportedDomain} is not supported yet.`}</Text>
-              <Button
-                onPress={() => {}}
-                variant="primary"
-                backgroundColor="text"
-              >
-                <Text color="background" fontWeight="600" fontSize={15}>
-                  I want {unsupportedDomain} to be supported
-                </Text>
-              </Button>
+              <PrimaryButton
+                label={`I want ${unsupportedDomain} to be supported`}
+              />
             </Box>
           ) : (
             <Box flexDirection="row" justifyContent="space-between" gap="m">
@@ -495,18 +488,13 @@ function PasteLinkSheet({
           !invalidLink &&
           !isLoading &&
           currentProduct.images.length > 0 ? (
-            <Button
+            <PrimaryButton
+              label="Go to product"
               onPress={() => {
                 pasteLinkSheetRef?.current?.dismiss();
                 navigation.navigate('Product', { product: currentProduct });
               }}
-              variant="primary"
-              backgroundColor="text"
-            >
-              <Text color="background" fontWeight="600" fontSize={15}>
-                Go to product
-              </Text>
-            </Button>
+            />
           ) : null}
         </Box>
       </Box>

@@ -8,6 +8,7 @@ import { DarkModeContext } from '../context/DarkMode';
 import { Text } from '../styling/Text';
 import { clearHistory } from '../utils/history';
 import { Button } from '../components/Buttons';
+import { PrimaryButton } from '../components/Button';
 
 export default function Profile() {
   const { isLoaded, signOut } = useAuth();
@@ -77,17 +78,9 @@ export default function Profile() {
                 </Box>
               ))}
             </Box>
-            <Box>
+            <Box marginBottom="s">
               {/* <Button title="Clear Cache" onPress={handleClearCache} /> */}
-              <Button
-                onPress={signOut}
-                variant="primary"
-                backgroundColor="text"
-              >
-                <Text color="background" fontWeight="600" fontSize={18}>
-                  Sign out
-                </Text>
-              </Button>
+              <PrimaryButton label="Sign out" onPress={() => signOut()} />
             </Box>
           </Box>
         </Box>

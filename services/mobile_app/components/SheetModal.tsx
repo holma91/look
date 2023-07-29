@@ -9,6 +9,8 @@ import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Button } from './Buttons';
 import { Filters } from '../utils/types';
+import { TouchableOpacity } from 'react-native';
+import { PrimaryButton, SecondaryButton, FilterListButton } from './Button';
 
 type SheetModalProps = {
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;
@@ -28,38 +30,21 @@ export default function SheetModal({
   handleFilterSelection,
   filters,
 }: SheetModalProps) {
-  const snapPoints = useMemo(() => ['50%'], []);
+  const snapPoints = useMemo(() => ['65%'], []);
 
   const renderListItem = useCallback(
     ({ item }: { item: string }) => {
       const isSelected = filters[outerChoice]?.includes(item);
 
       return (
-        <Button
+        <FilterListButton
+          label={item}
           onPress={() => {
             handleFilterSelection(outerChoice, item);
           }}
-          variant="new"
-          backgroundColor={isSelected ? 'text' : 'grey'}
-          margin="xs"
-        >
-          <Text
-            variant="body"
-            fontWeight="bold"
-            fontSize={16}
-            color={isSelected ? 'background' : 'text'}
-          >
-            {item}
-          </Text>
-          <Ionicons
-            name="checkmark"
-            size={20}
-            color={isSelected ? 'white' : 'transparent'}
-          />
-          {item === 'New List' ? (
-            <Ionicons name="add" size={20} color="black" />
-          ) : null}
-        </Button>
+          isSelected={isSelected || false}
+          item={item}
+        />
       );
     },
     [outerChoice, filters, handleFilterSelection]
@@ -91,6 +76,19 @@ export default function SheetModal({
         style={{ paddingHorizontal: 10 }}
         showsVerticalScrollIndicator={false}
       />
+
+      <Box
+        flexDirection="row"
+        justifyContent="center"
+        alignItems="center"
+        marginBottom="xl"
+        gap="s"
+        paddingTop="m"
+        paddingHorizontal="m"
+      >
+        <SecondaryButton label="Reset" flex={1}></SecondaryButton>
+        <PrimaryButton label="Done" flex={1}></PrimaryButton>
+      </Box>
     </BottomSheetModal>
   );
 }

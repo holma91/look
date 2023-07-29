@@ -63,7 +63,13 @@ export const theme = createTheme({
     },
     onBackground: {
       color: 'textOnBackground',
-      fontSize: 16,
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    buttonText: {
+      color: 'textOnBackground',
+      fontSize: 17,
+      fontWeight: 'bold',
     },
   },
   inputVariants: {
@@ -82,18 +88,6 @@ export const theme = createTheme({
       height: 36,
       width: '100%',
       paddingLeft: 'l',
-    },
-  },
-  cardVariants: {
-    defaults: {
-      padding: 'm',
-      borderRadius: 10,
-    },
-    primary: {
-      backgroundColor: 'primary',
-    },
-    secondary: {
-      backgroundColor: 'secondary',
     },
   },
   buttonVariants: {
@@ -117,17 +111,6 @@ export const theme = createTheme({
       color: 'textOnBackground',
       fontSize: 3,
       padding: 's',
-    },
-    new: {
-      padding: 'm',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      // borderWidth: 2,
-      borderRadius: 10,
-    },
-    new2: {
-      padding: 16,
     },
   },
 });

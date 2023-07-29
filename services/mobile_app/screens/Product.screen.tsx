@@ -29,6 +29,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { likeProduct, unlikeProduct } from '../api';
 import { useUser } from '@clerk/clerk-expo';
 import { useLikeMutation } from '../hooks/useLikeMutation';
+import { PrimaryButton } from '../components/Button';
 
 const { width, height } = Dimensions.get('window');
 
@@ -357,7 +358,7 @@ function TextBox({
               </Box>
             ) : null}
             <Box marginTop={product?.generatedBy ? 'xs' : 'l'}>
-              <LegacyButton
+              {/* <LegacyButton
                 label={`Buy on ${product.domain}`}
                 onPress={() =>
                   navigation.navigate('Browser', {
@@ -370,7 +371,17 @@ function TextBox({
                 fontSize={17}
                 paddingVertical="s"
                 color="textOnBackground"
-              ></LegacyButton>
+              ></LegacyButton> */}
+              <PrimaryButton
+                label={`Buy on ${product.domain}`}
+                onPress={() =>
+                  navigation.navigate('Browser', {
+                    url: product.url,
+                    product,
+                    baseProductUrl: product.url,
+                  })
+                }
+              ></PrimaryButton>
             </Box>
           </Box>
         </>

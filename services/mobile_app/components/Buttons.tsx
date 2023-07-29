@@ -21,13 +21,19 @@ type RestyleProps = SpacingProps<Theme> &
 type Props = RestyleProps & {
   onPress: () => void;
   children: React.ReactNode;
-  variant: 'new' | 'primary' | 'secondary';
+  variant: 'primary' | 'secondary';
 };
 
 const buttonVariant: any = createVariant({ themeKey: 'buttonVariants' });
 
 // ButtonContainer is just a Box with buttonVariant applied
 const ButtonContainer = createRestyleComponent<
+  VariantProps<Theme, 'buttonVariants'> &
+    React.ComponentProps<typeof TouchableOpacity>,
+  Theme
+>([buttonVariant], Box);
+
+const TouchableOpacityContainer = createRestyleComponent<
   VariantProps<Theme, 'buttonVariants'> & React.ComponentProps<typeof Box>,
   Theme
 >([buttonVariant], Box);
