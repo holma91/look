@@ -230,6 +230,7 @@ function PasteLinkSheet({
     price: '',
     currency: '',
     images: [],
+    domain: '',
   });
   const [linkText, setLinkText] = useState('');
   const [webViewSource, setWebViewSource] = useState(DEFAULT_SOURCE);
@@ -241,17 +242,20 @@ function PasteLinkSheet({
   const [forceRenderKey, setForceRenderKey] = useState(
     Math.random().toString()
   );
+  const [invalidLink, setInvalidLink] = useState(false);
   const snapPoints = useMemo(() => ['56%'], []);
   const webViewRef = useRef<WebView>(null);
   const { user } = useUser();
   const queryClient = useQueryClient();
 
   const handleUpload = async () => {
-    console.log('1. handleUpload');
     setUnsupportedDomain(null);
+    setInvalidLink(false);
+
     const domain = getDomain(linkText);
     if (!domain) {
-      console.error('Invalid link');
+      console.log('Invalid link');
+      setInvalidLink(true);
       return;
     } else if (!knownDomains.includes(domain)) {
       console.log('domain not known');
@@ -265,7 +269,6 @@ function PasteLinkSheet({
   };
 
   const handleLoadEnd = (navState: any) => {
-    console.log('2. handleLoadEnd');
     if (webViewSource === DEFAULT_SOURCE) return;
 
     const domain = getDomain(linkText);
@@ -279,7 +282,6 @@ function PasteLinkSheet({
   };
 
   const handleMessage = async (event: any) => {
-    console.log('3. handleMessage');
     const domain = getDomain(linkText);
     if (!domain || !user) return;
 
@@ -295,11 +297,11 @@ function PasteLinkSheet({
         price: '',
         currency: '',
         images: [],
+        domain: '',
       };
     }
 
-    // console.log('product:', product);
-    setCurrentProduct(product);
+    setCurrentProduct({ ...product, domain: domain });
     setIsLoading(false);
     try {
       await createProduct(user?.id, product, domain);
@@ -319,6 +321,21 @@ function PasteLinkSheet({
     setCurrentImageIndex(0);
   };
 
+  const resetState = () => {
+    setLinkText('');
+    setWebViewSource(DEFAULT_SOURCE);
+    setCurrentProduct({
+      url: '',
+      name: '',
+      brand: '',
+      price: '',
+      currency: '',
+      images: [],
+    });
+    setUnsupportedDomain(null);
+    setInvalidLink(false);
+  };
+
   const img = currentProduct.images[currentImageIndex];
 
   return (
@@ -333,19 +350,7 @@ function PasteLinkSheet({
           disappearsOnIndex={-1}
         />
       )}
-      onDismiss={() => {
-        setLinkText('');
-        setWebViewSource(DEFAULT_SOURCE);
-        setCurrentProduct({
-          url: '',
-          name: '',
-          brand: '',
-          price: '',
-          currency: '',
-          images: [],
-        });
-        setUnsupportedDomain(null);
-      }}
+      onDismiss={resetState}
     >
       <Box padding="m">
         <Box
@@ -381,6 +386,13 @@ function PasteLinkSheet({
           {isLoading ? (
             <Box marginTop="m">
               <ActivityIndicator size="large" color="#808080" />
+            </Box>
+          ) : invalidLink ? (
+            <Box marginTop="s" gap="l">
+              <Text
+                variant="title"
+                textAlign="center"
+              >{`This is an invalid link. Please try again.`}</Text>
             </Box>
           ) : unsupportedDomain ? (
             <Box marginTop="s" gap="l">
@@ -480,6 +492,7 @@ function PasteLinkSheet({
             </Box>
           )}
           {!unsupportedDomain &&
+          !invalidLink &&
           !isLoading &&
           currentProduct.images.length > 0 ? (
             <Button
@@ -504,13 +517,28 @@ function PasteLinkSheet({
         style={{ height: 0, width: 0 }}
         onMessage={handleMessage}
         mediaPlaybackRequiresUserAction={true}
+        startInLoadingState={true}
         onLoadEnd={handleLoadEnd}
+        renderLoading={() => <></>}
       />
     </BottomSheetModal>
   );
 }
 
-const knownDomains = ['zalando.se', 'se.loropiana.com'];
+const knownDomains = [
+  'zalando.se',
+  'se.loropiana.com',
+  'boozt.com',
+  'hm.com',
+  'sellpy.se',
+  'adaysmarch.com',
+  'careofcarl.se',
+  'shop.lululemon.com',
+  'gucci.com',
+  'moncler.com',
+  'farfetch.com',
+  'mytheresa.com',
+];
 
 const defaultImage =
   'https://i0.wp.com/roadmap-tech.com/wp-content/uploads/2019/04/placeholder-image.jpg?resize=400%2C400&ssl=1';

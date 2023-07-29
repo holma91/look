@@ -14,42 +14,54 @@ so the plan is to first make a guess, and try to extract images.
 2. all images that's not nested in a link and in a certain size
 3. always allow the user to to click by themselves
 
-### TODO rn
+### TODO
+
+FRONTEND:
 
 - fix upload by link feature for all chosen websites
 - fix error handling for link feature
+  - show accepted websites
+- one-shot image selection
+- design and implement profile/settings page
+- sort by price (?)
+- fix bugs
+  - make it impossible to swipe back a screen when in a webview
 
-**replace all flatlists with flashlists**:
+BACKEND:
+
+- error handling for inserting SQL
+
+deploy private beta
+
+### TODO rn
+
+- make ui/ux of upload by link feature perfect
+- basic image selection for softgoat
+- start on profile/settings page
 
 ## research todos
 
 - try out replicate
 - play around with the diffusion models
 
-## client todos
+## todo after beta launch
 
 **small**:
 
-- fix everything with the browser sheet ui
-  - automatically select images
-  - make images selectable
-- ui fixes in navbar
 - make lists swipeable
   https://reactnavigation.org/docs/tab-view/
 - fix dark mode
-- make it impossible to swipe back a screen when in a webview
 - replace all flatlists with flashlists
 
 **big**:
 
-- fix upload link feature
-  - this is where we look into gpt-4 for extraction
+- gpt-4 enhanced scraping
 - start designing the "studio" screen
   - skia?
 - start designing the "scan your face" stuff
-- redo browser screen
+- redo browser screen to looks as much as safari as possible
 
-**what would it take to add dark mode?**
+### what would it take to add dark mode?
 
 - add a theme, switch out the context
   keep in mind that ALWAYS try to do color with restyle components

@@ -6,6 +6,7 @@ export type Product = {
   currency: string;
   updated_at?: string;
   images: string[];
+  domain?: string;
 };
 
 export type UserProduct = {
