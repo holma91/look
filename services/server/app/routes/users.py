@@ -31,10 +31,6 @@ async def read_user(id: str) -> UserExtended:
 
 ### PRODUCT INFO ###
 
-def get_filters(request: Request):
-    return dict(request.query_params)
-
-
 @router.get("/{user_id}/products", response_model=list[UserProduct])
 async def read_user_products(
     user_id: str, 
@@ -42,35 +38,37 @@ async def read_user_products(
     brand: list[str] = Query(None),
     website: list[str] = Query(None)
 ) -> UserProduct:
-    print("brand:",brand)
     filters = {"view": view, "brand": brand, "website": website}
-    print(filters)
     try:
         products = await crud.get_products(user_id, filters)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return products
 
-### WEBSITE INFO ###
-
-@router.get("/{user_id}/websites", response_model=list[Any])
-async def read_user_websites(user_id: str) -> list[Any]:
-    sites = await crud.get_websites(user_id)
-    return sites
-
-@router.get("/{user_id}/favorites", response_model=list[Any])
-async def read_user_favorites(user_id: str) -> list[Any]:
-    sites = await crud.get_favorites(user_id)
-    return sites
-
 ### COMPANY INFO ###
+
 @router.get("/{user_id}/companies", response_model=list[Any])
 async def read_user_companies(user_id: str) -> list[Any]:
     companies = await crud.get_companies(user_id)
     return companies
 
+@router.post("/{user_id}/favorites", status_code=201, response_model=POSTResponse)
+async def add_favorite(user_id: str, company: FavoriteCompany) -> POSTResponse:
+    product = await crud.add_favorite(user_id, company.id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="User or Company not found!")
+
+    return SUCCESSFUL_POST_RESPONSE
+
+@router.delete("/{user_id}/favorites", status_code=204)
+async def delete_like(user_id: str, company: FavoriteCompany):
+    result = await crud.un_favorite(user_id, company.id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="User or Company not found!")
+
 
 ### BRAND INFO ###
+
 @router.get("/{user_id}/brands", response_model=list[Any])
 async def read_user_brands(user_id: str) -> list[Any]:
     brands = await crud.get_brands(user_id)
@@ -96,7 +94,6 @@ async def add_product_image(user_id: str, product_image: ProductImage) -> POSTRe
 
     return result
 
-
 @router.post("/{user_id}/likes", status_code=201, response_model=POSTResponse)
 async def add_like(user_id: str, product: LikeProduct) -> POSTResponse:
     product = await crud.add_like(user_id, product.product_url)
@@ -110,30 +107,6 @@ async def delete_like(user_id: str, product: LikeProduct):
     result = await crud.un_like(user_id, product.product_url)
     if result is None:
         raise HTTPException(status_code=404, detail="User or Product not found!")
-
-### WEBSITE INFO ###
-
-@router.post("/{user_id}/websites", status_code=201, response_model=POSTResponse) # when seeing a new website
-async def add_product(user_id: str, website: WebsiteBase) -> POSTResponse:
-    success = await crud.add_website(user_id, website)
-    if not success:
-        raise HTTPException(status_code=404, detail="User not found!")
-
-    return SUCCESSFUL_POST_RESPONSE
-    
-@router.post("/{user_id}/favorites", status_code=201, response_model=POSTResponse)
-async def add_favorite(user_id: str, company: FavoriteCompany) -> POSTResponse:
-    product = await crud.add_favorite(user_id, company.id)
-    if product is None:
-        raise HTTPException(status_code=404, detail="User or Company not found!")
-
-    return SUCCESSFUL_POST_RESPONSE
-
-@router.delete("/{user_id}/favorites", status_code=204)
-async def delete_like(user_id: str, company: FavoriteCompany):
-    result = await crud.un_favorite(user_id, company.id)
-    if result is None:
-        raise HTTPException(status_code=404, detail="User or Company not found!")
 
 ### CLERK WEBHOOK ROUTES ###
 

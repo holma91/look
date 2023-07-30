@@ -1,7 +1,4 @@
-from typing import Optional
-
 from tortoise import Tortoise
-from app.models.pydantic import ProductBase, ProductExtended
 from app.db import get_db_connection
 
 
@@ -54,44 +51,3 @@ async def get(id: str) -> dict:
             product['images'].append(row['image_url'])
 
     return product
-
-async def add(product: ProductExtended) -> Optional[ProductBase]:
-
-    async with get_db_connection() as conn:
-        check_query = """select * from product where url = $1;"""
-        check_result = await conn.execute_query_dict(check_query, [product.url])
-        if check_result:
-            return ProductBase(**check_result[0])
-        
-        # Insert product
-
-        query = """
-        insert into product (url, domain, brand, name, price, currency)
-        values ($1, $2, $3, $4, $5, $6) returning *;
-        """
-        result = await conn.execute_query_dict(query, [
-            product.url, product.domain, product.brand, product.name, product.price, product.currency
-        ])
-
-        # Insert images
-        query = """
-        insert into product_image (product_url, image_url)
-        values ($1, $2) returning *;
-        """
-        for image in product.images:
-            await conn.execute_query_dict(query, [product.url, image])
-
-    return ProductBase(**result[0]) if result else None
-
-async def delete(id: str) -> bool:
-    product_url = id.replace('|', '/')
-    async with get_db_connection() as conn:
-        check_query = """select * from product where url = $1;"""
-        check_result = await conn.execute_query_dict(check_query, [product_url])
-
-        if check_result:  # if product exists
-            delete_query = """delete from product where url = $1;"""
-            await conn.execute_query(delete_query, [product_url])
-            return True
-        else:
-            return False

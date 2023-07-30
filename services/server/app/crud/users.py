@@ -1,9 +1,6 @@
 from typing import Optional
-
 from app.models.pydantic import ProductExtended, ProductImage
-
 from app.db import get_db_connection
-
 
 async def get_all() -> list[dict]:
     async with get_db_connection() as conn:
@@ -40,6 +37,52 @@ async def get(id: str) -> dict:
     user['favorites'] = [website["website_id"] for website in favorite_websites]
     return user
 
+### COMPANY INFO ###
+
+async def get_companies(user_id: str) -> list:
+    async with get_db_connection() as conn:
+        query = """
+            select uc.company_id, favorited, domain from user_company uc
+            join website w on w.company_id = uc.company_id
+            where uc.user_id = $1;
+        """
+        sites = await conn.execute_query_dict(query, [user_id])
+
+    processed_data = {}
+    for site in sites:
+        company_id = site['company_id']
+
+        if company_id not in processed_data:
+            processed_data[company_id] = {
+                "id": site["company_id"],
+                "favorited": site["favorited"],
+                "domains": []
+            }
+
+        processed_data[company_id]["domains"].append(site["domain"])
+
+    return list(processed_data.values())
+
+async def add_favorite(user_id: str, id: str) -> Optional[str]:
+    async with get_db_connection() as conn:
+        query = """
+        update user_company set favorited = TRUE where user_id = $1 and company_id = $2;
+        """
+        await conn.execute_query_dict(query, [user_id, id])
+
+    return id
+
+async def un_favorite(user_id: str, id: str) -> Optional[str]:
+    async with get_db_connection() as conn:
+        query = """
+        update user_company set favorited = FALSE where user_id = $1 and company_id = $2;
+        """
+
+        await conn.execute_query_dict(query, [user_id, id])
+
+    return id
+
+### PRODUCT INFO ###
 
 async def add_product(user_id: str, product: ProductExtended) -> bool:
     # Adding a product from a user's perspective
@@ -156,52 +199,6 @@ async def get_products(user_id: str, filters: Optional[dict[str, str]] = None):
 
     return products
 
-
-async def get_companies(user_id: str) -> list:
-    async with get_db_connection() as conn:
-        query = """
-            select uc.company_id, favorited, domain from user_company uc
-            join website w on w.company_id = uc.company_id
-            where uc.user_id = $1;
-        """
-        sites = await conn.execute_query_dict(query, [user_id])
-
-    processed_data = {}
-    for site in sites:
-        company_id = site['company_id']
-
-        if company_id not in processed_data:
-            processed_data[company_id] = {
-                "id": site["company_id"],
-                "favorited": site["favorited"],
-                "domains": []
-            }
-
-        processed_data[company_id]["domains"].append(site["domain"])
-
-    return list(processed_data.values())
-
-async def get_brands(user_id: str) -> list:
-    async with get_db_connection() as conn:
-        query = """
-            SELECT DISTINCT brand FROM product 
-            join user_product up on up.product_url = product.url where up.user_id = $1;
-        """
-        brands = await conn.execute_query_dict(query, [user_id])
-    
-    return brands
-
-
-async def get_favorites(user_id: str) -> list:
-    async with get_db_connection() as conn:
-        query = """
-            select * from user_website uw 
-            where uw.user_id = $1 and uw.favorited = TRUE;
-        """
-        favorites = await conn.execute_query_dict(query, [user_id])
-    return favorites
-    
-
 async def add_like(user_id: str, product_url: str) -> Optional[str]:
     async with get_db_connection() as conn:
         query = """
@@ -221,25 +218,17 @@ async def un_like(user_id: str, product_url: str) -> Optional[str]:
 
     return product_url
 
-async def add_favorite(user_id: str, id: str) -> Optional[str]:
+### BRAND INFO ###
+
+async def get_brands(user_id: str) -> list:
     async with get_db_connection() as conn:
         query = """
-        update user_company set favorited = TRUE where user_id = $1 and company_id = $2;
+            SELECT DISTINCT brand FROM product 
+            join user_product up on up.product_url = product.url where up.user_id = $1;
         """
-        await conn.execute_query_dict(query, [user_id, id])
-
-    return id
-
-async def un_favorite(user_id: str, id: str) -> Optional[str]:
-    async with get_db_connection() as conn:
-        query = """
-        update user_company set favorited = FALSE where user_id = $1 and company_id = $2;
-        """
-
-        await conn.execute_query_dict(query, [user_id, id])
-
-    return id
-
+        brands = await conn.execute_query_dict(query, [user_id])
+    
+    return brands
 
 ### CLERK WEBHOOK FUNCTIONS ###
 

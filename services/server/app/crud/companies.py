@@ -1,4 +1,3 @@
-from tortoise import Tortoise
 from app.db import get_db_connection
 
 async def get_all() -> list:

@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 from fastapi import APIRouter
 
 from app.crud import companies as crud
