@@ -35,8 +35,16 @@ export type Company = {
 };
 
 export type Filters = {
+  all?: string[];
   view?: string[];
   category?: string[];
   brand?: string[];
   website?: string[];
 };
+
+export type OuterChoiceFilterType =
+  | 'all'
+  | 'view'
+  | 'category'
+  | 'website'
+  | 'brand';

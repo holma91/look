@@ -53,6 +53,9 @@ export default function TabNavigator() {
           } else if (route.name === 'ExploreNavigator') {
             iconName = focused ? 'compass' : 'compass-outline';
             return <Ionicons name={iconName} size={size * 1.1} color={color} />;
+          } else if (route.name === 'Testing') {
+            iconName = focused ? 'compass' : 'compass-outline';
+            return <Ionicons name={iconName} size={size} color={color} />;
           }
         },
         tabBarActiveTintColor: activeTheme.colors.text,

@@ -1,164 +1,131 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { View, StyleSheet, SafeAreaView, Button } from 'react-native';
-import BottomSheet, {
-  BottomSheetModal,
-  BottomSheetView,
-  BottomSheetScrollView,
-  BottomSheetFlatList,
-  BottomSheetModalProvider,
+import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
-import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
-import { SelectField } from '../components/SelectField';
+import { NavigationContainer } from '@react-navigation/native';
+import {
+  BottomSheetScreenProps,
+  createBottomSheetNavigator,
+} from '@th3rdwave/react-navigation-bottom-sheet';
+import * as React from 'react';
+import { Button, StyleSheet, Text, View } from 'react-native';
 
-export default function Testing() {
+type BottomSheetParams = {
+  Home: undefined;
+  Sheet: { id: number };
+  BigSheet: { id: number };
+};
+
+const BottomSheet = createBottomSheetNavigator<BottomSheetParams>();
+
+function HomeScreen({
+  navigation,
+}: BottomSheetScreenProps<BottomSheetParams, 'Home'>) {
   return (
-    <Box backgroundColor="background" flex={1}>
-      <SafeAreaView style={{ flex: 1 }}>
-        {/* <SheetModal /> */}
-        <SelectField />
-      </SafeAreaView>
-    </Box>
+    <View style={styles.container}>
+      <Text>Home Screen</Text>
+      <View style={styles.spacer} />
+      <Button
+        title="Open sheet"
+        onPress={() => {
+          navigation.navigate('Sheet', { id: 1 });
+        }}
+      />
+      <View style={styles.spacer} />
+      <Button
+        title="Open a big sheet"
+        onPress={() => {
+          navigation.navigate('BigSheet', { id: 1 });
+        }}
+      />
+    </View>
   );
 }
 
-const SheetModal = () => {
-  // ref
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
-  // variables
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
-
-  const data = useMemo(
-    () =>
-      Array(50)
-        .fill(0)
-        .map((_, index) => `index-${index}`),
-    []
-  );
-
-  // callbacks
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
-
-  const handleDismissModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.dismiss();
-  }, []);
-
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
-
-  const renderItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.itemContainer}>
-        <Text>{item}</Text>
-      </View>
-    ),
-    []
-  );
-
-  // renders
+function SheetScreen({
+  route,
+  navigation,
+}: BottomSheetScreenProps<BottomSheetParams, 'Sheet'>) {
   return (
-    <BottomSheetModalProvider>
-      <View style={styles.container}>
-        <Button
-          onPress={handlePresentModalPress}
-          title="Present Modal"
-          color="black"
-        />
-        <Button
-          onPress={handleDismissModalPress}
-          title="Dismiss Modal"
-          color="black"
-        />
-        <BottomSheetModal
-          ref={bottomSheetModalRef}
-          index={1}
-          snapPoints={snapPoints}
-          onChange={handleSheetChanges}
-        >
-          <BottomSheetFlatList
-            data={data}
-            keyExtractor={(i) => i}
-            renderItem={renderItem}
-            contentContainerStyle={styles.contentContainer}
+    <View style={[styles.container, styles.content]}>
+      <Text>Sheet Screen {route.params.id}</Text>
+      <View style={styles.spacer} />
+      <Button
+        title="Open new sheet"
+        onPress={() => {
+          navigation.navigate('Sheet', { id: route.params.id + 1 });
+        }}
+      />
+      <View style={styles.spacer} />
+      <Button
+        title="Open new big sheet"
+        onPress={() => {
+          navigation.navigate('BigSheet', { id: route.params.id + 1 });
+        }}
+      />
+      <View style={styles.spacer} />
+      <Button
+        title="Close this sheet"
+        onPress={() => {
+          navigation.goBack();
+        }}
+      />
+      {route.name === ('BigSheet' as unknown) && (
+        <>
+          <View style={styles.spacer} />
+          <Button
+            title="Snap to top"
+            onPress={() => {
+              navigation.snapTo(1);
+            }}
           />
-        </BottomSheetModal>
-      </View>
-    </BottomSheetModalProvider>
-  );
-};
-
-const SheetView = () => {
-  // hooks
-  const sheetRef = useRef<BottomSheet>(null);
-
-  // variables
-  const data = useMemo(
-    () =>
-      Array(50)
-        .fill(0)
-        .map((_, index) => `index-${index}`),
-    []
-  );
-  const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
-
-  // callbacks
-  const handleSheetChange = useCallback((index: number) => {
-    console.log('handleSheetChange', index);
-  }, []);
-  const handleSnapPress = useCallback((index: number) => {
-    sheetRef.current?.snapToIndex(index);
-  }, []);
-  const handleClosePress = useCallback(() => {
-    sheetRef.current?.close();
-  }, []);
-
-  // render
-  const renderItem = useCallback(
-    ({ item }: { item: any }) => (
-      <View style={styles.itemContainer}>
-        <Text>{item}</Text>
-      </View>
-    ),
-    []
-  );
-
-  return (
-    <View style={styles.container}>
-      <Button title="Snap To 90%" onPress={() => handleSnapPress(2)} />
-      <Button title="Snap To 50%" onPress={() => handleSnapPress(1)} />
-      <Button title="Snap To 25%" onPress={() => handleSnapPress(0)} />
-      <Button title="Close" onPress={() => handleClosePress()} />
-      <BottomSheet
-        ref={sheetRef}
-        snapPoints={snapPoints}
-        onChange={handleSheetChange}
-      >
-        <BottomSheetFlatList
-          data={data}
-          keyExtractor={(i) => i}
-          renderItem={renderItem}
-          contentContainerStyle={styles.contentContainer}
-        />
-      </BottomSheet>
+        </>
+      )}
     </View>
   );
-};
+}
+
+const renderBackdrop = (props: BottomSheetBackdropProps) => (
+  <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />
+);
+
+export default function Testing() {
+  return (
+    // <NavigationContainer>
+    <BottomSheet.Navigator
+      screenOptions={{
+        backdropComponent: renderBackdrop,
+      }}
+    >
+      <BottomSheet.Screen name="Home" component={HomeScreen} />
+      <BottomSheet.Screen
+        name="Sheet"
+        component={SheetScreen}
+        getId={({ params }) => `sheet-${params.id}`}
+      />
+      <BottomSheet.Screen
+        name="BigSheet"
+        component={SheetScreen}
+        options={{
+          snapPoints: ['50%', '80%'],
+        }}
+        getId={({ params }) => `sheet-${params.id}`}
+      />
+    </BottomSheet.Navigator>
+    // </NavigationContainer>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  contentContainer: {
-    backgroundColor: 'white',
+  content: {
+    marginVertical: 20,
   },
-  itemContainer: {
-    padding: 6,
-    margin: 6,
-    backgroundColor: '#eee',
+  spacer: {
+    margin: 5,
   },
 });

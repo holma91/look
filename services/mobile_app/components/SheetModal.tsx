@@ -1,4 +1,3 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   BottomSheetModal,
@@ -7,20 +6,18 @@ import {
 } from '@gorhom/bottom-sheet';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { Button } from './Buttons';
-import { Filters } from '../utils/types';
-import { TouchableOpacity } from 'react-native';
+import { Filters, OuterChoiceFilterType } from '../utils/types';
 import { PrimaryButton, SecondaryButton, FilterListButton } from './Button';
 
 type SheetModalProps = {
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;
   choices: Filters;
-  outerChoice: 'view' | 'category' | 'website' | 'brand';
+  outerChoice: OuterChoiceFilterType;
+  resetFilter: () => void;
   handleFilterSelection: (
-    filterType: 'view' | 'category' | 'website' | 'brand',
+    filterType: OuterChoiceFilterType,
     filterValue: string
   ) => void;
-  resetFilter: () => void;
   filters: Filters;
 };
 
@@ -34,6 +31,51 @@ export default function SheetModal({
 }: SheetModalProps) {
   const snapPoints = useMemo(() => ['65%'], []);
 
+  return (
+    <BottomSheetModal
+      ref={bottomSheetModalRef}
+      snapPoints={snapPoints}
+      backdropComponent={(props) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+        />
+      )}
+      handleIndicatorStyle={{ backgroundColor: 'white' }}
+    >
+      <BottomSheetContent
+        bottomSheetModalRef={bottomSheetModalRef}
+        choices={choices}
+        outerChoice={outerChoice}
+        resetFilter={resetFilter}
+        handleFilterSelection={handleFilterSelection}
+        filters={filters}
+      />
+    </BottomSheetModal>
+  );
+}
+
+type BottomSheetContentProps = {
+  bottomSheetModalRef: React.RefObject<BottomSheetModal>;
+  choices: Filters;
+  outerChoice: OuterChoiceFilterType;
+  resetFilter: () => void;
+  handleFilterSelection: (
+    filterType: OuterChoiceFilterType,
+    filterValue: string
+  ) => void;
+  filters: Filters;
+};
+
+function BottomSheetContent({
+  outerChoice,
+  choices,
+  filters,
+  handleFilterSelection,
+  resetFilter,
+  bottomSheetModalRef,
+}: BottomSheetContentProps) {
   const renderListItem = useCallback(
     ({ item }: { item: string }) => {
       const isSelected = filters[outerChoice]?.includes(item);
@@ -52,19 +94,11 @@ export default function SheetModal({
     [outerChoice, filters, handleFilterSelection]
   );
 
+  // here we wanna do different shit depending on the values
+  // implement a super basic nav system
+
   return (
-    <BottomSheetModal
-      ref={bottomSheetModalRef}
-      snapPoints={snapPoints}
-      backdropComponent={(props) => (
-        <BottomSheetBackdrop
-          {...props}
-          appearsOnIndex={0}
-          disappearsOnIndex={-1}
-        />
-      )}
-      handleIndicatorStyle={{ backgroundColor: 'white' }}
-    >
+    <>
       <Box justifyContent="center" alignItems="center" marginBottom="m">
         <Text variant="title" fontSize={22}>
           {outerChoice}
@@ -105,6 +139,6 @@ export default function SheetModal({
           }}
         />
       </Box>
-    </BottomSheetModal>
+    </>
   );
 }

@@ -12,7 +12,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { SearchBar } from '../components/SearchBar';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { fetchCompanies, fetchWebsites } from '../api';
+import { fetchCompanies } from '../api';
 import { useState } from 'react';
 import { Website, Company } from '../utils/types';
 import { companyToInfo } from '../utils/utils';

@@ -3,18 +3,6 @@ import { Filters, UserProduct } from '../utils/types';
 // api.ts
 const URL = 'https://77f8-85-230-9-36.ngrok-free.app';
 
-export const fetchWebsites = async (id: string) => {
-  const completeUrl = `${URL}/users/${id}/websites`;
-  const response = await fetch(completeUrl);
-
-  if (!response.ok) {
-    throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
-    );
-  }
-  return response.json();
-};
-
 export const fetchCompanies = async (id: string) => {
   const completeUrl = `${URL}/users/${id}/companies`;
   const response = await fetch(completeUrl);

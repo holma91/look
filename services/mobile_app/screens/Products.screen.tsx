@@ -23,7 +23,12 @@ import * as Haptics from 'expo-haptics';
 import { createProduct, fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { Filters, Product as ProductType, UserProduct } from '../utils/types';
+import {
+  Filters,
+  OuterChoiceFilterType,
+  Product as ProductType,
+  UserProduct,
+} from '../utils/types';
 import SheetModal from '../components/SheetModal';
 import Filter from '../components/Filter';
 import { TextInput } from '../styling/TextInput';
@@ -56,10 +61,7 @@ export default function Products({ navigation }: { navigation: any }) {
   }, []);
 
   const handleFilterSelection = useCallback(
-    (
-      filterType: 'view' | 'category' | 'website' | 'brand',
-      filterValue: string
-    ) => {
+    (filterType: OuterChoiceFilterType, filterValue: string) => {
       setFilters((prevFilters) => {
         if (filterType === 'view') {
           // we only allow single selection for the view

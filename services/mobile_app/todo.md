@@ -35,10 +35,9 @@ deploy private beta
 
 ### TODO rn
 
-- make ui/ux of upload by link feature perfect ; check
+- fix outer filter
+  - search by price functionality
 - basic image selection for softgoat
-- start on profile/settings page ; check
-- figure out how to actually do buttons correctly with restyle
 
 ## research todos
 

@@ -18,11 +18,12 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Text } from '../styling/Text';
 import SheetModal from './SheetModal';
 import { useQuery } from '@tanstack/react-query';
-import { Filters, UserProduct } from '../utils/types';
-import { fetchBrands, fetchCompanies, fetchWebsites } from '../api';
+import { Filters, OuterChoiceFilterType } from '../utils/types';
+import { fetchBrands, fetchCompanies } from '../api';
 import { Website } from '../utils/types';
 
-const possibleFilters: { label: 'category' | 'website' | 'brand' }[] = [
+const possibleFilters: { label: 'all' | 'category' | 'website' | 'brand' }[] = [
+  { label: 'all' },
   { label: 'brand' },
   { label: 'website' },
   // { label: 'category' },
@@ -37,7 +38,7 @@ type FilterProps = {
   resetFilter: () => void;
   showFilter: boolean;
   handleFilterSelection: (
-    filterType: 'view' | 'category' | 'website' | 'brand',
+    filterType: OuterChoiceFilterType,
     filterValue: string
   ) => void;
 };
@@ -49,11 +50,10 @@ export default function Filter({
   showFilter,
   handleFilterSelection,
 }: FilterProps) {
-  const [outerChoice, setOuterChoice] = useState<
-    'category' | 'website' | 'brand'
-  >('brand');
-
+  const [outerChoice, setOuterChoice] =
+    useState<OuterChoiceFilterType>('brand');
   const { user } = useUser();
+
   const { data: companies } = useQuery<string[]>({
     queryKey: ['companies', user?.id],
     queryFn: () => fetchCompanies(user?.id as string),
@@ -82,7 +82,7 @@ export default function Filter({
   const filterSheetModalRef = useRef<BottomSheetModal>(null);
 
   const handlePresentModalPress = useCallback(
-    (label: 'category' | 'website' | 'brand') => {
+    (label: OuterChoiceFilterType) => {
       console.log('setting outer choice', label);
       setOuterChoice(label);
 
@@ -97,21 +97,6 @@ export default function Filter({
     brand: brands || [],
     website: companies || [],
   };
-
-  const choicesList = useMemo(() => {
-    if (outerChoice === 'category') {
-      // this should be fetched from the backend depending on the categories the user has viewed
-      return ['Hoodies', 'T-shirts', 'Suits'];
-    } else if (outerChoice === 'brand') {
-      // same as above
-      return brands || [];
-    } else if (outerChoice === 'website') {
-      // same as above
-      return companies || [];
-    }
-
-    return [];
-  }, [outerChoice]);
 
   return (
     <>
