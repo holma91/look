@@ -68,6 +68,7 @@ export function WebViewBox({
 
         try {
           await addProductImages(user.id, url, parsedImageSrc);
+          queryClient.invalidateQueries({ queryKey: ['products', user?.id] });
         } catch (e) {
           console.error(e);
         }

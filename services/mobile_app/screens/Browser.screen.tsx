@@ -278,6 +278,8 @@ function NavBar({
         <Box flex={0} flexDirection="row" gap="m" alignItems="center">
           <TouchableOpacity
             onPress={() => {
+              console.log('like mutation', activeProduct);
+
               if (activeProduct) {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 likeMutation.mutate(activeProduct);
