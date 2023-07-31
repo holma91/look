@@ -29,16 +29,18 @@ import {
   Product as ProductType,
   UserProduct,
 } from '../utils/types';
-import SheetModal from '../components/SheetModal';
 import Filter from '../components/Filter';
 import { TextInput } from '../styling/TextInput';
 import { getInjectScripts, parseProductData } from '../utils/inject';
-import { getDomain } from '../utils/helpers';
+import { capitalizeFirstLetter, getDomain } from '../utils/helpers';
 import { PrimaryButton } from '../components/Button';
 
 export default function Products({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);
   const [filters, setFilters] = useState<Filters>({ list: ['likes'] });
+  const [sheetNavStack, setSheetNavStack] = useState<OuterChoiceFilterType[]>(
+    []
+  );
 
   const { user } = useUser();
 
@@ -98,10 +100,6 @@ export default function Products({ navigation }: { navigation: any }) {
     return list;
   }, [productsQuery.data]);
 
-  const viewChoices: Filters = {
-    list: ['likes', 'history', 'purchases', 'New List'],
-  };
-
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -131,9 +129,8 @@ export default function Products({ navigation }: { navigation: any }) {
             }}
           >
             <Text variant="title" fontSize={18}>
-              {filters['list']?.[0] || 'likes'}
+              {capitalizeFirstLetter(filters['list']?.[0] || 'likes')}
             </Text>
-            <Ionicons name="chevron-down" size={26} color="black" />
           </TouchableOpacity>
           <TouchableOpacity onPress={handlePresentPasteLinkSheetPress}>
             <Ionicons name="link" size={24} color="black" />
@@ -145,6 +142,8 @@ export default function Products({ navigation }: { navigation: any }) {
           resetFilter={resetFilter}
           showFilter={showFilter}
           handleFilterSelection={handleFilterSelection}
+          sheetNavStack={sheetNavStack}
+          setSheetNavStack={setSheetNavStack}
         />
         <Box flex={1} paddingHorizontal="xs">
           <FlatList
@@ -165,14 +164,6 @@ export default function Products({ navigation }: { navigation: any }) {
             showsVerticalScrollIndicator={false}
           />
         </Box>
-        <SheetModal
-          bottomSheetModalRef={bottomSheetModalRef}
-          choices={viewChoices}
-          outerChoice="list"
-          handleFilterSelection={handleFilterSelection}
-          resetFilter={resetFilter}
-          filters={filters}
-        />
         <PasteLinkSheet
           navigation={navigation}
           pasteLinkSheetRef={pasteLinkSheetRef}

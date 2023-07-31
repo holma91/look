@@ -22,8 +22,11 @@ import { Filters, OuterChoiceFilterType } from '../utils/types';
 import { fetchBrands, fetchCompanies } from '../api';
 import { Website } from '../utils/types';
 
-const possibleFilters: { label: 'all' | 'category' | 'website' | 'brand' }[] = [
+const possibleFilters: {
+  label: 'all' | 'list' | 'category' | 'website' | 'brand';
+}[] = [
   { label: 'all' },
+  { label: 'list' },
   { label: 'brand' },
   { label: 'website' },
   // { label: 'category' },
@@ -41,6 +44,10 @@ type FilterProps = {
     filterType: OuterChoiceFilterType,
     filterValue: string
   ) => void;
+  sheetNavStack: OuterChoiceFilterType[];
+  setSheetNavStack: React.Dispatch<
+    React.SetStateAction<OuterChoiceFilterType[]>
+  >;
 };
 
 export default function Filter({
@@ -49,9 +56,12 @@ export default function Filter({
   resetFilter,
   showFilter,
   handleFilterSelection,
+  sheetNavStack,
+  setSheetNavStack,
 }: FilterProps) {
   const [outerChoice, setOuterChoice] =
     useState<OuterChoiceFilterType>('brand');
+
   const { user } = useUser();
 
   const { data: companies } = useQuery<string[]>({
@@ -83,8 +93,8 @@ export default function Filter({
 
   const handlePresentModalPress = useCallback(
     (label: OuterChoiceFilterType) => {
-      console.log('setting outer choice', label);
       setOuterChoice(label);
+      setSheetNavStack((prev) => [...prev, label]);
 
       filterSheetModalRef.current?.present();
     },
@@ -93,9 +103,8 @@ export default function Filter({
 
   const choices = React.useMemo<Filters>(() => {
     return {
-      all: ['list', 'category', 'brand', 'website'],
+      all: ['list', 'brand', 'website'],
       list: ['likes', 'history', 'purchases', 'New List'],
-      category: ['Hoodies', 'T-shirts', 'Suits'],
       brand: brands || [],
       website: companies || [],
     };
@@ -151,6 +160,8 @@ export default function Filter({
         resetFilter={resetFilter}
         handleFilterSelection={handleFilterSelection}
         filters={filters}
+        sheetNavStack={sheetNavStack}
+        setSheetNavStack={setSheetNavStack}
       />
     </>
   );
