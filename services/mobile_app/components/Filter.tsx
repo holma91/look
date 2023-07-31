@@ -91,12 +91,15 @@ export default function Filter({
     []
   );
 
-  const choices: Filters = {
-    view: ['Likes', 'History', 'Purchases', 'New List'],
-    category: ['Hoodies', 'T-shirts', 'Suits'],
-    brand: brands || [],
-    website: companies || [],
-  };
+  const choices = React.useMemo<Filters>(() => {
+    return {
+      all: ['list', 'category', 'brand', 'website'],
+      list: ['likes', 'history', 'purchases', 'New List'],
+      category: ['Hoodies', 'T-shirts', 'Suits'],
+      brand: brands || [],
+      website: companies || [],
+    };
+  }, [brands, companies]);
 
   return (
     <>
@@ -144,6 +147,7 @@ export default function Filter({
         bottomSheetModalRef={filterSheetModalRef}
         choices={choices}
         outerChoice={outerChoice}
+        setOuterChoice={setOuterChoice}
         resetFilter={resetFilter}
         handleFilterSelection={handleFilterSelection}
         filters={filters}

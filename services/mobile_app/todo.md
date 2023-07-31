@@ -18,11 +18,8 @@ so the plan is to first make a guess, and try to extract images.
 
 FRONTEND:
 
-- fix upload by link feature for all chosen websites
-- fix error handling for link feature
-  - show accepted websites
-- one-shot image selection
-- design and implement profile/settings page
+- implement base filter
+- one-shot image selection (?)
 - sort by price (?)
 - fix bugs
   - make it impossible to swipe back a screen when in a webview
@@ -73,3 +70,22 @@ deploy private beta
 - Do the try-it-on stuff
 - make it so that when a user favorites something, it's checked daily if the size exists etc.
 - put in shopping info somewhere in app, and autofill on sites
+
+### filter
+
+all
+
+- view
+  - likes
+  - history
+  - purchased
+- category
+  - all categories
+- brand
+  - all brands
+- company
+  - all companies
+
+so when clicking on e.g view, we should go to the list with l, h, p.
+
+exiting FadeInLeft from all, entering FadeInRight from view

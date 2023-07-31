@@ -19,12 +19,12 @@ export const useLikeMutation = () => {
       await queryClient.cancelQueries([
         'products',
         user?.id,
-        { view: ['likes'] },
+        { list: ['likes'] },
       ]);
       const previousProducts = queryClient.getQueryData([
         'products',
         user?.id,
-        { view: ['likes'] },
+        { list: ['likes'] },
       ]);
 
       return { previousProducts, product };
@@ -35,7 +35,7 @@ export const useLikeMutation = () => {
     },
     onSettled: async () => {
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.id, { view: ['likes'] }],
+        queryKey: ['products', user?.id, { list: ['likes'] }],
       });
     },
   });

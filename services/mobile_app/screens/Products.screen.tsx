@@ -38,7 +38,7 @@ import { PrimaryButton } from '../components/Button';
 
 export default function Products({ navigation }: { navigation: any }) {
   const [showFilter, setShowFilter] = useState(false);
-  const [filters, setFilters] = useState<Filters>({ view: ['likes'] });
+  const [filters, setFilters] = useState<Filters>({ list: ['likes'] });
 
   const { user } = useUser();
 
@@ -63,7 +63,7 @@ export default function Products({ navigation }: { navigation: any }) {
   const handleFilterSelection = useCallback(
     (filterType: OuterChoiceFilterType, filterValue: string) => {
       setFilters((prevFilters) => {
-        if (filterType === 'view') {
+        if (filterType === 'list') {
           // we only allow single selection for the view
           return {
             ...prevFilters,
@@ -90,7 +90,7 @@ export default function Products({ navigation }: { navigation: any }) {
   );
 
   const resetFilter = useCallback(() => {
-    setFilters({ view: ['likes'] });
+    setFilters({ list: ['likes'] });
   }, []);
 
   const displayedProducts = useMemo(() => {
@@ -99,7 +99,7 @@ export default function Products({ navigation }: { navigation: any }) {
   }, [productsQuery.data]);
 
   const viewChoices: Filters = {
-    view: ['likes', 'history', 'purchases', 'New List'],
+    list: ['likes', 'history', 'purchases', 'New List'],
   };
 
   return (
@@ -131,7 +131,7 @@ export default function Products({ navigation }: { navigation: any }) {
             }}
           >
             <Text variant="title" fontSize={18}>
-              {filters['view']?.[0] || 'likes'}
+              {filters['list']?.[0] || 'likes'}
             </Text>
             <Ionicons name="chevron-down" size={26} color="black" />
           </TouchableOpacity>
@@ -168,7 +168,7 @@ export default function Products({ navigation }: { navigation: any }) {
         <SheetModal
           bottomSheetModalRef={bottomSheetModalRef}
           choices={viewChoices}
-          outerChoice="view"
+          outerChoice="list"
           handleFilterSelection={handleFilterSelection}
           resetFilter={resetFilter}
           filters={filters}
@@ -314,7 +314,7 @@ function PasteLinkSheet({
       await createProduct(user?.id, product, domain);
       queryClient.invalidateQueries({ queryKey: ['brands', user?.id] });
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.id, { view: ['history'] }],
+        queryKey: ['products', user?.id, { list: ['history'] }],
       });
     } catch (e) {
       console.error(e);

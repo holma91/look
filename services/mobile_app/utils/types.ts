@@ -36,7 +36,7 @@ export type Company = {
 
 export type Filters = {
   all?: string[];
-  view?: string[];
+  list?: string[];
   category?: string[];
   brand?: string[];
   website?: string[];
@@ -44,7 +44,7 @@ export type Filters = {
 
 export type OuterChoiceFilterType =
   | 'all'
-  | 'view'
+  | 'list'
   | 'category'
   | 'website'
   | 'brand';

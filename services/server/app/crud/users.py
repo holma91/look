@@ -149,13 +149,13 @@ async def get_products(user_id: str, filters: Optional[dict[str, str]] = None):
         
         if filters:
             for key, value in filters.items():
-                if key == "view":
+                if key == "list":
                     if value == "likes":
                         query += " and liked = TRUE"
                     elif value == "purchases":
                         query += " and purchased = TRUE"
                     elif value != "history":
-                        raise ValueError(f"Invalid 'view' filter: {value}")
+                        raise ValueError(f"Invalid 'list' filter: {value}")
                 elif key == "brand":
                     if value:
                         brand_placeholders = ', '.join(f"${i+len(query_params)+1}" for i in range(len(value)))

@@ -13,6 +13,7 @@ type SheetModalProps = {
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;
   choices: Filters;
   outerChoice: OuterChoiceFilterType;
+  setOuterChoice?: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
   resetFilter: () => void;
   handleFilterSelection: (
     filterType: OuterChoiceFilterType,
@@ -25,6 +26,7 @@ export default function SheetModal({
   bottomSheetModalRef,
   choices,
   outerChoice,
+  setOuterChoice,
   handleFilterSelection,
   resetFilter,
   filters,
@@ -48,6 +50,7 @@ export default function SheetModal({
         bottomSheetModalRef={bottomSheetModalRef}
         choices={choices}
         outerChoice={outerChoice}
+        setOuterChoice={setOuterChoice}
         resetFilter={resetFilter}
         handleFilterSelection={handleFilterSelection}
         filters={filters}
@@ -60,6 +63,7 @@ type BottomSheetContentProps = {
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;
   choices: Filters;
   outerChoice: OuterChoiceFilterType;
+  setOuterChoice?: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
   resetFilter: () => void;
   handleFilterSelection: (
     filterType: OuterChoiceFilterType,
@@ -70,12 +74,14 @@ type BottomSheetContentProps = {
 
 function BottomSheetContent({
   outerChoice,
+  setOuterChoice,
   choices,
   filters,
   handleFilterSelection,
   resetFilter,
   bottomSheetModalRef,
 }: BottomSheetContentProps) {
+  // I want this to be different depending on the outerChoice
   const renderListItem = useCallback(
     ({ item }: { item: string }) => {
       const isSelected = filters[outerChoice]?.includes(item);
@@ -94,8 +100,14 @@ function BottomSheetContent({
     [outerChoice, filters, handleFilterSelection]
   );
 
-  // here we wanna do different shit depending on the values
-  // implement a super basic nav system
+  console.log('outerChoice:', outerChoice);
+  console.log('choices:', choices);
+
+  const relevantChoices = choices[outerChoice];
+
+  // if all we show this
+
+  // if brand we show that
 
   return (
     <>
@@ -104,14 +116,26 @@ function BottomSheetContent({
           {outerChoice}
         </Text>
       </Box>
-      <BottomSheetFlatList
-        data={choices[outerChoice]}
-        renderItem={renderListItem}
-        keyExtractor={(item) => item}
-        contentContainerStyle={{ backgroundColor: 'white' }}
-        style={{ paddingHorizontal: 10 }}
-        showsVerticalScrollIndicator={false}
-      />
+      {outerChoice === 'all' ? (
+        <AllList
+          bottomSheetModalRef={bottomSheetModalRef}
+          choices={choices}
+          outerChoice={outerChoice}
+          setOuterChoice={setOuterChoice}
+          resetFilter={resetFilter}
+          handleFilterSelection={handleFilterSelection}
+          filters={filters}
+        />
+      ) : (
+        <BottomSheetFlatList
+          data={relevantChoices}
+          renderItem={renderListItem}
+          keyExtractor={(item) => item}
+          contentContainerStyle={{ backgroundColor: 'white' }}
+          style={{ paddingHorizontal: 10 }}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
 
       <Box
         flexDirection="row"
@@ -140,5 +164,52 @@ function BottomSheetContent({
         />
       </Box>
     </>
+  );
+}
+
+function AllList({
+  outerChoice,
+  setOuterChoice,
+  choices,
+  filters,
+  handleFilterSelection,
+  resetFilter,
+  bottomSheetModalRef,
+}: BottomSheetContentProps) {
+  const renderListItem = useCallback(
+    ({ item }: { item: string }) => {
+      const isSelected = filters[outerChoice]?.includes(item);
+
+      return (
+        <FilterListButton
+          label={item}
+          onPress={() => {
+            // handleFilterSelection(outerChoice, item);
+            console.log('setOuterChoice:', setOuterChoice);
+            console.log('item:', item);
+
+            setOuterChoice?.(item as OuterChoiceFilterType);
+          }}
+          isSelected={isSelected || false}
+          item={item}
+        />
+      );
+    },
+    [outerChoice, filters, handleFilterSelection]
+  );
+
+  console.log('outerChoice:', outerChoice);
+  console.log('choices:', choices);
+
+  const relevantChoices = choices[outerChoice];
+  return (
+    <BottomSheetFlatList
+      data={relevantChoices}
+      renderItem={renderListItem}
+      keyExtractor={(item) => item}
+      contentContainerStyle={{ backgroundColor: 'white' }}
+      style={{ paddingHorizontal: 10 }}
+      showsVerticalScrollIndicator={false}
+    />
   );
 }

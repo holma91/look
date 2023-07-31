@@ -140,7 +140,7 @@ export default function Browser({
 
   const { data: products, refetch: refetchProducts } = useQuery({
     queryKey: ['products', user?.id],
-    queryFn: () => fetchProducts(user?.id as string, { view: ['history'] }),
+    queryFn: () => fetchProducts(user?.id as string, { list: ['history'] }),
     enabled: !!user?.id,
   });
 

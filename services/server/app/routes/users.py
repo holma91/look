@@ -34,11 +34,11 @@ async def read_user(id: str) -> UserExtended:
 @router.get("/{user_id}/products", response_model=list[UserProduct])
 async def read_user_products(
     user_id: str, 
-    view: str = "likes",
+    list: str = "likes",
     brand: list[str] = Query(None),
     website: list[str] = Query(None)
 ) -> UserProduct:
-    filters = {"view": view, "brand": brand, "website": website}
+    filters = {"list": list, "brand": brand, "website": website}
     try:
         products = await crud.get_products(user_id, filters)
     except ValueError as e:
