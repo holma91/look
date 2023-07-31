@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserBase, UserProduct, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
+from app.models.pydantic import UserBase, UserProduct, ListBase, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
 from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
@@ -40,7 +40,10 @@ async def read_user_products(
 ) -> UserProduct:
     filters = {"list": list, "brand": brand, "website": website}
     try:
-        products = await crud.get_products(user_id, filters)
+        if list in ["history", "likes"]:
+            products = await crud.get_products(user_id, filters)
+        else:
+            products = await crud.get_products_from_list(user_id, filters)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return products
@@ -61,7 +64,7 @@ async def add_favorite(user_id: str, company: FavoriteCompany) -> POSTResponse:
     return SUCCESSFUL_POST_RESPONSE
 
 @router.delete("/{user_id}/favorites", status_code=204)
-async def delete_like(user_id: str, company: FavoriteCompany):
+async def delete_favorite(user_id: str, company: FavoriteCompany):
     result = await crud.un_favorite(user_id, company.id)
     if result is None:
         raise HTTPException(status_code=404, detail="User or Company not found!")
@@ -107,6 +110,26 @@ async def delete_like(user_id: str, product: LikeProduct):
     result = await crud.un_like(user_id, product.product_url)
     if result is None:
         raise HTTPException(status_code=404, detail="User or Product not found!")
+
+### LISTS ###
+@router.get("/{user_id}/lists", response_model=list[ListBase])
+async def read_user_p_lists(user_id: str) -> list[ListBase]:
+    lists = await crud.get_p_lists(user_id)
+    return lists
+
+@router.post("/{user_id}/lists", status_code=201, response_model=POSTResponse)
+async def add_p_list(user_id: str, list_id: str) -> POSTResponse:
+    success = await crud.create_p_list(user_id, list_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="User not found!")
+
+    return SUCCESSFUL_POST_RESPONSE
+
+@router.delete("/{user_id}/lists", status_code=204)
+async def delete_p_list(user_id: str, list_id: str):
+    result = await crud.delete_p_list(user_id, list_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="User or List not found!")
 
 ### CLERK WEBHOOK ROUTES ###
 

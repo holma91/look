@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS "product_image" (
 CREATE TABLE IF NOT EXISTS "user_product" (
     "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
     "product_url" TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,
-    "liked" BOOL NOT NULL DEFAULT FALSE,
+    -- "liked" BOOL NOT NULL DEFAULT FALSE,
     -- "purchased" BOOL NOT NULL DEFAULT FALSE,
     UNIQUE(user_id, product_url)
 );
@@ -46,12 +46,6 @@ CREATE TABLE IF NOT EXISTS "p_list" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
     UNIQUE(id, user_id)
-);
-
-CREATE TABLE IF NOT EXISTS "list_product" (
-    "list_id" TEXT NOT NULL REFERENCES "p_list" ("id") ON DELETE CASCADE,
-    "product_url" TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,
-    UNIQUE(list_id, product_url)
 );
 
 insert into "user" (id) values ('user_2RYsQv4W7NG9YYHaOId6Tq599SV');
@@ -164,16 +158,6 @@ VALUES
 ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://softgoat.com/p/boatneck-red'),
 ('user_2RYsQv4W7NG9YYHaOId6Tq599SV', 'https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html');
 
-INSERT INTO p_list (id, user_id)
-VALUES
-('purchases', 'user_2RYsQv4W7NG9YYHaOId6Tq599SV');
-
-
-INSERT INTO list_product (list_id, product_url)
-VALUES
-('purchases', 'https://softgoat.com/p/mens-collar-navy'),
-('purchases', 'https://softgoat.com/p/mens-waffle-knit-sea-foam');
-
 UPDATE user_product SET liked = TRUE
 WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey';
 UPDATE user_product SET liked = TRUE
@@ -182,3 +166,9 @@ UPDATE user_product SET liked = TRUE
 WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-waffle-knit-sea-foam';
 UPDATE user_product SET liked = TRUE
 WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html';
+
+UPDATE user_product SET purchased = TRUE
+WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-collar-navy';
+
+UPDATE user_product SET purchased = TRUE
+WHERE user_id = 'user_2RYsQv4W7NG9YYHaOId6Tq599SV' AND product_url = 'https://softgoat.com/p/mens-waffle-knit-sea-foam';

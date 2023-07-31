@@ -1,24 +1,9 @@
-### thoughts
-
-What do with brand?
-
-1. strip whitespace
-2. make lowercase
-3. replace " " with "-"
-
-### image extraction feature
-
-so the plan is to first make a guess, and try to extract images.
-
-1. try getting from schema.org
-2. all images that's not nested in a link and in a certain size
-3. always allow the user to to click by themselves
-
 ### TODO
 
 FRONTEND:
 
 - implement base filter ; check
+- fix parsing for all sites we got that have schema.org integrated.
 - one-shot image selection (?)
 - sort by price (?)
 - fix bugs
@@ -27,6 +12,7 @@ FRONTEND:
 BACKEND:
 
 - error handling for inserting SQL
+- do schema changes to allow for arbitrary company and product lists
 
 deploy private beta
 
@@ -70,3 +56,13 @@ deploy private beta
 - Do the try-it-on stuff
 - make it so that when a user favorites something, it's checked daily if the size exists etc.
 - put in shopping info somewhere in app, and autofill on sites
+
+### fetch all companies thing
+
+- get all companies from server
+  - do some join with user_company, with default favorited to false
+  - if user favs:
+    - optimistically update UI, sent to server which in turn will:
+      - insert into user company with favorited = true
+  - if user unfavs:
+    - just set favorited = false

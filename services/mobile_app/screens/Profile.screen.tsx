@@ -1,5 +1,5 @@
 import { SafeAreaView, Switch } from 'react-native';
-import { useAuth } from '@clerk/clerk-expo';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 
 import { Box } from '../styling/Box';
 import { useContext } from 'react';
@@ -11,6 +11,7 @@ import { Button } from '../components/Buttons';
 import { PrimaryButton } from '../components/Button';
 
 export default function Profile() {
+  const { user } = useUser();
   const { isLoaded, signOut } = useAuth();
   const { isDemo, setIsDemo } = useContext(DemoContext);
   const { isDarkMode, setIsDarkMode } = useContext(DarkModeContext);
@@ -40,6 +41,8 @@ export default function Profile() {
     }
   };
 
+  console.log('user:', user);
+
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -51,7 +54,7 @@ export default function Profile() {
             paddingBottom="sm"
           >
             <Text variant="title">Account</Text>
-            <Text variant="body">alexanderholmberg91@gmail.com</Text>
+            <Text variant="body">{user?.emailAddresses[0].emailAddress}</Text>
           </Box>
           <Box flex={1} justifyContent="space-between">
             <Box gap="m">

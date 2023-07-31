@@ -32,6 +32,9 @@ class WebsiteBase(BaseModel):
 class CompanyBase(BaseModel):
     id: str
 
+class ListBase(BaseModel):
+    id: str
+
 ### REQUEST MODELS ###
 
 class LikeProduct(BaseModel):
@@ -52,7 +55,12 @@ class ProductImage(BaseModel):
 class UserProduct(ProductBase):
     company: str
     liked: bool
-    purchased: bool
+    # purchased: bool
+    images: list[str]
+
+class UserProduct2(ProductBase):
+    company: str
+    liked: bool
     images: list[str]
 
 class UserExtended(UserBase):
