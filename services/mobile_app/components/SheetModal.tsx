@@ -21,6 +21,7 @@ import { capitalizeFirstLetter } from '../utils/helpers';
 
 type SheetModalProps = {
   filterSheetModalRef: React.RefObject<BottomSheetModal>;
+  newListSheetModalRef: React.RefObject<BottomSheetModal>;
   choices: Filters;
   outerChoice: OuterChoiceFilterType;
   setOuterChoice?: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
@@ -38,6 +39,7 @@ type SheetModalProps = {
 
 export default function SheetModal({
   filterSheetModalRef,
+  newListSheetModalRef,
   choices,
   outerChoice,
   setOuterChoice,
@@ -48,8 +50,6 @@ export default function SheetModal({
   setSheetNavStack,
 }: SheetModalProps) {
   const snapPoints = useMemo(() => ['65%'], []);
-
-  const newListSheetModalRef = useRef<BottomSheetModal>(null);
 
   return (
     <>

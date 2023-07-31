@@ -1,131 +1,88 @@
-import {
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-} from '@gorhom/bottom-sheet';
-import { NavigationContainer } from '@react-navigation/native';
-import {
-  BottomSheetScreenProps,
-  createBottomSheetNavigator,
-} from '@th3rdwave/react-navigation-bottom-sheet';
-import * as React from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { HoldItem } from 'react-native-hold-menu';
 
-type BottomSheetParams = {
-  Home: undefined;
-  Sheet: { id: number };
-  BigSheet: { id: number };
-};
+const MenuItems = [
+  { text: 'Actions', icon: 'home', isTitle: true, onPress: () => {} },
+  { text: 'Action 1', icon: 'edit', onPress: () => {} },
+  { text: 'Action 2', icon: 'map-pin', withSeparator: true, onPress: () => {} },
+  { text: 'Action 3', icon: 'trash', isDestructive: true, onPress: () => {} },
+];
 
-const BottomSheet = createBottomSheetNavigator<BottomSheetParams>();
+const SampleList = [
+  { text: 'Reply', onPress: () => {} },
+  { text: 'Edit', onPress: () => {} },
+  { text: 'Delete', onPress: () => {} },
+];
 
-function HomeScreen({
-  navigation,
-}: BottomSheetScreenProps<BottomSheetParams, 'Home'>) {
-  return (
-    <View style={styles.container}>
-      <Text>Home Screen</Text>
-      <View style={styles.spacer} />
-      <Button
-        title="Open sheet"
-        onPress={() => {
-          navigation.navigate('Sheet', { id: 1 });
-        }}
-      />
-      <View style={styles.spacer} />
-      <Button
-        title="Open a big sheet"
-        onPress={() => {
-          navigation.navigate('BigSheet', { id: 1 });
-        }}
-      />
-    </View>
-  );
-}
-
-function SheetScreen({
-  route,
-  navigation,
-}: BottomSheetScreenProps<BottomSheetParams, 'Sheet'>) {
-  return (
-    <View style={[styles.container, styles.content]}>
-      <Text>Sheet Screen {route.params.id}</Text>
-      <View style={styles.spacer} />
-      <Button
-        title="Open new sheet"
-        onPress={() => {
-          navigation.navigate('Sheet', { id: route.params.id + 1 });
-        }}
-      />
-      <View style={styles.spacer} />
-      <Button
-        title="Open new big sheet"
-        onPress={() => {
-          navigation.navigate('BigSheet', { id: route.params.id + 1 });
-        }}
-      />
-      <View style={styles.spacer} />
-      <Button
-        title="Close this sheet"
-        onPress={() => {
-          navigation.goBack();
-        }}
-      />
-      {route.name === ('BigSheet' as unknown) && (
-        <>
-          <View style={styles.spacer} />
-          <Button
-            title="Snap to top"
-            onPress={() => {
-              navigation.snapTo(1);
-            }}
-          />
-        </>
-      )}
-    </View>
-  );
-}
-
-const renderBackdrop = (props: BottomSheetBackdropProps) => (
-  <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />
-);
+const SampleList2 = [
+  { text: 'Action', isTitle: true, onPress: () => {} },
+  {
+    text: 'Home',
+    icon: () => <Ionicons name="home" size={18} />,
+    onPress: () => {},
+  },
+  {
+    text: 'Edit',
+    icon: () => <Ionicons name="pencil" size={18} />,
+    onPress: () => {},
+  },
+  {
+    text: 'Delete',
+    icon: () => <Ionicons name="remove" size={18} />,
+    withSeparator: true,
+    isDestructive: true,
+    onPress: () => {},
+  },
+  {
+    text: 'Share',
+    icon: () => <Ionicons name="share" size={18} />,
+    onPress: () => {},
+  },
+  {
+    text: 'More',
+    icon: () => <Ionicons name="menu" size={18} />,
+    onPress: () => {},
+  },
+];
 
 export default function Testing() {
   return (
-    // <NavigationContainer>
-    <BottomSheet.Navigator
-      screenOptions={{
-        backdropComponent: renderBackdrop,
-      }}
-    >
-      <BottomSheet.Screen name="Home" component={HomeScreen} />
-      <BottomSheet.Screen
-        name="Sheet"
-        component={SheetScreen}
-        getId={({ params }) => `sheet-${params.id}`}
-      />
-      <BottomSheet.Screen
-        name="BigSheet"
-        component={SheetScreen}
-        options={{
-          snapPoints: ['50%', '80%'],
-        }}
-        getId={({ params }) => `sheet-${params.id}`}
-      />
-    </BottomSheet.Navigator>
-    // </NavigationContainer>
+    <View style={styles.container}>
+      <HoldItem items={SampleList} menuAnchorPosition="top-center">
+        <View style={styles.item} />
+      </HoldItem>
+      <HoldItem items={SampleList2} activateOn="tap" bottom={true}>
+        <View style={{ backgroundColor: 'yellow', width: 100, height: 50 }} />
+      </HoldItem>
+      <HoldItem
+        items={SampleList2}
+        activateOn="tap"
+        menuAnchorPosition="top-right"
+      >
+        <View style={{ backgroundColor: 'green', width: 100, height: 50 }} />
+      </HoldItem>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: 'black',
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 100,
   },
-  content: {
-    marginVertical: 20,
+  item: {
+    width: 100,
+    height: 50,
+    backgroundColor: 'blue',
   },
-  spacer: {
-    margin: 5,
+  text: {
+    color: 'white',
+    fontSize: 40,
+    fontWeight: 'bold',
   },
 });

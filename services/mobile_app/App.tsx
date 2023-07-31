@@ -6,6 +6,7 @@ import { ClerkProvider } from '@clerk/clerk-expo';
 import Constants from 'expo-constants';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { HoldMenuProvider } from 'react-native-hold-menu';
 import { theme } from './styling/theme';
 import { tokenCache } from './utils/tokenCache';
 import Navigation from './navigation';
@@ -27,17 +28,22 @@ export default function App() {
         tokenCache={tokenCache}
         publishableKey={Constants?.expoConfig?.extra?.clerkApiKey}
       >
-        <BottomSheetModalProvider>
-          <DarkModeProvider>
-            <DemoProvider>
-              <TrainingProvider>
-                <QueryClientProvider client={queryClient}>
-                  <Navigation />
-                </QueryClientProvider>
-              </TrainingProvider>
-            </DemoProvider>
-          </DarkModeProvider>
-        </BottomSheetModalProvider>
+        <HoldMenuProvider
+          theme="light"
+          safeAreaInsets={{ top: 0, bottom: 0, left: 0, right: 0 }}
+        >
+          <BottomSheetModalProvider>
+            <DarkModeProvider>
+              <DemoProvider>
+                <TrainingProvider>
+                  <QueryClientProvider client={queryClient}>
+                    <Navigation />
+                  </QueryClientProvider>
+                </TrainingProvider>
+              </DemoProvider>
+            </DarkModeProvider>
+          </BottomSheetModalProvider>
+        </HoldMenuProvider>
       </ClerkProvider>
     </ThemeProvider>
   );

@@ -19,6 +19,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { WebView } from 'react-native-webview';
 import * as Haptics from 'expo-haptics';
+import { HoldItem } from 'react-native-hold-menu';
 
 import { createProduct, fetchProducts } from '../api';
 import { Box } from '../styling/Box';
@@ -49,12 +50,6 @@ export default function Products({ navigation }: { navigation: any }) {
     queryFn: () => fetchProducts(user?.id as string, filters),
     enabled: !!user?.id,
   });
-
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
 
   const pasteLinkSheetRef = useRef<BottomSheetModal>(null);
 
@@ -100,6 +95,34 @@ export default function Products({ navigation }: { navigation: any }) {
     return list;
   }, [productsQuery.data]);
 
+  const SampleList2 = [
+    // { text: 'Action', isTitle: true, onPress: () => {} },
+    {
+      text: 'Upload',
+      icon: () => <Ionicons name="link" size={18} />,
+      onPress: () => {
+        console.log('upload link!');
+        handlePresentPasteLinkSheetPress();
+      },
+    },
+    {
+      text: 'New list',
+      icon: () => <Ionicons name="add" size={18} />,
+      onPress: () => {
+        console.log('new list!');
+        newListSheetModalRef.current?.present();
+      },
+    },
+    {
+      text: 'Delete',
+      icon: () => <Ionicons name="remove" size={18} />,
+      isDestructive: true,
+      onPress: () => {},
+    },
+  ];
+
+  const newListSheetModalRef = useRef<BottomSheetModal>(null);
+
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -120,7 +143,6 @@ export default function Products({ navigation }: { navigation: any }) {
             />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={handlePresentModalPress}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -132,9 +154,16 @@ export default function Products({ navigation }: { navigation: any }) {
               {capitalizeFirstLetter(filters['list']?.[0] || 'likes')}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handlePresentPasteLinkSheetPress}>
+          {/* <TouchableOpacity onPress={handlePresentPasteLinkSheetPress}>
             <Ionicons name="link" size={24} color="black" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          <HoldItem
+            items={SampleList2}
+            activateOn="tap"
+            menuAnchorPosition="top-right"
+          >
+            <Ionicons name="ellipsis-horizontal" size={24} color="black" />
+          </HoldItem>
         </Box>
         <Filter
           filters={filters}
@@ -144,6 +173,7 @@ export default function Products({ navigation }: { navigation: any }) {
           handleFilterSelection={handleFilterSelection}
           sheetNavStack={sheetNavStack}
           setSheetNavStack={setSheetNavStack}
+          newListSheetModalRef={newListSheetModalRef}
         />
         <Box flex={1} paddingHorizontal="xs">
           <FlatList

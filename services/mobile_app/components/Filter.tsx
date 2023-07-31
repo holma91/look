@@ -52,6 +52,7 @@ type FilterProps = {
   setSheetNavStack: React.Dispatch<
     React.SetStateAction<OuterChoiceFilterType[]>
   >;
+  newListSheetModalRef: React.MutableRefObject<BottomSheetModal | null>;
 };
 
 export default function Filter({
@@ -62,6 +63,7 @@ export default function Filter({
   handleFilterSelection,
   sheetNavStack,
   setSheetNavStack,
+  newListSheetModalRef,
 }: FilterProps) {
   const [outerChoice, setOuterChoice] =
     useState<OuterChoiceFilterType>('brand');
@@ -158,6 +160,7 @@ export default function Filter({
       </Animated.View>
       <SheetModal
         filterSheetModalRef={filterSheetModalRef}
+        newListSheetModalRef={newListSheetModalRef}
         choices={choices}
         outerChoice={outerChoice}
         setOuterChoice={setOuterChoice}

@@ -73,6 +73,7 @@ export default function TabNavigator() {
       ) : null}
       <Tab.Screen name="ProductsNavigator" component={ProductsNavigator} />
       <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Testing" component={Testing} />
     </Tab.Navigator>
   );
 }
