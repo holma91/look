@@ -1,0 +1,24 @@
+POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/lists HTTP/1.1
+content-type: application/json
+
+{
+    "id": "wishlist"
+}
+
+###
+
+DELETE http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/lists HTTP/1.1
+content-type: application/json
+
+{
+    "id": "wishlist"
+}
+
+###
+POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/lists/wishlist/products HTTP/1.1
+content-type: application/json
+
+{
+    "list_id": "wishlist",
+    "product_url": "https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey"
+}

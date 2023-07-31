@@ -14,7 +14,11 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetModal,
+  BottomSheetFlatList,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 import { Text } from '../styling/Text';
 import SheetModal from './SheetModal';
 import { useQuery } from '@tanstack/react-query';
@@ -104,7 +108,7 @@ export default function Filter({
   const choices = React.useMemo<Filters>(() => {
     return {
       all: ['list', 'brand', 'website'],
-      list: ['likes', 'history', 'purchases', 'New List'],
+      list: ['likes', 'history', 'purchases', 'new list'],
       brand: brands || [],
       website: companies || [],
     };
@@ -153,7 +157,7 @@ export default function Filter({
         />
       </Animated.View>
       <SheetModal
-        bottomSheetModalRef={filterSheetModalRef}
+        filterSheetModalRef={filterSheetModalRef}
         choices={choices}
         outerChoice={outerChoice}
         setOuterChoice={setOuterChoice}

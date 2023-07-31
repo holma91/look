@@ -50,6 +50,10 @@ class ProductImage(BaseModel):
     product_url: str
     image_url: str
 
+class ListProduct(BaseModel):
+    list_id: str
+    product_url: str
+
 ### RESPONSE MODELS ###
 
 class UserProduct(ProductBase):

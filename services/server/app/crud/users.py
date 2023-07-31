@@ -1,5 +1,5 @@
 from typing import Optional
-from app.models.pydantic import ProductExtended, ProductImage
+from app.models.pydantic import ProductExtended, ProductImage,ListBase, ListProduct
 from app.db import get_db_connection
 
 async def get_all() -> list[dict]:
@@ -250,24 +250,31 @@ async def get_p_lists(user_id: str) -> list:
 
     return lists
 
-async def create_p_list(user_id: str, list_id: str) -> str:
+async def create_p_list(user_id: str, p_list: ListBase) -> str:
     async with get_db_connection() as conn:
         query = """
         insert into p_list (id, user_id) values ($1, $2);
         """
-        await conn.execute_query_dict(query, [list_id, user_id])
+        await conn.execute_query_dict(query, [p_list.id, user_id])
 
-    return list_id
+    return p_list.id
 
-async def delete_p_list(user_id: str, list_id: str) -> str:
+async def delete_p_list(user_id: str, p_list: ListBase) -> str:
     async with get_db_connection() as conn:
         query = """
         delete from p_list where id = $1 and user_id = $2;
         """
-        await conn.execute_query_dict(query, [list_id, user_id])
+        await conn.execute_query_dict(query, [p_list.id, user_id])
 
-    return list_id
+    return p_list.id
 
+async def add_product_to_list(user_id: str, list_product: ListProduct) -> str:
+    async with get_db_connection() as conn:
+        query = """
+        insert into list_product (list_id, product_url) values ($1, $2);
+        """
+        await conn.execute_query_dict(query, [list_product.list_id, list_product.product_url])
+    return True
 ### CLERK WEBHOOK FUNCTIONS ###
 
 async def create(id: str) -> int:

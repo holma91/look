@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   BottomSheetModal,
   BottomSheetFlatList,
@@ -12,17 +12,15 @@ import { Filters, OuterChoiceFilterType } from '../utils/types';
 import { PrimaryButton, SecondaryButton, FilterListButton } from './Button';
 import { TouchableOpacity } from 'react-native';
 import Animated, {
-  FadeOutLeft,
   SlideInLeft,
   SlideInRight,
   SlideOutLeft,
   SlideOutRight,
-  set,
 } from 'react-native-reanimated';
 import { capitalizeFirstLetter } from '../utils/helpers';
 
 type SheetModalProps = {
-  bottomSheetModalRef: React.RefObject<BottomSheetModal>;
+  filterSheetModalRef: React.RefObject<BottomSheetModal>;
   choices: Filters;
   outerChoice: OuterChoiceFilterType;
   setOuterChoice?: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
@@ -39,7 +37,7 @@ type SheetModalProps = {
 };
 
 export default function SheetModal({
-  bottomSheetModalRef,
+  filterSheetModalRef,
   choices,
   outerChoice,
   setOuterChoice,
@@ -51,40 +49,59 @@ export default function SheetModal({
 }: SheetModalProps) {
   const snapPoints = useMemo(() => ['65%'], []);
 
+  const newListSheetModalRef = useRef<BottomSheetModal>(null);
+
   return (
-    <BottomSheetModal
-      ref={bottomSheetModalRef}
-      snapPoints={snapPoints}
-      backdropComponent={(props) => (
-        <BottomSheetBackdrop
-          {...props}
-          appearsOnIndex={0}
-          disappearsOnIndex={-1}
+    <>
+      <BottomSheetModal
+        ref={filterSheetModalRef}
+        snapPoints={snapPoints}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            appearsOnIndex={0}
+            disappearsOnIndex={-1}
+          />
+        )}
+        handleIndicatorStyle={{ backgroundColor: 'white' }}
+        onDismiss={() => {
+          console.log('dismissed');
+          setSheetNavStack([]);
+        }}
+      >
+        <FilterSheet
+          filterSheetModalRef={filterSheetModalRef}
+          choices={choices}
+          outerChoice={outerChoice}
+          setOuterChoice={setOuterChoice}
+          resetFilter={resetFilter}
+          handleFilterSelection={handleFilterSelection}
+          filters={filters}
+          sheetNavStack={sheetNavStack}
+          setSheetNavStack={setSheetNavStack}
+          newListSheetModalRef={newListSheetModalRef}
         />
-      )}
-      handleIndicatorStyle={{ backgroundColor: 'white' }}
-      onDismiss={() => {
-        console.log('dismissed');
-        setSheetNavStack([]);
-      }}
-    >
-      <BottomSheetContent
-        bottomSheetModalRef={bottomSheetModalRef}
-        choices={choices}
-        outerChoice={outerChoice}
-        setOuterChoice={setOuterChoice}
-        resetFilter={resetFilter}
-        handleFilterSelection={handleFilterSelection}
-        filters={filters}
-        sheetNavStack={sheetNavStack}
-        setSheetNavStack={setSheetNavStack}
-      />
-    </BottomSheetModal>
+      </BottomSheetModal>
+      <BottomSheetModal
+        ref={newListSheetModalRef}
+        snapPoints={['65%']}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            appearsOnIndex={0}
+            disappearsOnIndex={-1}
+          />
+        )}
+        handleIndicatorStyle={{ backgroundColor: 'white' }}
+      >
+        <NewListSheet newListSheetModalRef={newListSheetModalRef} />
+      </BottomSheetModal>
+    </>
   );
 }
 
-type BottomSheetContentProps = {
-  bottomSheetModalRef: React.RefObject<BottomSheetModal>;
+type FilterSheetProps = {
+  filterSheetModalRef: React.RefObject<BottomSheetModal>;
   choices: Filters;
   outerChoice: OuterChoiceFilterType;
   setOuterChoice?: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
@@ -98,22 +115,36 @@ type BottomSheetContentProps = {
   setSheetNavStack: React.Dispatch<
     React.SetStateAction<OuterChoiceFilterType[]>
   >;
+  newListSheetModalRef?: React.RefObject<BottomSheetModal>;
 };
 
-function BottomSheetContent({
+function FilterSheet({
   outerChoice,
   setOuterChoice,
   choices,
   filters,
   handleFilterSelection,
   resetFilter,
-  bottomSheetModalRef,
+  filterSheetModalRef,
   sheetNavStack,
   setSheetNavStack,
-}: BottomSheetContentProps) {
+  newListSheetModalRef,
+}: FilterSheetProps) {
   const renderListItem = useCallback(
     ({ item }: { item: string }) => {
       const isSelected = filters[outerChoice]?.includes(item);
+      if (item === 'new list') {
+        return (
+          <FilterListButton
+            label={item}
+            onPress={() => {
+              newListSheetModalRef?.current?.present();
+            }}
+            isSelected={false}
+            item={item}
+          />
+        );
+      }
 
       return (
         <FilterListButton
@@ -131,6 +162,9 @@ function BottomSheetContent({
 
   const relevantChoices = choices[outerChoice];
 
+  console.log('sheetNavStack:', sheetNavStack);
+  console.log('outerChoice:', outerChoice);
+
   return (
     <>
       <Box
@@ -145,7 +179,7 @@ function BottomSheetContent({
         {outerChoice !== 'all' && sheetNavStack.includes('all') ? (
           <TouchableOpacity
             onPress={() => {
-              setOuterChoice?.('all');
+              setOuterChoice?.(sheetNavStack[sheetNavStack.length - 2]);
               setSheetNavStack((prev) => prev.slice(0, prev.length - 1));
             }}
             style={{
@@ -159,7 +193,7 @@ function BottomSheetContent({
       </Box>
       {outerChoice === 'all' ? (
         <AllList
-          bottomSheetModalRef={bottomSheetModalRef}
+          filterSheetModalRef={filterSheetModalRef}
           choices={choices}
           outerChoice={outerChoice}
           setOuterChoice={setOuterChoice}
@@ -169,7 +203,7 @@ function BottomSheetContent({
           sheetNavStack={sheetNavStack}
           setSheetNavStack={setSheetNavStack}
         />
-      ) : sheetNavStack.includes('all') ? (
+      ) : sheetNavStack.length > 0 && sheetNavStack[0] === 'all' ? (
         <Animated.View
           style={{ flex: 1 }}
           entering={SlideInRight.duration(500)}
@@ -209,7 +243,7 @@ function BottomSheetContent({
           flex={1}
           onPress={() => {
             resetFilter();
-            bottomSheetModalRef?.current?.close();
+            filterSheetModalRef?.current?.close();
           }}
         />
 
@@ -217,7 +251,7 @@ function BottomSheetContent({
           label="Done"
           flex={1}
           onPress={() => {
-            bottomSheetModalRef?.current?.close();
+            filterSheetModalRef?.current?.close();
           }}
         />
       </Box>
@@ -232,10 +266,10 @@ function AllList({
   filters,
   handleFilterSelection,
   resetFilter,
-  bottomSheetModalRef,
+  filterSheetModalRef,
   sheetNavStack,
   setSheetNavStack,
-}: BottomSheetContentProps) {
+}: FilterSheetProps) {
   const renderListItem = useCallback(
     ({ item }: { item: string }) => {
       const isSelected = filters[outerChoice]?.includes(item);
@@ -290,5 +324,53 @@ function AllList({
         showsVerticalScrollIndicator={false}
       />
     </Animated.View>
+  );
+}
+
+type NewListSheetProps = {
+  newListSheetModalRef: React.RefObject<BottomSheetModal>;
+};
+
+function NewListSheet({ newListSheetModalRef }: NewListSheetProps) {
+  return (
+    <Box flex={1}>
+      <Box
+        justifyContent="center"
+        alignItems="center"
+        marginBottom="m"
+        position="relative"
+      >
+        <Box flexDirection="row" gap="s">
+          <Text variant="title" fontSize={22}>
+            New List
+          </Text>
+          <Ionicons name="pencil" size={22} color="black" />
+        </Box>
+        <TouchableOpacity
+          onPress={() => {
+            newListSheetModalRef?.current?.close();
+          }}
+          style={{
+            position: 'absolute',
+            right: 15,
+          }}
+        >
+          <Ionicons name="close" size={28} color="black" />
+        </TouchableOpacity>
+      </Box>
+      <Box
+        marginTop="s"
+        marginBottom="xl"
+        marginHorizontal="m"
+        gap="l"
+        justifyContent="space-between"
+        flex={1}
+      >
+        <Text variant="smallTitle" textAlign="center">
+          Do you want to add any of your products to your new list?
+        </Text>
+        <PrimaryButton label="Create list" />
+      </Box>
+    </Box>
   );
 }

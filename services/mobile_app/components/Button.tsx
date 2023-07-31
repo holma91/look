@@ -121,7 +121,7 @@ const FilterListButton = ({
         size={20}
         color={isSelected ? 'white' : 'transparent'}
       />
-      {item === 'New List' ? (
+      {item === 'new list' ? (
         <Ionicons name="add" size={20} color="black" />
       ) : null}
     </BaseButton>
