@@ -1,7 +1,16 @@
 from typing import Optional
 
 from pydantic import BaseModel
-import datetime
+from humps import camelize
+
+# https://medium.com/analytics-vidhya/camel-case-models-with-fast-api-and-pydantic-5a8acb6c0eee
+def to_camel(string):
+    return camelize(string)
+
+class CustomBaseModel(BaseModel):
+    class Config:
+        alias_generator = to_camel
+        allow_population_by_field_name = True
 
 ### GENERIC RESPONSE MODELS ###
 
@@ -32,7 +41,7 @@ class WebsiteBase(BaseModel):
 class CompanyBase(BaseModel):
     id: str
 
-class ListBase(BaseModel):
+class ListBase(CustomBaseModel):
     id: str
 
 ### REQUEST MODELS ###
@@ -53,6 +62,9 @@ class ProductImage(BaseModel):
 class ListProduct(BaseModel):
     list_id: str
     product_url: str
+
+class ListWithProducts(ListBase):
+    product_urls: Optional[list[str]]
 
 ### RESPONSE MODELS ###
 

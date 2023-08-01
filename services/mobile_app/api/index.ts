@@ -183,13 +183,21 @@ export const unlikeProduct = async (userId: string, productUrl: string) => {
 };
 
 /*** P LIST STUFF ***/
-export const createPlist = async (userId: string, listId: string) => {
+export const createPlist = async (
+  userId: string,
+  listId: string,
+  selectedProducts: UserProduct[]
+) => {
+  // Create plist
   const response = await fetch(`${URL}/users/${userId}/plists`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ id: listId }),
+    body: JSON.stringify({
+      id: listId,
+      productUrls: selectedProducts.map((product) => product.url),
+    }),
   });
 
   if (!response.ok) {

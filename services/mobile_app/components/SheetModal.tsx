@@ -10,7 +10,7 @@ import { FlashList } from '@shopify/flash-list';
 
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { Filters, OuterChoiceFilterType } from '../utils/types';
+import { Filters, OuterChoiceFilterType, UserProduct } from '../utils/types';
 import {
   PrimaryButton,
   SecondaryButton,
@@ -352,6 +352,7 @@ function NewListSheet({
   handleFilterSelection,
 }: NewListSheetProps) {
   const [listName, setListName] = useState('New List');
+  const [selectedProducts, setSelectedProducts] = useState<UserProduct[]>([]);
   const { user } = useUser();
 
   const { data: history } = useQuery({
@@ -364,6 +365,26 @@ function NewListSheet({
 
   const queryClient = useQueryClient();
 
+  const handleProductSelection = (
+    product: UserProduct,
+    isSelected: boolean
+  ) => {
+    setSelectedProducts((prevProducts) => {
+      if (isSelected) {
+        // Add the product to the array if it's not already there
+        if (!prevProducts.includes(product)) {
+          return [...prevProducts, product];
+        }
+      } else {
+        // Remove the product from the array
+        return prevProducts.filter((p) => p !== product);
+      }
+
+      // Return the previous state if no changes were made
+      return prevProducts;
+    });
+  };
+
   const handleCreateList = async () => {
     newListSheetModalRef?.current?.close();
     const listId = listName.toLowerCase();
@@ -372,14 +393,16 @@ function NewListSheet({
     if (!userId) return;
 
     try {
-      await createPlist(userId, listId);
+      await createPlist(userId, listId, selectedProducts);
       queryClient.invalidateQueries({ queryKey: ['plists', userId] });
       handleFilterSelection('list', listId);
-      filterSheetModalRef?.current?.close();
+      filterSheetModalRef?.current?.dismiss();
     } catch (e) {
       console.error(e);
     }
   };
+
+  console.log('selectedProducts:', selectedProducts.length);
 
   return (
     <Box flex={1}>
@@ -424,7 +447,11 @@ function NewListSheet({
         <FlashList
           data={history || []}
           renderItem={({ item }) => (
-            <ProductSmall product={item} height={150} />
+            <ProductSmall
+              product={item}
+              height={150}
+              handleProductSelection={handleProductSelection}
+            />
           )}
           estimatedItemSize={200}
           numColumns={3}

@@ -1,5 +1,5 @@
 from typing import Optional
-from app.models.pydantic import ProductExtended, ProductImage,ListBase, ListProduct
+from app.models.pydantic import ProductExtended, ProductImage,ListBase, ListProduct, ListWithProducts
 from app.db import get_db_connection
 
 async def get_all() -> list[dict]:
@@ -250,12 +250,19 @@ async def get_p_lists(user_id: str) -> list:
 
     return lists
 
-async def create_p_list(user_id: str, p_list: ListBase) -> str:
+async def create_p_list(user_id: str, p_list: ListWithProducts) -> str:
     async with get_db_connection() as conn:
         query = """
         insert into p_list (id, user_id) values ($1, $2);
         """
         await conn.execute_query_dict(query, [p_list.id, user_id])
+
+        if p_list.product_urls:
+            query = """
+            insert into list_product (list_id, product_url) values ($1, $2);
+            """
+            for product_url in p_list.product_urls:
+                await conn.execute_query_dict(query, [p_list.id, product_url])
 
     return p_list.id
 
@@ -268,7 +275,7 @@ async def delete_p_list(user_id: str, p_list: ListBase) -> str:
 
     return p_list.id
 
-async def add_product_to_list(user_id: str, list_product: ListProduct) -> str:
+async def add_product_to_p_list(user_id: str, list_product: ListProduct) -> str:
     async with get_db_connection() as conn:
         query = """
         insert into list_product (list_id, product_url) values ($1, $2);

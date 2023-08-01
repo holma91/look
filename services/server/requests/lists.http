@@ -1,4 +1,4 @@
-POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/lists HTTP/1.1
+POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/plists HTTP/1.1
 content-type: application/json
 
 {
@@ -6,16 +6,28 @@ content-type: application/json
 }
 
 ###
-
-DELETE http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/lists HTTP/1.1
+POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/plists HTTP/1.1
 content-type: application/json
 
 {
-    "id": "wishlist"
+    "id": "wlas",
+    "product_urls": [
+        "https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey",
+        "https://softgoat.com/p/mens-fine-knit-t-shirt-white"
+    ]
 }
 
 ###
-POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/lists/wishlist/products HTTP/1.1
+
+DELETE http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/plists HTTP/1.1
+content-type: application/json
+
+{
+    "id": "baggie"
+}
+
+###
+POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/plists/wishlist/products HTTP/1.1
 content-type: application/json
 
 {

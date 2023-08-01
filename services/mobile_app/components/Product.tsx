@@ -2,7 +2,7 @@ import { TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Animated from 'react-native-reanimated';
-import React from 'react';
+import React, { useState } from 'react';
 import { HoldItem } from 'react-native-hold-menu';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
@@ -73,27 +73,49 @@ export function ProductBig({
 export function ProductSmall({
   product,
   height,
+  handleProductSelection,
 }: {
   product: UserProduct;
   height: number;
+  handleProductSelection: (product: UserProduct, isSelected: boolean) => void;
 }) {
-  console.log('product', product);
+  const [isSelected, setIsSelected] = useState(false);
 
   const handleProductClick = () => {
-    console.log('click!');
+    setIsSelected(!isSelected);
+    handleProductSelection(product, !isSelected);
   };
 
   return (
     <TouchableOpacity onPress={handleProductClick} style={{ flex: 1 }}>
       <Box flex={1} margin="s" gap="s" marginBottom="m">
-        <Animated.Image
-          style={{
-            width: '100%',
-            height: height,
-          }}
-          source={{ uri: product.images[0] }}
-        />
-        <Box gap="xxs" backgroundColor="background">
+        <Box>
+          <Animated.Image
+            style={{
+              width: '100%',
+              height: height,
+              opacity: isSelected ? 0.25 : 1,
+            }}
+            source={{ uri: product.images[0] }}
+          />
+          {isSelected && (
+            <Ionicons
+              name="checkmark-circle"
+              size={24}
+              color="black"
+              style={{
+                position: 'absolute',
+                right: 5,
+                bottom: 5,
+              }}
+            />
+          )}
+        </Box>
+        <Box
+          gap="xxs"
+          backgroundColor="background"
+          opacity={isSelected ? 0.25 : 1}
+        >
           <Text
             variant="body"
             fontWeight="600"
