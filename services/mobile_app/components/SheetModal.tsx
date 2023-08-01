@@ -6,11 +6,17 @@ import {
 } from '@gorhom/bottom-sheet';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FlashList } from '@shopify/flash-list';
 
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Filters, OuterChoiceFilterType } from '../utils/types';
-import { PrimaryButton, SecondaryButton, FilterListButton } from './Button';
+import {
+  PrimaryButton,
+  SecondaryButton,
+  FilterListButton,
+  NewListButton,
+} from './Button';
 import { TextInput, TouchableOpacity } from 'react-native';
 import Animated, {
   SlideInLeft,
@@ -20,7 +26,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { capitalizeFirstLetter } from '../utils/helpers';
 import { useUser } from '@clerk/clerk-expo';
-import { createPlist } from '../api';
+import { createPlist, fetchProducts } from '../api';
+import { ProductSmall } from './Product';
 
 type SheetModalProps = {
   filterSheetModalRef: React.RefObject<BottomSheetModal>;
@@ -99,6 +106,7 @@ export default function SheetModal({
       >
         <NewListSheet
           newListSheetModalRef={newListSheetModalRef}
+          filterSheetModalRef={filterSheetModalRef}
           handleFilterSelection={handleFilterSelection}
         />
       </BottomSheetModal>
@@ -139,18 +147,6 @@ function FilterSheet({
   const renderListItem = useCallback(
     ({ item }: { item: string }) => {
       const isSelected = filters[outerChoice]?.includes(item);
-      if (item === 'new list') {
-        return (
-          <FilterListButton
-            label={item}
-            onPress={() => {
-              newListSheetModalRef?.current?.present();
-            }}
-            isSelected={false}
-            item={item}
-          />
-        );
-      }
 
       return (
         <FilterListButton
@@ -234,32 +230,40 @@ function FilterSheet({
           showsVerticalScrollIndicator={false}
         />
       )}
+      <Box paddingTop="m" paddingHorizontal="m" gap="m">
+        {outerChoice === 'list' ? (
+          <NewListButton
+            label="New List"
+            onPress={() => {
+              newListSheetModalRef?.current?.present();
+            }}
+          />
+        ) : null}
 
-      <Box
-        flexDirection="row"
-        justifyContent="center"
-        alignItems="center"
-        marginBottom="xl"
-        gap="s"
-        paddingTop="m"
-        paddingHorizontal="m"
-      >
-        <SecondaryButton
-          label="Reset"
-          flex={1}
-          onPress={() => {
-            resetFilter();
-            filterSheetModalRef?.current?.close();
-          }}
-        />
+        <Box
+          flexDirection="row"
+          justifyContent="center"
+          alignItems="center"
+          marginBottom="xl"
+          gap="s"
+        >
+          <SecondaryButton
+            label="Reset"
+            flex={1}
+            onPress={() => {
+              resetFilter();
+              filterSheetModalRef?.current?.close();
+            }}
+          />
 
-        <PrimaryButton
-          label="Done"
-          flex={1}
-          onPress={() => {
-            filterSheetModalRef?.current?.close();
-          }}
-        />
+          <PrimaryButton
+            label="Done"
+            flex={1}
+            onPress={() => {
+              filterSheetModalRef?.current?.close();
+            }}
+          />
+        </Box>
       </Box>
     </>
   );
@@ -335,6 +339,7 @@ function AllList({
 
 type NewListSheetProps = {
   newListSheetModalRef: React.RefObject<BottomSheetModal>;
+  filterSheetModalRef: React.RefObject<BottomSheetModal>;
   handleFilterSelection: (
     filterType: OuterChoiceFilterType,
     filterValue: string
@@ -343,10 +348,19 @@ type NewListSheetProps = {
 
 function NewListSheet({
   newListSheetModalRef,
+  filterSheetModalRef,
   handleFilterSelection,
 }: NewListSheetProps) {
   const [listName, setListName] = useState('New List');
   const { user } = useUser();
+
+  const { data: history } = useQuery({
+    queryKey: ['products', user?.id],
+    queryFn: () => fetchProducts(user?.id as string, { list: ['history'] }),
+    enabled: !!user?.id,
+  });
+
+  console.log('history:', history);
 
   const queryClient = useQueryClient();
 
@@ -361,6 +375,7 @@ function NewListSheet({
       await createPlist(userId, listId);
       queryClient.invalidateQueries({ queryKey: ['plists', userId] });
       handleFilterSelection('list', listId);
+      filterSheetModalRef?.current?.close();
     } catch (e) {
       console.error(e);
     }
@@ -406,6 +421,14 @@ function NewListSheet({
         <Text variant="smallTitle" textAlign="center">
           Do you want to add any of your products to your new list?
         </Text>
+        <FlashList
+          data={history || []}
+          renderItem={({ item }) => (
+            <ProductSmall product={item} height={150} />
+          )}
+          estimatedItemSize={200}
+          numColumns={3}
+        />
         <PrimaryButton label="Create list" onPress={handleCreateList} />
       </Box>
     </Box>

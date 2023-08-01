@@ -121,11 +121,36 @@ const FilterListButton = ({
         size={20}
         color={isSelected ? 'white' : 'transparent'}
       />
-      {item === 'new list' ? (
-        <Ionicons name="add" size={20} color="black" />
-      ) : null}
     </BaseButton>
   );
 };
 
-export { PrimaryButton, SecondaryButton, FilterListButton };
+type NewListButtonProps = {
+  label: string;
+  onPress: () => void;
+};
+
+const NewListButton = ({ label, onPress, ...props }: Props) => {
+  const theme = useTheme<Theme>();
+
+  return (
+    <BaseButton
+      flexDirection="row"
+      justifyContent="space-between"
+      alignItems="center"
+      paddingVertical="m"
+      paddingHorizontal="m"
+      borderRadius={10}
+      backgroundColor={'grey'}
+      onPress={onPress}
+      {...props}
+    >
+      <Text variant="body" fontWeight="bold" fontSize={16} color={'text'}>
+        {label}
+      </Text>
+      <Ionicons name="add" size={20} color="black" />
+    </BaseButton>
+  );
+};
+
+export { PrimaryButton, SecondaryButton, FilterListButton, NewListButton };

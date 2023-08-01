@@ -10,7 +10,6 @@ import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import { useState } from 'react';
-import Animated from 'react-native-reanimated';
 import React, { useCallback, useMemo, useRef } from 'react';
 import {
   BottomSheetModal,
@@ -35,8 +34,11 @@ import { TextInput } from '../styling/TextInput';
 import { getInjectScripts, parseProductData } from '../utils/inject';
 import { capitalizeFirstLetter, getDomain } from '../utils/helpers';
 import { PrimaryButton } from '../components/Button';
+import { ProductBig } from '../components/Product';
 
 export default function Products({ navigation }: { navigation: any }) {
+  const [outerChoice, setOuterChoice] =
+    useState<OuterChoiceFilterType>('brand');
   const [showFilter, setShowFilter] = useState(false);
   const [filters, setFilters] = useState<Filters>({ list: ['likes'] });
   const [sheetNavStack, setSheetNavStack] = useState<OuterChoiceFilterType[]>(
@@ -100,7 +102,6 @@ export default function Products({ navigation }: { navigation: any }) {
       text: 'Upload',
       icon: () => <Ionicons name="link" size={18} />,
       onPress: () => {
-        console.log('upload link!');
         handlePresentPasteLinkSheetPress();
       },
     },
@@ -108,7 +109,6 @@ export default function Products({ navigation }: { navigation: any }) {
       text: 'New list',
       icon: () => <Ionicons name="add" size={18} />,
       onPress: () => {
-        console.log('new list!');
         newListSheetModalRef.current?.present();
       },
     },
@@ -120,7 +120,18 @@ export default function Products({ navigation }: { navigation: any }) {
     },
   ];
 
+  const filterSheetModalRef = useRef<BottomSheetModal>(null);
   const newListSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentFilterSheetModal = useCallback(
+    (label: OuterChoiceFilterType) => {
+      setOuterChoice(label);
+      setSheetNavStack((prev) => [...prev, label]);
+
+      filterSheetModalRef.current?.present();
+    },
+    []
+  );
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -148,10 +159,20 @@ export default function Products({ navigation }: { navigation: any }) {
               justifyContent: 'center',
               gap: 6,
             }}
+            onPress={() => {
+              Haptics.selectionAsync();
+              handlePresentFilterSheetModal('list');
+            }}
           >
             <Text variant="title" fontSize={18}>
               {capitalizeFirstLetter(filters['list']?.[0] || 'likes')}
             </Text>
+            <Ionicons
+              name="chevron-down"
+              size={20}
+              color="black"
+              style={{ paddingTop: 1 }}
+            />
           </TouchableOpacity>
           <HoldItem
             items={MenuList}
@@ -170,6 +191,10 @@ export default function Products({ navigation }: { navigation: any }) {
           sheetNavStack={sheetNavStack}
           setSheetNavStack={setSheetNavStack}
           newListSheetModalRef={newListSheetModalRef}
+          filterSheetModalRef={filterSheetModalRef}
+          handlePresentFilterSheetModal={handlePresentFilterSheetModal}
+          outerChoice={outerChoice}
+          setOuterChoice={setOuterChoice}
         />
         <Box flex={1} paddingHorizontal="xs">
           <FlatList
@@ -177,7 +202,7 @@ export default function Products({ navigation }: { navigation: any }) {
             numColumns={2}
             keyExtractor={(item) => item.url}
             renderItem={({ item }) => (
-              <Product navigation={navigation} product={item} />
+              <ProductBig navigation={navigation} product={item} height={225} />
             )}
             refreshControl={
               <RefreshControl
@@ -196,65 +221,6 @@ export default function Products({ navigation }: { navigation: any }) {
         />
       </SafeAreaView>
     </Box>
-  );
-}
-
-function Product({
-  navigation,
-  product,
-}: {
-  navigation: any;
-  product: UserProduct;
-}) {
-  const HoldProductList = [
-    {
-      text: product.liked ? 'Unlike' : 'Like',
-      icon: () => (
-        <Ionicons name={product.liked ? 'heart' : 'heart-outline'} size={18} />
-      ),
-      onPress: () => {
-        console.log('like!');
-      },
-    },
-    {
-      text: 'Delete from list',
-      icon: () => <Ionicons name="remove" size={18} />,
-      isDestructive: true,
-      onPress: () => {},
-    },
-  ];
-
-  console.log('product', product);
-
-  return (
-    <TouchableOpacity
-      onPress={() => navigation.navigate('Product', { product: product })}
-      style={{ flex: 1 }}
-    >
-      <Box flex={1} margin="s" gap="s" marginBottom="m">
-        <HoldItem items={HoldProductList} containerStyles={{ flex: 1 }}>
-          <Animated.Image
-            // sharedTransitionTag={`image-${product.url}`}
-            style={{
-              width: '100%',
-              height: 225,
-              // borderRadius: 10,
-            }}
-            source={{ uri: product.images[0] }}
-          />
-        </HoldItem>
-        <Box gap="xxs" backgroundColor="background">
-          <Text variant="body" fontWeight="600">
-            {product.brand}
-          </Text>
-          <Text fontSize={14} numberOfLines={1} ellipsizeMode="tail">
-            {product.name}
-          </Text>
-          <Text>{`${product.price} ${product.currency}`}</Text>
-          <Text>{product.domain}</Text>
-        </Box>
-      </Box>
-    </TouchableOpacity>
   );
 }
 

@@ -53,6 +53,10 @@ type FilterProps = {
     React.SetStateAction<OuterChoiceFilterType[]>
   >;
   newListSheetModalRef: React.MutableRefObject<BottomSheetModal | null>;
+  filterSheetModalRef: React.MutableRefObject<BottomSheetModal | null>;
+  handlePresentFilterSheetModal: (label: OuterChoiceFilterType) => void;
+  outerChoice: OuterChoiceFilterType;
+  setOuterChoice: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
 };
 
 export default function Filter({
@@ -63,11 +67,12 @@ export default function Filter({
   handleFilterSelection,
   sheetNavStack,
   setSheetNavStack,
+  filterSheetModalRef,
   newListSheetModalRef,
+  handlePresentFilterSheetModal,
+  outerChoice,
+  setOuterChoice,
 }: FilterProps) {
-  const [outerChoice, setOuterChoice] =
-    useState<OuterChoiceFilterType>('brand');
-
   const { user } = useUser();
 
   const { data: companies } = useQuery<string[]>({
@@ -102,22 +107,10 @@ export default function Filter({
     };
   });
 
-  const filterSheetModalRef = useRef<BottomSheetModal>(null);
-
-  const handlePresentModalPress = useCallback(
-    (label: OuterChoiceFilterType) => {
-      setOuterChoice(label);
-      setSheetNavStack((prev) => [...prev, label]);
-
-      filterSheetModalRef.current?.present();
-    },
-    []
-  );
-
   const choices = React.useMemo<Filters>(() => {
     return {
       all: ['list', 'brand', 'website'],
-      list: ['likes', 'history'].concat(plists || []).concat(['new list']),
+      list: ['likes', 'history'].concat(plists || []),
       brand: brands || [],
       website: companies || [],
     };
@@ -137,7 +130,7 @@ export default function Filter({
             <TouchableOpacity
               onPress={() => {
                 Haptics.selectionAsync();
-                handlePresentModalPress(item.label);
+                handlePresentFilterSheetModal(item.label);
               }}
               style={{
                 display: 'flex',
