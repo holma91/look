@@ -18,7 +18,7 @@ import { SearchBar } from '../components/SearchBar';
 import { favoriteCompany, fetchCompanies, unFavoriteCompany } from '../api';
 import { Company } from '../utils/types';
 import SearchList from '../components/SearchList';
-import { getHistory, saveHistory } from '../utils/history';
+import { clearHistory, getHistory, saveHistory } from '../utils/history';
 
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -52,6 +52,11 @@ export default function Shop({ navigation }: { navigation: any }) {
     }
   };
 
+  const handleClearHistory = async () => {
+    await clearHistory();
+    setHistory([]);
+  };
+
   useEffect(() => {
     async function fetchHistory() {
       const fetchedHistory = await getHistory();
@@ -82,9 +87,11 @@ export default function Shop({ navigation }: { navigation: any }) {
                     paddingHorizontal="m"
                   >
                     <Text variant="title">History</Text>
-                    <Text variant="body" fontWeight="600">
-                      See all
-                    </Text>
+                    <TouchableOpacity onPress={handleClearHistory}>
+                      <Text variant="body" fontWeight="600">
+                        Clear
+                      </Text>
+                    </TouchableOpacity>
                   </Box>
                   <FlatList
                     horizontal
@@ -126,14 +133,6 @@ export default function Shop({ navigation }: { navigation: any }) {
                   />
                 </Box>
               ) : null}
-              {/* <Text
-                variant="title"
-                paddingLeft="m"
-                paddingTop="s"
-                paddingBottom="s"
-              >
-                Websites
-              </Text> */}
               <Box flexDirection="row" gap="m" marginVertical="s">
                 <FlatList
                   style={{ flex: 1, gap: 10 }}

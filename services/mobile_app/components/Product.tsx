@@ -2,7 +2,7 @@ import { TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Animated from 'react-native-reanimated';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { HoldItem } from 'react-native-hold-menu';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
@@ -18,18 +18,20 @@ export function ProductBig({
   product: UserProduct;
   height: number;
 }) {
+  const [currentProduct, setCurrentProduct] = useState(product);
   const likeMutation = useLikeMutation();
 
   const HoldProductList = [
     {
-      text: product.liked ? 'Unlike' : 'Like',
+      text: (Math.random() * 100).toString(), //product.liked ? 'Unlike' : 'Like',
       icon: () => (
         <Ionicons name={product.liked ? 'heart' : 'heart-outline'} size={18} />
       ),
       onPress: () => {
-        console.log('like!');
-
-        // likeMutation.mutate(product);
+        // for debugging
+        console.log('currentProduct:', currentProduct.url);
+        console.log('like:', product.name);
+        likeMutation.mutate(product);
       },
     },
     {

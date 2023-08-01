@@ -70,15 +70,15 @@ function SearchBar({
             <Ionicons name="close" flex={0} size={24} color="black" />
           </TouchableOpacity>
         </Box>
-      ) : (
-        <Ionicons
-          name="ellipsis-vertical"
-          flex={0}
-          size={26}
-          color="black"
-          onPress={() => {}}
-        />
-      )}
+      ) : null
+      // <Ionicons
+      //   name="ellipsis-vertical"
+      //   flex={0}
+      //   size={26}
+      //   color="black"
+      //   onPress={() => {}}
+      // />
+      }
     </Box>
   );
 }

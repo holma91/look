@@ -2,10 +2,12 @@
 
 FRONTEND:
 
-- implement base filter ; check
 - fix parsing for all sites we got that have schema.org integrated.
-- one-shot image selection (?)
-- sort by price (?)
+- make a big letter for sites without logos
+- make it possible to remove from lists
+  - individually
+  - in bulk
+- make it possible to remove lists
 - fix bugs
   - make it impossible to swipe back a screen when in a webview
 
@@ -35,6 +37,7 @@ deploy private beta
   https://reactnavigation.org/docs/tab-view/
 - fix dark mode
 - replace all flatlists with flashlists
+- sort by price
 
 **big**:
 
