@@ -23,7 +23,7 @@ import { Text } from '../styling/Text';
 import SheetModal from './SheetModal';
 import { useQuery } from '@tanstack/react-query';
 import { Filters, OuterChoiceFilterType } from '../utils/types';
-import { fetchBrands, fetchCompanies } from '../api';
+import { fetchBrands, fetchCompanies, fetchPlists } from '../api';
 import { Website } from '../utils/types';
 
 const possibleFilters: {
@@ -84,6 +84,13 @@ export default function Filter({
     select: (data) => data.map((brand: any) => brand.brand),
   });
 
+  const { data: plists } = useQuery<string[]>({
+    queryKey: ['plists', user?.id],
+    queryFn: () => fetchPlists(user?.id as string),
+    enabled: !!user?.id,
+    select: (data) => data.map((plist: any) => plist.id),
+  });
+
   const animationValue = useSharedValue(0);
   useEffect(() => {
     animationValue.value = withTiming(showFilter ? 1 : 0, { duration: 250 });
@@ -110,11 +117,11 @@ export default function Filter({
   const choices = React.useMemo<Filters>(() => {
     return {
       all: ['list', 'brand', 'website'],
-      list: ['likes', 'history', 'purchases', 'new list'],
+      list: ['likes', 'history'].concat(plists || []).concat(['new list']),
       brand: brands || [],
       website: companies || [],
     };
-  }, [brands, companies]);
+  }, [brands, companies, plists]);
 
   return (
     <>

@@ -5,12 +5,13 @@ import {
   BottomSheetBackdrop,
 } from '@gorhom/bottom-sheet';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Filters, OuterChoiceFilterType } from '../utils/types';
 import { PrimaryButton, SecondaryButton, FilterListButton } from './Button';
-import { TouchableOpacity } from 'react-native';
+import { TextInput, TouchableOpacity } from 'react-native';
 import Animated, {
   SlideInLeft,
   SlideInRight,
@@ -18,6 +19,8 @@ import Animated, {
   SlideOutRight,
 } from 'react-native-reanimated';
 import { capitalizeFirstLetter } from '../utils/helpers';
+import { useUser } from '@clerk/clerk-expo';
+import { createPlist } from '../api';
 
 type SheetModalProps = {
   filterSheetModalRef: React.RefObject<BottomSheetModal>;
@@ -94,7 +97,10 @@ export default function SheetModal({
         )}
         handleIndicatorStyle={{ backgroundColor: 'white' }}
       >
-        <NewListSheet newListSheetModalRef={newListSheetModalRef} />
+        <NewListSheet
+          newListSheetModalRef={newListSheetModalRef}
+          handleFilterSelection={handleFilterSelection}
+        />
       </BottomSheetModal>
     </>
   );
@@ -329,9 +335,37 @@ function AllList({
 
 type NewListSheetProps = {
   newListSheetModalRef: React.RefObject<BottomSheetModal>;
+  handleFilterSelection: (
+    filterType: OuterChoiceFilterType,
+    filterValue: string
+  ) => void;
 };
 
-function NewListSheet({ newListSheetModalRef }: NewListSheetProps) {
+function NewListSheet({
+  newListSheetModalRef,
+  handleFilterSelection,
+}: NewListSheetProps) {
+  const [listName, setListName] = useState('New List');
+  const { user } = useUser();
+
+  const queryClient = useQueryClient();
+
+  const handleCreateList = async () => {
+    newListSheetModalRef?.current?.close();
+    const listId = listName.toLowerCase();
+    const userId = user?.id;
+
+    if (!userId) return;
+
+    try {
+      await createPlist(userId, listId);
+      queryClient.invalidateQueries({ queryKey: ['plists', userId] });
+      handleFilterSelection('list', listId);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <Box flex={1}>
       <Box
@@ -341,9 +375,12 @@ function NewListSheet({ newListSheetModalRef }: NewListSheetProps) {
         position="relative"
       >
         <Box flexDirection="row" gap="s">
-          <Text variant="title" fontSize={22}>
-            New List
-          </Text>
+          <TextInput
+            style={{ fontSize: 22, fontWeight: 'bold' }} // Replace this with your preferred styles
+            onChangeText={(text) => setListName(text)}
+            value={listName}
+            selectTextOnFocus
+          />
           <Ionicons name="pencil" size={22} color="black" />
         </Box>
         <TouchableOpacity
@@ -369,7 +406,7 @@ function NewListSheet({ newListSheetModalRef }: NewListSheetProps) {
         <Text variant="smallTitle" textAlign="center">
           Do you want to add any of your products to your new list?
         </Text>
-        <PrimaryButton label="Create list" />
+        <PrimaryButton label="Create list" onPress={handleCreateList} />
       </Box>
     </Box>
   );

@@ -95,8 +95,7 @@ export default function Products({ navigation }: { navigation: any }) {
     return list;
   }, [productsQuery.data]);
 
-  const SampleList2 = [
-    // { text: 'Action', isTitle: true, onPress: () => {} },
+  const MenuList = [
     {
       text: 'Upload',
       icon: () => <Ionicons name="link" size={18} />,
@@ -154,11 +153,8 @@ export default function Products({ navigation }: { navigation: any }) {
               {capitalizeFirstLetter(filters['list']?.[0] || 'likes')}
             </Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity onPress={handlePresentPasteLinkSheetPress}>
-            <Ionicons name="link" size={24} color="black" />
-          </TouchableOpacity> */}
           <HoldItem
-            items={SampleList2}
+            items={MenuList}
             activateOn="tap"
             menuAnchorPosition="top-right"
           >
@@ -210,22 +206,44 @@ function Product({
   navigation: any;
   product: UserProduct;
 }) {
+  const HoldProductList = [
+    {
+      text: product.liked ? 'Unlike' : 'Like',
+      icon: () => (
+        <Ionicons name={product.liked ? 'heart' : 'heart-outline'} size={18} />
+      ),
+      onPress: () => {
+        console.log('like!');
+      },
+    },
+    {
+      text: 'Delete from list',
+      icon: () => <Ionicons name="remove" size={18} />,
+      isDestructive: true,
+      onPress: () => {},
+    },
+  ];
+
+  console.log('product', product);
+
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate('Product', { product: product })}
       style={{ flex: 1 }}
     >
       <Box flex={1} margin="s" gap="s" marginBottom="m">
-        <Animated.Image
-          // sharedTransitionTag={`image-${product.url}`}
-          style={{
-            width: '100%',
-            height: 225,
-            // borderRadius: 10,
-          }}
-          source={{ uri: product.images[0] }}
-        />
-        <Box gap="xxs">
+        <HoldItem items={HoldProductList} containerStyles={{ flex: 1 }}>
+          <Animated.Image
+            // sharedTransitionTag={`image-${product.url}`}
+            style={{
+              width: '100%',
+              height: 225,
+              // borderRadius: 10,
+            }}
+            source={{ uri: product.images[0] }}
+          />
+        </HoldItem>
+        <Box gap="xxs" backgroundColor="background">
           <Text variant="body" fontWeight="600">
             {product.brand}
           </Text>

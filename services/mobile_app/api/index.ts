@@ -181,3 +181,34 @@ export const unlikeProduct = async (userId: string, productUrl: string) => {
   });
   return response;
 };
+
+/*** P LIST STUFF ***/
+export const createPlist = async (userId: string, listId: string) => {
+  const response = await fetch(`${URL}/users/${userId}/plists`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id: listId }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+    );
+  }
+
+  return response.json();
+};
+
+export const fetchPlists = async (userId: string) => {
+  const completeUrl = `${URL}/users/${userId}/plists`;
+  const response = await fetch(completeUrl);
+
+  if (!response.ok) {
+    throw new Error(
+      `Network response was not ok. Status code: ${response.status}`
+    );
+  }
+  return response.json();
+};

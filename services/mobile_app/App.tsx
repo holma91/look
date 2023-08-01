@@ -32,17 +32,17 @@ export default function App() {
           theme="light"
           safeAreaInsets={{ top: 0, bottom: 0, left: 0, right: 0 }}
         >
-          <BottomSheetModalProvider>
-            <DarkModeProvider>
-              <DemoProvider>
-                <TrainingProvider>
-                  <QueryClientProvider client={queryClient}>
+          <QueryClientProvider client={queryClient}>
+            <BottomSheetModalProvider>
+              <DarkModeProvider>
+                <DemoProvider>
+                  <TrainingProvider>
                     <Navigation />
-                  </QueryClientProvider>
-                </TrainingProvider>
-              </DemoProvider>
-            </DarkModeProvider>
-          </BottomSheetModalProvider>
+                  </TrainingProvider>
+                </DemoProvider>
+              </DarkModeProvider>
+            </BottomSheetModalProvider>
+          </QueryClientProvider>
         </HoldMenuProvider>
       </ClerkProvider>
     </ThemeProvider>
