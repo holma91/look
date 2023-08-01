@@ -27,7 +27,9 @@ export function ProductBig({
         <Ionicons name={product.liked ? 'heart' : 'heart-outline'} size={18} />
       ),
       onPress: () => {
-        likeMutation.mutate(product);
+        console.log('like!');
+
+        // likeMutation.mutate(product);
       },
     },
     {

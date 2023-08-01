@@ -97,7 +97,7 @@ type Product = {
   brand: string;
   price: string;
   currency: string;
-  updated_at?: string;
+  updatedAt?: string;
   images: string[];
 };
 
@@ -135,8 +135,8 @@ export const addProductImages = async (
   imageUrl: string
 ) => {
   const imageProduct = {
-    product_url: productUrl,
-    image_url: imageUrl,
+    productUrl,
+    imageUrl,
   };
 
   const response = await fetch(`${URL}/users/${userId}/products/images`, {
@@ -166,7 +166,7 @@ export const likeProduct = async (userId: string, productUrl: string) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ product_url: productUrl }),
+    body: JSON.stringify({ productUrl }),
   });
   return response;
 };
@@ -177,7 +177,7 @@ export const unlikeProduct = async (userId: string, productUrl: string) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ product_url: productUrl }),
+    body: JSON.stringify({ productUrl }),
   });
   return response;
 };

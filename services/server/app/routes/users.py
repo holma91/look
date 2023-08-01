@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserBase, UserProduct, ListBase, ListWithProducts, ListProduct, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
+from app.models.pydantic import UserBase, UserProduct, ListBase, ListProducts, ListProduct, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
 from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
@@ -118,7 +118,7 @@ async def read_user_p_lists(user_id: str) -> list[ListBase]:
     return lists
 
 @router.post("/{user_id}/plists", status_code=201, response_model=POSTResponse)
-async def add_p_list(user_id: str, p_list: ListWithProducts) -> POSTResponse:
+async def add_p_list(user_id: str, p_list: ListProducts) -> POSTResponse:
     success = await crud.create_p_list(user_id, p_list)
     if not success:
         raise HTTPException(status_code=404, detail="User not found!")
@@ -133,7 +133,7 @@ async def delete_p_list(user_id: str, p_list: ListBase):
 
 @router.post("/{user_id}/plists/{list_id}/products", status_code=201, response_model=POSTResponse)
 async def add_product_to_p_list(user_id: str, list_product: ListProduct) -> POSTResponse:
-    success = await crud.add_product_to_list(user_id, list_product)
+    success = await crud.add_product_to_p_list(user_id, list_product)
     if not success:
         raise HTTPException(status_code=404, detail="User, List, or Product not found!")
 

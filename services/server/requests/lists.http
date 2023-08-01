@@ -31,6 +31,6 @@ POST http://localhost:8004/users/user_2RYsQv4W7NG9YYHaOId6Tq599SV/plists/wishlis
 content-type: application/json
 
 {
-    "list_id": "wishlist",
-    "product_url": "https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey"
+    "id": "wlas",
+    "productUrl": "https://softgoat.com/p/mens-collar-navy"
 }

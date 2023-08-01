@@ -4,7 +4,7 @@ export type Product = {
   brand: string;
   price: string;
   currency: string;
-  updated_at?: string;
+  updatedAt?: string;
   images: string[];
   domain?: string;
 };
@@ -16,7 +16,7 @@ export type UserProduct = {
   price: string;
   currency: string;
   images: string[];
-  updated_at?: string;
+  updatedAt?: string;
   liked?: boolean;
   domain?: string;
   creator?: string;

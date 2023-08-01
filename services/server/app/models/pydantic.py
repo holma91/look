@@ -14,20 +14,20 @@ class CustomBaseModel(BaseModel):
 
 ### GENERIC RESPONSE MODELS ###
 
-class POSTResponse(BaseModel):
+class POSTResponse(CustomBaseModel):
     status: str
     message: str
 
-class POSTResponseAddImage(BaseModel):
+class POSTResponseAddImage(CustomBaseModel):
     success: bool
     message: str
 
 ### BASE MODELS ###
 
-class UserBase(BaseModel):
+class UserBase(CustomBaseModel):
     id: str
 
-class ProductBase(BaseModel):
+class ProductBase(CustomBaseModel):
     url: str
     domain: str
     brand: str
@@ -35,10 +35,10 @@ class ProductBase(BaseModel):
     price: float
     currency: str
 
-class WebsiteBase(BaseModel):
+class WebsiteBase(CustomBaseModel):
     domain: str
 
-class CompanyBase(BaseModel):
+class CompanyBase(CustomBaseModel):
     id: str
 
 class ListBase(CustomBaseModel):
@@ -46,24 +46,23 @@ class ListBase(CustomBaseModel):
 
 ### REQUEST MODELS ###
 
-class LikeProduct(BaseModel):
+class LikeProduct(CustomBaseModel):
     product_url: str
 
-class FavoriteWebsite(BaseModel):
+class FavoriteWebsite(CustomBaseModel):
     domain: str
 
-class FavoriteCompany(BaseModel):
+class FavoriteCompany(CustomBaseModel):
     id: str
 
-class ProductImage(BaseModel):
+class ProductImage(CustomBaseModel):
     product_url: str
     image_url: str
 
-class ListProduct(BaseModel):
-    list_id: str
+class ListProduct(ListBase):
     product_url: str
 
-class ListWithProducts(ListBase):
+class ListProducts(ListBase):
     product_urls: Optional[list[str]]
 
 ### RESPONSE MODELS ###

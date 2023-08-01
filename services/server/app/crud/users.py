@@ -1,5 +1,5 @@
 from typing import Optional
-from app.models.pydantic import ProductExtended, ProductImage,ListBase, ListProduct, ListWithProducts
+from app.models.pydantic import ProductExtended, ProductImage,ListBase, ListProduct, ListProducts
 from app.db import get_db_connection
 
 async def get_all() -> list[dict]:
@@ -250,7 +250,7 @@ async def get_p_lists(user_id: str) -> list:
 
     return lists
 
-async def create_p_list(user_id: str, p_list: ListWithProducts) -> str:
+async def create_p_list(user_id: str, p_list: ListProducts) -> str:
     async with get_db_connection() as conn:
         query = """
         insert into p_list (id, user_id) values ($1, $2);
@@ -276,12 +276,15 @@ async def delete_p_list(user_id: str, p_list: ListBase) -> str:
     return p_list.id
 
 async def add_product_to_p_list(user_id: str, list_product: ListProduct) -> str:
+    # user id might be needed in the future
     async with get_db_connection() as conn:
         query = """
         insert into list_product (list_id, product_url) values ($1, $2);
         """
-        await conn.execute_query_dict(query, [list_product.list_id, list_product.product_url])
+        await conn.execute_query_dict(query, [list_product.id, list_product.product_url])
     return True
+
+
 ### CLERK WEBHOOK FUNCTIONS ###
 
 async def create(id: str) -> int:
