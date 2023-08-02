@@ -37,23 +37,20 @@ export function WebViewBox({
     console.log('got message, parsedData.type:', parsedData.type);
 
     if (parsedData.type === 'product') {
-      const product = parseProductData(
-        event.nativeEvent.url,
-        event.nativeEvent.data
-      );
-
-      if (!product) return;
-
-      setCurrentProduct(product);
-
       try {
+        const product = parseProductData(
+          event.nativeEvent.url,
+          event.nativeEvent.data
+        );
+
+        setCurrentProduct(product);
         console.log('full product:', product);
 
         await createProduct(user?.id, product, domain);
         queryClient.invalidateQueries({ queryKey: ['brands', user?.id] });
         queryClient.invalidateQueries({ queryKey: ['products', user?.id] });
-      } catch (error) {
-        console.error(error);
+      } catch (e) {
+        console.log('error parsing product data OR when sending to server:', e);
       }
     } else if (parsedData.type === 'imageSrc') {
       const imageSrc: string = parsedData.data;
