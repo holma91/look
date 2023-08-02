@@ -1,84 +1,12 @@
-import { getDomain } from './helpers';
 import { Product } from './types';
 
-type IntermediaryProduct = {
-  name: string;
-  brand: string;
-  price: string;
-  currency: string;
-  images: string[];
-};
-
-const baseParsers = {
-  type1: (productData: any) => {
-    return {
-      name: productData['name'],
-      brand: productData['brand']['name'],
-      price: productData['offers']['price'],
-      currency: productData['offers']['priceCurrency'],
-      images: productData['image'],
-    };
-  },
-  type2: (productData: any) => {
-    return {
-      name: productData['name'],
-      brand: productData['brand']['name'],
-      price: productData['offers']['price'],
-      currency: productData['offers']['priceCurrency'],
-      images: [productData['image']],
-    };
-  },
-  type3: (productData: any) => {
-    return {
-      name: productData['name'],
-      brand: productData['brand']['name'],
-      price: productData['offers'][0]['price'],
-      currency: productData['offers'][0]['priceCurrency'],
-      images: productData['image'],
-    };
-  },
-  type4: (productData: any) => {
-    return {
-      name: productData['name'],
-      brand: productData['brand']['name'],
-      price: productData['offers'][0]['price'],
-      currency: productData['offers'][0]['priceCurrency'],
-      images: [productData['image']],
-    };
-  },
-};
-
-const domainSpecificParsers: {
-  [key: string]: (product: IntermediaryProduct) => IntermediaryProduct;
-} = {
-  'zalando.se': (product: IntermediaryProduct) => {
-    return {
-      ...product,
-      images: product.images.map((image) =>
-        image.substring(0, image.indexOf('?'))
-      ),
-    };
-  },
-  'hm.com': (product: IntermediaryProduct) => {
-    return {
-      ...product,
-      images: product.images.map((image) => 'https://' + image.slice(2)),
-    };
-  },
-};
-
-const type1Domains = ['se.loropiana.com'];
-const type2Domains = ['sellpy.se', 'boozt.com'];
-const type3Domains = ['zalando.se', 'careofcarl.se'];
-const type4Domains = ['hm.com'];
-
-export function parseProductData(url: string, rawData: string): Product {
-  const domain = getDomain(url);
-  if (!domain) throw new Error('Could not parse domain');
-  const parsedRawData = JSON.parse(rawData);
-  const productData = JSON.parse(parsedRawData['data']);
-
-  let product: IntermediaryProduct = {
+export function parseProduct(
+  domain: string,
+  product_url: string,
+  productData: any
+): Product {
+  let product: Product = {
+    url: product_url, // alternatively, use the URL from the productData?
     name: '',
     brand: '',
     price: '',
@@ -86,32 +14,25 @@ export function parseProductData(url: string, rawData: string): Product {
     images: [],
   };
 
-  let baseParse;
-  if (type1Domains.includes(domain as string)) {
-    baseParse = baseParsers['type1'];
-  } else if (type2Domains.includes(domain as string)) {
-    baseParse = baseParsers['type2'];
-  } else if (type3Domains.includes(domain as string)) {
-    baseParse = baseParsers['type3'];
-  } else if (type4Domains.includes(domain as string)) {
-    baseParse = baseParsers['type4'];
-  } else {
-    return { ...product, url: url };
-  }
+  // console.log('productData', productData);
+  console.log('domain', domain);
 
-  try {
-    product = baseParse(productData);
-    if (domainSpecificParsers[domain]) {
-      product = domainSpecificParsers[domain](product);
-    }
-  } catch (e) {
-    console.log(`couldn't parse on domain:${domain} with error: ${e}`);
-  }
-
-  /*
   try {
     if (domain === 'zalando.se') {
-      product = baseParse(productData);
+      product['name'] = productData['name'];
+      product['brand'] = productData['brand']['name'];
+      product['price'] = productData['offers'][0]['price'];
+      product['currency'] = productData['offers'][0]['priceCurrency'];
+      product['images'] = productData['image'];
+      if (product.images) {
+        // remove query parameters from images to get high quality
+        for (let i = 0; i < product.images.length; i++) {
+          product.images[i] = product.images[i].substring(
+            0,
+            product.images[i].indexOf('?')
+          );
+        }
+      }
     } else if (domain === 'boozt.com') {
       product['name'] = productData['name'];
       product['brand'] = productData['brand']['name'];
@@ -237,7 +158,14 @@ export function parseProductData(url: string, rawData: string): Product {
   } catch (e) {
     console.log(`couldn't parse on domain:${domain} with error: ${e}`);
   }
-  */
 
-  return { ...product, url: url };
+  return product;
+}
+
+export function parseImageSrc(domain: string, imageSrc: string) {
+  if (domain === 'hm.com') {
+    return 'https://' + imageSrc.slice(2);
+  }
+
+  return imageSrc;
 }

@@ -26,7 +26,7 @@ export default function RootNavigator() {
             <Stack.Screen
               name="Browser"
               component={Browser}
-              options={{ animation: 'none' }}
+              // options={{ animation: 'none' }}
             />
             <Stack.Screen
               name="Search"

@@ -1,9 +1,10 @@
 import { WebView } from 'react-native-webview';
 import { useUser } from '@clerk/clerk-expo';
-import { parseImageSrc, parseProduct } from '../utils/parsing';
+import { parseImageSrc, parseProduct } from '../utils/parsingOld';
 import { Product } from '../utils/types';
 import { addProductImages, createProduct } from '../api';
 import { useQueryClient } from '@tanstack/react-query';
+import { parseProductData } from '../utils/parsing';
 
 type WebViewBoxProps = {
   webviewRef: any;
@@ -30,19 +31,18 @@ export function WebViewBox({
   const handleMessage = async (event: any) => {
     if (!user?.id) return;
 
-    const productUrl = event.nativeEvent.url;
-
     // message type 1: product data
     const parsedData = JSON.parse(event.nativeEvent.data);
     const url = event.nativeEvent.url;
     console.log('got message, parsedData.type:', parsedData.type);
 
     if (parsedData.type === 'product') {
-      const product: Product = parseProduct(
-        domain,
-        productUrl,
-        JSON.parse(parsedData.data)
+      const product = parseProductData(
+        event.nativeEvent.url,
+        event.nativeEvent.data
       );
+
+      if (!product) return;
 
       setCurrentProduct(product);
 

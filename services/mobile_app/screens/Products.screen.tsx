@@ -31,7 +31,8 @@ import {
 } from '../utils/types';
 import Filter from '../components/Filter';
 import { TextInput } from '../styling/TextInput';
-import { getInjectScripts, parseProductData } from '../utils/inject';
+import { parseProductData } from '../utils/parsing';
+import { getInjectScripts } from '../utils/inject';
 import { capitalizeFirstLetter, getDomain } from '../utils/helpers';
 import { PrimaryButton } from '../components/Button';
 import { ProductBig } from '../components/Product';

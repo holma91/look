@@ -361,8 +361,6 @@ function NewListSheet({
     enabled: !!user?.id,
   });
 
-  console.log('history:', history);
-
   const queryClient = useQueryClient();
 
   const handleProductSelection = (
@@ -371,16 +369,13 @@ function NewListSheet({
   ) => {
     setSelectedProducts((prevProducts) => {
       if (isSelected) {
-        // Add the product to the array if it's not already there
         if (!prevProducts.includes(product)) {
           return [...prevProducts, product];
         }
       } else {
-        // Remove the product from the array
         return prevProducts.filter((p) => p !== product);
       }
 
-      // Return the previous state if no changes were made
       return prevProducts;
     });
   };
