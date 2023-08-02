@@ -87,12 +87,22 @@ type TertiaryProps = React.ComponentProps<typeof BaseButton> &
     // isLoading?: boolean;
   };
 
+type FilterListButtonProps = React.ComponentProps<typeof BaseButton> &
+  ColorProps<Theme> & {
+    label: string;
+    isSelected: boolean;
+    item: string;
+    isDeleting?: boolean;
+    // isLoading?: boolean;
+  };
+
 const FilterListButton = ({
   label,
   isSelected,
   item,
+  isDeleting,
   ...props
-}: TertiaryProps) => {
+}: FilterListButtonProps) => {
   const theme = useTheme<Theme>();
 
   return (

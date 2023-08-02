@@ -21,6 +21,7 @@ export const theme = createTheme({
     textOnBackground: palette.white,
     grey: palette.grey,
     darkGrey: palette.darkGrey,
+    red: '#FF3B30',
   },
   spacing: {
     none: 0,

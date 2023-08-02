@@ -2,7 +2,7 @@ import { TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Animated from 'react-native-reanimated';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { HoldItem } from 'react-native-hold-menu';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
@@ -23,31 +23,68 @@ export function ProductBig({
   const likeMutation = useLikeMutation();
   const deleteProductMutation = useDeleteProductMutation(filter);
 
-  const HoldProductList = [
-    {
-      text: (Math.random() * 100).toString(), //product.liked ? 'Unlike' : 'Like',
-      icon: () => (
-        <Ionicons name={product.liked ? 'heart' : 'heart-outline'} size={18} />
-      ),
-      onPress: () => {
-        // for debugging
-        console.log('currentProduct:', currentProduct.url);
-        console.log('like:', product.name);
-        likeMutation.mutate(product);
-      },
-    },
-    {
-      text: 'Delete from list',
-      icon: () => <Ionicons name="remove" size={18} />,
-      isDestructive: true,
-      onPress: () => {
-        const listId = filter?.list && filter.list[0];
-        if (listId !== 'likes' && listId !== 'history') {
-          deleteProductMutation.mutate(product);
-        }
-      },
-    },
-  ];
+  const listId = filter?.list && filter.list[0];
+
+  const HoldProductList = useMemo(() => {
+    if (listId === 'likes') {
+      return [
+        {
+          text: (Math.random() * 100).toString(), //product.liked ? 'Unlike' : 'Like',
+          icon: () => (
+            <Ionicons
+              name={product.liked ? 'heart' : 'heart-outline'}
+              size={18}
+            />
+          ),
+          onPress: () => {
+            // for debugging
+            console.log('currentProduct:', currentProduct.url);
+            console.log('like:', product.name);
+            likeMutation.mutate(product);
+          },
+        },
+        {
+          text: 'Add to list',
+          icon: () => <Ionicons name="add" size={18} />,
+          onPress: () => {},
+        },
+      ];
+    } else {
+      return [
+        {
+          text: (Math.random() * 100).toString(), //product.liked ? 'Unlike' : 'Like',
+          icon: () => (
+            <Ionicons
+              name={product.liked ? 'heart' : 'heart-outline'}
+              size={18}
+            />
+          ),
+          onPress: () => {
+            // for debugging
+            console.log('currentProduct:', currentProduct.url);
+            console.log('like:', product.name);
+            likeMutation.mutate(product);
+          },
+        },
+        {
+          text: `Delete from ${listId}`,
+          icon: () => <Ionicons name="remove" size={18} />,
+          isDestructive: true,
+          withSeparator: true,
+          onPress: () => {
+            if (listId !== 'likes' && listId !== 'history') {
+              deleteProductMutation.mutate(product);
+            }
+          },
+        },
+        {
+          text: 'Add to list',
+          icon: () => <Ionicons name="add" size={18} />,
+          onPress: () => {},
+        },
+      ];
+    }
+  }, [listId]);
 
   const handleProductClick = () => {
     navigation.navigate('Product', { product: product });

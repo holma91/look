@@ -20,8 +20,9 @@ deploy private beta
 
 ### TODO rn
 
-- make it possible to delete from lists
--
+- make it possible to delete from lists ; check
+- make it possible to bulk delete from lists
+- do same things for adding!
 
 ## research todos
 

@@ -132,6 +132,47 @@ type FilterSheetProps = {
   newListSheetModalRef?: React.RefObject<BottomSheetModal>;
 };
 
+type ListItemProps = {
+  item: string;
+  outerChoice: OuterChoiceFilterType;
+  filter: FilterType;
+  handleFilterSelection: (
+    filterType: OuterChoiceFilterType,
+    filterValue: string
+  ) => void;
+  isEditing: boolean;
+};
+
+const ListItem = ({
+  item,
+  outerChoice,
+  filter,
+  handleFilterSelection,
+  isEditing,
+}: ListItemProps) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const isSelected = filter[outerChoice]?.includes(item);
+
+  return (
+    <Box flexDirection="row" alignItems="center" gap="s">
+      {isEditing ? (
+        <TouchableOpacity onPress={() => setIsDeleting(true)}>
+          <Ionicons name="remove-circle" size={24} color="#FF3B30" />
+        </TouchableOpacity>
+      ) : null}
+      <FilterListButton
+        label={item}
+        onPress={() => {
+          handleFilterSelection(outerChoice, item);
+        }}
+        isSelected={isSelected || false}
+        item={item}
+        isDeleting={isDeleting}
+      />
+    </Box>
+  );
+};
+
 function FilterSheet({
   outerChoice,
   setOuterChoice,
@@ -144,28 +185,8 @@ function FilterSheet({
   setSheetNavStack,
   newListSheetModalRef,
 }: FilterSheetProps) {
-  const renderListItem = useCallback(
-    ({ item }: { item: string }) => {
-      const isSelected = filter[outerChoice]?.includes(item);
-
-      return (
-        <FilterListButton
-          label={item}
-          onPress={() => {
-            handleFilterSelection(outerChoice, item);
-          }}
-          isSelected={isSelected || false}
-          item={item}
-        />
-      );
-    },
-    [outerChoice, filter, handleFilterSelection]
-  );
-
+  const [isEditing, setIsEditing] = useState(false);
   const relevantChoices = choices[outerChoice];
-
-  console.log('sheetNavStack:', sheetNavStack);
-  console.log('outerChoice:', outerChoice);
 
   return (
     <>
@@ -192,6 +213,17 @@ function FilterSheet({
             <Ionicons name="chevron-back" size={28} color="black" />
           </TouchableOpacity>
         ) : null}
+        {outerChoice === 'list' ? (
+          <TouchableOpacity
+            onPress={() => setIsEditing(!isEditing)}
+            style={{
+              position: 'absolute',
+              right: 20,
+            }}
+          >
+            <Text variant="body">{isEditing ? 'Done' : 'Edit'}</Text>
+          </TouchableOpacity>
+        ) : null}
       </Box>
       {outerChoice === 'all' ? (
         <AllList
@@ -213,7 +245,15 @@ function FilterSheet({
         >
           <BottomSheetFlatList
             data={relevantChoices}
-            renderItem={renderListItem}
+            renderItem={({ item }) => (
+              <ListItem
+                item={item}
+                outerChoice={outerChoice}
+                filter={filter}
+                handleFilterSelection={handleFilterSelection}
+                isEditing={isEditing}
+              />
+            )}
             keyExtractor={(item) => item}
             contentContainerStyle={{ backgroundColor: 'white' }}
             style={{ paddingHorizontal: 10 }}
@@ -223,7 +263,15 @@ function FilterSheet({
       ) : (
         <BottomSheetFlatList
           data={relevantChoices}
-          renderItem={renderListItem}
+          renderItem={({ item }) => (
+            <ListItem
+              item={item}
+              outerChoice={outerChoice}
+              filter={filter}
+              handleFilterSelection={handleFilterSelection}
+              isEditing={isEditing}
+            />
+          )}
           keyExtractor={(item) => item}
           contentContainerStyle={{ backgroundColor: 'white' }}
           style={{ paddingHorizontal: 10 }}
