@@ -24,7 +24,7 @@ import { createProduct, fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import {
-  Filters,
+  FilterType,
   OuterChoiceFilterType,
   Product as ProductType,
   UserProduct,
@@ -41,7 +41,7 @@ export default function Products({ navigation }: { navigation: any }) {
   const [outerChoice, setOuterChoice] =
     useState<OuterChoiceFilterType>('brand');
   const [showFilter, setShowFilter] = useState(false);
-  const [filters, setFilters] = useState<Filters>({ list: ['likes'] });
+  const [filter, setFilter] = useState<FilterType>({ list: ['likes'] });
   const [sheetNavStack, setSheetNavStack] = useState<OuterChoiceFilterType[]>(
     []
   );
@@ -49,8 +49,8 @@ export default function Products({ navigation }: { navigation: any }) {
   const { user } = useUser();
 
   const productsQuery = useQuery({
-    queryKey: ['products', user?.id, filters],
-    queryFn: () => fetchProducts(user?.id as string, filters),
+    queryKey: ['products', user?.id, filter],
+    queryFn: () => fetchProducts(user?.id as string, filter),
     enabled: !!user?.id,
   });
 
@@ -62,16 +62,16 @@ export default function Products({ navigation }: { navigation: any }) {
 
   const handleFilterSelection = useCallback(
     (filterType: OuterChoiceFilterType, filterValue: string) => {
-      setFilters((prevFilters) => {
+      setFilter((prevFilter) => {
         if (filterType === 'list') {
           // we only allow single selection for the view
           return {
-            ...prevFilters,
+            ...prevFilter,
             [filterType]: [filterValue],
           };
         }
 
-        const currentFilterValues = [...(prevFilters[filterType] || [])];
+        const currentFilterValues = [...(prevFilter[filterType] || [])];
         const filterIndex = currentFilterValues.indexOf(filterValue);
 
         if (filterIndex === -1) {
@@ -81,16 +81,16 @@ export default function Products({ navigation }: { navigation: any }) {
         }
 
         return {
-          ...prevFilters,
+          ...prevFilter,
           [filterType]: currentFilterValues,
         };
       });
     },
-    [setFilters]
+    [setFilter]
   );
 
   const resetFilter = useCallback(() => {
-    setFilters({ list: ['likes'] });
+    setFilter({ list: ['likes'] });
   }, []);
 
   const displayedProducts = useMemo(() => {
@@ -166,7 +166,7 @@ export default function Products({ navigation }: { navigation: any }) {
             }}
           >
             <Text variant="title" fontSize={18}>
-              {capitalizeFirstLetter(filters['list']?.[0] || 'likes')}
+              {capitalizeFirstLetter(filter['list']?.[0] || 'likes')}
             </Text>
             <Ionicons
               name="chevron-down"
@@ -184,8 +184,8 @@ export default function Products({ navigation }: { navigation: any }) {
           </HoldItem>
         </Box>
         <Filter
-          filters={filters}
-          setFilters={setFilters}
+          filter={filter}
+          setFilter={setFilter}
           resetFilter={resetFilter}
           showFilter={showFilter}
           handleFilterSelection={handleFilterSelection}
@@ -203,7 +203,11 @@ export default function Products({ navigation }: { navigation: any }) {
             numColumns={2}
             keyExtractor={(item) => item.url}
             renderItem={({ item }) => (
-              <ProductBig navigation={navigation} product={item} height={225} />
+              <ProductBig
+                navigation={navigation}
+                product={item}
+                filter={filter}
+              />
             )}
             refreshControl={
               <RefreshControl

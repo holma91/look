@@ -22,7 +22,7 @@ import {
 import { Text } from '../styling/Text';
 import SheetModal from './SheetModal';
 import { useQuery } from '@tanstack/react-query';
-import { Filters, OuterChoiceFilterType } from '../utils/types';
+import { FilterType, OuterChoiceFilterType } from '../utils/types';
 import { fetchBrands, fetchCompanies, fetchPlists } from '../api';
 import { Website } from '../utils/types';
 
@@ -40,8 +40,8 @@ const possibleFilters: {
 ];
 
 type FilterProps = {
-  filters: Filters;
-  setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+  filter: FilterType;
+  setFilter: React.Dispatch<React.SetStateAction<FilterType>>;
   resetFilter: () => void;
   showFilter: boolean;
   handleFilterSelection: (
@@ -60,8 +60,8 @@ type FilterProps = {
 };
 
 export default function Filter({
-  filters,
-  setFilters,
+  filter,
+  setFilter,
   resetFilter,
   showFilter,
   handleFilterSelection,
@@ -107,7 +107,7 @@ export default function Filter({
     };
   });
 
-  const choices = React.useMemo<Filters>(() => {
+  const choices = React.useMemo<FilterType>(() => {
     return {
       all: ['list', 'brand', 'website'],
       list: ['likes', 'history'].concat(plists || []),
@@ -166,7 +166,7 @@ export default function Filter({
         setOuterChoice={setOuterChoice}
         resetFilter={resetFilter}
         handleFilterSelection={handleFilterSelection}
-        filters={filters}
+        filter={filter}
         sheetNavStack={sheetNavStack}
         setSheetNavStack={setSheetNavStack}
       />

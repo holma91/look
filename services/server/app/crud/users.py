@@ -44,7 +44,8 @@ async def get_companies(user_id: str) -> list:
         query = """
             select uc.company_id, favorited, domain from user_company uc
             join website w on w.company_id = uc.company_id
-            where uc.user_id = $1;
+            where uc.user_id = $1
+            order by uc.company_id;
         """
         sites = await conn.execute_query_dict(query, [user_id])
 
@@ -282,6 +283,16 @@ async def add_product_to_p_list(user_id: str, list_product: ListProduct) -> str:
         insert into list_product (list_id, product_url) values ($1, $2);
         """
         await conn.execute_query_dict(query, [list_product.id, list_product.product_url])
+    return True
+
+async def delete_product_from_p_list(user_id: str, list_product: ListProduct) -> str:
+    # user id might be needed in the future
+    async with get_db_connection() as conn:
+        query = """
+        delete from list_product where list_id = $1 and product_url = $2;
+        """
+        rows = await conn.execute_query_dict(query, [list_product.id, list_product.product_url])
+    print('rows', rows)
     return True
 
 

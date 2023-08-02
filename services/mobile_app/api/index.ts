@@ -1,4 +1,4 @@
-import { Filters, UserProduct } from '../utils/types';
+import { FilterType, UserProduct } from '../utils/types';
 
 // api.ts
 const URL = 'https://77f8-85-230-9-36.ngrok-free.app';
@@ -63,11 +63,11 @@ export const unFavoriteCompany = async (userId: string, company: string) => {
 
 export const fetchProducts = async (
   id: string,
-  filters: Filters
+  filter: FilterType
 ): Promise<UserProduct[]> => {
   let completeUrl = '';
   try {
-    const queryString = Object.entries(filters)
+    const queryString = Object.entries(filter)
       .flatMap(([key, values]) =>
         values?.map(
           (value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
@@ -219,4 +219,29 @@ export const fetchPlists = async (userId: string) => {
     );
   }
   return response.json();
+};
+
+export const deleteFromPlist = async (
+  userId: string,
+  listId: string,
+  product: UserProduct
+) => {
+  const response = await fetch(
+    `${URL}/users/${userId}/plists/${listId}/products`,
+    {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: listId, productUrl: product.url }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+    );
+  }
+
+  return response;
 };

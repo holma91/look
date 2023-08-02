@@ -139,6 +139,13 @@ async def add_product_to_p_list(user_id: str, list_product: ListProduct) -> POST
 
     return SUCCESSFUL_POST_RESPONSE
 
+@router.delete("/{user_id}/plists/{list_id}/products", status_code=204)
+async def delete_product_from_p_list(user_id: str, list_product: ListProduct):
+    result = await crud.delete_product_from_p_list(user_id, list_product)
+    print(result)
+    if result is None:
+        raise HTTPException(status_code=404, detail="User, List, or Product not found!")
+
 
 ### CLERK WEBHOOK ROUTES ###
 

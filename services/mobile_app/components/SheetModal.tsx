@@ -10,7 +10,7 @@ import { FlashList } from '@shopify/flash-list';
 
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { Filters, OuterChoiceFilterType, UserProduct } from '../utils/types';
+import { FilterType, OuterChoiceFilterType, UserProduct } from '../utils/types';
 import {
   PrimaryButton,
   SecondaryButton,
@@ -32,7 +32,7 @@ import { ProductSmall } from './Product';
 type SheetModalProps = {
   filterSheetModalRef: React.RefObject<BottomSheetModal>;
   newListSheetModalRef: React.RefObject<BottomSheetModal>;
-  choices: Filters;
+  choices: FilterType;
   outerChoice: OuterChoiceFilterType;
   setOuterChoice?: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
   resetFilter: () => void;
@@ -40,7 +40,7 @@ type SheetModalProps = {
     filterType: OuterChoiceFilterType,
     filterValue: string
   ) => void;
-  filters: Filters;
+  filter: FilterType;
   sheetNavStack: OuterChoiceFilterType[];
   setSheetNavStack: React.Dispatch<
     React.SetStateAction<OuterChoiceFilterType[]>
@@ -55,7 +55,7 @@ export default function SheetModal({
   setOuterChoice,
   handleFilterSelection,
   resetFilter,
-  filters,
+  filter,
   sheetNavStack,
   setSheetNavStack,
 }: SheetModalProps) {
@@ -86,7 +86,7 @@ export default function SheetModal({
           setOuterChoice={setOuterChoice}
           resetFilter={resetFilter}
           handleFilterSelection={handleFilterSelection}
-          filters={filters}
+          filter={filter}
           sheetNavStack={sheetNavStack}
           setSheetNavStack={setSheetNavStack}
           newListSheetModalRef={newListSheetModalRef}
@@ -116,7 +116,7 @@ export default function SheetModal({
 
 type FilterSheetProps = {
   filterSheetModalRef: React.RefObject<BottomSheetModal>;
-  choices: Filters;
+  choices: FilterType;
   outerChoice: OuterChoiceFilterType;
   setOuterChoice?: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
   resetFilter: () => void;
@@ -124,7 +124,7 @@ type FilterSheetProps = {
     filterType: OuterChoiceFilterType,
     filterValue: string
   ) => void;
-  filters: Filters;
+  filter: FilterType;
   sheetNavStack: OuterChoiceFilterType[];
   setSheetNavStack: React.Dispatch<
     React.SetStateAction<OuterChoiceFilterType[]>
@@ -136,7 +136,7 @@ function FilterSheet({
   outerChoice,
   setOuterChoice,
   choices,
-  filters,
+  filter,
   handleFilterSelection,
   resetFilter,
   filterSheetModalRef,
@@ -146,7 +146,7 @@ function FilterSheet({
 }: FilterSheetProps) {
   const renderListItem = useCallback(
     ({ item }: { item: string }) => {
-      const isSelected = filters[outerChoice]?.includes(item);
+      const isSelected = filter[outerChoice]?.includes(item);
 
       return (
         <FilterListButton
@@ -159,7 +159,7 @@ function FilterSheet({
         />
       );
     },
-    [outerChoice, filters, handleFilterSelection]
+    [outerChoice, filter, handleFilterSelection]
   );
 
   const relevantChoices = choices[outerChoice];
@@ -201,7 +201,7 @@ function FilterSheet({
           setOuterChoice={setOuterChoice}
           resetFilter={resetFilter}
           handleFilterSelection={handleFilterSelection}
-          filters={filters}
+          filter={filter}
           sheetNavStack={sheetNavStack}
           setSheetNavStack={setSheetNavStack}
         />
@@ -273,7 +273,7 @@ function AllList({
   outerChoice,
   setOuterChoice,
   choices,
-  filters,
+  filter,
   handleFilterSelection,
   resetFilter,
   filterSheetModalRef,
@@ -282,7 +282,7 @@ function AllList({
 }: FilterSheetProps) {
   const renderListItem = useCallback(
     ({ item }: { item: string }) => {
-      const isSelected = filters[outerChoice]?.includes(item);
+      const isSelected = filter[outerChoice]?.includes(item);
 
       return (
         <FilterListButton
@@ -301,7 +301,7 @@ function AllList({
         />
       );
     },
-    [outerChoice, filters, handleFilterSelection]
+    [outerChoice, filter, handleFilterSelection]
   );
 
   const relevantChoices = choices[outerChoice];

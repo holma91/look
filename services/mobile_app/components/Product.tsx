@@ -2,24 +2,26 @@ import { TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Animated from 'react-native-reanimated';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { HoldItem } from 'react-native-hold-menu';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import { UserProduct } from '../utils/types';
+import { FilterType, UserProduct } from '../utils/types';
 import { useLikeMutation } from '../hooks/useLikeMutation';
+import { useDeleteProductMutation } from '../hooks/useDeleteProductMutation';
 
 export function ProductBig({
   navigation,
   product,
-  height,
+  filter,
 }: {
   navigation: any;
   product: UserProduct;
-  height: number;
+  filter: FilterType;
 }) {
   const [currentProduct, setCurrentProduct] = useState(product);
   const likeMutation = useLikeMutation();
+  const deleteProductMutation = useDeleteProductMutation(filter);
 
   const HoldProductList = [
     {
@@ -38,7 +40,12 @@ export function ProductBig({
       text: 'Delete from list',
       icon: () => <Ionicons name="remove" size={18} />,
       isDestructive: true,
-      onPress: () => {},
+      onPress: () => {
+        const listId = filter?.list && filter.list[0];
+        if (listId !== 'likes' && listId !== 'history') {
+          deleteProductMutation.mutate(product);
+        }
+      },
     },
   ];
 
@@ -54,7 +61,7 @@ export function ProductBig({
             // sharedTransitionTag={`image-${product.url}`}
             style={{
               width: '100%',
-              height: height,
+              height: 225,
               // borderRadius: 10,
             }}
             source={{ uri: product.images[0] }}

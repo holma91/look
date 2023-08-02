@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Product from '../screens/Product.screen';
-import Explore from '../screens/Explore.screen';
+import Explore from '../screens/demo/Explore.screen';
 
 // Individual stack navigator for the Shop tab
 const ExploreStack = createNativeStackNavigator();

@@ -20,9 +20,8 @@ deploy private beta
 
 ### TODO rn
 
-- fix outer filter
-  - search by price functionality
-- basic image selection for softgoat
+- make it possible to delete from lists
+-
 
 ## research todos
 

@@ -34,7 +34,7 @@ export type Company = {
   favorited: boolean;
 };
 
-export type Filters = {
+export type FilterType = {
   all?: string[];
   list?: string[];
   category?: string[];

@@ -3,11 +3,11 @@ import { MasonryFlashList } from '@shopify/flash-list';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Box } from '../styling/Box';
-import { TextInput } from '../styling/TextInput';
-import { UserProduct } from '../utils/types';
+import { Box } from '../../styling/Box';
+import { TextInput } from '../../styling/TextInput';
+import { UserProduct } from '../../utils/types';
 import { useState } from 'react';
-import Filter from '../components/Filter';
+import Filter from '../../components/Filter';
 
 const names = [
   'Alice',
@@ -30,8 +30,8 @@ const products: UserProduct[] = [
     price: '2027',
     currency: 'SEK',
     images: [
-      require('../assets/products/softgoat1/gen1.png'),
-      require('../assets/generations/demo/me/stepbystep2/30.png'),
+      require('../../assets/products/softgoat1/gen1.png'),
+      require('../../assets/generations/demo/me/stepbystep2/30.png'),
     ],
     domain: 'softgoat.com',
   },
@@ -42,8 +42,8 @@ const products: UserProduct[] = [
     price: '1077',
     currency: 'SEK',
     images: [
-      require('../assets/products/adaysmarch1/gen2.png'),
-      require('../assets/products/adaysmarch1/gen1.png'),
+      require('../../assets/products/adaysmarch1/gen2.png'),
+      require('../../assets/products/adaysmarch1/gen1.png'),
     ],
     domain: 'adaysmarch.com',
   },
@@ -54,10 +54,10 @@ const products: UserProduct[] = [
     price: '138',
     currency: 'EUR',
     images: [
-      require('../assets/products/lulubuy/black.png'),
-      require('../assets/products/lulubuy/blonde.png'),
-      require('../assets/products/lulubuy/indian.png'),
-      require('../assets/products/lulubuy/irish.png'),
+      require('../../assets/products/lulubuy/black.png'),
+      require('../../assets/products/lulubuy/blonde.png'),
+      require('../../assets/products/lulubuy/indian.png'),
+      require('../../assets/products/lulubuy/irish.png'),
     ],
     domain: 'eu.lululemon.com',
   },
@@ -68,8 +68,8 @@ const products: UserProduct[] = [
     price: '118',
     currency: 'USD',
     images: [
-      require('../assets/products/lululemon1/gen1.png'),
-      require('../assets/products/lululemon1/gen2.png'),
+      require('../../assets/products/lululemon1/gen1.png'),
+      require('../../assets/products/lululemon1/gen2.png'),
     ],
     domain: 'lululemon.com',
   },
@@ -80,9 +80,9 @@ const products: UserProduct[] = [
     price: '96500',
     currency: 'SEK',
     images: [
-      require('../assets/products/hermes1/gen1.png'),
-      require('../assets/products/hermes1/gen2.png'),
-      require('../assets/products/hermes1/gen3.png'),
+      require('../../assets/products/hermes1/gen1.png'),
+      require('../../assets/products/hermes1/gen2.png'),
+      require('../../assets/products/hermes1/gen3.png'),
     ],
     domain: 'hermes.com',
   },
@@ -93,10 +93,10 @@ const products: UserProduct[] = [
     price: '1537',
     currency: 'SEK',
     images: [
-      require('../assets/products/softgoat3/gen1.png'),
-      require('../assets/products/softgoat3/gen2.png'),
-      require('../assets/products/softgoat3/gen3.png'),
-      require('../assets/products/softgoat3/gen4.png'),
+      require('../../assets/products/softgoat3/gen1.png'),
+      require('../../assets/products/softgoat3/gen2.png'),
+      require('../../assets/products/softgoat3/gen3.png'),
+      require('../../assets/products/softgoat3/gen4.png'),
     ],
     domain: 'softgoat.com',
   },
@@ -107,8 +107,8 @@ const products: UserProduct[] = [
     price: '1345',
     currency: 'SEK',
     images: [
-      require('../assets/products/zalando1/gen1.png'),
-      require('../assets/products/zalando1/gen2.png'),
+      require('../../assets/products/zalando1/gen1.png'),
+      require('../../assets/products/zalando1/gen2.png'),
     ],
     domain: 'zalando.se',
   },
@@ -119,9 +119,9 @@ const products: UserProduct[] = [
     price: '14800',
     currency: 'EUR',
     images: [
-      require('../assets/products/lululemon2/gen3.png'),
-      require('../assets/products/lululemon2/gen2.png'),
-      require('../assets/products/lululemon2/gen1.png'),
+      require('../../assets/products/lululemon2/gen3.png'),
+      require('../../assets/products/lululemon2/gen2.png'),
+      require('../../assets/products/lululemon2/gen1.png'),
     ],
     domain: 'loropiana.com',
   },
@@ -132,8 +132,8 @@ const products: UserProduct[] = [
     price: '950',
     currency: 'EUR',
     images: [
-      require('../assets/products/loropiana1/gen1.png'),
-      require('../assets/products/loropiana1/gen2.png'),
+      require('../../assets/products/loropiana1/gen1.png'),
+      require('../../assets/products/loropiana1/gen2.png'),
     ],
     domain: 'loropiana.com',
   },
@@ -143,7 +143,7 @@ const products: UserProduct[] = [
     brand: 'Loro Piana',
     price: '',
     currency: '',
-    images: [require('../assets/products/loropiana2/gen1.png')],
+    images: [require('../../assets/products/loropiana2/gen1.png')],
     domain: '',
   },
   {
@@ -153,8 +153,8 @@ const products: UserProduct[] = [
     price: '118',
     currency: 'EUR',
     images: [
-      require('../assets/products/lululemon3/gen1.png'),
-      require('../assets/products/lululemon3/gen2.png'),
+      require('../../assets/products/lululemon3/gen1.png'),
+      require('../../assets/products/lululemon3/gen2.png'),
     ],
     domain: 'lululemon.com',
   },
