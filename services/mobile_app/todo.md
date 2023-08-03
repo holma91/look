@@ -60,12 +60,8 @@ deploy private beta
 - make it so that when a user favorites something, it's checked daily if the size exists etc.
 - put in shopping info somewhere in app, and autofill on sites
 
-### fetch all companies thing
+### hold menu
 
-- get all companies from server
-  - do some join with user_company, with default favorited to false
-  - if user favs:
-    - optimistically update UI, sent to server which in turn will:
-      - insert into user company with favorited = true
-  - if user unfavs:
-    - just set favorited = false
+buggy at times
+
+- when going in to select mode and then back, only select mode works.

@@ -21,7 +21,7 @@ import { Text } from '../styling/Text';
 import { FilterType, OuterChoiceFilterType, UserProduct } from '../utils/types';
 import Filter from '../components/Filter';
 import { capitalizeFirstLetter } from '../utils/helpers';
-import { ProductBig } from '../components/Product';
+import { ProductBig, ProductSmall } from '../components/Product';
 import { PasteLinkSheet } from '../components/PasteLinkSheet';
 import { useNavigation } from '@react-navigation/native';
 
@@ -54,68 +54,47 @@ export default function Products({
   if (selectMode) {
     // so, stuff here should be selectable
     return (
-      <SelectMode selectMode={selectMode} setSelectMode={setSelectMode}>
-        <Box flex={1} paddingHorizontal="xs">
-          <FlatList
-            data={displayedProducts?.slice().reverse()}
-            numColumns={2}
-            keyExtractor={(item) => item.url}
-            renderItem={({ item }) => (
-              <ProductBig
-                navigation={navigation}
-                product={item}
-                filter={filter}
-              />
-            )}
-            refreshControl={
-              <RefreshControl
-                refreshing={productsQuery.isFetching}
-                onRefresh={() => {
-                  productsQuery.refetch();
-                }}
-              />
-            }
-            showsVerticalScrollIndicator={false}
-          />
-        </Box>
-      </SelectMode>
+      <SelectMode
+        selectMode={selectMode}
+        setSelectMode={setSelectMode}
+        productsQuery={productsQuery}
+        displayedProducts={displayedProducts}
+      />
     );
   }
 
   return (
-    <>
-      <NormalMode
-        navigation={navigation}
-        filter={filter}
-        setFilter={setFilter}
-        selectMode={selectMode}
-        setSelectMode={setSelectMode}
-      >
-        <Box flex={1} paddingHorizontal="xs">
-          <FlatList
-            data={displayedProducts?.slice().reverse()}
-            numColumns={2}
-            keyExtractor={(item) => item.url}
-            renderItem={({ item }) => (
-              <ProductBig
-                navigation={navigation}
-                product={item}
-                filter={filter}
-              />
-            )}
-            refreshControl={
-              <RefreshControl
-                refreshing={productsQuery.isFetching}
-                onRefresh={() => {
-                  productsQuery.refetch();
-                }}
-              />
-            }
-            showsVerticalScrollIndicator={false}
-          />
-        </Box>
-      </NormalMode>
-    </>
+    <NormalMode
+      navigation={navigation}
+      filter={filter}
+      setFilter={setFilter}
+      selectMode={selectMode}
+      setSelectMode={setSelectMode}
+    >
+      <Box flex={1} paddingHorizontal="xs">
+        <FlatList
+          data={displayedProducts?.slice().reverse()}
+          numColumns={2}
+          keyExtractor={(item) => item.url}
+          renderItem={({ item }) => (
+            <ProductBig
+              navigation={navigation}
+              product={item}
+              filter={filter}
+            />
+          )}
+          refreshControl={
+            <RefreshControl
+              refreshing={productsQuery.isFetching}
+              onRefresh={() => {
+                productsQuery.refetch();
+              }}
+            />
+          }
+          showsVerticalScrollIndicator={false}
+        />
+      </Box>
+    </NormalMode>
   );
 }
 
@@ -144,9 +123,11 @@ function NormalMode({
   );
   const MenuList = [
     {
-      text: 'Upload',
+      text: 'Upload', // + Math.floor(Math.random() * 1000).toString(),
       icon: () => <Ionicons name="link" size={18} />,
       onPress: () => {
+        console.log('upload!');
+
         handlePresentPasteLinkSheetPress();
       },
     },
@@ -302,10 +283,35 @@ function NormalMode({
 type SelectModeProps = {
   selectMode: boolean;
   setSelectMode: React.Dispatch<React.SetStateAction<boolean>>;
-  children: React.ReactNode;
+  productsQuery: UseQueryResult<UserProduct[]>;
+  displayedProducts: UserProduct[];
 };
 
-function SelectMode({ selectMode, setSelectMode, children }: SelectModeProps) {
+function SelectMode({
+  selectMode,
+  setSelectMode,
+  productsQuery,
+  displayedProducts,
+}: SelectModeProps) {
+  const [selectedProducts, setSelectedProducts] = useState<UserProduct[]>([]);
+
+  const handleProductSelection = (
+    product: UserProduct,
+    isSelected: boolean
+  ) => {
+    setSelectedProducts((prevProducts) => {
+      if (isSelected) {
+        if (!prevProducts.includes(product)) {
+          return [...prevProducts, product];
+        }
+      } else {
+        return prevProducts.filter((p) => p !== product);
+      }
+
+      return prevProducts;
+    });
+  };
+
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -321,10 +327,48 @@ function SelectMode({ selectMode, setSelectMode, children }: SelectModeProps) {
             <Text variant="body">Stop</Text>
           </TouchableOpacity>
         </Box>
-        {children}
-        <Text variant="smallTitle" textAlign="center" paddingVertical="s">
-          BOTTOM MENU
-        </Text>
+        <Box flex={1} paddingHorizontal="xs">
+          <FlatList
+            data={displayedProducts?.slice().reverse()}
+            numColumns={2}
+            keyExtractor={(item) => item.url}
+            renderItem={({ item }) => (
+              <ProductSmall
+                product={item}
+                height={225}
+                handleProductSelection={handleProductSelection}
+              />
+            )}
+            refreshControl={
+              <RefreshControl
+                refreshing={productsQuery.isFetching}
+                onRefresh={() => {
+                  productsQuery.refetch();
+                }}
+              />
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        </Box>
+        <Box
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="center"
+          paddingHorizontal="m"
+          paddingVertical="s"
+        >
+          <TouchableOpacity>
+            <Ionicons name="share" size={24} color="black" />
+          </TouchableOpacity>
+          <Text variant="smallTitle" textAlign="center" paddingVertical="s">
+            {selectedProducts.length} products selected
+          </Text>
+          <Box flexDirection="row" gap="s">
+            <TouchableOpacity>
+              <Ionicons name="ellipsis-horizontal" size={24} color="black" />
+            </TouchableOpacity>
+          </Box>
+        </Box>
       </SafeAreaView>
     </Box>
   );

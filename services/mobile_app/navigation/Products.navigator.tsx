@@ -19,9 +19,6 @@ export default function ProductsNavigator({
   useLayoutEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route);
     console.log('routeName', routeName);
-    console.log('route', route);
-
-    console.log('navigation', navigation);
 
     if (routeName === 'Products' && selectMode === true) {
       navigation.setOptions({ tabBarStyle: { display: 'none' } });

@@ -291,8 +291,7 @@ async def delete_product_from_p_list(user_id: str, list_product: ListProduct) ->
         query = """
         delete from list_product where list_id = $1 and product_url = $2;
         """
-        rows = await conn.execute_query_dict(query, [list_product.id, list_product.product_url])
-    print('rows', rows)
+        await conn.execute_query_dict(query, [list_product.id, list_product.product_url])
     return True
 
 
