@@ -3,48 +3,40 @@ import {
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
-  ActivityIndicator,
 } from 'react-native';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { UseQueryResult, useQuery } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import React, { useCallback, useMemo, useRef } from 'react';
-import {
-  BottomSheetModal,
-  BottomSheetBackdrop,
-  BottomSheetFlatList,
-} from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { WebView } from 'react-native-webview';
 import * as Haptics from 'expo-haptics';
 import { HoldItem } from 'react-native-hold-menu';
 
-import { createProduct, fetchProducts } from '../api';
+import { fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
-import {
-  FilterType,
-  OuterChoiceFilterType,
-  Product as ProductType,
-  UserProduct,
-} from '../utils/types';
+import { FilterType, OuterChoiceFilterType, UserProduct } from '../utils/types';
 import Filter from '../components/Filter';
-import { TextInput } from '../styling/TextInput';
-import { parseProductData } from '../utils/parsing';
-import { getInjectScripts } from '../utils/inject';
-import { capitalizeFirstLetter, getDomain } from '../utils/helpers';
-import { PrimaryButton } from '../components/Button';
+import { capitalizeFirstLetter } from '../utils/helpers';
 import { ProductBig } from '../components/Product';
+import { PasteLinkSheet } from '../components/PasteLinkSheet';
+import { useNavigation } from '@react-navigation/native';
 
-export default function Products({ navigation }: { navigation: any }) {
-  const [outerChoice, setOuterChoice] =
-    useState<OuterChoiceFilterType>('brand');
-  const [showFilter, setShowFilter] = useState(false);
+type ProductsProps = {
+  navigation: any;
+  selectMode: boolean;
+  setSelectMode: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export default function Products({
+  navigation,
+  selectMode,
+  setSelectMode,
+}: ProductsProps) {
   const [filter, setFilter] = useState<FilterType>({ list: ['likes'] });
-  const [sheetNavStack, setSheetNavStack] = useState<OuterChoiceFilterType[]>(
-    []
-  );
 
   const { user } = useUser();
 
@@ -53,6 +45,134 @@ export default function Products({ navigation }: { navigation: any }) {
     queryFn: () => fetchProducts(user?.id as string, filter),
     enabled: !!user?.id,
   });
+
+  const displayedProducts = useMemo(() => {
+    let list = productsQuery.data || [];
+    return list;
+  }, [productsQuery.data]);
+
+  if (selectMode) {
+    // so, stuff here should be selectable
+    return (
+      <SelectMode selectMode={selectMode} setSelectMode={setSelectMode}>
+        <Box flex={1} paddingHorizontal="xs">
+          <FlatList
+            data={displayedProducts?.slice().reverse()}
+            numColumns={2}
+            keyExtractor={(item) => item.url}
+            renderItem={({ item }) => (
+              <ProductBig
+                navigation={navigation}
+                product={item}
+                filter={filter}
+              />
+            )}
+            refreshControl={
+              <RefreshControl
+                refreshing={productsQuery.isFetching}
+                onRefresh={() => {
+                  productsQuery.refetch();
+                }}
+              />
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        </Box>
+      </SelectMode>
+    );
+  }
+
+  return (
+    <>
+      <NormalMode
+        navigation={navigation}
+        filter={filter}
+        setFilter={setFilter}
+        selectMode={selectMode}
+        setSelectMode={setSelectMode}
+      >
+        <Box flex={1} paddingHorizontal="xs">
+          <FlatList
+            data={displayedProducts?.slice().reverse()}
+            numColumns={2}
+            keyExtractor={(item) => item.url}
+            renderItem={({ item }) => (
+              <ProductBig
+                navigation={navigation}
+                product={item}
+                filter={filter}
+              />
+            )}
+            refreshControl={
+              <RefreshControl
+                refreshing={productsQuery.isFetching}
+                onRefresh={() => {
+                  productsQuery.refetch();
+                }}
+              />
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        </Box>
+      </NormalMode>
+    </>
+  );
+}
+
+type NormalModeProps = {
+  navigation: any;
+  filter: FilterType;
+  setFilter: React.Dispatch<React.SetStateAction<FilterType>>;
+  selectMode: boolean;
+  setSelectMode: React.Dispatch<React.SetStateAction<boolean>>;
+  children: React.ReactNode;
+};
+
+function NormalMode({
+  navigation,
+  filter,
+  setFilter,
+  selectMode,
+  setSelectMode,
+  children,
+}: NormalModeProps) {
+  const [outerChoice, setOuterChoice] =
+    useState<OuterChoiceFilterType>('brand');
+  const [showFilter, setShowFilter] = useState(false);
+  const [sheetNavStack, setSheetNavStack] = useState<OuterChoiceFilterType[]>(
+    []
+  );
+  const MenuList = [
+    {
+      text: 'Upload',
+      icon: () => <Ionicons name="link" size={18} />,
+      onPress: () => {
+        handlePresentPasteLinkSheetPress();
+      },
+    },
+    {
+      text: 'New list',
+      icon: () => <Ionicons name="add" size={18} />,
+      onPress: () => {
+        newListSheetModalRef.current?.present();
+      },
+    },
+    {
+      text: 'Select',
+      icon: () => <Ionicons name="checkmark" size={18} />,
+      onPress: () => {
+        // toggle something that changes the screen to select mode
+        console.log('set select mode');
+        setSelectMode((prev) => !prev);
+      },
+    },
+    {
+      text: 'Delete',
+      icon: () => <Ionicons name="remove" size={18} />,
+      isDestructive: true,
+      onPress: () => {},
+    },
+  ];
 
   const pasteLinkSheetRef = useRef<BottomSheetModal>(null);
 
@@ -92,34 +212,6 @@ export default function Products({ navigation }: { navigation: any }) {
   const resetFilter = useCallback(() => {
     setFilter({ list: ['likes'] });
   }, []);
-
-  const displayedProducts = useMemo(() => {
-    let list = productsQuery.data || [];
-    return list;
-  }, [productsQuery.data]);
-
-  const MenuList = [
-    {
-      text: 'Upload',
-      icon: () => <Ionicons name="link" size={18} />,
-      onPress: () => {
-        handlePresentPasteLinkSheetPress();
-      },
-    },
-    {
-      text: 'New list',
-      icon: () => <Ionicons name="add" size={18} />,
-      onPress: () => {
-        newListSheetModalRef.current?.present();
-      },
-    },
-    {
-      text: 'Delete',
-      icon: () => <Ionicons name="remove" size={18} />,
-      isDestructive: true,
-      onPress: () => {},
-    },
-  ];
 
   const filterSheetModalRef = useRef<BottomSheetModal>(null);
   const newListSheetModalRef = useRef<BottomSheetModal>(null);
@@ -197,29 +289,7 @@ export default function Products({ navigation }: { navigation: any }) {
           outerChoice={outerChoice}
           setOuterChoice={setOuterChoice}
         />
-        <Box flex={1} paddingHorizontal="xs">
-          <FlatList
-            data={displayedProducts?.slice().reverse()}
-            numColumns={2}
-            keyExtractor={(item) => item.url}
-            renderItem={({ item }) => (
-              <ProductBig
-                navigation={navigation}
-                product={item}
-                filter={filter}
-              />
-            )}
-            refreshControl={
-              <RefreshControl
-                refreshing={productsQuery.isFetching}
-                onRefresh={() => {
-                  productsQuery.refetch();
-                }}
-              />
-            }
-            showsVerticalScrollIndicator={false}
-          />
-        </Box>
+        {children}
         <PasteLinkSheet
           navigation={navigation}
           pasteLinkSheetRef={pasteLinkSheetRef}
@@ -229,322 +299,33 @@ export default function Products({ navigation }: { navigation: any }) {
   );
 }
 
-type PasteLinkSheetProps = {
-  navigation: any;
-  pasteLinkSheetRef: React.RefObject<BottomSheetModal>;
+type SelectModeProps = {
+  selectMode: boolean;
+  setSelectMode: React.Dispatch<React.SetStateAction<boolean>>;
+  children: React.ReactNode;
 };
 
-const DEFAULT_SOURCE = 'https://github.com';
-
-function PasteLinkSheet({
-  navigation,
-  pasteLinkSheetRef,
-}: PasteLinkSheetProps) {
-  const [currentProduct, setCurrentProduct] = useState<ProductType>({
-    url: '',
-    name: '',
-    brand: '',
-    price: '',
-    currency: '',
-    images: [],
-    domain: '',
-  });
-  const [linkText, setLinkText] = useState('');
-  const [webViewSource, setWebViewSource] = useState(DEFAULT_SOURCE);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [unsupportedDomain, setUnsupportedDomain] = useState<string | null>(
-    null
-  );
-  const [forceRenderKey, setForceRenderKey] = useState(
-    Math.random().toString()
-  );
-  const [invalidLink, setInvalidLink] = useState(false);
-  const snapPoints = useMemo(() => ['56%'], []);
-  const webViewRef = useRef<WebView>(null);
-  const { user } = useUser();
-  const queryClient = useQueryClient();
-
-  const handleUpload = async () => {
-    setUnsupportedDomain(null);
-    setInvalidLink(false);
-
-    const domain = getDomain(linkText);
-    if (!domain) {
-      console.log('Invalid link');
-      setInvalidLink(true);
-      return;
-    } else if (!knownDomains.includes(domain)) {
-      console.log('domain not known');
-      setUnsupportedDomain(domain);
-      return;
-    }
-
-    setIsLoading(true);
-    setForceRenderKey(Math.random().toString());
-    setWebViewSource(linkText);
-  };
-
-  const handleLoadEnd = (navState: any) => {
-    if (webViewSource === DEFAULT_SOURCE) return;
-
-    const domain = getDomain(linkText);
-    let scripts = getInjectScripts(domain as string);
-
-    if (!webViewRef.current) return;
-
-    for (let script of scripts) {
-      webViewRef.current.injectJavaScript(script);
-    }
-  };
-
-  const handleMessage = async (event: any) => {
-    const domain = getDomain(linkText);
-    if (!domain || !user) return;
-
-    let product;
-    if (knownDomains.includes(domain)) {
-      product = parseProductData(event.nativeEvent.url, event.nativeEvent.data);
-    } else {
-      // call openai api
-      product = {
-        url: linkText,
-        name: '',
-        brand: '',
-        price: '',
-        currency: '',
-        images: [],
-        domain: '',
-      };
-    }
-
-    setCurrentProduct({ ...product, domain: domain });
-    setIsLoading(false);
-    try {
-      await createProduct(user?.id, product, domain);
-      queryClient.invalidateQueries({ queryKey: ['brands', user?.id] });
-      queryClient.invalidateQueries({
-        queryKey: ['products', user?.id, { list: ['history'] }],
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const handleRemoveImage = (image: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const newImages = currentProduct.images.filter((img) => img !== image);
-    setCurrentProduct({ ...currentProduct, images: newImages });
-    setCurrentImageIndex(0);
-  };
-
-  const resetState = () => {
-    setLinkText('');
-    setWebViewSource(DEFAULT_SOURCE);
-    setCurrentProduct({
-      url: '',
-      name: '',
-      brand: '',
-      price: '',
-      currency: '',
-      images: [],
-    });
-    setUnsupportedDomain(null);
-    setInvalidLink(false);
-  };
-
-  const img = currentProduct.images[currentImageIndex];
-
+function SelectMode({ selectMode, setSelectMode, children }: SelectModeProps) {
   return (
-    <BottomSheetModal
-      ref={pasteLinkSheetRef}
-      index={0}
-      snapPoints={snapPoints}
-      backdropComponent={(props) => (
-        <BottomSheetBackdrop
-          {...props}
-          appearsOnIndex={0}
-          disappearsOnIndex={-1}
-        />
-      )}
-      onDismiss={resetState}
-    >
-      <Box padding="m">
+    <Box backgroundColor="background" flex={1}>
+      <SafeAreaView style={{ flex: 1 }}>
         <Box
-          backgroundColor="grey"
-          borderRadius={10}
           flexDirection="row"
-          alignItems="center"
+          justifyContent="space-between"
+          paddingTop="s"
+          paddingBottom="xs"
           paddingHorizontal="m"
-          paddingVertical="xxxs"
         >
-          <TextInput
-            onChangeText={setLinkText}
-            value={linkText}
-            onSubmitEditing={handleUpload}
-            autoCapitalize="none"
-            autoComplete="off"
-            autoCorrect={false}
-            autoFocus={true}
-            inputMode="url"
-            variant="secondary"
-            selectTextOnFocus={true}
-            placeholder="Paste product link here"
-            placeholderTextColor="black"
-          />
-          <Ionicons
-            name="link"
-            size={18}
-            color="black"
-            style={{ position: 'absolute', left: 15 }}
-          />
+          <Text variant="title">Select products</Text>
+          <TouchableOpacity onPress={() => setSelectMode(!selectMode)}>
+            <Text variant="body">Stop</Text>
+          </TouchableOpacity>
         </Box>
-        <Box marginTop="m" gap="l">
-          {isLoading ? (
-            <Box marginTop="m">
-              <ActivityIndicator size="large" color="#808080" />
-            </Box>
-          ) : invalidLink ? (
-            <Box marginTop="s" gap="l">
-              <Text
-                variant="title"
-                textAlign="center"
-              >{`This is an invalid link. Please try again.`}</Text>
-            </Box>
-          ) : unsupportedDomain ? (
-            <Box marginTop="s" gap="l">
-              <Text
-                variant="title"
-                textAlign="center"
-              >{`We are sorry, ${unsupportedDomain} is not supported yet.`}</Text>
-              <PrimaryButton
-                label={`I want ${unsupportedDomain} to be supported`}
-              />
-            </Box>
-          ) : (
-            <Box flexDirection="row" justifyContent="space-between" gap="m">
-              <Box flex={1} position="relative">
-                <ExpoImage
-                  style={{
-                    aspectRatio: 0.65,
-                  }}
-                  source={img ? img : ''}
-                  contentFit="cover"
-                />
-                {img ? (
-                  <TouchableOpacity
-                    style={{
-                      position: 'absolute',
-                      top: 10,
-                      right: 10,
-                      backgroundColor: 'rgba(150,150,150,0.6)',
-                      padding: 2,
-                      borderRadius: 5,
-                    }}
-                    onPress={() => handleRemoveImage(img)}
-                  >
-                    <Ionicons name="close" size={20} color="white" />
-                  </TouchableOpacity>
-                ) : null}
-              </Box>
-              <Box flex={1} justifyContent="space-between">
-                <Box gap="s" flex={1}>
-                  <Text
-                    variant="body"
-                    fontWeight="bold"
-                    fontSize={20}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {currentProduct.name}
-                  </Text>
-                  <Text variant="body" fontSize={17}>
-                    {currentProduct.brand}
-                  </Text>
-
-                  <Text
-                    variant="body"
-                    fontSize={17}
-                  >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
-                </Box>
-                <Box flex={0} gap="l">
-                  <FlatList
-                    style={{ gap: 10, marginTop: 20 }}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    data={currentProduct.images}
-                    contentContainerStyle={{ paddingLeft: 5 }}
-                    keyExtractor={(item, index) => `category-${index}`}
-                    renderItem={({ item, index }) => (
-                      <Box position="relative">
-                        <TouchableOpacity
-                          onPress={() => {
-                            setCurrentImageIndex(index);
-                          }}
-                          style={{
-                            marginRight: 6,
-                          }}
-                        >
-                          <ExpoImage
-                            style={{
-                              height: 60,
-                              width: 60,
-                              // borderWidth: item === img ? 2 : 0,
-                            }}
-                            source={item}
-                            contentFit="cover"
-                          />
-                        </TouchableOpacity>
-                      </Box>
-                    )}
-                  />
-                </Box>
-              </Box>
-            </Box>
-          )}
-          {!unsupportedDomain &&
-          !invalidLink &&
-          !isLoading &&
-          currentProduct.images.length > 0 ? (
-            <PrimaryButton
-              label="Go to product"
-              onPress={() => {
-                pasteLinkSheetRef?.current?.dismiss();
-                navigation.navigate('Product', { product: currentProduct });
-              }}
-            />
-          ) : null}
-        </Box>
-      </Box>
-      <WebView
-        key={forceRenderKey}
-        ref={webViewRef}
-        source={{ uri: webViewSource }}
-        style={{ height: 0, width: 0 }}
-        onMessage={handleMessage}
-        mediaPlaybackRequiresUserAction={true}
-        startInLoadingState={true}
-        onLoadEnd={handleLoadEnd}
-        renderLoading={() => <></>}
-      />
-    </BottomSheetModal>
+        {children}
+        <Text variant="smallTitle" textAlign="center" paddingVertical="s">
+          BOTTOM MENU
+        </Text>
+      </SafeAreaView>
+    </Box>
   );
 }
-
-const knownDomains = [
-  'zalando.se',
-  'se.loropiana.com',
-  'boozt.com',
-  'hm.com',
-  'sellpy.se',
-  'adaysmarch.com',
-  'careofcarl.se',
-  'shop.lululemon.com',
-  'gucci.com',
-  'moncler.com',
-  'farfetch.com',
-  'mytheresa.com',
-];
-
-const defaultImage =
-  'https://i0.wp.com/roadmap-tech.com/wp-content/uploads/2019/04/placeholder-image.jpg?resize=400%2C400&ssl=1';
