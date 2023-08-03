@@ -41,8 +41,6 @@ export default function Profile() {
     }
   };
 
-  console.log('user:', user);
-
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
