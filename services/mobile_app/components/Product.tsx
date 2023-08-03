@@ -14,12 +14,17 @@ export function ProductBig({
   navigation,
   product,
   filter,
+  selectMode,
+  handleProductSelection,
 }: {
   navigation: any;
   product: UserProduct;
   filter: FilterType;
+  selectMode?: boolean;
+  handleProductSelection?: (product: UserProduct, isSelected: boolean) => void;
 }) {
   const [currentProduct, setCurrentProduct] = useState(product);
+  const [isSelected, setIsSelected] = useState(false);
   const likeMutation = useLikeMutation();
   const deleteProductMutation = useDeleteProductMutation(filter);
 
@@ -87,23 +92,53 @@ export function ProductBig({
   }, [listId]);
 
   const handleProductClick = () => {
-    navigation.navigate('Product', { product: product });
+    if (selectMode) {
+      setIsSelected(!isSelected);
+      handleProductSelection!(product, !isSelected);
+    } else {
+      navigation.navigate('Product', { product: product });
+    }
   };
 
   return (
     <TouchableOpacity onPress={handleProductClick} style={{ flex: 1 }}>
       <Box flex={1} margin="s" gap="s" marginBottom="m">
-        <HoldItem items={HoldProductList} containerStyles={{ flex: 1 }}>
-          <Animated.Image
-            // sharedTransitionTag={`image-${product.url}`}
-            style={{
-              width: '100%',
-              height: 225,
-              // borderRadius: 10,
-            }}
-            source={{ uri: product.images[0] }}
-          />
-        </HoldItem>
+        {selectMode ? (
+          <Box>
+            <Animated.Image
+              style={{
+                width: '100%',
+                height: 225,
+                opacity: isSelected ? 0.25 : 1,
+              }}
+              source={{ uri: product.images[0] }}
+            />
+            {isSelected && (
+              <Ionicons
+                name="checkmark-circle"
+                size={24}
+                color="black"
+                style={{
+                  position: 'absolute',
+                  right: 5,
+                  bottom: 5,
+                }}
+              />
+            )}
+          </Box>
+        ) : (
+          <HoldItem items={HoldProductList} containerStyles={{ flex: 1 }}>
+            <Animated.Image
+              // sharedTransitionTag={`image-${product.url}`}
+              style={{
+                width: '100%',
+                height: 225,
+                // borderRadius: 10,
+              }}
+              source={{ uri: product.images[0] }}
+            />
+          </HoldItem>
+        )}
         <Box gap="xxs" backgroundColor="background">
           <Text variant="body" fontWeight="600">
             {product.brand}

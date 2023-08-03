@@ -14,6 +14,7 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { WebView } from 'react-native-webview';
 import * as Haptics from 'expo-haptics';
 import { HoldItem } from 'react-native-hold-menu';
+import { FlashList } from '@shopify/flash-list';
 
 import { fetchProducts } from '../api';
 import { Box } from '../styling/Box';
@@ -37,6 +38,13 @@ export default function Products({
   setSelectMode,
 }: ProductsProps) {
   const [filter, setFilter] = useState<FilterType>({ list: ['likes'] });
+  const [outerChoice, setOuterChoice] =
+    useState<OuterChoiceFilterType>('brand');
+  const [showFilter, setShowFilter] = useState(false);
+  const [sheetNavStack, setSheetNavStack] = useState<OuterChoiceFilterType[]>(
+    []
+  );
+  const [selectedProducts, setSelectedProducts] = useState<UserProduct[]>([]);
 
   const { user } = useUser();
 
@@ -46,81 +54,6 @@ export default function Products({
     enabled: !!user?.id,
   });
 
-  const displayedProducts = useMemo(() => {
-    let list = productsQuery.data || [];
-    return list;
-  }, [productsQuery.data]);
-
-  if (selectMode) {
-    // so, stuff here should be selectable
-    return (
-      <SelectMode
-        selectMode={selectMode}
-        setSelectMode={setSelectMode}
-        productsQuery={productsQuery}
-        displayedProducts={displayedProducts}
-      />
-    );
-  }
-
-  return (
-    <NormalMode
-      navigation={navigation}
-      filter={filter}
-      setFilter={setFilter}
-      selectMode={selectMode}
-      setSelectMode={setSelectMode}
-    >
-      <Box flex={1} paddingHorizontal="xs">
-        <FlatList
-          data={displayedProducts?.slice().reverse()}
-          numColumns={2}
-          keyExtractor={(item) => item.url}
-          renderItem={({ item }) => (
-            <ProductBig
-              navigation={navigation}
-              product={item}
-              filter={filter}
-            />
-          )}
-          refreshControl={
-            <RefreshControl
-              refreshing={productsQuery.isFetching}
-              onRefresh={() => {
-                productsQuery.refetch();
-              }}
-            />
-          }
-          showsVerticalScrollIndicator={false}
-        />
-      </Box>
-    </NormalMode>
-  );
-}
-
-type NormalModeProps = {
-  navigation: any;
-  filter: FilterType;
-  setFilter: React.Dispatch<React.SetStateAction<FilterType>>;
-  selectMode: boolean;
-  setSelectMode: React.Dispatch<React.SetStateAction<boolean>>;
-  children: React.ReactNode;
-};
-
-function NormalMode({
-  navigation,
-  filter,
-  setFilter,
-  selectMode,
-  setSelectMode,
-  children,
-}: NormalModeProps) {
-  const [outerChoice, setOuterChoice] =
-    useState<OuterChoiceFilterType>('brand');
-  const [showFilter, setShowFilter] = useState(false);
-  const [sheetNavStack, setSheetNavStack] = useState<OuterChoiceFilterType[]>(
-    []
-  );
   const MenuList = [
     {
       text: 'Upload', // + Math.floor(Math.random() * 1000).toString(),
@@ -156,10 +89,22 @@ function NormalMode({
   ];
 
   const pasteLinkSheetRef = useRef<BottomSheetModal>(null);
+  const filterSheetModalRef = useRef<BottomSheetModal>(null);
+  const newListSheetModalRef = useRef<BottomSheetModal>(null);
 
   const handlePresentPasteLinkSheetPress = useCallback(() => {
     pasteLinkSheetRef.current?.present();
   }, []);
+
+  const handlePresentFilterSheetModal = useCallback(
+    (label: OuterChoiceFilterType) => {
+      setOuterChoice(label);
+      setSheetNavStack((prev) => [...prev, label]);
+
+      filterSheetModalRef.current?.present();
+    },
+    []
+  );
 
   const handleFilterSelection = useCallback(
     (filterType: OuterChoiceFilterType, filterValue: string) => {
@@ -194,107 +139,6 @@ function NormalMode({
     setFilter({ list: ['likes'] });
   }, []);
 
-  const filterSheetModalRef = useRef<BottomSheetModal>(null);
-  const newListSheetModalRef = useRef<BottomSheetModal>(null);
-
-  const handlePresentFilterSheetModal = useCallback(
-    (label: OuterChoiceFilterType) => {
-      setOuterChoice(label);
-      setSheetNavStack((prev) => [...prev, label]);
-
-      filterSheetModalRef.current?.present();
-    },
-    []
-  );
-
-  return (
-    <Box backgroundColor="background" flex={1}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Box
-          flexDirection="row"
-          justifyContent="space-between"
-          alignItems="center"
-          paddingTop="s"
-          paddingBottom="m"
-          paddingHorizontal="m"
-          gap="s"
-        >
-          <TouchableOpacity onPress={() => setShowFilter(!showFilter)}>
-            <Ionicons
-              name={showFilter ? 'options' : 'options-outline'}
-              size={24}
-              color="black"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 6,
-            }}
-            onPress={() => {
-              Haptics.selectionAsync();
-              handlePresentFilterSheetModal('list');
-            }}
-          >
-            <Text variant="title" fontSize={18}>
-              {capitalizeFirstLetter(filter['list']?.[0] || 'likes')}
-            </Text>
-            <Ionicons
-              name="chevron-down"
-              size={20}
-              color="black"
-              style={{ paddingTop: 1 }}
-            />
-          </TouchableOpacity>
-          <HoldItem
-            items={MenuList}
-            activateOn="tap"
-            menuAnchorPosition="top-right"
-          >
-            <Ionicons name="ellipsis-horizontal" size={24} color="black" />
-          </HoldItem>
-        </Box>
-        <Filter
-          filter={filter}
-          setFilter={setFilter}
-          resetFilter={resetFilter}
-          showFilter={showFilter}
-          handleFilterSelection={handleFilterSelection}
-          sheetNavStack={sheetNavStack}
-          setSheetNavStack={setSheetNavStack}
-          newListSheetModalRef={newListSheetModalRef}
-          filterSheetModalRef={filterSheetModalRef}
-          handlePresentFilterSheetModal={handlePresentFilterSheetModal}
-          outerChoice={outerChoice}
-          setOuterChoice={setOuterChoice}
-        />
-        {children}
-        <PasteLinkSheet
-          navigation={navigation}
-          pasteLinkSheetRef={pasteLinkSheetRef}
-        />
-      </SafeAreaView>
-    </Box>
-  );
-}
-
-type SelectModeProps = {
-  selectMode: boolean;
-  setSelectMode: React.Dispatch<React.SetStateAction<boolean>>;
-  productsQuery: UseQueryResult<UserProduct[]>;
-  displayedProducts: UserProduct[];
-};
-
-function SelectMode({
-  selectMode,
-  setSelectMode,
-  productsQuery,
-  displayedProducts,
-}: SelectModeProps) {
-  const [selectedProducts, setSelectedProducts] = useState<UserProduct[]>([]);
-
   const handleProductSelection = (
     product: UserProduct,
     isSelected: boolean
@@ -312,30 +156,103 @@ function SelectMode({
     });
   };
 
+  const handleStopSelecting = () => {
+    console.log('stop selecting');
+    setSelectMode(false);
+    setSelectedProducts([]);
+  };
+
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
-        <Box
-          flexDirection="row"
-          justifyContent="space-between"
-          paddingTop="s"
-          paddingBottom="xs"
-          paddingHorizontal="m"
-        >
-          <Text variant="title">Select products</Text>
-          <TouchableOpacity onPress={() => setSelectMode(!selectMode)}>
-            <Text variant="body">Stop</Text>
-          </TouchableOpacity>
-        </Box>
+        {selectMode ? (
+          <Box
+            flexDirection="row"
+            justifyContent="space-between"
+            paddingTop="s"
+            paddingBottom="xs"
+            paddingHorizontal="m"
+          >
+            <Text variant="title">Select products</Text>
+            <TouchableOpacity onPress={handleStopSelecting}>
+              <Text variant="body">Stop</Text>
+            </TouchableOpacity>
+          </Box>
+        ) : (
+          <>
+            <Box
+              flexDirection="row"
+              justifyContent="space-between"
+              alignItems="center"
+              paddingTop="s"
+              paddingBottom="m"
+              paddingHorizontal="m"
+              gap="s"
+            >
+              <TouchableOpacity onPress={() => setShowFilter(!showFilter)}>
+                <Ionicons
+                  name={showFilter ? 'options' : 'options-outline'}
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                }}
+                onPress={() => {
+                  Haptics.selectionAsync();
+                  handlePresentFilterSheetModal('list');
+                }}
+              >
+                <Text variant="title" fontSize={18}>
+                  {capitalizeFirstLetter(filter['list']?.[0] || 'likes')}
+                </Text>
+                <Ionicons
+                  name="chevron-down"
+                  size={20}
+                  color="black"
+                  style={{ paddingTop: 1 }}
+                />
+              </TouchableOpacity>
+              <HoldItem
+                items={MenuList}
+                activateOn="tap"
+                menuAnchorPosition="top-right"
+              >
+                <Ionicons name="ellipsis-horizontal" size={24} color="black" />
+              </HoldItem>
+            </Box>
+            <Filter
+              filter={filter}
+              setFilter={setFilter}
+              resetFilter={resetFilter}
+              showFilter={showFilter}
+              handleFilterSelection={handleFilterSelection}
+              sheetNavStack={sheetNavStack}
+              setSheetNavStack={setSheetNavStack}
+              newListSheetModalRef={newListSheetModalRef}
+              filterSheetModalRef={filterSheetModalRef}
+              handlePresentFilterSheetModal={handlePresentFilterSheetModal}
+              outerChoice={outerChoice}
+              setOuterChoice={setOuterChoice}
+            />
+          </>
+        )}
         <Box flex={1} paddingHorizontal="xs">
           <FlatList
-            data={displayedProducts?.slice().reverse()}
+            data={productsQuery.data?.slice().reverse() || []}
             numColumns={2}
             keyExtractor={(item) => item.url}
             renderItem={({ item }) => (
-              <ProductSmall
+              <ProductBig
+                navigation={navigation}
                 product={item}
-                height={225}
+                filter={filter}
+                selectMode={selectMode}
                 handleProductSelection={handleProductSelection}
               />
             )}
@@ -348,27 +265,35 @@ function SelectMode({
               />
             }
             showsVerticalScrollIndicator={false}
+            // estimatedItemSize={310}
           />
         </Box>
-        <Box
-          flexDirection="row"
-          justifyContent="space-between"
-          alignItems="center"
-          paddingHorizontal="m"
-          paddingVertical="s"
-        >
-          <TouchableOpacity>
-            <Ionicons name="share" size={24} color="black" />
-          </TouchableOpacity>
-          <Text variant="smallTitle" textAlign="center" paddingVertical="s">
-            {selectedProducts.length} products selected
-          </Text>
-          <Box flexDirection="row" gap="s">
+        {selectMode ? (
+          <Box
+            flexDirection="row"
+            justifyContent="space-between"
+            alignItems="center"
+            paddingHorizontal="m"
+            paddingVertical="s"
+          >
             <TouchableOpacity>
-              <Ionicons name="ellipsis-horizontal" size={24} color="black" />
+              <Ionicons name="share" size={24} color="black" />
             </TouchableOpacity>
+            <Text variant="smallTitle" textAlign="center" paddingVertical="s">
+              {selectedProducts.length} products selected
+            </Text>
+            <Box flexDirection="row" gap="s">
+              <TouchableOpacity>
+                <Ionicons name="ellipsis-horizontal" size={24} color="black" />
+              </TouchableOpacity>
+            </Box>
           </Box>
-        </Box>
+        ) : (
+          <PasteLinkSheet
+            navigation={navigation}
+            pasteLinkSheetRef={pasteLinkSheetRef}
+          />
+        )}
       </SafeAreaView>
     </Box>
   );
