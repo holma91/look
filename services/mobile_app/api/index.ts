@@ -245,3 +245,31 @@ export const deleteFromPlist = async (
 
   return response;
 };
+
+export const addToPlist = async (
+  userId: string,
+  listId: string,
+  product: UserProduct[]
+) => {
+  const response = await fetch(
+    `${URL}/users/${userId}/plists/${listId}/products`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: listId,
+        productUrls: product.map((p) => p.url),
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+    );
+  }
+
+  return response;
+};

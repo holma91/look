@@ -19,7 +19,7 @@ import * as Haptics from 'expo-haptics';
 import { HoldItem } from 'react-native-hold-menu';
 import { FlashList } from '@shopify/flash-list';
 
-import { fetchPlists, fetchProducts } from '../api';
+import { addToPlist, fetchPlists, fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { FilterType, OuterChoiceFilterType, UserProduct } from '../utils/types';
@@ -27,7 +27,7 @@ import Filter from '../components/Filter';
 import { capitalizeFirstLetter } from '../utils/helpers';
 import { ProductBig } from '../components/Product';
 import { PasteLinkSheet } from '../components/PasteLinkSheet';
-import { AddToListButton, FilterListButton } from '../components/Button';
+import { AddToListButton } from '../components/Button';
 
 type ProductsProps = {
   navigation: any;
@@ -43,6 +43,40 @@ export default function Products({
   const [filter, setFilter] = useState<FilterType>({ list: ['likes'] });
   const [selectedProducts, setSelectedProducts] = useState<UserProduct[]>([]);
 
+  const handleFilterSelection = useCallback(
+    (filterType: OuterChoiceFilterType, filterValue: string) => {
+      setFilter((prevFilter) => {
+        if (filterType === 'list') {
+          // we only allow single selection for the view
+          return {
+            ...prevFilter,
+            [filterType]: [filterValue],
+          };
+        }
+
+        const currentFilterValues = [...(prevFilter[filterType] || [])];
+        const filterIndex = currentFilterValues.indexOf(filterValue);
+
+        if (filterIndex === -1) {
+          currentFilterValues.push(filterValue);
+        } else {
+          currentFilterValues.splice(filterIndex, 1);
+        }
+
+        return {
+          ...prevFilter,
+          [filterType]: currentFilterValues,
+        };
+      });
+    },
+    [setFilter]
+  );
+
+  const resetSelection = () => {
+    setSelectedProducts([]);
+    setSelectMode(false);
+  };
+
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -50,9 +84,11 @@ export default function Products({
           navigation={navigation}
           selectMode={selectMode}
           setSelectMode={setSelectMode}
+          resetSelection={resetSelection}
           setSelectedProducts={setSelectedProducts}
           filter={filter}
           setFilter={setFilter}
+          handleFilterSelection={handleFilterSelection}
         />
         <Content
           navigation={navigation}
@@ -60,7 +96,13 @@ export default function Products({
           filter={filter}
           setSelectedProducts={setSelectedProducts}
         />
-        <Footer selectMode={selectMode} selectedProducts={selectedProducts} />
+        <Footer
+          selectMode={selectMode}
+          resetSelection={resetSelection}
+          selectedProducts={selectedProducts}
+          handleFilterSelection={handleFilterSelection}
+          filter={filter}
+        />
       </SafeAreaView>
     </Box>
   );
@@ -138,18 +180,25 @@ type HeaderProps = {
   navigation: any;
   selectMode: boolean;
   setSelectMode: React.Dispatch<React.SetStateAction<boolean>>;
+  resetSelection: () => void;
   setSelectedProducts: React.Dispatch<React.SetStateAction<UserProduct[]>>;
   filter: FilterType;
   setFilter: React.Dispatch<React.SetStateAction<FilterType>>;
+  handleFilterSelection: (
+    filterType: OuterChoiceFilterType,
+    filterValue: string
+  ) => void;
 };
 
 function Header({
   navigation,
   selectMode,
   setSelectMode,
+  resetSelection,
   setSelectedProducts,
   filter,
   setFilter,
+  handleFilterSelection,
 }: HeaderProps) {
   const [showFilter, setShowFilter] = useState(false);
   const [outerChoice, setOuterChoice] =
@@ -158,44 +207,9 @@ function Header({
     []
   );
 
-  const handleFilterSelection = useCallback(
-    (filterType: OuterChoiceFilterType, filterValue: string) => {
-      setFilter((prevFilter) => {
-        if (filterType === 'list') {
-          // we only allow single selection for the view
-          return {
-            ...prevFilter,
-            [filterType]: [filterValue],
-          };
-        }
-
-        const currentFilterValues = [...(prevFilter[filterType] || [])];
-        const filterIndex = currentFilterValues.indexOf(filterValue);
-
-        if (filterIndex === -1) {
-          currentFilterValues.push(filterValue);
-        } else {
-          currentFilterValues.splice(filterIndex, 1);
-        }
-
-        return {
-          ...prevFilter,
-          [filterType]: currentFilterValues,
-        };
-      });
-    },
-    [setFilter]
-  );
-
   const resetFilter = useCallback(() => {
     setFilter({ list: ['likes'] });
   }, []);
-
-  const handleStopSelecting = () => {
-    console.log('stop selecting');
-    setSelectMode(false);
-    setSelectedProducts([]);
-  };
 
   const handlePresentFilterSheetModal = useCallback(
     (label: OuterChoiceFilterType) => {
@@ -259,7 +273,7 @@ function Header({
         paddingHorizontal="m"
       >
         <Text variant="title">Select products</Text>
-        <TouchableOpacity onPress={handleStopSelecting}>
+        <TouchableOpacity onPress={resetSelection}>
           <Text variant="body">Cancel</Text>
         </TouchableOpacity>
       </Box>
@@ -338,10 +352,22 @@ function Header({
 
 type FooterProps = {
   selectMode: boolean;
+  resetSelection: () => void;
   selectedProducts: UserProduct[];
+  handleFilterSelection: (
+    filterType: OuterChoiceFilterType,
+    filterValue: string
+  ) => void;
+  filter: FilterType;
 };
 
-function Footer({ selectMode, selectedProducts }: FooterProps) {
+function Footer({
+  selectMode,
+  resetSelection,
+  selectedProducts,
+  handleFilterSelection,
+  filter,
+}: FooterProps) {
   const addProductsSheetRef = useRef<BottomSheetModal>(null);
 
   const handleShareProducts = async () => {
@@ -353,7 +379,6 @@ function Footer({ selectMode, selectedProducts }: FooterProps) {
   };
 
   const handleAddProducts = async () => {
-    // throw up a pretty advanced sheet that lets you choose a list to add to : TODO
     addProductsSheetRef.current?.present();
   };
 
@@ -389,6 +414,9 @@ function Footer({ selectMode, selectedProducts }: FooterProps) {
         <AddProductsSheet
           addProductsSheetRef={addProductsSheetRef}
           selectedProducts={selectedProducts}
+          handleFilterSelection={handleFilterSelection}
+          resetSelection={resetSelection}
+          filter={filter}
         />
       </>
     );
@@ -400,22 +428,46 @@ function Footer({ selectMode, selectedProducts }: FooterProps) {
 type AddProductsSheetProps = {
   addProductsSheetRef: React.RefObject<BottomSheetModal>;
   selectedProducts: UserProduct[];
+  handleFilterSelection: (
+    filterType: OuterChoiceFilterType,
+    filterValue: string
+  ) => void;
+  resetSelection: () => void;
+  filter: FilterType;
 };
 
 function AddProductsSheet({
   addProductsSheetRef,
   selectedProducts,
+  handleFilterSelection,
+  resetSelection,
+  filter,
 }: AddProductsSheetProps) {
   const snapPoints = useMemo(() => ['85%'], []);
 
   const { user } = useUser();
 
+  const listId = filter?.list && filter.list[0];
+
   const { data: plists } = useQuery<string[]>({
     queryKey: ['plists', user?.id],
     queryFn: () => fetchPlists(user?.id as string),
     enabled: !!user?.id,
-    select: (data) => data.map((plist: any) => plist.id),
+    select: (data) =>
+      data.map((plist: any) => plist.id).filter((id) => id !== listId),
   });
+
+  const handleAddToList = async (listId: string) => {
+    console.log('add to list', listId);
+    // add to the list
+    await addToPlist(user!.id, listId, selectedProducts);
+    // close sheet
+    addProductsSheetRef?.current?.close();
+    // change filter to view the new list
+    handleFilterSelection('list', listId);
+    // stop selecting
+    resetSelection();
+  };
 
   return (
     <BottomSheetModal
@@ -482,7 +534,12 @@ function AddProductsSheet({
             keyExtractor={(item) => item}
             contentContainerStyle={{ gap: 10, paddingBottom: 32 }}
             renderItem={({ item }) => (
-              <AddToListButton label={item} item={item} isSelected={false} />
+              <AddToListButton
+                onPress={() => handleAddToList(item)}
+                label={item}
+                item={item}
+                isSelected={false}
+              />
             )}
             showsVerticalScrollIndicator={false}
           />
