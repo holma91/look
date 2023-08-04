@@ -18,6 +18,7 @@ import BottomSheet, {
 import * as Haptics from 'expo-haptics';
 import { HoldItem } from 'react-native-hold-menu';
 import { FlashList } from '@shopify/flash-list';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 
 import { addToPlist, fetchPlists, fetchProducts } from '../api';
 import { Box } from '../styling/Box';
@@ -27,7 +28,8 @@ import Filter from '../components/Filter';
 import { capitalizeFirstLetter } from '../utils/helpers';
 import { ProductBig } from '../components/Product';
 import { PasteLinkSheet } from '../components/PasteLinkSheet';
-import { AddToListButton } from '../components/Button';
+import { AddToListButton, PrimaryButton } from '../components/Button';
+import { useDeleteProductsMutation } from '../hooks/useDeleteProductsMutation';
 
 type ProductsProps = {
   navigation: any;
@@ -368,14 +370,43 @@ function Footer({
   handleFilterSelection,
   filter,
 }: FooterProps) {
+  const { showActionSheetWithOptions } = useActionSheet();
   const addProductsSheetRef = useRef<BottomSheetModal>(null);
+  const deleteProductsMutation = useDeleteProductsMutation(filter);
+
+  const listId = filter?.list && filter.list[0];
 
   const handleShareProducts = async () => {
     // do something to share the selected products
   };
 
-  const handleTrashProducts = async () => {
-    // throw up an action sheet that lets you delete the selected products
+  const handleDeleteProducts = () => {
+    const options = [`Delete from ${listId}`, 'Cancel'];
+    const destructiveButtonIndex = 0;
+    const cancelButtonIndex = 1;
+    const message = 'Are you sure you want to delete these products?';
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+        message,
+      },
+      (selectedIndex?: number) => {
+        switch (selectedIndex) {
+          case 1:
+            // Save
+            break;
+          case destructiveButtonIndex:
+            deleteProductsMutation.mutate(selectedProducts);
+            resetSelection();
+            break;
+          case cancelButtonIndex:
+          // Canceled
+        }
+      }
+    );
   };
 
   const handleAddProducts = async () => {
@@ -403,7 +434,7 @@ function Footer({
             {selectedProducts.length} products selected
           </Text>
           <Box flexDirection="row" gap="m" position="absolute" right={20}>
-            <TouchableOpacity onPress={handleTrashProducts}>
+            <TouchableOpacity onPress={handleDeleteProducts}>
               <Ionicons name="trash-outline" size={24} color="black" />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleAddProducts}>

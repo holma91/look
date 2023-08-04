@@ -276,24 +276,39 @@ async def delete_p_list(user_id: str, p_list: ListBase) -> str:
 
     return p_list.id
 
-async def add_product_to_p_list(user_id: str, list_product: ListProduct) -> str:
+async def add_products_to_p_list(user_id: str, list_products: ListProducts) -> str:
     # user id might be needed in the future
     async with get_db_connection() as conn:
         query = """
         insert into list_product (list_id, product_url) values ($1, $2);
         """
-        await conn.execute_query_dict(query, [list_product.id, list_product.product_url])
+        for product_url in list_products.product_urls:
+            try:
+                await conn.execute_query_dict(query, [list_products.id, product_url])
+            except Exception as e:
+                print(e) # just a duplicate in the list, ignore it
+
     return True
 
-async def delete_product_from_p_list(user_id: str, list_product: ListProduct) -> str:
+async def delete_products_from_p_list(user_id: str, list_products: ListProducts) -> str:
     # user id might be needed in the future
     async with get_db_connection() as conn:
         query = """
         delete from list_product where list_id = $1 and product_url = $2;
         """
-        await conn.execute_query_dict(query, [list_product.id, list_product.product_url])
+        for product_url in list_products.product_urls:
+            await conn.execute_query_dict(query, [list_products.id, product_url])
     return True
 
+async def delete_products_from_history(user_id: str, list_products: ListProducts) -> str:
+    # user id might be needed in the future
+    async with get_db_connection() as conn:
+        query = """
+        delete from user_product where user_id = $1 and product_url = $2;
+        """
+        for product_url in list_products.product_urls:
+            await conn.execute_query_dict(query, [user_id, product_url])
+    return True
 
 ### CLERK WEBHOOK FUNCTIONS ###
 

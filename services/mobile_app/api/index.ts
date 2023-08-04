@@ -224,7 +224,7 @@ export const fetchPlists = async (userId: string) => {
 export const deleteFromPlist = async (
   userId: string,
   listId: string,
-  product: UserProduct
+  products: UserProduct[]
 ) => {
   const response = await fetch(
     `${URL}/users/${userId}/plists/${listId}/products`,
@@ -233,7 +233,10 @@ export const deleteFromPlist = async (
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id: listId, productUrl: product.url }),
+      body: JSON.stringify({
+        id: listId,
+        productUrls: products.map((p) => p.url),
+      }),
     }
   );
 
@@ -249,7 +252,7 @@ export const deleteFromPlist = async (
 export const addToPlist = async (
   userId: string,
   listId: string,
-  product: UserProduct[]
+  products: UserProduct[]
 ) => {
   const response = await fetch(
     `${URL}/users/${userId}/plists/${listId}/products`,
@@ -260,7 +263,7 @@ export const addToPlist = async (
       },
       body: JSON.stringify({
         id: listId,
-        productUrls: product.map((p) => p.url),
+        productUrls: products.map((p) => p.url),
       }),
     }
   );

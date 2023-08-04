@@ -3,17 +3,17 @@ import { useUser } from '@clerk/clerk-expo';
 import { deleteFromPlist } from '../api';
 import { FilterType, UserProduct } from '../utils/types';
 
-export const useDeleteProductMutation = (filter: FilterType) => {
+export const useDeleteProductsMutation = (filter: FilterType) => {
   const { user } = useUser();
   const queryClient = useQueryClient();
 
-  const deleteProductMutation = useMutation({
-    mutationFn: async (product: UserProduct) => {
+  const deleteProductsMutation = useMutation({
+    mutationFn: async (products: UserProduct[]) => {
       const listId = filter?.list && filter.list[0];
-      await deleteFromPlist(user!.id, listId!, product);
-      return product;
+      await deleteFromPlist(user!.id, listId!, products);
+      return products;
     },
-    onMutate: async (product: UserProduct) => {
+    onMutate: async (products: UserProduct[]) => {
       await queryClient.cancelQueries(['products', user?.id, filter]);
       const previousProducts = queryClient.getQueryData([
         'products',
@@ -21,18 +21,20 @@ export const useDeleteProductMutation = (filter: FilterType) => {
         filter,
       ]);
 
+      const productUrls = products.map((p) => p.url);
+
       // optimistically update the cache
       queryClient.setQueryData(
         ['products', user?.id, filter],
         (old: UserProduct[] | undefined) => {
-          return old?.filter((p) => p.url !== product.url);
+          return old?.filter((p) => !productUrls.includes(p.url));
         }
       );
 
       return { previousProducts };
     },
-    onError: (err, product, context) => {
-      console.log('error', err, product, context);
+    onError: (err, products, context) => {
+      console.log('error', err, products, context);
       queryClient.setQueryData(
         ['products', user?.id, filter],
         context?.previousProducts
@@ -45,5 +47,5 @@ export const useDeleteProductMutation = (filter: FilterType) => {
     },
   });
 
-  return deleteProductMutation;
+  return deleteProductsMutation;
 };

@@ -132,19 +132,24 @@ async def delete_p_list(user_id: str, p_list: ListBase):
         raise HTTPException(status_code=404, detail="User or List not found!")
 
 @router.post("/{user_id}/plists/{list_id}/products", status_code=201, response_model=POSTResponse)
-async def add_product_to_p_list(user_id: str, list_product: ListProduct) -> POSTResponse:
-    success = await crud.add_product_to_p_list(user_id, list_product)
+async def add_products_to_p_list(user_id: str, list_products: ListProducts) -> POSTResponse:
+    success = await crud.add_products_to_p_list(user_id, list_products)
     if not success:
         raise HTTPException(status_code=404, detail="User, List, or Product not found!")
 
     return SUCCESSFUL_POST_RESPONSE
 
 @router.delete("/{user_id}/plists/{list_id}/products", status_code=204)
-async def delete_product_from_p_list(user_id: str, list_product: ListProduct):
-    result = await crud.delete_product_from_p_list(user_id, list_product)
-    print(result)
+async def delete_products_from_p_list(user_id: str, list_id: str, list_products: ListProducts):
+    if list_id == 'history':
+        result = await crud.delete_products_from_history(user_id, list_products)
+    elif list_id == 'likes':
+        pass
+    else:
+        result = await crud.delete_products_from_p_list(user_id, list_products)
     if result is None:
         raise HTTPException(status_code=404, detail="User, List, or Product not found!")
+
 
 
 ### CLERK WEBHOOK ROUTES ###

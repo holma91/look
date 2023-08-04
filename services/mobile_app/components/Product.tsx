@@ -7,7 +7,7 @@ import { HoldItem } from 'react-native-hold-menu';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { FilterType, UserProduct } from '../utils/types';
-import { useDeleteProductMutation } from '../hooks/useDeleteProductMutation';
+import { useDeleteProductsMutation } from '../hooks/useDeleteProductsMutation';
 import { useLikeProductMutation } from '../hooks/useLikeProductMutation';
 
 export function ProductBig({
@@ -25,7 +25,7 @@ export function ProductBig({
 }) {
   const [isSelected, setIsSelected] = useState(false);
   const likeProductMutation = useLikeProductMutation(filter);
-  const deleteProductMutation = useDeleteProductMutation(filter);
+  const deleteProductsMutation = useDeleteProductsMutation(filter);
 
   const listId = filter?.list && filter.list[0];
 
@@ -73,8 +73,8 @@ export function ProductBig({
       isDestructive: true,
       withSeparator: true,
       onPress: () => {
-        if (listId !== 'likes' && listId !== 'history') {
-          deleteProductMutation.mutate(product);
+        if (listId !== 'likes') {
+          deleteProductsMutation.mutate([product]);
         }
       },
       actionParams: {
