@@ -93,6 +93,7 @@ type FilterListButtonProps = React.ComponentProps<typeof BaseButton> &
     isSelected: boolean;
     item: string;
     isDeleting?: boolean;
+    isAddable?: boolean;
     // isLoading?: boolean;
   };
 
@@ -101,6 +102,7 @@ const FilterListButton = ({
   isSelected,
   item,
   isDeleting,
+  isAddable,
   ...props
 }: FilterListButtonProps) => {
   const theme = useTheme<Theme>();
@@ -114,8 +116,8 @@ const FilterListButton = ({
       paddingVertical="m"
       paddingHorizontal="m"
       borderRadius={10}
-      backgroundColor={isSelected ? 'text' : 'grey'}
-      margin="xs"
+      backgroundColor={isSelected ? 'text' : 'gray5'}
+      // margin="xs"
       {...props}
     >
       <Text
@@ -131,6 +133,48 @@ const FilterListButton = ({
         size={20}
         color={isSelected ? 'white' : 'transparent'}
       />
+    </BaseButton>
+  );
+};
+
+type AddToListButtonProps = React.ComponentProps<typeof BaseButton> &
+  ColorProps<Theme> & {
+    label: string;
+    isSelected: boolean;
+    item: string;
+    // isLoading?: boolean;
+  };
+
+const AddToListButton = ({
+  label,
+  isSelected,
+  item,
+  ...props
+}: AddToListButtonProps) => {
+  const theme = useTheme<Theme>();
+
+  return (
+    <BaseButton
+      flexDirection="row"
+      flex={1}
+      justifyContent="space-between"
+      alignItems="center"
+      paddingVertical="m"
+      paddingHorizontal="m"
+      borderRadius={10}
+      backgroundColor={isSelected ? 'text' : 'gray6'}
+      // margin="xs"
+      {...props}
+    >
+      <Text
+        variant="body"
+        fontWeight="bold"
+        fontSize={16}
+        color={isSelected ? 'background' : 'text'}
+      >
+        {item}
+      </Text>
+      <Ionicons name="add" size={20} color="#8E8E93" />
     </BaseButton>
   );
 };
@@ -151,7 +195,7 @@ const NewListButton = ({ label, onPress, ...props }: Props) => {
       paddingVertical="m"
       paddingHorizontal="m"
       borderRadius={10}
-      backgroundColor={'grey'}
+      backgroundColor="gray5"
       onPress={onPress}
       {...props}
     >
@@ -163,4 +207,10 @@ const NewListButton = ({ label, onPress, ...props }: Props) => {
   );
 };
 
-export { PrimaryButton, SecondaryButton, FilterListButton, NewListButton };
+export {
+  PrimaryButton,
+  SecondaryButton,
+  FilterListButton,
+  NewListButton,
+  AddToListButton,
+};

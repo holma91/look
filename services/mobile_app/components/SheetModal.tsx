@@ -150,7 +150,7 @@ const ListItem = ({
   const isSelected = filter[outerChoice]?.includes(item);
 
   return (
-    <Box flexDirection="row" alignItems="center" gap="s">
+    <Box flexDirection="row" alignItems="center" gap="s" margin="xs">
       {isEditing ? (
         <TouchableOpacity onPress={() => setIsDeleting(true)}>
           <Ionicons name="remove-circle" size={24} color="#FF3B30" />
@@ -329,20 +329,22 @@ function AllList({
       const isSelected = filter[outerChoice]?.includes(item);
 
       return (
-        <FilterListButton
-          label={item}
-          onPress={() => {
-            console.log('setOuterChoice:', setOuterChoice);
-            console.log('item:', item);
-            setOuterChoice?.(item as OuterChoiceFilterType);
-            setSheetNavStack((prev) => [
-              ...prev,
-              item as OuterChoiceFilterType,
-            ]);
-          }}
-          isSelected={isSelected || false}
-          item={item}
-        />
+        <Box margin="xs">
+          <FilterListButton
+            label={item}
+            onPress={() => {
+              console.log('setOuterChoice:', setOuterChoice);
+              console.log('item:', item);
+              setOuterChoice?.(item as OuterChoiceFilterType);
+              setSheetNavStack((prev) => [
+                ...prev,
+                item as OuterChoiceFilterType,
+              ]);
+            }}
+            isSelected={isSelected || false}
+            item={item}
+          />
+        </Box>
       );
     },
     [outerChoice, filter, handleFilterSelection]

@@ -22,7 +22,10 @@ deploy private beta
 
 - make it possible to delete from lists ; check
 - make it possible to bulk delete from lists
-- do same things for adding!
+  - action sheet stuff
+- make it possible to add to lists
+  - do add sheet design and implement
+- https://gorhom.github.io/react-native-bottom-sheet/react-navigation-integration for nav in sheet
 
 ## research todos
 
@@ -65,3 +68,5 @@ deploy private beta
 buggy at times
 
 - when going in to select mode and then back, only select mode works.
+
+I think the like bug is fixed by using action params?

@@ -8,6 +8,12 @@ const palette = {
   grey: '#DDDFE9',
   darkGrey: '#A4A6B3',
   lightGrey: '#fafafa',
+  iosGray: '#8E8E93',
+  iosGray2: '#AEAEB2',
+  iosGray3: '#C7C7CC',
+  iosGray4: '#D1D1D6',
+  iosGray5: '#E5E5EA',
+  iosGray6: '#F2F2F7',
 };
 
 export const theme = createTheme({
@@ -21,6 +27,9 @@ export const theme = createTheme({
     textOnBackground: palette.white,
     grey: palette.grey,
     darkGrey: palette.darkGrey,
+    gray4: palette.iosGray4,
+    gray5: palette.iosGray5,
+    gray6: palette.iosGray6,
     red: '#FF3B30',
   },
   spacing: {

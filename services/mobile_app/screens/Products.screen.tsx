@@ -10,12 +10,16 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import { useEffect, useState } from 'react';
 import React, { useCallback, useMemo, useRef } from 'react';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
+  BottomSheetModal,
+} from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
 import { HoldItem } from 'react-native-hold-menu';
 import { FlashList } from '@shopify/flash-list';
 
-import { fetchProducts } from '../api';
+import { fetchPlists, fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { FilterType, OuterChoiceFilterType, UserProduct } from '../utils/types';
@@ -23,6 +27,7 @@ import Filter from '../components/Filter';
 import { capitalizeFirstLetter } from '../utils/helpers';
 import { ProductBig } from '../components/Product';
 import { PasteLinkSheet } from '../components/PasteLinkSheet';
+import { AddToListButton, FilterListButton } from '../components/Button';
 
 type ProductsProps = {
   navigation: any;
@@ -255,7 +260,7 @@ function Header({
       >
         <Text variant="title">Select products</Text>
         <TouchableOpacity onPress={handleStopSelecting}>
-          <Text variant="body">Stop</Text>
+          <Text variant="body">Cancel</Text>
         </TouchableOpacity>
       </Box>
     );
@@ -337,6 +342,8 @@ type FooterProps = {
 };
 
 function Footer({ selectMode, selectedProducts }: FooterProps) {
+  const addProductsSheetRef = useRef<BottomSheetModal>(null);
+
   const handleShareProducts = async () => {
     // do something to share the selected products
   };
@@ -347,38 +354,140 @@ function Footer({ selectMode, selectedProducts }: FooterProps) {
 
   const handleAddProducts = async () => {
     // throw up a pretty advanced sheet that lets you choose a list to add to : TODO
+    addProductsSheetRef.current?.present();
   };
 
   if (selectMode) {
     return (
-      <Box
-        flexDirection="row"
-        justifyContent="center"
-        alignItems="center"
-        paddingHorizontal="m"
-        paddingVertical="s"
-        position="relative"
-      >
-        <TouchableOpacity
-          onPress={handleShareProducts}
-          style={{ position: 'absolute', left: 20 }}
+      <>
+        <Box
+          flexDirection="row"
+          justifyContent="center"
+          alignItems="center"
+          paddingHorizontal="m"
+          paddingVertical="s"
+          position="relative"
         >
-          <Ionicons name="share-outline" size={24} color="black" />
-        </TouchableOpacity>
-        <Text variant="smallTitle" textAlign="center" paddingVertical="s">
-          {selectedProducts.length} products selected
-        </Text>
-        <Box flexDirection="row" gap="m" position="absolute" right={20}>
-          <TouchableOpacity onPress={handleTrashProducts}>
-            <Ionicons name="trash-outline" size={24} color="black" />
+          <TouchableOpacity
+            onPress={handleShareProducts}
+            style={{ position: 'absolute', left: 20 }}
+          >
+            <Ionicons name="share-outline" size={24} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleAddProducts}>
-            <Ionicons name="albums-outline" size={24} color="black" />
-          </TouchableOpacity>
+          <Text variant="smallTitle" textAlign="center" paddingVertical="s">
+            {selectedProducts.length} products selected
+          </Text>
+          <Box flexDirection="row" gap="m" position="absolute" right={20}>
+            <TouchableOpacity onPress={handleTrashProducts}>
+              <Ionicons name="trash-outline" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleAddProducts}>
+              <Ionicons name="albums-outline" size={24} color="black" />
+            </TouchableOpacity>
+          </Box>
         </Box>
-      </Box>
+        <AddProductsSheet
+          addProductsSheetRef={addProductsSheetRef}
+          selectedProducts={selectedProducts}
+        />
+      </>
     );
   }
 
   return null;
+}
+
+type AddProductsSheetProps = {
+  addProductsSheetRef: React.RefObject<BottomSheetModal>;
+  selectedProducts: UserProduct[];
+};
+
+function AddProductsSheet({
+  addProductsSheetRef,
+  selectedProducts,
+}: AddProductsSheetProps) {
+  const snapPoints = useMemo(() => ['85%'], []);
+
+  const { user } = useUser();
+
+  const { data: plists } = useQuery<string[]>({
+    queryKey: ['plists', user?.id],
+    queryFn: () => fetchPlists(user?.id as string),
+    enabled: !!user?.id,
+    select: (data) => data.map((plist: any) => plist.id),
+  });
+
+  return (
+    <BottomSheetModal
+      ref={addProductsSheetRef}
+      index={0}
+      snapPoints={snapPoints}
+      handleIndicatorStyle={{ backgroundColor: 'white' }}
+      backdropComponent={(props) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+        />
+      )}
+    >
+      <Box flex={1} paddingHorizontal="m">
+        <Box
+          justifyContent="center"
+          alignItems="center"
+          marginBottom="m"
+          position="relative"
+        >
+          <Box flexDirection="row" gap="s">
+            <Text variant="smallTitle">Add to list</Text>
+          </Box>
+          <TouchableOpacity
+            onPress={() => {
+              addProductsSheetRef?.current?.close();
+            }}
+            style={{
+              position: 'absolute',
+              right: 5,
+            }}
+          >
+            <Ionicons name="close" size={24} color="black" />
+          </TouchableOpacity>
+        </Box>
+        <Box flexDirection="row" marginVertical="s" alignItems="center" gap="m">
+          <Ionicons name="folder" size={34} color="black" />
+          <Text variant="body" fontWeight="600">
+            {selectedProducts.length} products
+          </Text>
+        </Box>
+        <Box paddingTop="sm" gap="s">
+          <Box
+            height={150}
+            width={150}
+            justifyContent="center"
+            alignItems="center"
+            backgroundColor="gray6"
+          >
+            <TouchableOpacity>
+              <Ionicons name="add" size={40} color="#8E8E93" />
+            </TouchableOpacity>
+          </Box>
+          <Text>New list...</Text>
+        </Box>
+        <Box paddingTop="xl" flex={1}>
+          <Text variant="smallTitle" paddingBottom="m">
+            My Lists
+          </Text>
+          <FlatList
+            data={plists}
+            keyExtractor={(item) => item}
+            contentContainerStyle={{ gap: 10, paddingBottom: 32 }}
+            renderItem={({ item }) => (
+              <AddToListButton label={item} item={item} isSelected={false} />
+            )}
+            showsVerticalScrollIndicator={false}
+          />
+        </Box>
+      </Box>
+    </BottomSheetModal>
+  );
 }

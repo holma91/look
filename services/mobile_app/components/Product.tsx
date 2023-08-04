@@ -7,7 +7,6 @@ import { HoldItem } from 'react-native-hold-menu';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { FilterType, UserProduct } from '../utils/types';
-import { useLikeMutation } from '../hooks/useLikeMutation';
 import { useDeleteProductMutation } from '../hooks/useDeleteProductMutation';
 import { useLikeProductMutation } from '../hooks/useLikeProductMutation';
 
@@ -162,6 +161,7 @@ export function ProductBig({
     </TouchableOpacity>
   );
 }
+
 export function ProductSmall({
   product,
   height,
