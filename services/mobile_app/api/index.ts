@@ -160,30 +160,8 @@ export const addProductImages = async (
   return response.json();
 };
 
-export const likeProduct = async (userId: string, productUrl: string) => {
-  const response = await fetch(`${URL}/users/${userId}/likes`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ productUrl }),
-  });
-  return response;
-};
-
-export const unlikeProduct = async (userId: string, productUrl: string) => {
-  const response = await fetch(`${URL}/users/${userId}/likes`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ productUrl }),
-  });
-  return response;
-};
-
 export const likeProducts = async (userId: string, products: UserProduct[]) => {
-  const response = await fetch(`${URL}/users/${userId}/likes/batch`, {
+  const response = await fetch(`${URL}/users/${userId}/likes`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -197,7 +175,7 @@ export const unlikeProducts = async (
   userId: string,
   products: UserProduct[]
 ) => {
-  const response = await fetch(`${URL}/users/${userId}/likes/batch`, {
+  const response = await fetch(`${URL}/users/${userId}/likes`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',

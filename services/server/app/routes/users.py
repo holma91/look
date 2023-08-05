@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserBase, UserProduct, ListBase, ListProducts, ListProduct, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
+from app.models.pydantic import UserBase, UserProduct, ListBase, ListProducts, LikeProducts, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
 from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
@@ -98,16 +98,16 @@ async def add_product_image(user_id: str, product_image: ProductImage) -> POSTRe
     return result
 
 @router.post("/{user_id}/likes", status_code=201, response_model=POSTResponse)
-async def add_like(user_id: str, product: LikeProduct) -> POSTResponse:
-    product = await crud.add_like(user_id, product.product_url)
+async def add_likes(user_id: str, products: LikeProducts) -> POSTResponse:
+    product = await crud.like_products(user_id, products)
     if product is None:
         raise HTTPException(status_code=404, detail="User or Product not found!")
 
     return SUCCESSFUL_POST_RESPONSE
 
 @router.delete("/{user_id}/likes", status_code=204)
-async def delete_like(user_id: str, product: LikeProduct):
-    result = await crud.un_like(user_id, product.product_url)
+async def delete_likes(user_id: str, products: LikeProducts):
+    result = await crud.dislike_products(user_id, products)
     if result is None:
         raise HTTPException(status_code=404, detail="User or Product not found!")
 
@@ -149,7 +149,6 @@ async def delete_products_from_p_list(user_id: str, list_id: str, list_products:
         result = await crud.delete_products_from_p_list(user_id, list_products)
     if result is None:
         raise HTTPException(status_code=404, detail="User, List, or Product not found!")
-
 
 
 ### CLERK WEBHOOK ROUTES ###

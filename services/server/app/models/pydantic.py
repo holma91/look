@@ -49,6 +49,9 @@ class ListBase(CustomBaseModel):
 class LikeProduct(CustomBaseModel):
     product_url: str
 
+class LikeProducts(CustomBaseModel):
+    product_urls: Optional[list[str]]
+
 class FavoriteWebsite(CustomBaseModel):
     domain: str
 

@@ -16,7 +16,7 @@ import {
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { Theme } from '../styling/theme';
-import { UserProduct } from '../utils/types';
+import { FilterType, UserProduct } from '../utils/types';
 import { useContext, useRef, useState } from 'react';
 import Animated, {
   useAnimatedStyle,
@@ -107,6 +107,7 @@ export default function Product({
   const imageHeight = useSharedValue(height * 0.6);
 
   const { product }: { product: UserProduct } = route.params;
+  const { filter }: { filter: FilterType } = route.params;
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,
@@ -127,7 +128,7 @@ export default function Product({
     setExpanded(!expanded);
   };
 
-  const likeProductMutation = useLikeProductMutation({ list: ['likes'] });
+  const likeProductMutation = useLikeProductMutation(filter);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -372,13 +373,15 @@ function TextBox({
               ></LegacyButton> */}
               <PrimaryButton
                 label={`Buy on ${product.domain}`}
-                onPress={() =>
+                onPress={() => {
+                  console.log('navigate to ', product.url);
+
                   navigation.navigate('Browser', {
                     url: product.url,
                     product,
                     baseProductUrl: product.url,
-                  })
-                }
+                  });
+                }}
               ></PrimaryButton>
             </Box>
           </Box>

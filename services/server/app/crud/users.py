@@ -1,5 +1,5 @@
 from typing import Optional
-from app.models.pydantic import ProductExtended, ProductImage,ListBase, ListProduct, ListProducts
+from app.models.pydantic import ProductExtended, LikeProducts, ProductImage,ListBase, ListProduct, ListProducts
 from app.db import get_db_connection
 
 async def get_all() -> list[dict]:
@@ -210,24 +210,25 @@ async def get_products(user_id: str, filters: Optional[dict[str, str]] = None):
 
     return products
 
-async def add_like(user_id: str, product_url: str) -> Optional[str]:
-    async with get_db_connection() as conn:
-        query = """
-        update user_product set liked = TRUE where user_id = $1 and product_url = $2;
-        """
-        await conn.execute_query_dict(query, [user_id, product_url])
-
-    return product_url
-
-async def un_like(user_id: str, product_url: str) -> Optional[str]:
+async def dislike_products(user_id: str, products: LikeProducts) -> Optional[str]:
     async with get_db_connection() as conn:
         query = """
         update user_product set liked = FALSE where user_id = $1 and product_url = $2;
         """
+        for product_url in products.product_urls:
+            await conn.execute_query_dict(query, [user_id, product_url])
 
-        await conn.execute_query_dict(query, [user_id, product_url])
+    return products.product_urls
 
-    return product_url
+async def like_products(user_id: str, products: LikeProducts) -> Optional[str]:
+    async with get_db_connection() as conn:
+        query = """
+        update user_product set liked = TRUE where user_id = $1 and product_url = $2;
+        """
+        for product_url in products.product_urls:
+            await conn.execute_query_dict(query, [user_id, product_url])
+
+    return products.product_urls
 
 ### BRAND INFO ###
 

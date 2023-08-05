@@ -93,7 +93,7 @@ export function ProductBig({
       setIsSelected(!isSelected);
       handleProductSelection!(product, !isSelected);
     } else {
-      navigation.navigate('Product', { product: product });
+      navigation.navigate('Product', { product: product, filter: filter });
     }
   };
 

@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import { likeProduct, unlikeProduct } from '../api';
+import { likeProducts, unlikeProducts } from '../api';
 import { FilterType, UserProduct } from '../utils/types';
 
 export const useLikeProductMutation = (filter: FilterType) => {
@@ -10,11 +10,13 @@ export const useLikeProductMutation = (filter: FilterType) => {
   const likeProductMutation = useMutation({
     mutationFn: async (product: UserProduct) => {
       !product.liked
-        ? await unlikeProduct(user!.id, product.url)
-        : await likeProduct(user!.id, product.url);
+        ? await unlikeProducts(user!.id, [product])
+        : await likeProducts(user!.id, [product]);
       return product;
     },
     onMutate: async (product: UserProduct) => {
+      console.log('product', product);
+
       await queryClient.cancelQueries(['products', user?.id, filter]);
       const previousProducts = queryClient.getQueryData([
         'products',

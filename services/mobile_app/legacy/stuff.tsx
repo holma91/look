@@ -215,3 +215,25 @@ const handleTestOnModel = async () => {
   setIsGenerating(false);
   setHasGenerated(true);
 };
+
+export const likeProduct = async (userId: string, productUrl: string) => {
+  const response = await fetch(`${URL}/users/${userId}/likes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ productUrl }),
+  });
+  return response;
+};
+
+export const unlikeProduct = async (userId: string, productUrl: string) => {
+  const response = await fetch(`${URL}/users/${userId}/likes`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ productUrl }),
+  });
+  return response;
+};
