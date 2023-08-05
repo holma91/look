@@ -182,6 +182,31 @@ export const unlikeProduct = async (userId: string, productUrl: string) => {
   return response;
 };
 
+export const likeProducts = async (userId: string, products: UserProduct[]) => {
+  const response = await fetch(`${URL}/users/${userId}/likes/batch`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ productUrls: products.map((p) => p.url) }),
+  });
+  return response;
+};
+
+export const unlikeProducts = async (
+  userId: string,
+  products: UserProduct[]
+) => {
+  const response = await fetch(`${URL}/users/${userId}/likes/batch`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ productUrls: products.map((p) => p.url) }),
+  });
+  return response;
+};
+
 /*** P LIST STUFF ***/
 export const createPlist = async (
   userId: string,

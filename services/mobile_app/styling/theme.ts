@@ -1,4 +1,14 @@
+import { Platform, PlatformColor } from 'react-native';
 import { createTheme } from '@shopify/restyle';
+
+const ios = {
+  gray: '#8E8E93',
+  gray2: '#AEAEB2',
+  gray3: '#C7C7CC',
+  gray4: '#D1D1D6',
+  gray5: '#E5E5EA',
+  gray6: '#F2F2F7',
+};
 
 const palette = {
   purple: '#5A31F4',
@@ -8,12 +18,12 @@ const palette = {
   grey: '#DDDFE9',
   darkGrey: '#A4A6B3',
   lightGrey: '#fafafa',
-  iosGray: '#8E8E93',
-  iosGray2: '#AEAEB2',
-  iosGray3: '#C7C7CC',
-  iosGray4: '#D1D1D6',
-  iosGray5: '#E5E5EA',
-  iosGray6: '#F2F2F7',
+  iosGray: ios['gray'],
+  iosGray2: ios['gray2'],
+  iosGray3: ios['gray3'],
+  iosGray4: ios['gray4'],
+  iosGray5: ios['gray5'],
+  iosGray6: ios['gray6'],
 };
 
 export const theme = createTheme({

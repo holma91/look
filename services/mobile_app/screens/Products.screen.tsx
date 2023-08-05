@@ -3,6 +3,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
+  PlatformColor,
+  Platform,
 } from 'react-native';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
@@ -30,6 +32,9 @@ import { ProductBig } from '../components/Product';
 import { PasteLinkSheet } from '../components/PasteLinkSheet';
 import { AddToListButton, PrimaryButton } from '../components/Button';
 import { useDeleteProductsMutation } from '../hooks/useDeleteProductsMutation';
+import { useAddProductsMutation } from '../hooks/useAddProductsMutation';
+import { useLikeProductMutation } from '../hooks/useLikeProductMutation';
+import { useLikeProductsMutation } from '../hooks/useLikeProductsMutation';
 
 type ProductsProps = {
   navigation: any;
@@ -373,6 +378,7 @@ function Footer({
   const { showActionSheetWithOptions } = useActionSheet();
   const addProductsSheetRef = useRef<BottomSheetModal>(null);
   const deleteProductsMutation = useDeleteProductsMutation(filter);
+  const likeProductsMutation = useLikeProductsMutation(filter);
 
   const listId = filter?.list && filter.list[0];
 
@@ -381,7 +387,10 @@ function Footer({
   };
 
   const handleDeleteProducts = () => {
-    const options = [`Delete from ${listId}`, 'Cancel'];
+    const options = [
+      listId === 'likes' ? 'Unlike products' : `Delete from ${listId}`,
+      'Cancel',
+    ];
     const destructiveButtonIndex = 0;
     const cancelButtonIndex = 1;
     const message = 'Are you sure you want to delete these products?';
@@ -399,7 +408,14 @@ function Footer({
             // Save
             break;
           case destructiveButtonIndex:
-            deleteProductsMutation.mutate(selectedProducts);
+            if (listId === 'likes') {
+              likeProductsMutation.mutate({
+                products: selectedProducts,
+                like: false,
+              });
+            } else {
+              deleteProductsMutation.mutate(selectedProducts);
+            }
             resetSelection();
             break;
           case cancelButtonIndex:
@@ -435,7 +451,11 @@ function Footer({
           </Text>
           <Box flexDirection="row" gap="m" position="absolute" right={20}>
             <TouchableOpacity onPress={handleDeleteProducts}>
-              <Ionicons name="trash-outline" size={24} color="black" />
+              <Ionicons
+                name={listId === 'likes' ? 'heart' : 'trash-outline'}
+                size={24}
+                color="black"
+              />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleAddProducts}>
               <Ionicons name="albums-outline" size={24} color="black" />
@@ -478,6 +498,9 @@ function AddProductsSheet({
 
   const { user } = useUser();
 
+  const addProductsMutation = useAddProductsMutation();
+  const likeProductsMutation = useLikeProductsMutation(filter);
+
   const listId = filter?.list && filter.list[0];
 
   const { data: plists } = useQuery<string[]>({
@@ -490,13 +513,13 @@ function AddProductsSheet({
 
   const handleAddToList = async (listId: string) => {
     console.log('add to list', listId);
-    // add to the list
-    await addToPlist(user!.id, listId, selectedProducts);
-    // close sheet
+    if (listId === 'likes') {
+      likeProductsMutation.mutate({ products: selectedProducts, like: true });
+    } else {
+      addProductsMutation.mutate({ products: selectedProducts, listId });
+    }
     addProductsSheetRef?.current?.close();
-    // change filter to view the new list
     handleFilterSelection('list', listId);
-    // stop selecting
     resetSelection();
   };
 
@@ -561,7 +584,7 @@ function AddProductsSheet({
             My Lists
           </Text>
           <FlatList
-            data={plists}
+            data={['likes'].concat(plists ?? [])}
             keyExtractor={(item) => item}
             contentContainerStyle={{ gap: 10, paddingBottom: 32 }}
             renderItem={({ item }) => (

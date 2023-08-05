@@ -21,11 +21,20 @@ deploy private beta
 ### TODO rn
 
 - make it possible to delete from lists ; check
-- make it possible to bulk delete from lists
-  - action sheet stuff
+- make it possible to bulk delete from lists ; check
+  - action sheet stuff ; check
 - make it possible to add to lists
+  - make it possible to add single product to list
   - do add sheet design and implement
 - https://gorhom.github.io/react-native-bottom-sheet/react-navigation-integration for nav in sheet
+- get codebase in great shape -> then do more sd stuff
+
+what's needed to get the codebase into good shape?
+
+- switch current hold-menu to zeego
+- make all mutations perfect
+- do necessary db changes
+- add more error handling to the API
 
 ## research todos
 

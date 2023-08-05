@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler'; // might need to do more than this on android
-import React, { ReactNode, useState } from 'react';
-import { LogBox, SafeAreaView } from 'react-native';
+import React from 'react';
+import { LogBox } from 'react-native';
 import { ThemeProvider } from '@shopify/restyle';
 import { ClerkProvider } from '@clerk/clerk-expo';
 import Constants from 'expo-constants';
@@ -11,7 +11,7 @@ import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { theme } from './styling/theme';
 import { tokenCache } from './utils/tokenCache';
 import Navigation from './navigation';
-import { TrainingContext, TrainingProvider } from './context/Training';
+import { TrainingProvider } from './context/Training';
 import { DemoProvider } from './context/Demo';
 import { DarkModeProvider } from './context/DarkMode';
 

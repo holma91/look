@@ -34,7 +34,7 @@ import { WebviewSearchBar } from '../components/SearchBar';
 import { TrainingContext } from '../context/Training';
 import SearchList from '../components/SearchList';
 import { saveHistory } from '../utils/history';
-import { useLikeMutation } from '../hooks/useLikeMutation';
+import { useLikeProductMutation } from '../hooks/useLikeProductMutation';
 import { PrimaryButton } from '../components/Button';
 
 function getDomain(url: string) {
@@ -139,7 +139,7 @@ export default function Browser({
   };
 
   const { data: products, refetch: refetchProducts } = useQuery({
-    queryKey: ['products', user?.id],
+    queryKey: ['products', user?.id, { list: ['history'] }],
     queryFn: () => fetchProducts(user?.id as string, { list: ['history'] }),
     enabled: !!user?.id,
   });
@@ -213,7 +213,7 @@ function NavBar({
   setCurrentProduct,
   products,
 }: NavBarProps) {
-  const likeMutation = useLikeMutation();
+  const likeProductMutation = useLikeProductMutation({ list: ['history'] });
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -282,7 +282,8 @@ function NavBar({
 
               if (activeProduct) {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                likeMutation.mutate(activeProduct);
+                // likeMutation.mutate(activeProduct);
+                likeProductMutation.mutate(activeProduct);
               }
             }}
           >

@@ -1,20 +1,24 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import { likeProduct, unlikeProduct } from '../api';
+import { likeProducts, unlikeProducts } from '../api';
 import { FilterType, UserProduct } from '../utils/types';
 
-export const useLikeProductMutation = (filter: FilterType) => {
+type LikeProductsMutationProps = { products: UserProduct[]; like: boolean };
+
+export const useLikeProductsMutation = (filter: FilterType) => {
   const { user } = useUser();
   const queryClient = useQueryClient();
 
-  const likeProductMutation = useMutation({
-    mutationFn: async (product: UserProduct) => {
-      !product.liked
-        ? await unlikeProduct(user!.id, product.url)
-        : await likeProduct(user!.id, product.url);
-      return product;
+  const likeProductsMutation = useMutation({
+    mutationFn: async ({ products, like }: LikeProductsMutationProps) => {
+      if (like) {
+        await likeProducts(user!.id, products);
+      } else {
+        await unlikeProducts(user!.id, products);
+      }
+      return products;
     },
-    onMutate: async (product: UserProduct) => {
+    onMutate: async ({ products, like }: LikeProductsMutationProps) => {
       await queryClient.cancelQueries(['products', user?.id, filter]);
       const previousProducts = queryClient.getQueryData([
         'products',
@@ -23,12 +27,13 @@ export const useLikeProductMutation = (filter: FilterType) => {
       ]);
 
       // optimistically update the cache
+      const productUrls = products.map((p) => p.url);
       queryClient.setQueryData(
         ['products', user?.id, filter],
         (old: UserProduct[] | undefined) => {
           return old?.map((p) => {
-            if (p.url === product.url) {
-              p.liked = !p.liked;
+            if (productUrls.includes(p.url)) {
+              p.liked = like;
             }
             return p;
           });
@@ -37,8 +42,8 @@ export const useLikeProductMutation = (filter: FilterType) => {
 
       return { previousProducts };
     },
-    onError: (err, product, context) => {
-      console.log('error', err, product, context);
+    onError: (err, { products, like }, context) => {
+      console.log('error', err, products, context);
       queryClient.setQueryData(
         ['products', user?.id, filter],
         context?.previousProducts
@@ -56,5 +61,5 @@ export const useLikeProductMutation = (filter: FilterType) => {
     },
   });
 
-  return likeProductMutation;
+  return likeProductsMutation;
 };

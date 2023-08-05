@@ -25,10 +25,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { TrainingContext } from '../context/Training';
 import { DemoContext } from '../context/Demo';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { likeProduct, unlikeProduct } from '../api';
-import { useUser } from '@clerk/clerk-expo';
-import { useLikeMutation } from '../hooks/useLikeMutation';
+import { useLikeProductMutation } from '../hooks/useLikeProductMutation';
 import { PrimaryButton } from '../components/Button';
 
 const { width, height } = Dimensions.get('window');
@@ -130,7 +127,7 @@ export default function Product({
     setExpanded(!expanded);
   };
 
-  const likeMutation = useLikeMutation();
+  const likeProductMutation = useLikeProductMutation({ list: ['likes'] });
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -161,7 +158,8 @@ export default function Product({
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                likeMutation.mutate(product);
+                // likeMutation.mutate(product);
+                likeProductMutation.mutate(product);
               }}
               style={{
                 position: 'absolute',
