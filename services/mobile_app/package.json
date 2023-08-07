@@ -23,6 +23,7 @@
     "dotenv": "^16.3.1",
     "expo": "~48.0.18",
     "expo-blur": "~12.2.2",
+    "expo-dev-client": "~2.2.1",
     "expo-haptics": "~12.2.1",
     "expo-image": "~1.0.1",
     "expo-image-picker": "~14.1.1",
@@ -40,6 +41,7 @@
     "react-native-screens": "~3.20.0",
     "react-native-svg": "13.4.0",
     "react-native-webview": "11.26.0",
+    "replicate": "^0.14.1",
     "typescript": "^4.9.4"
   },
   "devDependencies": {

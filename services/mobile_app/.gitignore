@@ -21,3 +21,8 @@ web-build/
 assets/products
 assets/models
 assets/generations/demo
+
+
+### native builds
+ios
+android

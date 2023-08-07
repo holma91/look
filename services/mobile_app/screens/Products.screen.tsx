@@ -3,11 +3,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
-  PlatformColor,
-  Platform,
 } from 'react-native';
-import { UseQueryResult, useQuery } from '@tanstack/react-query';
-import { Image as ExpoImage } from 'expo-image';
+import { useQuery } from '@tanstack/react-query';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import { useEffect, useState } from 'react';
@@ -22,7 +19,7 @@ import { HoldItem } from 'react-native-hold-menu';
 import { FlashList } from '@shopify/flash-list';
 import { useActionSheet } from '@expo/react-native-action-sheet';
 
-import { addToPlist, fetchPlists, fetchProducts } from '../api';
+import { fetchPlists, fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { FilterType, OuterChoiceFilterType, UserProduct } from '../utils/types';
@@ -33,7 +30,6 @@ import { PasteLinkSheet } from '../components/PasteLinkSheet';
 import { AddToListButton, PrimaryButton } from '../components/Button';
 import { useDeleteProductsMutation } from '../hooks/useDeleteProductsMutation';
 import { useAddProductsMutation } from '../hooks/useAddProductsMutation';
-import { useLikeProductMutation } from '../hooks/useLikeProductMutation';
 import { useLikeProductsMutation } from '../hooks/useLikeProductsMutation';
 
 type ProductsProps = {
@@ -253,12 +249,6 @@ function Header({
         console.log('set select mode');
         setSelectMode((prev) => !prev);
       },
-    },
-    {
-      text: 'Delete',
-      icon: () => <Ionicons name="remove" size={18} />,
-      isDestructive: true,
-      onPress: () => {},
     },
   ];
 
@@ -523,6 +513,11 @@ function AddProductsSheet({
     resetSelection();
   };
 
+  const handleCreateAndAddToList = async () => {
+    console.log('create and add to list');
+    // just go to new list sheet
+  };
+
   return (
     <BottomSheetModal
       ref={addProductsSheetRef}
@@ -573,7 +568,7 @@ function AddProductsSheet({
             alignItems="center"
             backgroundColor="gray6"
           >
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleCreateAndAddToList}>
               <Ionicons name="add" size={40} color="#8E8E93" />
             </TouchableOpacity>
           </Box>

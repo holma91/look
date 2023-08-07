@@ -335,6 +335,3 @@ const knownDomains = [
   'farfetch.com',
   'mytheresa.com',
 ];
-
-const defaultImage =
-  'https://i0.wp.com/roadmap-tech.com/wp-content/uploads/2019/04/placeholder-image.jpg?resize=400%2C400&ssl=1';

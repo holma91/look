@@ -31,6 +31,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   extra: {
     clerkApiKey: process.env.CLERK_PUBLISHABLE_KEY,
+    replicateApiKey: process.env.REPLICATE_API_TOKEN,
+    eas: {
+      projectId: '8b699122-7a5d-4951-b108-046ab0b92a44',
+    },
   },
   scheme: 'look', // don't really know what this does
 });

@@ -1,0 +1,18 @@
+{
+  "created_at": "2023-08-07T07:12:48.587433Z",
+  "error": null,
+  "id": "l3hwoabbj2xb73kbnalbcjn44q",
+  "input": {
+    "class_prompt": "a photo of a person",
+    "instance_data": "https://replicate.delivery/pbxt/JJ7VltK8fjbtUEb3RhKXqueAnPR5bg4PotaL6kZYnuYrQ6ip/data.zip",
+    "instance_prompt": "a photo of a cjw person",
+    "max_train_steps": 2000
+  },
+  "logs": null,
+  "metrics": {},
+  "model": "holma91/dbtest",
+  "notes": null,
+  "status": "queued",
+  "webhook_completed": "https://example.com/dreambooth-webhook",
+  "version": null
+}
