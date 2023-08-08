@@ -8,14 +8,8 @@
 
 ### todo now
 
-1. just generate an image with sd
-   write prompt in the UI, click generate
-   use custom model on replicate
+Do grounding sam stuff. The following should be possible:
 
-2. figure out how to get masks
-   what does a mask image look like?
-   first play with roboflow
-
-3. start playing with SDXL
-   watch all videos we missed
-   do stuff
+1. generate bounding box with DINO
+2. generate mask with SAM
+3. inpaint with SD

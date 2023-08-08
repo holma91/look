@@ -24,6 +24,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { capitalizeFirstLetter } from '../utils/helpers';
 import { NewListSheet } from './NewListSheet';
+import { useTheme } from '@shopify/restyle';
 
 type SheetModalProps = {
   filterSheetModalRef: React.RefObject<BottomSheetModal>;
@@ -55,6 +56,7 @@ export default function SheetModal({
   sheetNavStack,
   setSheetNavStack,
 }: SheetModalProps) {
+  const theme = useTheme();
   const snapPoints = useMemo(() => ['65%'], []);
 
   return (
@@ -69,7 +71,10 @@ export default function SheetModal({
             disappearsOnIndex={-1}
           />
         )}
-        handleIndicatorStyle={{ backgroundColor: 'white' }}
+        backgroundStyle={{
+          backgroundColor: theme.colors.background,
+        }}
+        handleIndicatorStyle={{ backgroundColor: theme.colors.background }}
         onDismiss={() => {
           console.log('dismissed');
           setSheetNavStack([]);
@@ -181,6 +186,7 @@ function FilterSheet({
   setSheetNavStack,
   newListSheetModalRef,
 }: FilterSheetProps) {
+  const theme = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const relevantChoices = choices[outerChoice];
 
@@ -251,7 +257,7 @@ function FilterSheet({
               />
             )}
             keyExtractor={(item) => item}
-            contentContainerStyle={{ backgroundColor: 'white' }}
+            contentContainerStyle={{ backgroundColor: theme.colors.background }}
             style={{ paddingHorizontal: 10 }}
             showsVerticalScrollIndicator={false}
           />
@@ -269,7 +275,7 @@ function FilterSheet({
             />
           )}
           keyExtractor={(item) => item}
-          contentContainerStyle={{ backgroundColor: 'white' }}
+          contentContainerStyle={{ backgroundColor: theme.colors.background }}
           style={{ paddingHorizontal: 10 }}
           showsVerticalScrollIndicator={false}
         />

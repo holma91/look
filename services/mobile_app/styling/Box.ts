@@ -1,5 +1,7 @@
 import {
   ActivityIndicator,
+  ScrollView,
+  ScrollViewProps,
   TouchableOpacity,
   TouchableOpacityProps,
 } from 'react-native';
@@ -12,3 +14,5 @@ export const Box = createBox<Theme>();
 export const BaseButton = createBox<Theme, TouchableOpacityProps>(
   TouchableOpacity
 );
+
+export const ScrollBox = createBox<Theme, ScrollViewProps>(ScrollView);

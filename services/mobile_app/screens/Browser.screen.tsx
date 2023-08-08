@@ -38,6 +38,7 @@ import { PrimaryButton } from '../components/Button';
 import ThemedIcon from '../components/ThemedIcon';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../styling/theme';
+import { HoldItem } from 'react-native-hold-menu';
 
 function getDomain(url: string) {
   let domain;
@@ -227,6 +228,24 @@ function NavBar({
     bottomSheetModalRef.current?.dismiss();
   }, []);
 
+  const MenuList = [
+    {
+      text: 'Add to list',
+      icon: () => <ThemedIcon name="add" size={18} />,
+      onPress: () => {
+        console.log('new list!');
+      },
+    },
+    {
+      text: 'Select mode',
+      icon: () => <ThemedIcon name="checkmark" size={18} />,
+      onPress: () => {
+        // toggle something that changes the screen to select mode
+        console.log('set select mode');
+      },
+    },
+  ];
+
   let icon: 'heart' | 'heart-outline' = products?.find(
     (product) => product.url === currentProduct?.url && product.liked
   )
@@ -291,11 +310,19 @@ function NavBar({
           >
             <ThemedIcon name={icon} size={24} color="text" />
           </TouchableOpacity>
-          <ThemedIcon
+          <HoldItem
+            items={MenuList}
+            activateOn="tap"
+            menuAnchorPosition="bottom-right"
+            // menuAnchorPosition="top-right"
+          >
+            <ThemedIcon name="ellipsis-horizontal" size={24} />
+          </HoldItem>
+          {/* <ThemedIcon
             name="md-ellipsis-horizontal-sharp"
             size={24}
             color="text"
-          />
+          /> */}
         </Box>
       </Box>
       <BottomSheet
@@ -359,6 +386,9 @@ const BottomSheet = ({
           disappearsOnIndex={-1}
         />
       )}
+      handleIndicatorStyle={{
+        backgroundColor: theme.colors.text,
+      }}
     >
       <BottomSheetContent
         currentProduct={currentProduct}
@@ -583,7 +613,7 @@ const BottomSheetContent = ({
             </Box>
           </Box>
         </Box>
-        <PrimaryButton label="Test on model" onPress={() => {}} />
+        <PrimaryButton label="Test on model" onPress={handleTestOnModel} />
       </Box>
     );
   }

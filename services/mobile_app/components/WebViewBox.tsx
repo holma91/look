@@ -28,6 +28,27 @@ export function WebViewBox({
   const { user } = useUser();
   const queryClient = useQueryClient();
 
+  const parseData = (data: any) => {};
+
+  const handle = async (event: any) => {
+    const data = JSON.parse(event.nativeEvent.data);
+    const url = event.nativeEvent.url;
+
+    if (data.type === 'product') {
+      const product = parseProductData(
+        event.nativeEvent.url,
+        event.nativeEvent.data
+      );
+      console.log('product', product);
+    } else if (data.type === 'imageByClick') {
+      console.log('imageByClick', data.data);
+    } else if (data.type === 'imageBySrc') {
+      console.log('imageBySrc', data.data);
+    } else {
+      console.log('unknown message type:', data.type, data.data);
+    }
+  };
+
   const handleMessage = async (event: any) => {
     if (!user?.id) return;
 
@@ -71,6 +92,7 @@ export function WebViewBox({
         }
       }
     } else if (parsedData.type === 'no product') {
+      // need to be more careful here.
       if (currentProduct.url !== '') {
         setCurrentProduct({
           url: '',
@@ -97,7 +119,7 @@ export function WebViewBox({
         uri: url,
       }}
       onLoadEnd={handleLoadEnd}
-      onMessage={handleMessage}
+      onMessage={handle}
       mediaPlaybackRequiresUserAction={true}
     />
   );

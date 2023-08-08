@@ -1,8 +1,9 @@
 import { TouchableOpacity, Keyboard } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Box } from '../styling/Box';
 import { TextInput } from '../styling/TextInput';
+import ThemedIcon from './ThemedIcon';
+import { useTheme } from '@shopify/restyle';
 
 function SearchBar({
   searchText,
@@ -17,6 +18,7 @@ function SearchBar({
   setFocus: React.Dispatch<React.SetStateAction<boolean>>;
   focus: boolean;
 }) {
+  const theme = useTheme();
   // Function to navigate to the SearchScreen
 
   return (
@@ -30,7 +32,7 @@ function SearchBar({
     >
       <Box
         flex={1}
-        backgroundColor="grey"
+        backgroundColor="searchBackground"
         borderRadius={10}
         flexDirection="row"
         alignItems="center"
@@ -50,35 +52,37 @@ function SearchBar({
           variant="secondary"
           selectTextOnFocus={true}
           placeholder="Search and shop anywhere"
-          placeholderTextColor="black"
+          placeholderTextColor={theme.colors.searchText}
         />
-        <Ionicons
+        <ThemedIcon
           name="search"
           size={18}
-          color="black"
+          color="searchText"
           style={{ position: 'absolute', left: 15 }}
         />
       </Box>
       {focus ? (
-        <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs">
+        <Box
+          flex={0}
+          backgroundColor="searchBackground"
+          borderRadius={10}
+          padding="xs"
+        >
           <TouchableOpacity
             onPress={() => {
               setFocus(false);
               Keyboard.dismiss();
             }}
           >
-            <Ionicons name="close" flex={0} size={24} color="black" />
+            <ThemedIcon
+              name="close"
+              size={24}
+              color="searchText"
+              style={{ flex: 0 }}
+            />
           </TouchableOpacity>
         </Box>
-      ) : null
-      // <Ionicons
-      //   name="ellipsis-vertical"
-      //   flex={0}
-      //   size={26}
-      //   color="black"
-      //   onPress={() => {}}
-      // />
-      }
+      ) : null}
     </Box>
   );
 }
@@ -100,7 +104,7 @@ function WebviewSearchBar({
   setFocus: React.Dispatch<React.SetStateAction<boolean>>;
   focus: boolean;
 }) {
-  // Function to navigate to the SearchScreen
+  const theme = useTheme();
 
   return (
     <Box
@@ -113,7 +117,7 @@ function WebviewSearchBar({
     >
       <Box
         flex={1}
-        backgroundColor="grey"
+        backgroundColor="searchBackground"
         borderRadius={10}
         flexDirection="row"
         alignItems="center"
@@ -133,12 +137,12 @@ function WebviewSearchBar({
           variant="secondary"
           selectTextOnFocus={true}
           placeholder="Search and shop anywhere"
-          placeholderTextColor="black"
+          placeholderTextColor={theme.colors.searchText}
         />
-        <Ionicons
+        <ThemedIcon
           name="search"
           size={18}
-          color="black"
+          color="searchText"
           style={{ position: 'absolute', left: 15 }}
         />
 
@@ -146,32 +150,55 @@ function WebviewSearchBar({
           onPress={() => webviewNavigation('reload')}
           style={{ position: 'absolute', right: 12 }}
         >
-          <Ionicons name="refresh" flex={0} size={18} color="black" />
+          <ThemedIcon
+            name="refresh"
+            size={18}
+            color="searchText"
+            style={{ flex: 0 }}
+          />
         </TouchableOpacity>
       </Box>
 
       {focus ? (
-        <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs">
+        <Box
+          flex={0}
+          backgroundColor="searchBackground"
+          borderRadius={10}
+          padding="xs"
+        >
           <TouchableOpacity
             onPress={() => {
               setFocus(false);
               Keyboard.dismiss();
             }}
           >
-            <Ionicons name="close" flex={0} size={24} color="black" />
+            <ThemedIcon
+              name="close"
+              size={24}
+              color="searchText"
+              style={{ flex: 0 }}
+            />
           </TouchableOpacity>
         </Box>
       ) : (
-        <Box flex={0} backgroundColor="grey" borderRadius={10} padding="xs">
-          <Ionicons
-            name="close"
-            flex={0}
-            size={24}
-            color="black"
+        <Box
+          flex={0}
+          backgroundColor="searchBackground"
+          borderRadius={10}
+          padding="xs"
+        >
+          <TouchableOpacity
             onPress={() => {
               navigation.goBack();
             }}
-          />
+          >
+            <ThemedIcon
+              name="close"
+              size={24}
+              color="searchText"
+              style={{ flex: 0 }}
+            />
+          </TouchableOpacity>
         </Box>
       )}
     </Box>

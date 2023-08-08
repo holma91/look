@@ -1,0 +1,27 @@
+### INJECT
+
+We have the url. Inject different scripts depending on: domain.
+
+user goes to lululemon/1 -> scripts get inserted
+user goes to lululemon/2 -> scripts get inserted
+
+urls are now different.
+if productData is different -> sendMessage with productData
+                       else -> try again ~5 times
+
+### RECEIVE
+Can receive 3 types of messages: productData, imageByClick, imageByScript
+
+when receiving productData:
+                          1. parse it depending on the url
+when receiving imageByClick:
+                          1. make sure that the productUrl is in the database
+                          2. parse the imageSrc depending on the url
+                          2. insert into database
+                          3. update UI state to show the clicked image in the sheet
+when receiving imageByScript:
+                          1. make sure that the productUrl is in the database
+                          2. log them
+
+
+### SAVE

@@ -31,6 +31,7 @@ import { useDeleteProductsMutation } from '../hooks/useDeleteProductsMutation';
 import { useAddProductsMutation } from '../hooks/useAddProductsMutation';
 import { useLikeProductsMutation } from '../hooks/useLikeProductsMutation';
 import ThemedIcon from '../components/ThemedIcon';
+import { useTheme } from '@shopify/restyle';
 
 type ProductsProps = {
   navigation: any;
@@ -480,6 +481,7 @@ function AddProductsSheet({
   const snapPoints = useMemo(() => ['85%'], []);
 
   const { user } = useUser();
+  const theme = useTheme();
 
   const addProductsMutation = useAddProductsMutation();
   const likeProductsMutation = useLikeProductsMutation(filter);
@@ -516,7 +518,10 @@ function AddProductsSheet({
       ref={addProductsSheetRef}
       index={0}
       snapPoints={snapPoints}
-      handleIndicatorStyle={{ backgroundColor: 'white' }}
+      handleIndicatorStyle={{ backgroundColor: theme.colors.background }}
+      backgroundStyle={{
+        backgroundColor: theme.colors.background,
+      }}
       backdropComponent={(props) => (
         <BottomSheetBackdrop
           {...props}
