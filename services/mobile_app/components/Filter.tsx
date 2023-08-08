@@ -25,6 +25,8 @@ import { useQuery } from '@tanstack/react-query';
 import { FilterType, OuterChoiceFilterType } from '../utils/types';
 import { fetchBrands, fetchCompanies, fetchPlists } from '../api';
 import { Website } from '../utils/types';
+import ThemedIcon from './ThemedIcon';
+import { useTheme } from '@shopify/restyle';
 
 const possibleFilters: {
   label: 'all' | 'list' | 'category' | 'website' | 'brand';
@@ -73,6 +75,7 @@ export default function Filter({
   outerChoice,
   setOuterChoice,
 }: FilterProps) {
+  const theme = useTheme();
   const { user } = useUser();
 
   const { data: companies } = useQuery<string[]>({
@@ -142,17 +145,22 @@ export default function Filter({
                 borderRadius: 10,
                 padding: 8,
                 paddingHorizontal: 10,
-                backgroundColor: '#ededed',
+                backgroundColor: theme.colors.lightBackground, // '#ededed',
               }}
             >
-              <Text variant="body" fontWeight="600" fontSize={13} color="text">
+              <Text
+                variant="body"
+                fontWeight="600"
+                fontSize={13}
+                color="textOnLightBackground"
+              >
                 {item.label}
               </Text>
-              <Ionicons
+              <ThemedIcon
                 name="chevron-down"
                 size={15}
-                color="black"
-                paddingTop={1}
+                style={{ paddingTop: 1 }}
+                color="textOnLightBackground"
               />
             </TouchableOpacity>
           )}

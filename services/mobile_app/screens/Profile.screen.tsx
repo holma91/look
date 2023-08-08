@@ -31,6 +31,8 @@ export default function Profile() {
     },
   ];
 
+  console.log('isDarkMode', isDarkMode);
+
   const handleClearCache = async () => {
     try {
       await clearHistory();
@@ -62,8 +64,6 @@ export default function Profile() {
                   key={toggle.title}
                   alignItems="center"
                   justifyContent="space-between"
-                  // borderBottomWidth={1}
-                  // borderBottomColor="grey"
                 >
                   <Box paddingBottom="s" gap="xs">
                     <Text variant="smallTitle">{toggle.title}</Text>

@@ -18,7 +18,6 @@ import * as Haptics from 'expo-haptics';
 
 import { useQuery } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
@@ -36,6 +35,9 @@ import SearchList from '../components/SearchList';
 import { saveHistory } from '../utils/history';
 import { useLikeProductMutation } from '../hooks/useLikeProductMutation';
 import { PrimaryButton } from '../components/Button';
+import ThemedIcon from '../components/ThemedIcon';
+import { useTheme } from '@shopify/restyle';
+import { Theme } from '../styling/theme';
 
 function getDomain(url: string) {
   let domain;
@@ -248,10 +250,10 @@ function NavBar({
       >
         <Box flex={0} flexDirection="row" gap="m" alignItems="center">
           <TouchableOpacity onPress={() => navigate('back')}>
-            <Ionicons name="arrow-back" size={28} color="black" />
+            <ThemedIcon name="arrow-back" size={28} color="text" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigate('forward')}>
-            <Ionicons name="arrow-forward" size={28} color="black" />
+            <ThemedIcon name="arrow-forward" size={28} color="text" />
           </TouchableOpacity>
         </Box>
         <Box flex={0} flexDirection="row" alignItems="center">
@@ -262,7 +264,7 @@ function NavBar({
                 handleDismissModalPress();
               }}
             >
-              <Ionicons name="close-circle" size={26} color="black" />
+              <ThemedIcon name="close-circle" size={26} color="text" />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -271,7 +273,7 @@ function NavBar({
                 handlePresentModalPress();
               }}
             >
-              <Ionicons name="arrow-up-circle" size={26} color="black" />
+              <ThemedIcon name="arrow-up-circle" size={26} color="text" />
             </TouchableOpacity>
           )}
         </Box>
@@ -287,12 +289,12 @@ function NavBar({
               }
             }}
           >
-            <Ionicons name={icon} size={24} color="black" />
+            <ThemedIcon name={icon} size={24} color="text" />
           </TouchableOpacity>
-          <Ionicons
+          <ThemedIcon
             name="md-ellipsis-horizontal-sharp"
             size={24}
-            color="black"
+            color="text"
           />
         </Box>
       </Box>
@@ -322,6 +324,7 @@ const BottomSheet = ({
   setCurrentProduct,
   products,
 }: BottomSheetModalProps) => {
+  const theme = useTheme<Theme>();
   const [expandedContent, setExpandedContent] = useState(false);
   const snapPoints = useMemo(() => ['46%', '100%'], []);
 
@@ -342,7 +345,9 @@ const BottomSheet = ({
   return (
     <BottomSheetModal
       style={{}}
-      backgroundStyle={{}}
+      backgroundStyle={{
+        backgroundColor: theme.colors.background,
+      }}
       ref={bottomSheetModalRef}
       index={0}
       snapPoints={snapPoints}
@@ -378,6 +383,7 @@ const BottomSheetContent = ({
   expandedContent,
   products,
 }: BottomSheetContentProps) => {
+  const theme = useTheme<Theme>();
   const { activeModel, setActiveModel } = useContext(TrainingContext);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
@@ -439,6 +445,7 @@ const BottomSheetContent = ({
         justifyContent="space-between"
         gap="m"
         flex={1}
+        backgroundColor="background"
       >
         <Box flex={1} borderWidth={0}>
           <ExpoImage
@@ -501,7 +508,7 @@ const BottomSheetContent = ({
                 }}
                 onPress={() => handleRemoveImage(img)}
               >
-                <Ionicons name="close" size={20} color="white" />
+                <ThemedIcon name="close" size={20} color="background" />
               </TouchableOpacity>
             ) : null}
           </Box>
@@ -549,6 +556,7 @@ const BottomSheetContent = ({
                           height: 60,
                           width: 60,
                           borderWidth: item === img ? 2 : 0,
+                          borderColor: theme.colors.text,
                         }}
                         source={item}
                         contentFit="cover"

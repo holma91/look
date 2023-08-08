@@ -5,7 +5,6 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import { useEffect, useState } from 'react';
 import React, { useCallback, useMemo, useRef } from 'react';
@@ -18,7 +17,7 @@ import * as Haptics from 'expo-haptics';
 import { HoldItem } from 'react-native-hold-menu';
 import { FlashList } from '@shopify/flash-list';
 import { useActionSheet } from '@expo/react-native-action-sheet';
-
+import { Ionicons } from '@expo/vector-icons';
 import { fetchPlists, fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
@@ -31,6 +30,7 @@ import { AddToListButton, PrimaryButton } from '../components/Button';
 import { useDeleteProductsMutation } from '../hooks/useDeleteProductsMutation';
 import { useAddProductsMutation } from '../hooks/useAddProductsMutation';
 import { useLikeProductsMutation } from '../hooks/useLikeProductsMutation';
+import ThemedIcon from '../components/ThemedIcon';
 
 type ProductsProps = {
   navigation: any;
@@ -227,7 +227,7 @@ function Header({
   const MenuList = [
     {
       text: 'Upload', // + Math.floor(Math.random() * 1000).toString(),
-      icon: () => <Ionicons name="link" size={18} />,
+      icon: () => <ThemedIcon name="link" size={18} />,
       onPress: () => {
         console.log('upload!');
 
@@ -236,14 +236,14 @@ function Header({
     },
     {
       text: 'New list',
-      icon: () => <Ionicons name="add" size={18} />,
+      icon: () => <ThemedIcon name="add" size={18} />,
       onPress: () => {
         newListSheetModalRef.current?.present();
       },
     },
     {
       text: 'Select',
-      icon: () => <Ionicons name="checkmark" size={18} />,
+      icon: () => <ThemedIcon name="checkmark" size={18} />,
       onPress: () => {
         // toggle something that changes the screen to select mode
         console.log('set select mode');
@@ -289,10 +289,9 @@ function Header({
         gap="s"
       >
         <TouchableOpacity onPress={() => setShowFilter(!showFilter)}>
-          <Ionicons
+          <ThemedIcon
             name={showFilter ? 'options' : 'options-outline'}
             size={24}
-            color="black"
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -310,19 +309,14 @@ function Header({
           <Text variant="title" fontSize={18}>
             {capitalizeFirstLetter(filter['list']?.[0] || 'likes')}
           </Text>
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color="black"
-            style={{ paddingTop: 1 }}
-          />
+          <ThemedIcon name="chevron-down" size={20} style={{ paddingTop: 1 }} />
         </TouchableOpacity>
         <HoldItem
           items={MenuList}
           activateOn="tap"
           menuAnchorPosition="top-right"
         >
-          <Ionicons name="ellipsis-horizontal" size={24} color="black" />
+          <ThemedIcon name="ellipsis-horizontal" size={24} />
         </HoldItem>
       </Box>
       <Filter
@@ -434,21 +428,20 @@ function Footer({
             onPress={handleShareProducts}
             style={{ position: 'absolute', left: 20 }}
           >
-            <Ionicons name="share-outline" size={24} color="black" />
+            <ThemedIcon name="share-outline" size={24} />
           </TouchableOpacity>
           <Text variant="smallTitle" textAlign="center" paddingVertical="s">
             {selectedProducts.length} products selected
           </Text>
           <Box flexDirection="row" gap="m" position="absolute" right={20}>
             <TouchableOpacity onPress={handleDeleteProducts}>
-              <Ionicons
+              <ThemedIcon
                 name={listId === 'likes' ? 'heart' : 'trash-outline'}
                 size={24}
-                color="black"
               />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleAddProducts}>
-              <Ionicons name="albums-outline" size={24} color="black" />
+              <ThemedIcon name="albums-outline" size={24} />
             </TouchableOpacity>
           </Box>
         </Box>
@@ -551,11 +544,11 @@ function AddProductsSheet({
               right: 5,
             }}
           >
-            <Ionicons name="close" size={24} color="black" />
+            <ThemedIcon name="close" size={24} />
           </TouchableOpacity>
         </Box>
         <Box flexDirection="row" marginVertical="s" alignItems="center" gap="m">
-          <Ionicons name="folder" size={34} color="black" />
+          <ThemedIcon name="folder" size={34} />
           <Text variant="body" fontWeight="600">
             {selectedProducts.length} products
           </Text>

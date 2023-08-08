@@ -5,7 +5,6 @@ import {
   Keyboard,
 } from 'react-native';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import { Image as ExpoImage } from 'expo-image';
 import * as Haptics from 'expo-haptics';
@@ -19,6 +18,7 @@ import { favoriteCompany, fetchCompanies, unFavoriteCompany } from '../api';
 import { Company } from '../utils/types';
 import SearchList from '../components/SearchList';
 import { clearHistory, getHistory, saveHistory } from '../utils/history';
+import ThemedIcon from '../components/ThemedIcon';
 
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -314,14 +314,10 @@ function CompanyList({
               mutation.mutate(item);
             }}
           >
-            <Ionicons
+            <ThemedIcon
               name={item.favorited ? 'ios-star' : 'ios-star-outline'}
               size={24}
-              color="black"
-              accessibilityRole="button"
-              accessibilityLabel={
-                item.favorited ? 'Unfavorite company' : 'Favorite company'
-              }
+              color="text"
             />
           </TouchableOpacity>
         </Box>

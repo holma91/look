@@ -26,12 +26,14 @@ const palette = {
   iosGray6: ios['gray6'],
 };
 
-export const theme = createTheme({
+export const lightTheme = createTheme({
   colors: {
     primary: palette.purple,
     secondary: palette.green,
     background: palette.white,
     secondaryBackground: palette.grey,
+    lightBackground: palette.iosGray6,
+    textOnLightBackground: palette.black,
     title: palette.black,
     text: palette.black,
     textOnBackground: palette.white,
@@ -136,12 +138,16 @@ export const theme = createTheme({
 });
 
 export const darkTheme: Theme = {
-  ...theme,
+  ...lightTheme,
   colors: {
-    ...theme.colors,
+    ...lightTheme.colors,
     background: palette.black,
     title: palette.white,
+    text: palette.white,
+    textOnBackground: palette.black,
+    lightBackground: palette.white,
+    textOnLightBackground: palette.black,
   },
 };
 
-export type Theme = typeof theme;
+export type Theme = typeof lightTheme;

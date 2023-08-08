@@ -13,6 +13,8 @@ import ExploreNavigator from './Explore.navigator';
 import { useContext } from 'react';
 import { DemoContext } from '../context/Demo';
 import ProductsNavigator from './Products.navigator';
+import ThemedIcon from '../components/ThemedIcon';
+import { View } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
@@ -41,27 +43,34 @@ export default function TabNavigator() {
           } else if (route.name === 'ProductsNavigator') {
             iconName = focused ? 'heart' : 'heart-outline';
             return (
-              <MaterialCommunityIcons
-                name={iconName}
-                size={size}
-                color={color}
-              />
+              // <MaterialCommunityIcons
+              //   name={iconName}
+              //   size={size}
+              //   color={color}
+              // />
+              <ThemedIcon name={iconName} size={size} />
+              // <Ionicons name={iconName} size={size} color={color} />
             );
           } else if (route.name === 'Profile') {
             iconName = focused ? 'ios-person' : 'ios-person-outline';
-            return <Ionicons name={iconName} size={size} color={color} />;
+            return <ThemedIcon name={iconName} size={size} />;
           } else if (route.name === 'ExploreNavigator') {
             iconName = focused ? 'compass' : 'compass-outline';
-            return <Ionicons name={iconName} size={size * 1.1} color={color} />;
+            return <ThemedIcon name={iconName} size={size * 1.1} />;
           } else if (route.name === 'Testing') {
             iconName = focused ? 'compass' : 'compass-outline';
-            return <Ionicons name={iconName} size={size} color={color} />;
+            return <ThemedIcon name={iconName} size={size} />;
           }
         },
         tabBarActiveTintColor: activeTheme.colors.text,
         tabBarInactiveTintColor: 'gray',
         tabBarLabel: () => null,
         headerShown: false,
+        tabBarBackground: () => (
+          <View
+            style={{ flex: 1, backgroundColor: activeTheme.colors.background }}
+          />
+        ),
       })}
     >
       <Tab.Screen name="Shop" component={Shop} />
