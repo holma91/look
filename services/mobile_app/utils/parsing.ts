@@ -122,6 +122,7 @@ const type1Domains = [
   'moncler.com',
   'farfetch.com',
   'adaysmarch.com',
+  'hermes.com',
 ];
 const type2Domains = ['boozt.com', 'eu.lululemon.com', 'valentino.com'];
 const type3Domains = ['zalando.se', 'careofcarl.se', 'gucci.com'];

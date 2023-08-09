@@ -40,7 +40,13 @@ import { useTheme } from '@shopify/restyle';
 import { Theme } from '../styling/theme';
 import { HoldItem } from 'react-native-hold-menu';
 import { parseProductData } from '../utils/parsing';
-import { set } from 'react-native-reanimated';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  set,
+  useAnimatedStyle,
+  useDerivedValue,
+} from 'react-native-reanimated';
 
 function getDomain(url: string) {
   let domain;
@@ -135,21 +141,21 @@ export default function Browser({
 
   const injectScripts = () => {
     // keep injecting here, 10s should be enough for all sites (not really but currently it's fine)
-    webviewRef.current!.injectJavaScript(extractScriptV2);
+    webviewRef?.current?.injectJavaScript(extractScriptV2);
     setTimeout(() => {
-      webviewRef.current!.injectJavaScript(extractScriptV2);
+      webviewRef?.current?.injectJavaScript(extractScriptV2);
     }, 1000);
     setTimeout(() => {
-      webviewRef.current!.injectJavaScript(extractScriptV2);
+      webviewRef?.current?.injectJavaScript(extractScriptV2);
     }, 2500);
     setTimeout(() => {
-      webviewRef.current!.injectJavaScript(extractScriptV2);
+      webviewRef?.current?.injectJavaScript(extractScriptV2);
     }, 5000);
     setTimeout(() => {
-      webviewRef.current!.injectJavaScript(extractScriptV2);
+      webviewRef?.current?.injectJavaScript(extractScriptV2);
     }, 7500);
     setTimeout(() => {
-      webviewRef.current!.injectJavaScript(extractScriptV2);
+      webviewRef?.current?.injectJavaScript(extractScriptV2);
     }, 10000);
   };
 
@@ -245,6 +251,7 @@ export default function Browser({
                 onLoadEnd={handleLoadEnd}
                 onMessage={handle}
                 mediaPlaybackRequiresUserAction={true}
+                originWhitelist={['*']}
               />
             </Box>
           </Box>
@@ -366,10 +373,8 @@ function NavBar({
           <TouchableOpacity
             onPress={() => {
               console.log('like mutation', activeProduct);
-
               if (activeProduct) {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                // likeMutation.mutate(activeProduct);
                 likeProductMutation.mutate(activeProduct);
               }
             }}
@@ -384,11 +389,6 @@ function NavBar({
           >
             <ThemedIcon name="ellipsis-horizontal" size={24} />
           </HoldItem>
-          {/* <ThemedIcon
-            name="md-ellipsis-horizontal-sharp"
-            size={24}
-            color="text"
-          /> */}
         </Box>
       </Box>
       <BottomSheet
@@ -423,6 +423,8 @@ const BottomSheet = ({
 
   const handleSheetChanges = useCallback((index: number) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    console.log('handleSheetChanges', index);
+
     if (index === -1) {
       setExpandedContent(false);
       setExpandedMenu(false);
@@ -446,15 +448,22 @@ const BottomSheet = ({
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       backdropComponent={(props) => (
-        <BottomSheetBackdrop
+        <CustomBackdrop
           {...props}
-          appearsOnIndex={0}
-          disappearsOnIndex={-1}
+          dismiss={() => bottomSheetModalRef.current?.dismiss()}
         />
       )}
+      // backdropComponent={(props) => (
+      //   <BottomSheetBackdrop
+      //     {...props}
+      //     appearsOnIndex={0}
+      //     disappearsOnIndex={-1}
+      //   />
+      // )}
       handleIndicatorStyle={{
         backgroundColor: theme.colors.text,
       }}
+      bottomInset={86}
     >
       <BottomSheetContent
         currentProduct={currentProduct}
@@ -463,6 +472,33 @@ const BottomSheet = ({
         setCurrentProduct={setCurrentProduct}
       />
     </BottomSheetModal>
+  );
+};
+
+type CustomBackdropProps = {
+  animatedIndex: Animated.SharedValue<number>;
+  dismiss: () => void;
+};
+
+const CustomBackdrop: React.FC<CustomBackdropProps> = ({
+  animatedIndex,
+  dismiss,
+}) => {
+  const theme = useTheme();
+
+  return (
+    <Animated.View
+      onTouchStart={dismiss}
+      style={{
+        position: 'absolute',
+        bottom: 86, // height of the NavBar
+        left: 0,
+        right: 0,
+        top: 0,
+        backgroundColor: theme.colors.backdropColor || 'rgba(0,0,0,0.5)',
+        opacity: 1, // todo: make this animated
+      }}
+    />
   );
 };
 
