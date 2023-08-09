@@ -26,6 +26,8 @@ import {
   baseImageExtractScript,
   baseInteractScript,
   extractScriptV2,
+  freezeScript,
+  unFreezeScript,
 } from '../utils/scripts';
 import { fetchProducts } from '../api';
 import { Company, Product, UserProduct } from '../utils/types';
@@ -40,13 +42,7 @@ import { useTheme } from '@shopify/restyle';
 import { Theme } from '../styling/theme';
 import { HoldItem } from 'react-native-hold-menu';
 import { parseProductData } from '../utils/parsing';
-import Animated, {
-  Extrapolation,
-  interpolate,
-  set,
-  useAnimatedStyle,
-  useDerivedValue,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 function getDomain(url: string) {
   let domain;
@@ -115,6 +111,7 @@ export default function Browser({
       images: [],
     }
   );
+  const [selectMode, setSelectMode] = useState(false);
   const { user } = useUser();
 
   const url = getUrl(route.params.url);
@@ -212,6 +209,17 @@ export default function Browser({
     }
   };
 
+  const handleToggleSelectMode = () => {
+    if (!selectMode) {
+      console.log('injecting le freeze');
+      webviewRef?.current?.injectJavaScript(freezeScript);
+    } else {
+      console.log('injecting le unfreeze');
+      webviewRef?.current?.injectJavaScript(unFreezeScript);
+    }
+    setSelectMode(!selectMode);
+  };
+
   const { data: products, refetch: refetchProducts } = useQuery({
     queryKey: ['products', user?.id, { list: ['history'] }],
     queryFn: () => fetchProducts(user?.id as string, { list: ['history'] }),
@@ -222,15 +230,28 @@ export default function Browser({
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
         <Box flex={1}>
-          <WebviewSearchBar
-            navigation={navigation}
-            webviewNavigation={navigate}
-            searchText={searchText}
-            setSearchText={setSearchText}
-            handleSearch={() => {}}
-            setFocus={setFocus}
-            focus={focus}
-          />
+          {selectMode ? (
+            <Box
+              alignContent="center"
+              justifyContent="center"
+              paddingTop="s"
+              paddingBottom="sm"
+            >
+              <Text textAlign="center" variant="title">
+                SELECT MODE
+              </Text>
+            </Box>
+          ) : (
+            <WebviewSearchBar
+              navigation={navigation}
+              webviewNavigation={navigate}
+              searchText={searchText}
+              setSearchText={setSearchText}
+              handleSearch={() => {}}
+              setFocus={setFocus}
+              focus={focus}
+            />
+          )}
           <Box flex={1}>
             {focus ? (
               <Box flex={1}>
@@ -261,10 +282,11 @@ export default function Browser({
         expandedMenu={expandedMenu}
         setExpandedMenu={setExpandedMenu}
         navigate={navigate}
-        user={user}
         currentProduct={currentProduct}
         setCurrentProduct={setCurrentProduct}
         products={products || []}
+        selectMode={selectMode}
+        handleToggleSelectMode={handleToggleSelectMode}
       />
     </Box>
   );
@@ -274,20 +296,22 @@ type NavBarProps = {
   expandedMenu: boolean;
   setExpandedMenu: React.Dispatch<React.SetStateAction<boolean>>;
   navigate: (direction: 'back' | 'forward') => void;
-  user: any;
   currentProduct: Product;
   setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
   products: UserProduct[];
+  selectMode: boolean;
+  handleToggleSelectMode: () => void;
 };
 
 function NavBar({
   expandedMenu,
   setExpandedMenu,
   navigate,
-  user,
   currentProduct,
   setCurrentProduct,
   products,
+  selectMode,
+  handleToggleSelectMode,
 }: NavBarProps) {
   const likeProductMutation = useLikeProductMutation({ list: ['history'] });
 
@@ -300,24 +324,6 @@ function NavBar({
   const handleDismissModalPress = useCallback(() => {
     bottomSheetModalRef.current?.dismiss();
   }, []);
-
-  const MenuList = [
-    {
-      text: 'Add to list',
-      icon: () => <ThemedIcon name="add" size={18} />,
-      onPress: () => {
-        console.log('new list!');
-      },
-    },
-    {
-      text: 'Select mode',
-      icon: () => <ThemedIcon name="checkmark" size={18} />,
-      onPress: () => {
-        // toggle something that changes the screen to select mode
-        console.log('set select mode');
-      },
-    },
-  ];
 
   let icon: 'heart' | 'heart-outline' = products?.find(
     (product) => product.url === currentProduct?.url && product.liked
@@ -381,14 +387,13 @@ function NavBar({
           >
             <ThemedIcon name={icon} size={24} color="text" />
           </TouchableOpacity>
-          <HoldItem
-            items={MenuList}
-            activateOn="tap"
-            menuAnchorPosition="bottom-right"
-            // menuAnchorPosition="top-right"
-          >
-            <ThemedIcon name="ellipsis-horizontal" size={24} />
-          </HoldItem>
+          <TouchableOpacity onPress={handleToggleSelectMode}>
+            <ThemedIcon
+              name={selectMode ? 'create' : 'create-outline'}
+              size={24}
+              style={{ paddingBottom: 3 }}
+            />
+          </TouchableOpacity>
         </Box>
       </Box>
       <BottomSheet
@@ -397,6 +402,7 @@ function NavBar({
         currentProduct={currentProduct}
         setCurrentProduct={setCurrentProduct}
         products={products}
+        selectMode={selectMode}
       />
     </Box>
   );
@@ -408,6 +414,7 @@ type BottomSheetModalProps = {
   currentProduct: Product;
   setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
   products: UserProduct[];
+  selectMode: boolean;
 };
 
 const BottomSheet = ({
@@ -416,6 +423,7 @@ const BottomSheet = ({
   currentProduct,
   setCurrentProduct,
   products,
+  selectMode,
 }: BottomSheetModalProps) => {
   const theme = useTheme<Theme>();
   const [expandedContent, setExpandedContent] = useState(false);
@@ -423,8 +431,6 @@ const BottomSheet = ({
 
   const handleSheetChanges = useCallback((index: number) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    console.log('handleSheetChanges', index);
-
     if (index === -1) {
       setExpandedContent(false);
       setExpandedMenu(false);
@@ -453,13 +459,6 @@ const BottomSheet = ({
           dismiss={() => bottomSheetModalRef.current?.dismiss()}
         />
       )}
-      // backdropComponent={(props) => (
-      //   <BottomSheetBackdrop
-      //     {...props}
-      //     appearsOnIndex={0}
-      //     disappearsOnIndex={-1}
-      //   />
-      // )}
       handleIndicatorStyle={{
         backgroundColor: theme.colors.text,
       }}
@@ -470,35 +469,9 @@ const BottomSheet = ({
         expandedContent={expandedContent}
         products={products}
         setCurrentProduct={setCurrentProduct}
+        selectMode={selectMode}
       />
     </BottomSheetModal>
-  );
-};
-
-type CustomBackdropProps = {
-  animatedIndex: Animated.SharedValue<number>;
-  dismiss: () => void;
-};
-
-const CustomBackdrop: React.FC<CustomBackdropProps> = ({
-  animatedIndex,
-  dismiss,
-}) => {
-  const theme = useTheme();
-
-  return (
-    <Animated.View
-      onTouchStart={dismiss}
-      style={{
-        position: 'absolute',
-        bottom: 86, // height of the NavBar
-        left: 0,
-        right: 0,
-        top: 0,
-        backgroundColor: theme.colors.backdropColor || 'rgba(0,0,0,0.5)',
-        opacity: 1, // todo: make this animated
-      }}
-    />
   );
 };
 
@@ -507,6 +480,7 @@ type BottomSheetContentProps = {
   expandedContent: boolean;
   products: UserProduct[];
   setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
+  selectMode: boolean;
 };
 
 const BottomSheetContent = ({
@@ -514,6 +488,7 @@ const BottomSheetContent = ({
   setCurrentProduct,
   expandedContent,
   products,
+  selectMode,
 }: BottomSheetContentProps) => {
   const theme = useTheme<Theme>();
   const { activeModel, setActiveModel } = useContext(TrainingContext);
@@ -628,7 +603,7 @@ const BottomSheetContent = ({
               source={img ? img : defaultImage}
               contentFit="cover"
             />
-            {img ? (
+            {img && selectMode ? (
               <TouchableOpacity
                 style={{
                   position: 'absolute',
@@ -719,6 +694,33 @@ const BottomSheetContent = ({
       </Box>
     );
   }
+};
+
+type CustomBackdropProps = {
+  animatedIndex: Animated.SharedValue<number>;
+  dismiss: () => void;
+};
+
+const CustomBackdrop: React.FC<CustomBackdropProps> = ({
+  animatedIndex,
+  dismiss,
+}) => {
+  const theme = useTheme();
+
+  return (
+    <Animated.View
+      onTouchStart={dismiss}
+      style={{
+        position: 'absolute',
+        bottom: 86, // height of the NavBar
+        left: 0,
+        right: 0,
+        top: 0,
+        backgroundColor: theme.colors.backdropColor || 'rgba(0,0,0,0.5)',
+        opacity: 1, // todo: make this animated
+      }}
+    />
+  );
 };
 
 const demoImages: { [key: string]: any } = {

@@ -1,3 +1,23 @@
+export const freezeScript = `
+document.body.freezeEventHandler = function(event) {
+  event.stopPropagation();
+  event.preventDefault();
+  
+  if (event.target.tagName.toLowerCase() === 'img') {
+      if (event.target.style.border === '5px solid red') {
+          event.target.style.border = '';
+      } else {
+          event.target.style.border = '5px solid red';
+      }
+  }
+};
+document.body.addEventListener('click', document.body.freezeEventHandler, true);
+`;
+
+export const unFreezeScript = `
+document.body.removeEventListener('click', document.body.freezeEventHandler, true);
+`;
+
 export const extractScriptV2 = `
 function getProductData() {
   var elements = document.querySelectorAll(
