@@ -19,13 +19,13 @@ import * as Haptics from 'expo-haptics';
 import { useQuery } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import { useUser } from '@clerk/clerk-expo';
-import { WebViewBox } from '../components/WebViewBox';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import {
   baseExtractScript,
   baseImageExtractScript,
   baseInteractScript,
+  extractScriptV2,
 } from '../utils/scripts';
 import { fetchProducts } from '../api';
 import { Company, Product, UserProduct } from '../utils/types';
@@ -39,6 +39,8 @@ import ThemedIcon from '../components/ThemedIcon';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../styling/theme';
 import { HoldItem } from 'react-native-hold-menu';
+import { parseProductData } from '../utils/parsing';
+import { set } from 'react-native-reanimated';
 
 function getDomain(url: string) {
   let domain;
@@ -74,6 +76,16 @@ function getUrl(urlParam: string) {
   }
 }
 
+function arraysAreEqual(arr1: string[], arr2: string[]) {
+  if (arr1.length !== arr2.length) return false;
+
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) return false;
+  }
+
+  return true;
+}
+
 const defaultImage =
   'https://i0.wp.com/roadmap-tech.com/wp-content/uploads/2019/04/placeholder-image.jpg?resize=400%2C400&ssl=1';
 
@@ -100,7 +112,6 @@ export default function Browser({
   const { user } = useUser();
 
   const url = getUrl(route.params.url);
-  const domain = getDomain(route.params.url);
 
   const webviewRef = useRef<WebView>(null);
 
@@ -122,23 +133,77 @@ export default function Browser({
     navigation.navigate('Browser', { url: domain });
   };
 
+  const injectScripts = () => {
+    // keep injecting here, 10s should be enough for all sites (not really but currently it's fine)
+    webviewRef.current!.injectJavaScript(extractScriptV2);
+    setTimeout(() => {
+      webviewRef.current!.injectJavaScript(extractScriptV2);
+    }, 1000);
+    setTimeout(() => {
+      webviewRef.current!.injectJavaScript(extractScriptV2);
+    }, 2500);
+    setTimeout(() => {
+      webviewRef.current!.injectJavaScript(extractScriptV2);
+    }, 5000);
+    setTimeout(() => {
+      webviewRef.current!.injectJavaScript(extractScriptV2);
+    }, 7500);
+    setTimeout(() => {
+      webviewRef.current!.injectJavaScript(extractScriptV2);
+    }, 10000);
+  };
+
   const handleLoadEnd = (navState: any) => {
-    // console.log('handleLoadEnd', navState.nativeEvent.url);
-
-    if (!webviewRef.current) return;
-
     if (route.params?.baseProductUrl) {
       if (navState.nativeEvent.url === route.params.baseProductUrl) {
         return;
       }
     }
 
-    // make decisions here based on the url
-    webviewRef.current.injectJavaScript(baseExtractScript);
-    webviewRef.current.injectJavaScript(baseInteractScript);
+    // 1. inject
+    injectScripts();
+  };
 
-    // image extract should be used when the Image field in the schema.org is not enough
-    webviewRef.current.injectJavaScript(baseImageExtractScript);
+  const handle = async (event: any) => {
+    // 2. receive
+    const data = JSON.parse(event.nativeEvent.data);
+
+    if (data.type === 'product') {
+      const product = parseProductData(
+        event.nativeEvent.url,
+        event.nativeEvent.data
+      );
+      // so, if url differs, then the images ALSO need to differ
+      if (currentProduct.url !== product.url) {
+        if (!arraysAreEqual(currentProduct.images, product.images)) {
+          // PROTECTING FROM CORRUPT IMG-URL COMBOS
+          console.log('images differ');
+          console.log('newProduct', product);
+          setCurrentProduct(product);
+
+          // 3. save
+        } else {
+          console.log('images do not differ');
+        }
+      } else {
+        // this is a refresh
+        setCurrentProduct(product);
+      }
+    } else if (data.type === 'no product') {
+      console.log('no product');
+      if (currentProduct.url !== '') {
+        setCurrentProduct({
+          url: '',
+          name: '',
+          brand: '',
+          price: '',
+          currency: '',
+          images: [],
+        });
+      }
+    } else {
+      console.log('unknown message type:', data.type, data.data);
+    }
   };
 
   const { data: products, refetch: refetchProducts } = useQuery({
@@ -171,14 +236,15 @@ export default function Browser({
               </Box>
             ) : null}
             <Box flex={focus ? 0 : 1}>
-              <WebViewBox
-                webviewRef={webviewRef}
-                handleLoadEnd={handleLoadEnd}
-                url={url}
-                domain={domain}
-                currentProduct={currentProduct}
-                setCurrentProduct={setCurrentProduct}
-                refetchProducts={refetchProducts}
+              <WebView
+                ref={webviewRef}
+                startInLoadingState={true} // https://github.com/react-native-webview/react-native-webview/issues/124
+                source={{
+                  uri: url,
+                }}
+                onLoadEnd={handleLoadEnd}
+                onMessage={handle}
+                mediaPlaybackRequiresUserAction={true}
               />
             </Box>
           </Box>

@@ -1,3 +1,39 @@
+export const extractScriptV2 = `
+function getProductData() {
+  var elements = document.querySelectorAll(
+    'script[type="application/ld+json"]'
+  );
+
+  for (let i = 0; i < elements.length; i++) {
+    var parsed = JSON.parse(elements[i].textContent);
+    if (parsed['@type'] === 'Product') {
+      return elements[i].textContent;
+    }
+  }
+}
+
+try {
+  let rawProductData = getProductData();
+  if (rawProductData) {
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: 'product',
+        data: rawProductData,
+        url: window.location.href,
+      })
+    );
+  } else {
+    // did not find product data
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({ type: 'no product', data: '' })
+    );
+  }
+} catch (e) {
+  window.ReactNativeWebView.postMessage(
+    JSON.stringify({ type: 'error', data: e })
+  );
+}
+`;
 export const baseExtractScript = `
   if (typeof lastProductInfo === 'undefined') {
     var lastProductInfo = { url: '', firstImage: '' };

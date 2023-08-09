@@ -1,5 +1,10 @@
 ### INJECT
 
+ASSUMPTION: url changes when product changes
+VIOLATIONS: boozt,
+
+WHAT DO: let user handle it
+
 We have the url. Inject different scripts depending on: domain.
 
 user goes to lululemon/1 -> scripts get inserted
@@ -23,5 +28,16 @@ when receiving imageByScript:
                           1. make sure that the productUrl is in the database
                           2. log them
 
+when to show no product?
+when we are at an url, and haven't received a product
 
-### SAVE
+
+Can we somehow notify the webview when we've received a product at a url?
+ 
+### Post-mortem
+There's a case to be made for the following:
+- sites differ to much in their loading product stuff, so it's not worth it to try 
+a general solution that works for all of them.
+
+Instead, do it similarly to how we do with the parsing. Have a base approach that works
+for good sites, and then a domain specific approach for bad sites. 
