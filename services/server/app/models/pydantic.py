@@ -62,6 +62,10 @@ class ProductImage(CustomBaseModel):
     product_url: str
     image_url: str
 
+class ProductImages(CustomBaseModel):
+    product_url: str
+    image_urls: list[str]
+
 class ListProduct(ListBase):
     product_url: str
 

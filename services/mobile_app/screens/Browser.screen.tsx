@@ -6,14 +6,8 @@ import {
   View,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import React, {
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { BottomSheetModal, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
 
 import { useQuery } from '@tanstack/react-query';
@@ -22,9 +16,6 @@ import { useUser } from '@clerk/clerk-expo';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import {
-  baseExtractScript,
-  baseImageExtractScript,
-  baseInteractScript,
   extractScriptV2,
   freezeScript,
   unFreezeScript,
@@ -32,7 +23,6 @@ import {
 import { fetchProducts } from '../api';
 import { Company, Product, UserProduct } from '../utils/types';
 import { WebviewSearchBar } from '../components/SearchBar';
-import { TrainingContext } from '../context/Training';
 import SearchList from '../components/SearchList';
 import { saveHistory } from '../utils/history';
 import { useLikeProductMutation } from '../hooks/useLikeProductMutation';
@@ -40,30 +30,10 @@ import { PrimaryButton } from '../components/Button';
 import ThemedIcon from '../components/ThemedIcon';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../styling/theme';
-import { HoldItem } from 'react-native-hold-menu';
 import { parseProductData } from '../utils/parsing';
 import Animated from 'react-native-reanimated';
-
-function getDomain(url: string) {
-  let domain;
-
-  // find & remove protocol (http, ftp, etc.) and get domain
-  if (url.indexOf('://') > -1) {
-    domain = url.split('/')[2];
-  } else {
-    domain = url.split('/')[0];
-  }
-
-  // find & remove port number if present
-  domain = domain.split(':')[0];
-
-  // find & remove "www."
-  if (domain.indexOf('www.') > -1) {
-    domain = domain.split('www.')[1];
-  }
-
-  return domain;
-}
+import { useAddToHistoryMutation } from '../hooks/useAddToHistoryMutation';
+import { useAddImagesMutation } from '../hooks/useAddImagesMutation';
 
 function getUrl(urlParam: string) {
   if (urlParam === 'gucci.com') {
@@ -113,6 +83,8 @@ export default function Browser({
   );
   const [selectMode, setSelectMode] = useState(false);
   const { user } = useUser();
+  const addToHistoryMutation = useAddToHistoryMutation();
+  const addImagesMutation = useAddImagesMutation();
 
   const url = getUrl(route.params.url);
 
@@ -145,15 +117,15 @@ export default function Browser({
     setTimeout(() => {
       webviewRef?.current?.injectJavaScript(extractScriptV2);
     }, 2500);
-    setTimeout(() => {
-      webviewRef?.current?.injectJavaScript(extractScriptV2);
-    }, 5000);
-    setTimeout(() => {
-      webviewRef?.current?.injectJavaScript(extractScriptV2);
-    }, 7500);
-    setTimeout(() => {
-      webviewRef?.current?.injectJavaScript(extractScriptV2);
-    }, 10000);
+    // setTimeout(() => {
+    //   webviewRef?.current?.injectJavaScript(extractScriptV2);
+    // }, 5000);
+    // setTimeout(() => {
+    //   webviewRef?.current?.injectJavaScript(extractScriptV2);
+    // }, 7500);
+    // setTimeout(() => {
+    //   webviewRef?.current?.injectJavaScript(extractScriptV2);
+    // }, 10000);
   };
 
   const handleLoadEnd = (navState: any) => {
@@ -167,7 +139,7 @@ export default function Browser({
     injectScripts();
   };
 
-  const handle = async (event: any) => {
+  const handleMessage = async (event: any) => {
     // 2. receive
     const data = JSON.parse(event.nativeEvent.data);
 
@@ -176,22 +148,48 @@ export default function Browser({
         event.nativeEvent.url,
         event.nativeEvent.data
       );
-      // so, if url differs, then the images ALSO need to differ
       if (currentProduct.url !== product.url) {
-        if (!arraysAreEqual(currentProduct.images, product.images)) {
-          // PROTECTING FROM CORRUPT IMG-URL COMBOS
-          console.log('images differ');
-          console.log('newProduct', product);
+        if (
+          !arraysAreEqual(currentProduct.images, product.images) ||
+          product.images.length === 0
+        ) {
           setCurrentProduct(product);
 
           // 3. save
+          if (product.images.length > 0) {
+            addToHistoryMutation.mutate(product);
+          }
         } else {
-          console.log('images do not differ');
+          // console.log('images do not differ');
         }
       } else {
         // this is a refresh
         setCurrentProduct(product);
       }
+    } else if (data.type === 'imageAdd') {
+      console.log(data.type, data.data);
+      const updatedProduct = {
+        ...currentProduct,
+        images: [...currentProduct.images, data.data],
+      };
+      if (currentProduct.images.length === 0) {
+        console.log('addHistoryMutation');
+        addToHistoryMutation.mutate(updatedProduct);
+      } else {
+        console.log('addImagesMutation');
+        addImagesMutation.mutate({
+          product: currentProduct,
+          images: [data.data],
+        });
+      }
+
+      setCurrentProduct(updatedProduct);
+    } else if (data.type === 'imageRemove') {
+      console.log(data.type, data.data);
+      const newImages = currentProduct.images.filter(
+        (img) => img !== data.data
+      );
+      setCurrentProduct({ ...currentProduct, images: newImages });
     } else if (data.type === 'no product') {
       console.log('no product');
       if (currentProduct.url !== '') {
@@ -270,7 +268,7 @@ export default function Browser({
                   uri: url,
                 }}
                 onLoadEnd={handleLoadEnd}
-                onMessage={handle}
+                onMessage={handleMessage}
                 mediaPlaybackRequiresUserAction={true}
                 originWhitelist={['*']}
               />
@@ -325,6 +323,14 @@ function NavBar({
     bottomSheetModalRef.current?.dismiss();
   }, []);
 
+  const handleLikeProduct = async () => {
+    console.log('like mutation', activeProduct);
+    if (activeProduct) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      likeProductMutation.mutate(activeProduct);
+    }
+  };
+
   let icon: 'heart' | 'heart-outline' = products?.find(
     (product) => product.url === currentProduct?.url && product.liked
   )
@@ -376,15 +382,7 @@ function NavBar({
           )}
         </Box>
         <Box flex={0} flexDirection="row" gap="m" alignItems="center">
-          <TouchableOpacity
-            onPress={() => {
-              console.log('like mutation', activeProduct);
-              if (activeProduct) {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                likeProductMutation.mutate(activeProduct);
-              }
-            }}
-          >
+          <TouchableOpacity onPress={handleLikeProduct}>
             <ThemedIcon name={icon} size={24} color="text" />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleToggleSelectMode}>
@@ -491,7 +489,6 @@ const BottomSheetContent = ({
   selectMode,
 }: BottomSheetContentProps) => {
   const theme = useTheme<Theme>();
-  const { activeModel, setActiveModel } = useContext(TrainingContext);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
   const handleTestOnModel = async () => {
@@ -499,8 +496,12 @@ const BottomSheetContent = ({
   };
 
   const handleRemoveImage = (image: string) => {
+    // this only removes the image on the client side
+    // we should also remove it on the server side
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     console.log('remove image:', image);
+
     const newImages = currentProduct.images.filter((img) => img !== image);
     setCurrentProduct({ ...currentProduct, images: newImages });
     setCurrentImageIndex(0);
@@ -577,7 +578,7 @@ const BottomSheetContent = ({
               Selected Model:
             </Text>
             <Text variant="body" fontWeight="bold">
-              {activeModel.name}
+              active model
             </Text>
           </Box>
           <Box flex={0}>
@@ -672,21 +673,6 @@ const BottomSheetContent = ({
                   </Box>
                 )}
               />
-              {/* <Box
-                flexDirection="row"
-                borderWidth={1}
-                padding="s"
-                paddingVertical="sm"
-                borderRadius={10}
-                alignItems="center"
-                justifyContent="center"
-                gap="xs"
-              >
-                <Text variant="body" fontWeight="bold" fontSize={16}>
-                  {activeModel.name}
-                </Text>
-                <Ionicons name="chevron-down" size={20} color="black" />
-              </Box> */}
             </Box>
           </Box>
         </Box>

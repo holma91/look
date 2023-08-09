@@ -103,7 +103,7 @@ type Product = {
 
 export const createProduct = async (
   userId: string,
-  product: Product,
+  product: UserProduct,
   domain: string
 ) => {
   // fix the brand name here
@@ -132,11 +132,11 @@ export const createProduct = async (
 export const addProductImages = async (
   userId: string,
   productUrl: string,
-  imageUrl: string
+  imageUrls: string[]
 ) => {
   const imageProduct = {
     productUrl,
-    imageUrl,
+    imageUrls,
   };
 
   const response = await fetch(`${URL}/users/${userId}/products/images`, {

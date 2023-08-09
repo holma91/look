@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserBase, UserProduct, ListBase, ListProducts, LikeProducts, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
+from app.models.pydantic import UserBase, ProductImages, UserProduct, ListBase, ListProducts, LikeProducts, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
 from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
@@ -89,9 +89,17 @@ async def add_product(user_id: str, product: ProductExtended) -> POSTResponse:
 
     return SUCCESSFUL_POST_RESPONSE
 
+# @router.post("/{user_id}/products/images", status_code=201, response_model=POSTResponseAddImage)
+# async def add_product_image(user_id: str, product_image: ProductImage) -> POSTResponseAddImage:
+#     result = await crud.add_product_image(product_image)
+#     if not result['success']:
+#         raise HTTPException(status_code=409, detail=result["message"])
+
+#     return result
+
 @router.post("/{user_id}/products/images", status_code=201, response_model=POSTResponseAddImage)
-async def add_product_image(user_id: str, product_image: ProductImage) -> POSTResponseAddImage:
-    result = await crud.add_product_image(product_image)
+async def add_product_images(user_id: str, product_images: ProductImages) -> POSTResponseAddImage:
+    result = await crud.add_product_images(product_images)
     if not result['success']:
         raise HTTPException(status_code=409, detail=result["message"])
 

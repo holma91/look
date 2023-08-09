@@ -1,5 +1,5 @@
 from typing import Optional
-from app.models.pydantic import ProductExtended, LikeProducts, ProductImage,ListBase, ListProduct, ListProducts
+from app.models.pydantic import ProductExtended, ProductImages, LikeProducts, ProductImage,ListBase, ListProduct, ListProducts
 from app.db import get_db_connection
 
 async def get_all() -> list[dict]:
@@ -137,6 +137,17 @@ async def add_product_image(product_image: ProductImage) -> dict:
     except Exception as e:
         # todo: more specific error handling
         return {"success": False, "message": "Image already exists"}
+    
+async def add_product_images(product_images: ProductImages) -> dict:
+    async with get_db_connection() as conn:
+        query = """insert into product_image (product_url, image_url) values ($1, $2);"""
+        for image_url in product_images.image_urls:
+            try:
+                await conn.execute_query_dict(query, [product_images.product_url, image_url])
+            except Exception as e:
+                print(e) # just a duplicate in the list, ignore it
+    
+    return {"success": True, "message": "Images added successfully"}
 
 
 async def get_products_from_list(user_id: str, filters: Optional[dict[str, str]] = None):
