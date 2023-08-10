@@ -6,8 +6,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Box } from '../../styling/Box';
-import { Text } from '../../styling/Text';
+import { Box, Text } from '../../styling/RestylePrimitives';
 import { FilterType, OuterChoiceFilterType } from '../../utils/types';
 import {
   PrimaryButton,

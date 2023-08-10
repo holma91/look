@@ -229,6 +229,21 @@ async def get_products(user_id: str, filters: Optional[dict[str, str]] = None):
 
     return products
 
+async def get_product(user_id: str, product_url: str) -> dict:
+    async with get_db_connection() as conn:
+        query = """
+            select * from user_product up
+            join product p on up.product_url = p.url
+            join product_image pi on p.url = pi.product_url
+            join website w on p.domain = w.domain
+            where up.user_id = $1 and up.product_url = $2;
+        """
+        rows = await conn.execute_query_dict(query, [user_id, product_url])
+
+    products = process_product_rows(rows)
+
+    return products[0]
+
 async def dislike_products(user_id: str, products: LikeProducts) -> Optional[str]:
     async with get_db_connection() as conn:
         query = """

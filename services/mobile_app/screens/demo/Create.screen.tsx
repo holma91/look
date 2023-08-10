@@ -7,8 +7,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as ImagePicker from 'expo-image-picker';
-import { Box } from '../../styling/Box';
-import { Text } from '../../styling/Text';
+import { Box, Text } from '../../styling/RestylePrimitives';
 import { useContext, useState } from 'react';
 import { TrainingContext } from '../../context/Training';
 

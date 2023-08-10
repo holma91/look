@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Text } from '../styling/Text';
+import { Text } from '../styling/RestylePrimitives';
 import { Theme } from '../styling/theme';
 
 const BaseButton = createBox<Theme, TouchableOpacityProps>(TouchableOpacity);

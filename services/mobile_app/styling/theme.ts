@@ -1,4 +1,3 @@
-import { Platform, PlatformColor } from 'react-native';
 import { createTheme } from '@shopify/restyle';
 
 const ios = {

@@ -6,21 +6,20 @@ import * as Haptics from 'expo-haptics';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
 
-import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
+import { Box, Text } from '../styling/RestylePrimitives';
 import {
   extractScriptV2,
   freezeScript,
   unFreezeScript,
-} from '../utils/scripts';
-import { fetchProducts } from '../api';
-import { Company, Product, UserProduct } from '../utils/types';
+} from '../utils/extraction/scripts';
+import { fetchProduct, fetchProducts } from '../api';
+import { Company, UserProduct } from '../utils/types';
 import { WebviewSearchBar } from '../components/SearchBar';
 import SearchList from '../components/SearchList';
-import { saveHistory } from '../utils/history';
+import { saveHistory } from '../utils/storage/history';
 import { useLikeProductMutation } from '../hooks/mutations/useLikeProductMutation';
 import ThemedIcon from '../components/ThemedIcon';
-import { parseProductData } from '../utils/parsing';
+import { parseProductData } from '../utils/extraction/parsing';
 import { useAddToHistoryMutation } from '../hooks/mutations/useAddToHistoryMutation';
 import { useAddImagesMutation } from '../hooks/mutations/useAddImagesMutation';
 import { useRemoveImagesMutation } from '../hooks/mutations/useRemoveImagesMutation';
@@ -49,7 +48,7 @@ export default function Browser({ navigation, route }: BrowserProps) {
   const [searchText, setSearchText] = useState('');
   const [searchBarFocused, setSearchBarFocused] = useState(false);
   const [expandedMenu, setExpandedMenu] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState<Product>(
+  const [currentProduct, setCurrentProduct] = useState<UserProduct>(
     route.params?.product || {
       url: '',
       name: '',
@@ -57,6 +56,8 @@ export default function Browser({ navigation, route }: BrowserProps) {
       price: '',
       currency: '',
       images: [],
+      domain: '',
+      liked: false,
     }
   );
   const [selectMode, setSelectMode] = useState(false);
@@ -124,10 +125,10 @@ export default function Browser({ navigation, route }: BrowserProps) {
           setExpandedMenu={setExpandedMenu}
           navigate={navigate}
           currentProduct={currentProduct}
-          setCurrentProduct={setCurrentProduct}
           products={products || []}
           selectMode={selectMode}
           handleToggleSelectMode={handleToggleSelectMode}
+          user={user}
         />
       </SafeAreaView>
     </Box>
@@ -184,8 +185,8 @@ function Header({
 type ContentProps = {
   navigation: any;
   route: any;
-  currentProduct: Product;
-  setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
+  currentProduct: UserProduct;
+  setCurrentProduct: React.Dispatch<React.SetStateAction<UserProduct>>;
   webviewRef: React.RefObject<WebView>;
   searchBarFocused: boolean;
   searchText: string;
@@ -303,6 +304,8 @@ function Content({
         price: '',
         currency: '',
         images: [],
+        domain: '',
+        liked: false,
       });
     }
   };
@@ -360,11 +363,11 @@ type NavBarProps = {
   expandedMenu: boolean;
   setExpandedMenu: React.Dispatch<React.SetStateAction<boolean>>;
   navigate: (direction: 'back' | 'forward') => void;
-  currentProduct: Product;
-  setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
+  currentProduct: UserProduct;
   products: UserProduct[];
   selectMode: boolean;
   handleToggleSelectMode: () => void;
+  user: any;
 };
 
 function NavBar({
@@ -372,11 +375,18 @@ function NavBar({
   setExpandedMenu,
   navigate,
   currentProduct,
-  setCurrentProduct,
   products,
   selectMode,
   handleToggleSelectMode,
+  user,
 }: NavBarProps) {
+  const { data: activeProduct } = useQuery({
+    queryKey: ['product', currentProduct.url],
+    queryFn: () => fetchProduct(user!.id, currentProduct.url),
+    initialData: currentProduct,
+    enabled: !!user?.id,
+  });
+
   const likeProductMutation = useLikeProductMutation({ list: ['history'] });
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -395,14 +405,6 @@ function NavBar({
       likeProductMutation.mutate(activeProduct);
     }
   };
-
-  let icon: 'heart' | 'heart-outline' = products?.find(
-    (product) => product.url === currentProduct?.url && product.liked
-  )
-    ? 'heart'
-    : 'heart-outline';
-
-  let activeProduct = products?.find((p) => p.url === currentProduct?.url);
 
   return (
     <Box zIndex={100}>
@@ -447,7 +449,11 @@ function NavBar({
         </Box>
         <Box flex={0} flexDirection="row" gap="m" alignItems="center">
           <TouchableOpacity onPress={handleLikeProduct}>
-            <ThemedIcon name={icon} size={24} color="text" />
+            <ThemedIcon
+              name={activeProduct?.liked ? 'heart' : 'heart-outline'}
+              size={24}
+              color="text"
+            />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleToggleSelectMode}>
             <ThemedIcon
@@ -461,8 +467,7 @@ function NavBar({
       <BrowserSheetModal
         bottomSheetModalRef={bottomSheetModalRef}
         setExpandedMenu={setExpandedMenu}
-        currentProduct={currentProduct}
-        setCurrentProduct={setCurrentProduct}
+        activeProduct={activeProduct}
         products={products}
         selectMode={selectMode}
       />

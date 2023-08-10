@@ -1,6 +1,4 @@
-import { getDomain } from './helpers';
-import { baseExtractScript, baseInteractScript } from './scripts';
-import { Product } from './types';
+import { baseInteractScript } from './scripts';
 
 export function getInjectScripts(domain: string) {
   let scripts = [extractScript];

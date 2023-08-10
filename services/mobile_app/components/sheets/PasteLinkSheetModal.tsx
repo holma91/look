@@ -10,12 +10,10 @@ import { WebView } from 'react-native-webview';
 import * as Haptics from 'expo-haptics';
 
 import { createProduct } from '../../api';
-import { Box } from '../../styling/Box';
-import { Text } from '../../styling/Text';
-import { Product as ProductType } from '../../utils/types';
-import { TextInput } from '../../styling/TextInput';
-import { parseProductData } from '../../utils/parsing';
-import { getInjectScripts } from '../../utils/inject';
+import { Box, Text, TextInput } from '../../styling/RestylePrimitives';
+import { UserProduct } from '../../utils/types';
+import { parseProductData } from '../../utils/extraction/parsing';
+import { getInjectScripts } from '../../utils/extraction/inject';
 import { getDomain } from '../../utils/helpers';
 import { PrimaryButton } from '../Button';
 
@@ -30,7 +28,7 @@ export function PasteLinkSheetModal({
   navigation,
   pasteLinkSheetRef,
 }: PasteLinkSheetModalProps) {
-  const [currentProduct, setCurrentProduct] = useState<ProductType>({
+  const [currentProduct, setCurrentProduct] = useState<UserProduct>({
     url: '',
     name: '',
     brand: '',
@@ -38,6 +36,7 @@ export function PasteLinkSheetModal({
     currency: '',
     images: [],
     domain: '',
+    liked: false,
   });
   const [linkText, setLinkText] = useState('');
   const [webViewSource, setWebViewSource] = useState(DEFAULT_SOURCE);
@@ -105,10 +104,11 @@ export function PasteLinkSheetModal({
         currency: '',
         images: [],
         domain: '',
+        liked: false,
       };
     }
 
-    setCurrentProduct({ ...product, domain: domain });
+    setCurrentProduct({ ...product, domain: domain, liked: false });
     setIsLoading(false);
     try {
       await createProduct(user?.id, product, domain);
@@ -138,6 +138,8 @@ export function PasteLinkSheetModal({
       price: '',
       currency: '',
       images: [],
+      domain: '',
+      liked: false,
     });
     setUnsupportedDomain(null);
     setInvalidLink(false);

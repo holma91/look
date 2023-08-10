@@ -2,8 +2,7 @@ import { FlatList, View, TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Box } from '../../styling/Box';
-import { Text } from '../../styling/Text';
+import { Box, Text } from '../../styling/RestylePrimitives';
 import { useContext, useEffect, useState } from 'react';
 import { TrainingContext } from '../../context/Training';
 import TrainingSticker from '../../components/TrainingSticker';

@@ -7,7 +7,7 @@ import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
-import { Box } from '../styling/Box';
+import { Box } from '../styling/RestylePrimitives';
 import { Text } from '../styling/Text';
 import { SelectField } from '../components/SelectField';
 

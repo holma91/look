@@ -9,15 +9,18 @@ import { useUser } from '@clerk/clerk-expo';
 import { Image as ExpoImage } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 
-import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
+import { Box, Text } from '../styling/RestylePrimitives';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { companyToInfo } from '../utils/utils';
+import { companyToInfo } from '../utils/info';
 import { SearchBar } from '../components/SearchBar';
 import { favoriteCompany, fetchCompanies, unFavoriteCompany } from '../api';
 import { Company } from '../utils/types';
 import SearchList from '../components/SearchList';
-import { clearHistory, getHistory, saveHistory } from '../utils/history';
+import {
+  clearHistory,
+  getHistory,
+  saveHistory,
+} from '../utils/storage/history';
 import ThemedIcon from '../components/ThemedIcon';
 
 export default function Shop({ navigation }: { navigation: any }) {

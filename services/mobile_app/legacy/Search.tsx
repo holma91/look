@@ -10,12 +10,12 @@ import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { SearchBar } from '../components/SearchBar';
-import { Box } from '../styling/Box';
+import { Box } from '../styling/RestylePrimitives';
 import { Text } from '../styling/Text';
 import { fetchCompanies } from '../api';
 import { useState } from 'react';
 import { Website, Company } from '../utils/types';
-import { companyToInfo } from '../utils/utils';
+import { companyToInfo } from '../utils/info';
 
 export default function Search({ navigation }: { navigation: any }) {
   const [searchText, setSearchText] = useState('');

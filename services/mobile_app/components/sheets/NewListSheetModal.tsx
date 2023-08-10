@@ -4,8 +4,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FlashList } from '@shopify/flash-list';
 
-import { Box } from '../../styling/Box';
-import { Text } from '../../styling/Text';
+import { Box, Text } from '../../styling/RestylePrimitives';
 import { OuterChoiceFilterType, UserProduct } from '../../utils/types';
 import { PrimaryButton } from '../Button';
 import { TextInput, TouchableOpacity } from 'react-native';

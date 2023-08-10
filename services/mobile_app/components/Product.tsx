@@ -1,14 +1,12 @@
 import { TouchableOpacity } from 'react-native';
-import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Animated from 'react-native-reanimated';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HoldItem } from 'react-native-hold-menu';
-import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
+import { Box, Text } from '../styling/RestylePrimitives';
 import { FilterType, UserProduct } from '../utils/types';
 import { useDeleteProductsMutation } from '../hooks/mutations/useDeleteProductsMutation';
-import { useLikeProductMutation } from '../hooks/mutations/useLikeProductMutation';
+import { useLikeProductsMutation } from '../hooks/mutations/useLikeProductsMutation';
 
 export function ProductBig({
   navigation,
@@ -24,7 +22,8 @@ export function ProductBig({
   handleProductSelection?: (product: UserProduct, isSelected: boolean) => void;
 }) {
   const [isSelected, setIsSelected] = useState(false);
-  const likeProductMutation = useLikeProductMutation(filter);
+  const likeProductsMutation = useLikeProductsMutation(filter);
+
   const deleteProductsMutation = useDeleteProductsMutation(filter);
 
   const listId = filter?.list && filter.list[0];
@@ -37,7 +36,10 @@ export function ProductBig({
       ),
       onPress: () => {
         console.log('like:', product.name);
-        likeProductMutation.mutate(product);
+        likeProductsMutation.mutate({
+          products: [product],
+          like: !product.liked,
+        });
       },
       actionParams: {
         key: product.url,
@@ -61,7 +63,10 @@ export function ProductBig({
       ),
       onPress: () => {
         console.log('like:', product.name);
-        likeProductMutation.mutate(product);
+        likeProductsMutation.mutate({
+          products: [product],
+          like: !product.liked,
+        });
       },
       actionParams: {
         key: product.url,

@@ -1,12 +1,11 @@
 import { SafeAreaView, Switch } from 'react-native';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 
-import { Box } from '../styling/Box';
+import { Box, Text } from '../styling/RestylePrimitives';
 import { useContext } from 'react';
 import { DemoContext } from '../context/Demo';
 import { DarkModeContext } from '../context/DarkMode';
-import { Text } from '../styling/Text';
-import { clearHistory } from '../utils/history';
+import { clearHistory } from '../utils/storage/history';
 import { Button } from '../components/Buttons';
 import { PrimaryButton } from '../components/Button';
 

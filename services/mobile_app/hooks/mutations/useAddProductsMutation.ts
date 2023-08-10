@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import { addToPlist, deleteFromPlist } from '../../api';
-import { FilterType, UserProduct } from '../../utils/types';
+import { addToPlist } from '../../api';
+import { UserProduct } from '../../utils/types';
 
 type AddProductsMutationProps = { products: UserProduct[]; listId: string };
 

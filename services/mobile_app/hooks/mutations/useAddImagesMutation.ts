@@ -1,13 +1,7 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import {
-  addProductImages,
-  addToPlist,
-  createProduct,
-  deleteFromPlist,
-} from '../../api';
-import { FilterType, UserProduct } from '../../utils/types';
-import { getDomain } from '../../utils/helpers';
+import { addProductImages } from '../../api';
+import { UserProduct } from '../../utils/types';
 
 type AddImagesMutationProps = {
   product: UserProduct;
@@ -23,7 +17,7 @@ export const useAddImagesMutation = () => {
       await addProductImages(user!.id, product.url, images);
       return product;
     },
-    onError: (err, images, context) => {
+    onError: (err, { product, images }, context) => {
       console.log('error', err, product, context);
     },
     onSettled: async (_, err, products, context) => {

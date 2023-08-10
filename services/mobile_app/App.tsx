@@ -9,7 +9,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { HoldMenuProvider } from 'react-native-hold-menu';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { lightTheme, darkTheme } from './styling/theme';
-import { tokenCache } from './utils/tokenCache';
+import { tokenCache } from './utils/storage/tokenCache';
 import Navigation from './navigation';
 import { TrainingProvider } from './context/Training';
 import { DemoProvider } from './context/Demo';

@@ -8,7 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import React, { useEffect } from 'react';
 import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
-import { Text } from '../styling/Text';
+import { Text } from '../styling/RestylePrimitives';
 import { FilterSheetModal } from './sheets/FilterSheetModal';
 import { useQuery } from '@tanstack/react-query';
 import { FilterType, OuterChoiceFilterType } from '../utils/types';

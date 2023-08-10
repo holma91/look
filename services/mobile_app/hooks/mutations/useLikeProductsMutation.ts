@@ -26,7 +26,6 @@ export const useLikeProductsMutation = (filter: FilterType) => {
         filter,
       ]);
 
-      // optimistically update the cache
       const productUrls = products.map((p) => p.url);
       queryClient.setQueryData(
         ['products', user?.id, filter],

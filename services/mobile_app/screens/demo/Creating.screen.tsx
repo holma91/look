@@ -3,8 +3,7 @@ import { View, Dimensions, TouchableOpacity, Animated } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Box } from '../../styling/Box';
-import { Text } from '../../styling/Text';
+import { Box, Text } from '../../styling/RestylePrimitives';
 import { TrainingContext } from '../../context/Training';
 
 const images = [

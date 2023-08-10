@@ -10,9 +10,8 @@ import {
 import { Image as ExpoImage } from 'expo-image';
 import FontistoIcons from '@expo/vector-icons/Fontisto';
 
-import { Text } from '../styling/Text';
 import { Theme } from '../styling/theme';
-import { Box } from '../styling/Box';
+import { Box, Text } from '../styling/RestylePrimitives';
 
 type RestyleProps = SpacingProps<Theme> &
   BorderProps<Theme> &

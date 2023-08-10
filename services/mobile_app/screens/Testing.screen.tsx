@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Replicate from 'replicate';
 import Constants from 'expo-constants';
 
-import { Box } from '../styling/Box';
+import { Box } from '../styling/RestylePrimitives';
 
 const replicate = new Replicate({
   auth: Constants?.expoConfig?.extra?.replicateApiKey,

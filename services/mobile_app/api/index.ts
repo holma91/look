@@ -91,6 +91,18 @@ export const fetchProducts = async (
   return response.json();
 };
 
+export const fetchProduct = async (id: string, url: string) => {
+  const completeUrl = `${URL}/users/${id}/product?product_url=${url}`;
+  const response = await fetch(completeUrl);
+
+  if (!response.ok) {
+    throw new Error(
+      `Network response was not ok. Status code: ${response.status}`
+    );
+  }
+  return response.json();
+};
+
 export const createProduct = async (
   userId: string,
   product: UserProduct,

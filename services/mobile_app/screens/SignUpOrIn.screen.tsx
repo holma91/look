@@ -2,8 +2,7 @@ import {
   SignInWithApple,
   SignInWithGoogle,
 } from '../components/SignInWithOAuth';
-import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
+import { Box, Text } from '../styling/RestylePrimitives';
 import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 

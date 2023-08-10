@@ -1,14 +1,4 @@
-export type Product = {
-  url: string;
-  name: string;
-  brand: string;
-  price: string;
-  currency: string;
-  updatedAt?: string;
-  images: string[];
-  domain?: string;
-};
-
+// A product from a User's perspective
 export type UserProduct = {
   url: string;
   name: string;
@@ -16,16 +6,8 @@ export type UserProduct = {
   price: string;
   currency: string;
   images: string[];
-  updatedAt?: string;
-  liked?: boolean;
-  domain?: string;
-  creator?: string;
-  generatedBy?: string[];
-};
-
-export type Website = {
   domain: string;
-  favorited: boolean;
+  liked: boolean;
 };
 
 export type Company = {

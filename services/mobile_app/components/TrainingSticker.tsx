@@ -6,7 +6,7 @@ import Animated, {
   useAnimatedGestureHandler,
   withSpring,
 } from 'react-native-reanimated';
-import { Text } from '../styling/Text';
+import { Text } from '../styling/RestylePrimitives';
 import { TrainingContext } from '../context/Training';
 import { useContext } from 'react';
 

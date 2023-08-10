@@ -3,8 +3,7 @@ import { MasonryFlashList } from '@shopify/flash-list';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Box } from '../../styling/Box';
-import { TextInput } from '../../styling/TextInput';
+import { Box, TextInput } from '../../styling/RestylePrimitives';
 import { UserProduct } from '../../utils/types';
 import { useState } from 'react';
 import Filter from '../../components/Filter';

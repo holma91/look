@@ -1,7 +1,6 @@
 import { TouchableOpacity, Keyboard } from 'react-native';
 
-import { Box } from '../styling/Box';
-import { TextInput } from '../styling/TextInput';
+import { Box, TextInput } from '../styling/RestylePrimitives';
 import ThemedIcon from './ThemedIcon';
 import { useTheme } from '@shopify/restyle';
 

@@ -1,5 +1,5 @@
-import { getDomain } from './helpers';
-import { Product } from './types';
+import { getDomain } from '../helpers';
+import { UserProduct } from '../types';
 
 type IntermediaryProduct = {
   name: string;
@@ -145,7 +145,7 @@ function getParser(domain: string) {
   return parser;
 }
 
-export function parseProductData(url: string, rawData: string): Product {
+export function parseProductData(url: string, rawData: string): UserProduct {
   const domain = getDomain(url);
   if (!domain) throw new Error('Could not parse domain');
 
@@ -182,5 +182,5 @@ export function parseProductData(url: string, rawData: string): Product {
     throw new Error(`couldn't parse on domain:${domain} with error: ${e}`);
   }
 
-  return { ...product, url: url };
+  return { ...product, url: url, domain: domain, liked: false };
 }

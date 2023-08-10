@@ -1,49 +1,54 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import { likeProducts, unlikeProducts } from '../../api';
-import { FilterType, UserProduct } from '../../utils/types';
+import { likeProducts, unlikeProducts } from '../api';
+import { FilterType, UserProduct } from '../utils/types';
 
-export const useLikeProductMutation = (filter: FilterType) => {
+export const useLikeProductMutationOld = (filter: FilterType) => {
   const { user } = useUser();
   const queryClient = useQueryClient();
 
   const likeProductMutation = useMutation({
     mutationFn: async (product: UserProduct) => {
+      console.log('product in mfn', product);
+
       !product.liked
         ? await unlikeProducts(user!.id, [product])
         : await likeProducts(user!.id, [product]);
       return product;
     },
     onMutate: async (product: UserProduct) => {
-      await queryClient.cancelQueries(['product', product.url]);
-      const previousProduct = queryClient.getQueryData([
-        'product',
-        product.url,
+      console.log('product', product);
+
+      await queryClient.cancelQueries(['products', user?.id, filter]);
+      const previousProducts = queryClient.getQueryData([
+        'products',
+        user?.id,
+        filter,
       ]);
 
+      // optimistically update the cache
       queryClient.setQueryData(
-        ['product', product.url],
-        (old: UserProduct | undefined) => {
-          if (old) {
-            old.liked = !old.liked;
-          }
-          return old;
+        ['products', user?.id, filter],
+        (old: UserProduct[] | undefined) => {
+          return old?.map((p) => {
+            if (p.url === product.url) {
+              p.liked = !p.liked;
+            }
+            return p;
+          });
         }
       );
 
-      return { previousProduct };
+      return { previousProducts };
     },
     onError: (err, product, context) => {
       console.log('error', err, product, context);
       queryClient.setQueryData(
-        ['product', product.url],
-        context?.previousProduct
+        ['products', user?.id, filter],
+        context?.previousProducts
       );
     },
-    onSettled: async (_, err, product, context) => {
-      queryClient.invalidateQueries({
-        queryKey: ['product', product.url],
-      });
+    onSettled: async () => {
       queryClient.invalidateQueries({
         queryKey: ['products', user?.id, filter],
       });

@@ -5,8 +5,7 @@ import React, { useMemo } from 'react';
 import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import { fetchPlists } from '../../api';
-import { Box } from '../../styling/Box';
-import { Text } from '../../styling/Text';
+import { Box, Text } from '../../styling/RestylePrimitives';
 import {
   FilterType,
   OuterChoiceFilterType,

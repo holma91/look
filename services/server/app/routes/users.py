@@ -31,6 +31,8 @@ async def read_user(id: str) -> UserExtended:
 
 ### PRODUCT INFO ###
 
+
+
 @router.get("/{user_id}/products", response_model=list[UserProduct])
 async def read_user_products(
     user_id: str, 
@@ -47,6 +49,24 @@ async def read_user_products(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return products
+
+@router.get("/{user_id}/products/{product_url}", response_model=UserProduct)
+async def read_user_product(user_id: str, product_url: str) -> UserProduct:
+    product = await crud.get_product(user_id, product_url)
+    if not product:
+        raise HTTPException(status_code=404, detail="User or Product not found!")
+
+    return product
+
+@router.get("/{user_id}/product", response_model=UserProduct)
+async def read_user_product(user_id: str, product_url: str = Query(None)) -> UserProduct:
+    print('product_url', product_url)
+    product = await crud.get_product(user_id, product_url)
+    if not product:
+        raise HTTPException(status_code=404, detail="User or Product not found!")
+
+    return product
+
 
 ### COMPANY INFO ###
 

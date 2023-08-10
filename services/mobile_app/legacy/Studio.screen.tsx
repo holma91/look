@@ -10,7 +10,7 @@ import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-import { Box } from '../styling/Box';
+import { Box } from '../styling/RestylePrimitives';
 import { Text } from '../styling/Text';
 import { UserProduct } from '../utils/types';
 import { useRef, useState } from 'react';

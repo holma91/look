@@ -77,7 +77,6 @@ class ListProducts(ListBase):
 class UserProduct(ProductBase):
     company: str
     liked: bool
-    # purchased: bool
     images: list[str]
 
 class UserProduct2(ProductBase):

@@ -14,7 +14,7 @@ import {
   createVariant,
 } from '@shopify/restyle';
 
-import { Box, ScrollBox } from '../styling/Box';
+import { Box, ScrollBox } from '../styling/RestylePrimitives';
 import { Text } from '../styling/Text';
 import { Theme } from '../styling/theme';
 import { FilterType, UserProduct } from '../utils/types';

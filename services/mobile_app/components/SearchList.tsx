@@ -2,9 +2,8 @@ import { FlatList, Keyboard, TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { useUser } from '@clerk/clerk-expo';
 
-import { Box } from '../styling/Box';
-import { companyToInfo } from '../utils/utils';
-import { Text } from '../styling/Text';
+import { Box, Text } from '../styling/RestylePrimitives';
+import { companyToInfo } from '../utils/info';
 import { fetchCompanies } from '../api';
 import { useQuery } from '@tanstack/react-query';
 import { Company } from '../utils/types';

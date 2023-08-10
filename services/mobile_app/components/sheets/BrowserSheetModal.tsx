@@ -4,9 +4,8 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
 import { Image as ExpoImage } from 'expo-image';
 
-import { Box } from '../../styling/Box';
-import { Text } from '../../styling/Text';
-import { Product, UserProduct } from '../../utils/types';
+import { Box, Text } from '../../styling/RestylePrimitives';
+import { UserProduct } from '../../utils/types';
 import { PrimaryButton } from '../../components/Button';
 import ThemedIcon from '../../components/ThemedIcon';
 import { useTheme } from '@shopify/restyle';
@@ -20,8 +19,7 @@ const defaultImage =
 type BrowserSheetModalProps = {
   bottomSheetModalRef: React.RefObject<BottomSheetModal>;
   setExpandedMenu: React.Dispatch<React.SetStateAction<boolean>>;
-  currentProduct: Product;
-  setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
+  activeProduct: UserProduct;
   products: UserProduct[];
   selectMode: boolean;
 };
@@ -29,8 +27,7 @@ type BrowserSheetModalProps = {
 export function BrowserSheetModal({
   bottomSheetModalRef,
   setExpandedMenu,
-  currentProduct,
-  setCurrentProduct,
+  activeProduct,
   products,
   selectMode,
 }: BrowserSheetModalProps) {
@@ -74,10 +71,9 @@ export function BrowserSheetModal({
       bottomInset={86}
     >
       <BottomSheetContent
-        currentProduct={currentProduct}
+        activeProduct={activeProduct}
         expandedContent={expandedContent}
         products={products}
-        setCurrentProduct={setCurrentProduct}
         selectMode={selectMode}
       />
     </BottomSheetModal>
@@ -85,16 +81,14 @@ export function BrowserSheetModal({
 }
 
 type BottomSheetContentProps = {
-  currentProduct: Product;
+  activeProduct: UserProduct;
   expandedContent: boolean;
   products: UserProduct[];
-  setCurrentProduct: React.Dispatch<React.SetStateAction<Product>>;
   selectMode: boolean;
 };
 
 const BottomSheetContent = ({
-  currentProduct,
-  setCurrentProduct,
+  activeProduct,
   expandedContent,
   products,
   selectMode,
@@ -110,18 +104,16 @@ const BottomSheetContent = ({
   const handleRemoveImage = (image: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    const newImages = currentProduct.images.filter((img) => img !== image);
     removeImagesMutation.mutate({
-      product: currentProduct,
+      product: activeProduct,
       images: [image],
     });
-    setCurrentProduct({ ...currentProduct, images: newImages });
     setCurrentImageIndex(0);
   };
 
-  const img = currentProduct.images[currentImageIndex];
+  const img = activeProduct.images[currentImageIndex];
 
-  if (currentProduct.url === '') {
+  if (activeProduct.url === '') {
     return (
       <Box justifyContent="center" alignItems="center" marginTop="l" gap="m">
         <Text variant="title">We can't find a product!</Text>
@@ -236,16 +228,16 @@ const BottomSheetContent = ({
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {currentProduct.name}
+                {activeProduct.name}
               </Text>
               <Text variant="body" fontSize={17}>
-                {currentProduct.brand}
+                {activeProduct.brand}
               </Text>
 
               <Text
                 variant="body"
                 fontSize={17}
-              >{`${currentProduct.price} ${currentProduct.currency}`}</Text>
+              >{`${activeProduct.price} ${activeProduct.currency}`}</Text>
             </Box>
 
             <Box flex={0} gap="l">
@@ -253,7 +245,7 @@ const BottomSheetContent = ({
                 style={{ gap: 10, marginTop: 20 }}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                data={currentProduct.images}
+                data={activeProduct.images}
                 contentContainerStyle={{ paddingLeft: 5 }}
                 keyExtractor={(item, index) => `category-${index}`}
                 renderItem={({ item, index }) => (

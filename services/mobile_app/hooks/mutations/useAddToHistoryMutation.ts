@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import { addToPlist, createProduct, deleteFromPlist } from '../../api';
-import { FilterType, UserProduct } from '../../utils/types';
+import { createProduct } from '../../api';
+import { UserProduct } from '../../utils/types';
 import { getDomain } from '../../utils/helpers';
 
 export const useAddToHistoryMutation = () => {
