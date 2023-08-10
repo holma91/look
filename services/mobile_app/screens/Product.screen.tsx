@@ -19,9 +19,7 @@ import Animated, {
 import { TrainingContext } from '../context/Training';
 import { useLikeProductMutation } from '../hooks/mutations/useLikeProductMutation';
 import { PrimaryButton } from '../components/Button';
-import { useQuery } from '@tanstack/react-query';
-import { fetchProduct } from '../api';
-import { useUser } from '@clerk/clerk-expo';
+import { useProductQuery } from '../hooks/queries/useProductQuery';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,22 +32,14 @@ const determineImage = (image: string | number) => {
   return image;
 };
 
-export default function Product({
-  navigation,
-  route,
-}: {
+type ProductProps = {
   navigation: any;
   route: any;
-}) {
-  const { filter }: { filter: FilterType } = route.params;
-  const { user } = useUser();
+};
 
-  const { data: activeProduct } = useQuery({
-    queryKey: ['product', route.params.product.url],
-    queryFn: () => fetchProduct(user!.id, route.params.product.url),
-    initialData: route.params.product,
-    enabled: !!user?.id,
-  });
+export default function Product({ navigation, route }: ProductProps) {
+  const { filter }: { filter: FilterType } = route.params;
+  const { data: activeProduct } = useProductQuery(route.params.product);
   const likeProductMutation = useLikeProductMutation(filter);
 
   const [activeIndex, setActiveIndex] = useState(0);

@@ -1,7 +1,36 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import { removeProductImages } from '../../api';
 import { UserProduct } from '../../utils/types';
+import { URL } from '../../api/index';
+
+export async function removeProductImages(
+  userId: string,
+  productUrl: string,
+  imageUrls: string[]
+) {
+  const imageProduct = {
+    productUrl,
+    imageUrls,
+  };
+
+  console.log('JSON.stringify(imageProduct)', JSON.stringify(imageProduct));
+
+  const response = await fetch(`${URL}/users/${userId}/products/images`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(imageProduct),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+    );
+  }
+
+  return response;
+}
 
 type RemoveImagesMutationProps = {
   product: UserProduct;

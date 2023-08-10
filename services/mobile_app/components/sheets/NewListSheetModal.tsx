@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { FlashList } from '@shopify/flash-list';
 
 import { Box, Text } from '../../styling/RestylePrimitives';
@@ -9,8 +9,9 @@ import { OuterChoiceFilterType, UserProduct } from '../../utils/types';
 import { PrimaryButton } from '../Button';
 import { TextInput, TouchableOpacity } from 'react-native';
 import { useUser } from '@clerk/clerk-expo';
-import { createPlist, fetchProducts } from '../../api';
+import { createPlist } from '../../api';
 import { ProductSmall } from '../Product';
+import { useProductsQuery } from '../../hooks/queries/useProductsQuery';
 
 type NewListSheetModalProps = {
   newListSheetModalRef: React.RefObject<BottomSheetModal>;
@@ -30,11 +31,7 @@ export function NewListSheetModal({
   const [selectedProducts, setSelectedProducts] = useState<UserProduct[]>([]);
   const { user } = useUser();
 
-  const { data: history } = useQuery({
-    queryKey: ['products', user?.id],
-    queryFn: () => fetchProducts(user?.id as string, { list: ['history'] }),
-    enabled: !!user?.id,
-  });
+  const { data: products } = useProductsQuery({ list: ['history'] });
 
   const queryClient = useQueryClient();
 
@@ -127,7 +124,7 @@ export function NewListSheetModal({
             Do you want to add any of your products to your new list?
           </Text>
           <FlashList
-            data={history || []}
+            data={products ?? []}
             renderItem={({ item }) => (
               <ProductSmall
                 product={item}

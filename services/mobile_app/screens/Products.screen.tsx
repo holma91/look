@@ -4,15 +4,12 @@ import {
   RefreshControl,
   SafeAreaView,
 } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
 import { useState } from 'react';
 import React, { useCallback, useRef } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
 import { HoldItem } from 'react-native-hold-menu';
 import { useActionSheet } from '@expo/react-native-action-sheet';
-import { fetchProducts } from '../api';
 import { Box, Text } from '../styling/RestylePrimitives';
 import { FilterType, OuterChoiceFilterType, UserProduct } from '../utils/types';
 import Filter from '../components/Filter';
@@ -23,6 +20,7 @@ import { useDeleteProductsMutation } from '../hooks/mutations/useDeleteProductsM
 import { useLikeProductsMutation } from '../hooks/mutations/useLikeProductsMutation';
 import ThemedIcon from '../components/ThemedIcon';
 import { AddProductsSheetModal } from '../components/sheets/AddProductsSheetModal';
+import { useProductsQuery } from '../hooks/queries/useProductsQuery';
 
 type ProductsProps = {
   navigation: any;
@@ -116,13 +114,7 @@ function Content({
   filter,
   setSelectedProducts,
 }: ContentProps) {
-  const { user } = useUser();
-
-  const productsQuery = useQuery({
-    queryKey: ['products', user?.id, filter],
-    queryFn: () => fetchProducts(user?.id as string, filter),
-    enabled: !!user?.id,
-  });
+  const productsQuery = useProductsQuery(filter);
 
   const handleProductSelection = (
     product: UserProduct,

@@ -1,5 +1,4 @@
 import { FlatList, TouchableOpacity } from 'react-native';
-import { useUser } from '@clerk/clerk-expo';
 import * as Haptics from 'expo-haptics';
 import Animated, {
   useSharedValue,
@@ -7,15 +6,17 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import React, { useEffect } from 'react';
-import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Text } from '../styling/RestylePrimitives';
 import { FilterSheetModal } from './sheets/FilterSheetModal';
-import { useQuery } from '@tanstack/react-query';
 import { FilterType, OuterChoiceFilterType } from '../utils/types';
-import { fetchBrands, fetchCompanies, fetchPlists } from '../api';
+
 import ThemedIcon from './ThemedIcon';
 import { useTheme } from '@shopify/restyle';
 import { NewListSheetModal } from './sheets/NewListSheetModal';
+import { useCompaniesQuery } from '../hooks/queries/useCompaniesQuery';
+import { useBrandsQuery } from '../hooks/queries/useBrandsQuery';
+import { usePlistsQuery } from '../hooks/queries/usePlistsQuery';
 
 const possibleFilters: {
   label: 'all' | 'list' | 'category' | 'website' | 'brand';
@@ -65,28 +66,10 @@ export default function Filter({
   setOuterChoice,
 }: FilterProps) {
   const theme = useTheme();
-  const { user } = useUser();
 
-  const { data: companies } = useQuery<string[]>({
-    queryKey: ['companies', user?.id],
-    queryFn: () => fetchCompanies(user?.id as string),
-    enabled: !!user?.id,
-    select: (data) => data.map((company: any) => company.id),
-  });
-
-  const { data: brands } = useQuery<string[]>({
-    queryKey: ['brands', user?.id],
-    queryFn: () => fetchBrands(user?.id as string),
-    enabled: !!user?.id,
-    select: (data) => data.map((brand: any) => brand.brand),
-  });
-
-  const { data: plists } = useQuery<string[]>({
-    queryKey: ['plists', user?.id],
-    queryFn: () => fetchPlists(user?.id as string),
-    enabled: !!user?.id,
-    select: (data) => data.map((plist: any) => plist.id),
-  });
+  const { data: companies } = useCompaniesQuery();
+  const { data: brands } = useBrandsQuery();
+  const { data: plists } = usePlistsQuery();
 
   const animationValue = useSharedValue(0);
   useEffect(() => {
@@ -102,9 +85,9 @@ export default function Filter({
   const choices = React.useMemo<FilterType>(() => {
     return {
       all: ['list', 'brand', 'website'],
-      list: ['likes', 'history'].concat(plists || []),
-      brand: brands || [],
-      website: companies || [],
+      list: ['likes', 'history'].concat(plists?.map((plist) => plist.id) || []),
+      brand: brands?.map((brand) => brand.brand) || [],
+      website: companies?.map((company) => company.id) || [],
     };
   }, [brands, companies, plists]);
 

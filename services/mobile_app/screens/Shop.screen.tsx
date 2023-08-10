@@ -1,19 +1,11 @@
-import {
-  FlatList,
-  SafeAreaView,
-  TouchableOpacity,
-  Keyboard,
-} from 'react-native';
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
+import { FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 
 import { Box, Text } from '../styling/RestylePrimitives';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { companyToInfo } from '../utils/info';
 import { SearchBar } from '../components/SearchBar';
-import { favoriteCompany, fetchCompanies, unFavoriteCompany } from '../api';
 import { Company } from '../utils/types';
 import SearchList from '../components/SearchList';
 import {
@@ -22,6 +14,8 @@ import {
   saveHistory,
 } from '../utils/storage/history';
 import ThemedIcon from '../components/ThemedIcon';
+import { useCompaniesQuery } from '../hooks/queries/useCompaniesQuery';
+import { useFavCompanyMutation } from '../hooks/mutations/useFavCompanyMutation';
 
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -29,13 +23,8 @@ export default function Shop({ navigation }: { navigation: any }) {
   const [history, setHistory] = useState<string[]>([]);
   const [searchText, setSearchText] = useState('');
   const [focus, setFocus] = useState(false);
-  const { user } = useUser();
 
-  const { data: companies } = useQuery<Company[]>({
-    queryKey: ['companies', user?.id],
-    queryFn: () => fetchCompanies(user?.id as string),
-    enabled: !!user?.id,
-  });
+  const { data: companies } = useCompaniesQuery();
 
   const navigateToSite = async (company: Company) => {
     await saveHistory(company.id);
@@ -103,9 +92,6 @@ export default function Shop({ navigation }: { navigation: any }) {
                     contentContainerStyle={{ paddingLeft: 18 }}
                     keyExtractor={(item, index) => `history-${index}`}
                     renderItem={({ item }) => {
-                      // get company from domain
-                      // get info from company with companyToInfo
-                      const companyInfo = companyToInfo[item];
                       const company = companies?.find((c) => c.id === item);
                       return (
                         <TouchableOpacity
@@ -127,9 +113,6 @@ export default function Shop({ navigation }: { navigation: any }) {
                             source={companyToInfo[item].icon}
                             contentFit="contain"
                           />
-                          {/* <Text fontSize={14} fontWeight="500">
-                            {item}
-                          </Text> */}
                         </TouchableOpacity>
                       );
                     }}
@@ -180,7 +163,6 @@ export default function Shop({ navigation }: { navigation: any }) {
                   navigateToSite={navigateToSite}
                   selectedCategory={selectedCategory}
                   companies={companies || []}
-                  user={user}
                 />
               </Box>
             </>
@@ -203,55 +185,16 @@ type CompanyListProps = {
   navigateToSite: any;
   selectedCategory: string;
   companies: Company[];
-  user?: any;
 };
 
 function CompanyList({
   navigateToSite,
   selectedCategory,
   companies,
-  user,
 }: CompanyListProps) {
   const [renderToggle, setRenderToggle] = useState(false);
-  const queryClient = useQueryClient();
 
-  const mutation = useMutation({
-    mutationFn: async (company: Company) => {
-      if (!user?.id) return;
-
-      if (!company.favorited) {
-        return unFavoriteCompany(user.id, company.id);
-      } else {
-        return favoriteCompany(user.id, company.id);
-      }
-    },
-    onMutate: async (company: Company) => {
-      company.favorited = !company.favorited;
-
-      await queryClient.cancelQueries({ queryKey: ['companies', user?.id] });
-
-      const previousCompany = queryClient.getQueryData([
-        'companies',
-        company.id,
-      ]);
-
-      queryClient.setQueryData(['companies', company.id], company);
-
-      return { previousCompany, company };
-    },
-    onError: (err, company, context) => {
-      console.log('mutation error', err, company, context);
-      queryClient.setQueryData(
-        ['companies', context?.company.id],
-        context?.previousCompany
-      );
-    },
-    onSettled: async () => {
-      setRenderToggle(!renderToggle);
-
-      queryClient.invalidateQueries({ queryKey: ['companies', user?.id] });
-    },
-  });
+  const favCompanyMutation = useFavCompanyMutation(setRenderToggle);
 
   const filteredSites = useMemo(() => {
     let filtered;
@@ -314,7 +257,7 @@ function CompanyList({
           <TouchableOpacity
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              mutation.mutate(item);
+              favCompanyMutation.mutate(item);
             }}
           >
             <ThemedIcon

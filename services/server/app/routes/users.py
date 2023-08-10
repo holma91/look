@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from svix.webhooks import Webhook, WebhookVerificationError
 
 from app.crud import users as crud
-from app.models.pydantic import UserBase, ProductImages, UserProduct, ListBase, ListProducts, LikeProducts, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
+from app.models.pydantic import UserBase, UserCompany, UserBrand, ProductImages, UserProduct, ListBase, ListProducts, LikeProducts, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
 from app.utils import SUCCESSFUL_POST_RESPONSE
 
 router = APIRouter()
@@ -70,8 +70,8 @@ async def read_user_product(user_id: str, product_url: str = Query(None)) -> Use
 
 ### COMPANY INFO ###
 
-@router.get("/{user_id}/companies", response_model=list[Any])
-async def read_user_companies(user_id: str) -> list[Any]:
+@router.get("/{user_id}/companies", response_model=list[UserCompany])
+async def read_user_companies(user_id: str) -> list[UserCompany]:
     companies = await crud.get_companies(user_id)
     return companies
 
@@ -92,8 +92,8 @@ async def delete_favorite(user_id: str, company: FavoriteCompany):
 
 ### BRAND INFO ###
 
-@router.get("/{user_id}/brands", response_model=list[Any])
-async def read_user_brands(user_id: str) -> list[Any]:
+@router.get("/{user_id}/brands", response_model=list[UserBrand])
+async def read_user_brands(user_id: str) -> list[UserBrand]:
     brands = await crud.get_brands(user_id)
     return brands
 

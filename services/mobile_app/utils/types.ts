@@ -16,6 +16,14 @@ export type Company = {
   favorited: boolean;
 };
 
+export type Brand = {
+  brand: string;
+};
+
+export type Plist = {
+  id: string;
+};
+
 export type FilterType = {
   all?: string[];
   list?: string[];

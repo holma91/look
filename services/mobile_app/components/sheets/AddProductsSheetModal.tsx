@@ -1,10 +1,7 @@
 import { FlatList, TouchableOpacity } from 'react-native';
-import { useQuery } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
 import React, { useMemo } from 'react';
 import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
-import { fetchPlists } from '../../api';
 import { Box, Text } from '../../styling/RestylePrimitives';
 import {
   FilterType,
@@ -16,6 +13,7 @@ import { useAddProductsMutation } from '../../hooks/mutations/useAddProductsMuta
 import { useLikeProductsMutation } from '../../hooks/mutations/useLikeProductsMutation';
 import ThemedIcon from '../../components/ThemedIcon';
 import { useTheme } from '@shopify/restyle';
+import { usePlistsQuery } from '../../hooks/queries/usePlistsQuery';
 
 type AddProductsSheetModalProps = {
   addProductsSheetRef: React.RefObject<BottomSheetModal>;
@@ -36,8 +34,6 @@ export function AddProductsSheetModal({
   filter,
 }: AddProductsSheetModalProps) {
   const snapPoints = useMemo(() => ['85%'], []);
-
-  const { user } = useUser();
   const theme = useTheme();
 
   const addProductsMutation = useAddProductsMutation();
@@ -45,13 +41,7 @@ export function AddProductsSheetModal({
 
   const listId = filter?.list && filter.list[0];
 
-  const { data: plists } = useQuery<string[]>({
-    queryKey: ['plists', user?.id],
-    queryFn: () => fetchPlists(user?.id as string),
-    enabled: !!user?.id,
-    select: (data) =>
-      data.map((plist: any) => plist.id).filter((id) => id !== listId),
-  });
+  const { data: plists } = usePlistsQuery();
 
   const handleAddToList = async (listId: string) => {
     console.log('add to list', listId);
@@ -134,7 +124,10 @@ export function AddProductsSheetModal({
             My Lists
           </Text>
           <FlatList
-            data={['likes'].concat(plists ?? [])}
+            data={['likes'].concat(
+              plists?.map((plist) => plist.id).filter((id) => id !== listId) ??
+                []
+            )}
             keyExtractor={(item) => item}
             contentContainerStyle={{ gap: 10, paddingBottom: 32 }}
             renderItem={({ item }) => (

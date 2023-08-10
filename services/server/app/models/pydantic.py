@@ -109,3 +109,10 @@ class UserSchema(BaseModel):
 
 class WebsiteExtended(WebsiteBase):
     is_favorite: bool
+
+class UserCompany(CompanyBase):
+    favorited: bool
+    domains: list[str]
+
+class UserBrand(CustomBaseModel):
+    brand: str

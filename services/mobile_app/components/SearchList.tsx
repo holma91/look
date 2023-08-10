@@ -1,12 +1,10 @@
 import { FlatList, Keyboard, TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
-import { useUser } from '@clerk/clerk-expo';
 
 import { Box, Text } from '../styling/RestylePrimitives';
 import { companyToInfo } from '../utils/info';
-import { fetchCompanies } from '../api';
-import { useQuery } from '@tanstack/react-query';
 import { Company } from '../utils/types';
+import { useCompaniesQuery } from '../hooks/queries/useCompaniesQuery';
 
 export default function SearchList({
   navigateToSite,
@@ -17,14 +15,7 @@ export default function SearchList({
   searchText: string;
   setFocus: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { user } = useUser();
-
-  const { data: companies } = useQuery<Company[]>({
-    queryKey: ['companies', user?.id],
-    queryFn: () => fetchCompanies(user?.id as string),
-    enabled: !!user?.id,
-    onSuccess: () => {},
-  });
+  const { data: companies } = useCompaniesQuery();
 
   const filteredWebsites = companies?.filter((company) =>
     company.id.includes(searchText)

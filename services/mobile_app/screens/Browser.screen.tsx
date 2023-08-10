@@ -3,8 +3,6 @@ import { WebView } from 'react-native-webview';
 import React, { useCallback, useRef, useState } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
-import { useQuery } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
 
 import { Box, Text } from '../styling/RestylePrimitives';
 import {
@@ -12,7 +10,6 @@ import {
   freezeScript,
   unFreezeScript,
 } from '../utils/extraction/scripts';
-import { fetchProduct, fetchProducts } from '../api';
 import { Company, UserProduct } from '../utils/types';
 import { WebviewSearchBar } from '../components/SearchBar';
 import SearchList from '../components/SearchList';
@@ -25,6 +22,8 @@ import { useAddImagesMutation } from '../hooks/mutations/useAddImagesMutation';
 import { useRemoveImagesMutation } from '../hooks/mutations/useRemoveImagesMutation';
 import { arraysAreEqual } from '../utils/helpers';
 import { BrowserSheetModal } from '../components/sheets/BrowserSheetModal';
+import { useProductsQuery } from '../hooks/queries/useProductsQuery';
+import { useProductQuery } from '../hooks/queries/useProductQuery';
 
 function getUrl(urlParam: string) {
   if (urlParam === 'gucci.com') {
@@ -61,7 +60,6 @@ export default function Browser({ navigation, route }: BrowserProps) {
     }
   );
   const [selectMode, setSelectMode] = useState(false);
-  const { user } = useUser();
 
   const webviewRef = useRef<WebView>(null);
 
@@ -91,12 +89,6 @@ export default function Browser({ navigation, route }: BrowserProps) {
     setSelectMode((prevSelectMode) => !prevSelectMode);
   }, [selectMode, webviewRef]);
 
-  const { data: products } = useQuery({
-    queryKey: ['products', user?.id, { list: ['history'] }],
-    queryFn: () => fetchProducts(user?.id as string, { list: ['history'] }),
-    enabled: !!user?.id,
-  });
-
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -125,10 +117,8 @@ export default function Browser({ navigation, route }: BrowserProps) {
           setExpandedMenu={setExpandedMenu}
           navigate={navigate}
           currentProduct={currentProduct}
-          products={products || []}
           selectMode={selectMode}
           handleToggleSelectMode={handleToggleSelectMode}
-          user={user}
         />
       </SafeAreaView>
     </Box>
@@ -364,10 +354,8 @@ type NavBarProps = {
   setExpandedMenu: React.Dispatch<React.SetStateAction<boolean>>;
   navigate: (direction: 'back' | 'forward') => void;
   currentProduct: UserProduct;
-  products: UserProduct[];
   selectMode: boolean;
   handleToggleSelectMode: () => void;
-  user: any;
 };
 
 function NavBar({
@@ -375,18 +363,11 @@ function NavBar({
   setExpandedMenu,
   navigate,
   currentProduct,
-  products,
   selectMode,
   handleToggleSelectMode,
-  user,
 }: NavBarProps) {
-  const { data: activeProduct } = useQuery({
-    queryKey: ['product', currentProduct.url],
-    queryFn: () => fetchProduct(user!.id, currentProduct.url),
-    initialData: currentProduct,
-    enabled: !!user?.id,
-  });
-
+  const { data: activeProduct } = useProductQuery(currentProduct);
+  const { data: products } = useProductsQuery({ list: ['history'] });
   const likeProductMutation = useLikeProductMutation({ list: ['history'] });
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -468,7 +449,7 @@ function NavBar({
         bottomSheetModalRef={bottomSheetModalRef}
         setExpandedMenu={setExpandedMenu}
         activeProduct={activeProduct}
-        products={products}
+        products={products ?? []}
         selectMode={selectMode}
       />
     </Box>
