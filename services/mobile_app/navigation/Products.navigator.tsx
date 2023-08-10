@@ -20,13 +20,8 @@ export default function ProductsNavigator({
   const theme = useTheme();
   const [selectMode, setSelectMode] = useState(false);
 
-  console.log(navigation);
-
   useLayoutEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'Products';
-    console.log('routeName', routeName);
-    console.log('theme.colors.background', theme.colors.background);
-    console.log('selectMode', selectMode);
 
     if (routeName === 'Products' && selectMode === true) {
       navigation.setOptions({

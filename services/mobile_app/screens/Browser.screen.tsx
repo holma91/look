@@ -34,6 +34,8 @@ import { parseProductData } from '../utils/parsing';
 import Animated from 'react-native-reanimated';
 import { useAddToHistoryMutation } from '../hooks/useAddToHistoryMutation';
 import { useAddImagesMutation } from '../hooks/useAddImagesMutation';
+import { useRemoveImagesMutation } from '../hooks/useRemoveImagesMutation';
+import { arraysAreEqual } from '../utils/helpers';
 
 function getUrl(urlParam: string) {
   if (urlParam === 'gucci.com') {
@@ -46,16 +48,6 @@ function getUrl(urlParam: string) {
   } else {
     return 'https://' + urlParam;
   }
-}
-
-function arraysAreEqual(arr1: string[], arr2: string[]) {
-  if (arr1.length !== arr2.length) return false;
-
-  for (let i = 0; i < arr1.length; i++) {
-    if (arr1[i] !== arr2[i]) return false;
-  }
-
-  return true;
 }
 
 const defaultImage =
@@ -85,8 +77,7 @@ export default function Browser({
   const { user } = useUser();
   const addToHistoryMutation = useAddToHistoryMutation();
   const addImagesMutation = useAddImagesMutation();
-
-  const url = getUrl(route.params.url);
+  const removeImagesMutation = useRemoveImagesMutation();
 
   const webviewRef = useRef<WebView>(null);
 
@@ -130,12 +121,12 @@ export default function Browser({
 
   const handleLoadEnd = (navState: any) => {
     if (route.params?.baseProductUrl) {
+      // this is when user comes right from the product screen
       if (navState.nativeEvent.url === route.params.baseProductUrl) {
         return;
       }
     }
 
-    // 1. inject
     injectScripts();
   };
 
@@ -189,6 +180,12 @@ export default function Browser({
       const newImages = currentProduct.images.filter(
         (img) => img !== data.data
       );
+
+      removeImagesMutation.mutate({
+        product: currentProduct,
+        images: [data.data],
+      });
+
       setCurrentProduct({ ...currentProduct, images: newImages });
     } else if (data.type === 'no product') {
       console.log('no product');
@@ -265,7 +262,7 @@ export default function Browser({
                 ref={webviewRef}
                 startInLoadingState={true} // https://github.com/react-native-webview/react-native-webview/issues/124
                 source={{
-                  uri: url,
+                  uri: getUrl(route.params.url),
                 }}
                 onLoadEnd={handleLoadEnd}
                 onMessage={handleMessage}
@@ -490,19 +487,21 @@ const BottomSheetContent = ({
 }: BottomSheetContentProps) => {
   const theme = useTheme<Theme>();
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  const removeImagesMutation = useRemoveImagesMutation();
 
   const handleTestOnModel = async () => {
     console.log('test on model');
   };
 
   const handleRemoveImage = (image: string) => {
-    // this only removes the image on the client side
-    // we should also remove it on the server side
-
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     console.log('remove image:', image);
 
     const newImages = currentProduct.images.filter((img) => img !== image);
+    removeImagesMutation.mutate({
+      product: currentProduct,
+      images: [image],
+    });
     setCurrentProduct({ ...currentProduct, images: newImages });
     setCurrentImageIndex(0);
   };

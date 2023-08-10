@@ -237,3 +237,32 @@ export const unlikeProduct = async (userId: string, productUrl: string) => {
   });
   return response;
 };
+
+const demoImages: { [key: string]: any } = {
+  basic: [
+    require('../assets/generations/demo/blackman/stepbystep/1.png'),
+    require('../assets/generations/demo/blackman/stepbystep/2.png'),
+    require('../assets/generations/demo/blackman/stepbystep/3.png'),
+    require('../assets/generations/demo/blackman/stepbystep/4.png'),
+    require('../assets/generations/demo/blackman/stepbystep/5.png'),
+    require('../assets/generations/demo/blackman/stepbystep/6.png'),
+    require('../assets/generations/demo/blackman/stepbystep/7.png'),
+    require('../assets/generations/demo/blackman/stepbystep/8.png'),
+    require('../assets/generations/demo/blackman/stepbystep/9.png'),
+    require('../assets/generations/demo/blackman/stepbystep/10.png'),
+    require('../assets/generations/demo/blackman/stepbystep/11.png'),
+    require('../assets/generations/demo/blackman/stepbystep/12.png'),
+    require('../assets/generations/demo/blackman/stepbystep/13.png'),
+    require('../assets/generations/demo/blackman/stepbystep/14.png'),
+    require('../assets/generations/demo/blackman/stepbystep/15.png'),
+    require('../assets/generations/demo/blackman/stepbystep/20.png'),
+    require('../assets/generations/demo/blackman/stepbystep/25.png'),
+    require('../assets/generations/demo/blackman/stepbystep/30.png'),
+  ],
+  other: [
+    require('../assets/generations/demo/kitchen.png'),
+    require('../assets/generations/demo/park.png'),
+    require('../assets/generations/demo/timessquare.png'),
+    require('../assets/generations/demo/villa.png'),
+  ],
+};

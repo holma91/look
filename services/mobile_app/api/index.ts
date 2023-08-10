@@ -160,6 +160,35 @@ export const addProductImages = async (
   return response.json();
 };
 
+export const removeProductImages = async (
+  userId: string,
+  productUrl: string,
+  imageUrls: string[]
+) => {
+  const imageProduct = {
+    productUrl,
+    imageUrls,
+  };
+
+  console.log('JSON.stringify(imageProduct)', JSON.stringify(imageProduct));
+
+  const response = await fetch(`${URL}/users/${userId}/products/images`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(imageProduct),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+    );
+  }
+
+  return response;
+};
+
 export const likeProducts = async (userId: string, products: UserProduct[]) => {
   const response = await fetch(`${URL}/users/${userId}/likes`, {
     method: 'POST',
