@@ -4,7 +4,6 @@ import { ClerkLoaded, useUser } from '@clerk/clerk-expo';
 import TabNavigator from './Tabs.navigator';
 import Browser from '../screens/Browser.screen';
 import SignUpOrIn from '../screens/SignUpOrIn.screen';
-import Search from '../legacy/Search.screen';
 import Create from '../screens/demo/Create.screen';
 import Creating from '../screens/demo/Creating.screen';
 
@@ -27,11 +26,6 @@ export default function RootNavigator() {
               name="Browser"
               component={Browser}
               // options={{ animation: 'none' }}
-            />
-            <Stack.Screen
-              name="Search"
-              component={Search}
-              options={{ animation: 'none' }}
             />
             <Stack.Screen
               name="Create"

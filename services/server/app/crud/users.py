@@ -149,6 +149,14 @@ async def add_product_images(product_images: ProductImages) -> dict:
     
     return {"success": True, "message": "Images added successfully"}
 
+async def delete_product_images(product_image: ProductImages) -> dict:
+    async with get_db_connection() as conn:
+        query = """delete from product_image where product_url = $1 and image_url = $2;"""
+        for image_url in product_image.image_urls:
+            await conn.execute_query_dict(query, [product_image.product_url, image_url])
+    
+    return {"success": True, "message": "Images deleted successfully"}
+
 
 async def get_products_from_list(user_id: str, filters: Optional[dict[str, str]] = None):
     async with get_db_connection() as conn:

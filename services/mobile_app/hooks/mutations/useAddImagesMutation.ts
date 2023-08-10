@@ -5,9 +5,9 @@ import {
   addToPlist,
   createProduct,
   deleteFromPlist,
-} from '../api';
-import { FilterType, UserProduct } from '../utils/types';
-import { getDomain } from '../utils/helpers';
+} from '../../api';
+import { FilterType, UserProduct } from '../../utils/types';
+import { getDomain } from '../../utils/helpers';
 
 type AddImagesMutationProps = {
   product: UserProduct;

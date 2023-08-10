@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import { deleteFromPlist } from '../api';
-import { FilterType, UserProduct } from '../utils/types';
+import { deleteFromPlist } from '../../api';
+import { FilterType, UserProduct } from '../../utils/types';
 
 export const useDeleteProductsMutation = (filter: FilterType) => {
   const { user } = useUser();

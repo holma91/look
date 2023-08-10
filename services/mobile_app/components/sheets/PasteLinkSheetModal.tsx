@@ -9,27 +9,27 @@ import { BottomSheetModal, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { WebView } from 'react-native-webview';
 import * as Haptics from 'expo-haptics';
 
-import { createProduct } from '../api';
-import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
-import { Product as ProductType } from '../utils/types';
-import { TextInput } from '../styling/TextInput';
-import { parseProductData } from '../utils/parsing';
-import { getInjectScripts } from '../utils/inject';
-import { getDomain } from '../utils/helpers';
-import { PrimaryButton } from '../components/Button';
+import { createProduct } from '../../api';
+import { Box } from '../../styling/Box';
+import { Text } from '../../styling/Text';
+import { Product as ProductType } from '../../utils/types';
+import { TextInput } from '../../styling/TextInput';
+import { parseProductData } from '../../utils/parsing';
+import { getInjectScripts } from '../../utils/inject';
+import { getDomain } from '../../utils/helpers';
+import { PrimaryButton } from '../Button';
 
-type PasteLinkSheetProps = {
+type PasteLinkSheetModalProps = {
   navigation: any;
   pasteLinkSheetRef: React.RefObject<BottomSheetModal>;
 };
 
 const DEFAULT_SOURCE = 'https://github.com';
 
-export function PasteLinkSheet({
+export function PasteLinkSheetModal({
   navigation,
   pasteLinkSheetRef,
-}: PasteLinkSheetProps) {
+}: PasteLinkSheetModalProps) {
   const [currentProduct, setCurrentProduct] = useState<ProductType>({
     url: '',
     name: '',

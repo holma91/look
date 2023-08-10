@@ -6,32 +6,24 @@ import {
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import { useEffect, useState } from 'react';
-import React, { useCallback, useMemo, useRef } from 'react';
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetFlatList,
-  BottomSheetModal,
-} from '@gorhom/bottom-sheet';
+import { useState } from 'react';
+import React, { useCallback, useRef } from 'react';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
 import { HoldItem } from 'react-native-hold-menu';
-import { FlashList } from '@shopify/flash-list';
 import { useActionSheet } from '@expo/react-native-action-sheet';
-import { Ionicons } from '@expo/vector-icons';
-import { fetchPlists, fetchProducts } from '../api';
+import { fetchProducts } from '../api';
 import { Box } from '../styling/Box';
 import { Text } from '../styling/Text';
 import { FilterType, OuterChoiceFilterType, UserProduct } from '../utils/types';
 import Filter from '../components/Filter';
 import { capitalizeFirstLetter } from '../utils/helpers';
 import { ProductBig } from '../components/Product';
-import { PasteLinkSheet } from '../components/PasteLinkSheet';
-import { AddToListButton, PrimaryButton } from '../components/Button';
-import { useDeleteProductsMutation } from '../hooks/useDeleteProductsMutation';
-import { useAddProductsMutation } from '../hooks/useAddProductsMutation';
-import { useLikeProductsMutation } from '../hooks/useLikeProductsMutation';
+import { PasteLinkSheetModal } from '../components/sheets/PasteLinkSheetModal';
+import { useDeleteProductsMutation } from '../hooks/mutations/useDeleteProductsMutation';
+import { useLikeProductsMutation } from '../hooks/mutations/useLikeProductsMutation';
 import ThemedIcon from '../components/ThemedIcon';
-import { useTheme } from '@shopify/restyle';
+import { AddProductsSheetModal } from '../components/sheets/AddProductsSheetModal';
 
 type ProductsProps = {
   navigation: any;
@@ -334,7 +326,7 @@ function Header({
         outerChoice={outerChoice}
         setOuterChoice={setOuterChoice}
       />
-      <PasteLinkSheet
+      <PasteLinkSheetModal
         navigation={navigation}
         pasteLinkSheetRef={pasteLinkSheetRef}
       />
@@ -446,7 +438,7 @@ function Footer({
             </TouchableOpacity>
           </Box>
         </Box>
-        <AddProductsSheet
+        <AddProductsSheetModal
           addProductsSheetRef={addProductsSheetRef}
           selectedProducts={selectedProducts}
           handleFilterSelection={handleFilterSelection}
@@ -458,140 +450,4 @@ function Footer({
   }
 
   return null;
-}
-
-type AddProductsSheetProps = {
-  addProductsSheetRef: React.RefObject<BottomSheetModal>;
-  selectedProducts: UserProduct[];
-  handleFilterSelection: (
-    filterType: OuterChoiceFilterType,
-    filterValue: string
-  ) => void;
-  resetSelection: () => void;
-  filter: FilterType;
-};
-
-function AddProductsSheet({
-  addProductsSheetRef,
-  selectedProducts,
-  handleFilterSelection,
-  resetSelection,
-  filter,
-}: AddProductsSheetProps) {
-  const snapPoints = useMemo(() => ['85%'], []);
-
-  const { user } = useUser();
-  const theme = useTheme();
-
-  const addProductsMutation = useAddProductsMutation();
-  const likeProductsMutation = useLikeProductsMutation(filter);
-
-  const listId = filter?.list && filter.list[0];
-
-  const { data: plists } = useQuery<string[]>({
-    queryKey: ['plists', user?.id],
-    queryFn: () => fetchPlists(user?.id as string),
-    enabled: !!user?.id,
-    select: (data) =>
-      data.map((plist: any) => plist.id).filter((id) => id !== listId),
-  });
-
-  const handleAddToList = async (listId: string) => {
-    console.log('add to list', listId);
-    if (listId === 'likes') {
-      likeProductsMutation.mutate({ products: selectedProducts, like: true });
-    } else {
-      addProductsMutation.mutate({ products: selectedProducts, listId });
-    }
-    addProductsSheetRef?.current?.close();
-    handleFilterSelection('list', listId);
-    resetSelection();
-  };
-
-  const handleCreateAndAddToList = async () => {
-    console.log('create and add to list');
-    // just go to new list sheet
-  };
-
-  return (
-    <BottomSheetModal
-      ref={addProductsSheetRef}
-      index={0}
-      snapPoints={snapPoints}
-      handleIndicatorStyle={{ backgroundColor: theme.colors.background }}
-      backgroundStyle={{
-        backgroundColor: theme.colors.background,
-      }}
-      backdropComponent={(props) => (
-        <BottomSheetBackdrop
-          {...props}
-          appearsOnIndex={0}
-          disappearsOnIndex={-1}
-        />
-      )}
-    >
-      <Box flex={1} paddingHorizontal="m">
-        <Box
-          justifyContent="center"
-          alignItems="center"
-          marginBottom="m"
-          position="relative"
-        >
-          <Box flexDirection="row" gap="s">
-            <Text variant="smallTitle">Add to list</Text>
-          </Box>
-          <TouchableOpacity
-            onPress={() => {
-              addProductsSheetRef?.current?.close();
-            }}
-            style={{
-              position: 'absolute',
-              right: 5,
-            }}
-          >
-            <ThemedIcon name="close" size={24} />
-          </TouchableOpacity>
-        </Box>
-        <Box flexDirection="row" marginVertical="s" alignItems="center" gap="m">
-          <ThemedIcon name="folder" size={34} />
-          <Text variant="body" fontWeight="600">
-            {selectedProducts.length} products
-          </Text>
-        </Box>
-        <Box paddingTop="sm" gap="s">
-          <Box
-            height={150}
-            width={150}
-            justifyContent="center"
-            alignItems="center"
-            backgroundColor="gray6"
-          >
-            <TouchableOpacity onPress={handleCreateAndAddToList}>
-              <Ionicons name="add" size={40} color="#8E8E93" />
-            </TouchableOpacity>
-          </Box>
-          <Text>New list...</Text>
-        </Box>
-        <Box paddingTop="xl" flex={1}>
-          <Text variant="smallTitle" paddingBottom="m">
-            My Lists
-          </Text>
-          <FlatList
-            data={['likes'].concat(plists ?? [])}
-            keyExtractor={(item) => item}
-            contentContainerStyle={{ gap: 10, paddingBottom: 32 }}
-            renderItem={({ item }) => (
-              <AddToListButton
-                onPress={() => handleAddToList(item)}
-                label={item}
-                item={item}
-                isSelected={false}
-              />
-            )}
-            showsVerticalScrollIndicator={false}
-          />
-        </Box>
-      </Box>
-    </BottomSheetModal>
-  );
 }

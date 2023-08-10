@@ -1,5 +1,4 @@
 import { FlatList, TouchableOpacity } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useUser } from '@clerk/clerk-expo';
 import * as Haptics from 'expo-haptics';
 import Animated, {
@@ -7,26 +6,16 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-} from 'react';
-import {
-  BottomSheetModal,
-  BottomSheetFlatList,
-  BottomSheetBackdrop,
-} from '@gorhom/bottom-sheet';
+import React, { useEffect } from 'react';
+import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Text } from '../styling/Text';
-import SheetModal from './SheetModal';
+import { FilterSheetModal } from './sheets/FilterSheetModal';
 import { useQuery } from '@tanstack/react-query';
 import { FilterType, OuterChoiceFilterType } from '../utils/types';
 import { fetchBrands, fetchCompanies, fetchPlists } from '../api';
-import { Website } from '../utils/types';
 import ThemedIcon from './ThemedIcon';
 import { useTheme } from '@shopify/restyle';
+import { NewListSheetModal } from './sheets/NewListSheetModal';
 
 const possibleFilters: {
   label: 'all' | 'list' | 'category' | 'website' | 'brand';
@@ -166,7 +155,7 @@ export default function Filter({
           )}
         />
       </Animated.View>
-      <SheetModal
+      <FilterSheetModal
         filterSheetModalRef={filterSheetModalRef}
         newListSheetModalRef={newListSheetModalRef}
         choices={choices}
@@ -177,6 +166,12 @@ export default function Filter({
         filter={filter}
         sheetNavStack={sheetNavStack}
         setSheetNavStack={setSheetNavStack}
+      />
+
+      <NewListSheetModal
+        newListSheetModalRef={newListSheetModalRef}
+        filterSheetModalRef={filterSheetModalRef}
+        handleFilterSelection={handleFilterSelection}
       />
     </>
   );

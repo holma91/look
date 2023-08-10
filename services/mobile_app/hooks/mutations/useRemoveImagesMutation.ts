@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import { removeProductImages } from '../api';
-import { UserProduct } from '../utils/types';
+import { removeProductImages } from '../../api';
+import { UserProduct } from '../../utils/types';
 
 type RemoveImagesMutationProps = {
   product: UserProduct;

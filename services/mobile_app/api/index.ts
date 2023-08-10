@@ -91,16 +91,6 @@ export const fetchProducts = async (
   return response.json();
 };
 
-type Product = {
-  url: string;
-  name: string;
-  brand: string;
-  price: string;
-  currency: string;
-  updatedAt?: string;
-  images: string[];
-};
-
 export const createProduct = async (
   userId: string,
   product: UserProduct,

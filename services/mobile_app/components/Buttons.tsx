@@ -11,7 +11,7 @@ import { Image as ExpoImage } from 'expo-image';
 import FontistoIcons from '@expo/vector-icons/Fontisto';
 
 import { Text } from '../styling/Text';
-import { Theme, theme } from '../styling/theme';
+import { Theme } from '../styling/theme';
 import { Box } from '../styling/Box';
 
 type RestyleProps = SpacingProps<Theme> &
@@ -30,11 +30,6 @@ const buttonVariant: any = createVariant({ themeKey: 'buttonVariants' });
 const ButtonContainer = createRestyleComponent<
   VariantProps<Theme, 'buttonVariants'> &
     React.ComponentProps<typeof TouchableOpacity>,
-  Theme
->([buttonVariant], Box);
-
-const TouchableOpacityContainer = createRestyleComponent<
-  VariantProps<Theme, 'buttonVariants'> & React.ComponentProps<typeof Box>,
   Theme
 >([buttonVariant], Box);
 

@@ -26,7 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { TrainingContext } from '../context/Training';
 import { DemoContext } from '../context/Demo';
-import { useLikeProductMutation } from '../hooks/useLikeProductMutation';
+import { useLikeProductMutation } from '../hooks/mutations/useLikeProductMutation';
 import { PrimaryButton } from '../components/Button';
 
 const { width, height } = Dimensions.get('window');

@@ -6,15 +6,15 @@ import {
 } from '@gorhom/bottom-sheet';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import { Box } from '../styling/Box';
-import { Text } from '../styling/Text';
-import { FilterType, OuterChoiceFilterType } from '../utils/types';
+import { Box } from '../../styling/Box';
+import { Text } from '../../styling/Text';
+import { FilterType, OuterChoiceFilterType } from '../../utils/types';
 import {
   PrimaryButton,
   SecondaryButton,
   FilterListButton,
   NewListButton,
-} from './Button';
+} from '../Button';
 import { TouchableOpacity } from 'react-native';
 import Animated, {
   SlideInLeft,
@@ -22,11 +22,10 @@ import Animated, {
   SlideOutLeft,
   SlideOutRight,
 } from 'react-native-reanimated';
-import { capitalizeFirstLetter } from '../utils/helpers';
-import { NewListSheet } from './NewListSheet';
+import { capitalizeFirstLetter } from '../../utils/helpers';
 import { useTheme } from '@shopify/restyle';
 
-type SheetModalProps = {
+type FilterSheetModalProps = {
   filterSheetModalRef: React.RefObject<BottomSheetModal>;
   newListSheetModalRef: React.RefObject<BottomSheetModal>;
   choices: FilterType;
@@ -44,7 +43,7 @@ type SheetModalProps = {
   >;
 };
 
-export default function SheetModal({
+export function FilterSheetModal({
   filterSheetModalRef,
   newListSheetModalRef,
   choices,
@@ -55,83 +54,45 @@ export default function SheetModal({
   filter,
   sheetNavStack,
   setSheetNavStack,
-}: SheetModalProps) {
+}: FilterSheetModalProps) {
   const theme = useTheme();
   const snapPoints = useMemo(() => ['65%'], []);
 
   return (
-    <>
-      <BottomSheetModal
-        ref={filterSheetModalRef}
-        snapPoints={snapPoints}
-        backdropComponent={(props) => (
-          <BottomSheetBackdrop
-            {...props}
-            appearsOnIndex={0}
-            disappearsOnIndex={-1}
-          />
-        )}
-        backgroundStyle={{
-          backgroundColor: theme.colors.background,
-        }}
-        handleIndicatorStyle={{ backgroundColor: theme.colors.background }}
-        onDismiss={() => {
-          console.log('dismissed');
-          setSheetNavStack([]);
-        }}
-      >
-        <FilterSheet
-          filterSheetModalRef={filterSheetModalRef}
-          choices={choices}
-          outerChoice={outerChoice}
-          setOuterChoice={setOuterChoice}
-          resetFilter={resetFilter}
-          handleFilterSelection={handleFilterSelection}
-          filter={filter}
-          sheetNavStack={sheetNavStack}
-          setSheetNavStack={setSheetNavStack}
-          newListSheetModalRef={newListSheetModalRef}
+    <BottomSheetModal
+      ref={filterSheetModalRef}
+      snapPoints={snapPoints}
+      backdropComponent={(props) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
         />
-      </BottomSheetModal>
-      <BottomSheetModal
-        ref={newListSheetModalRef}
-        snapPoints={['65%']}
-        backdropComponent={(props) => (
-          <BottomSheetBackdrop
-            {...props}
-            appearsOnIndex={0}
-            disappearsOnIndex={-1}
-          />
-        )}
-        handleIndicatorStyle={{ backgroundColor: 'white' }}
-      >
-        <NewListSheet
-          newListSheetModalRef={newListSheetModalRef}
-          filterSheetModalRef={filterSheetModalRef}
-          handleFilterSelection={handleFilterSelection}
-        />
-      </BottomSheetModal>
-    </>
+      )}
+      backgroundStyle={{
+        backgroundColor: theme.colors.background,
+      }}
+      handleIndicatorStyle={{ backgroundColor: theme.colors.background }}
+      onDismiss={() => {
+        console.log('dismissed');
+        setSheetNavStack([]);
+      }}
+    >
+      <InnerFilterSheet
+        filterSheetModalRef={filterSheetModalRef}
+        choices={choices}
+        outerChoice={outerChoice}
+        setOuterChoice={setOuterChoice}
+        resetFilter={resetFilter}
+        handleFilterSelection={handleFilterSelection}
+        filter={filter}
+        sheetNavStack={sheetNavStack}
+        setSheetNavStack={setSheetNavStack}
+        newListSheetModalRef={newListSheetModalRef}
+      />
+    </BottomSheetModal>
   );
 }
-
-type FilterSheetProps = {
-  filterSheetModalRef: React.RefObject<BottomSheetModal>;
-  choices: FilterType;
-  outerChoice: OuterChoiceFilterType;
-  setOuterChoice?: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
-  resetFilter: () => void;
-  handleFilterSelection: (
-    filterType: OuterChoiceFilterType,
-    filterValue: string
-  ) => void;
-  filter: FilterType;
-  sheetNavStack: OuterChoiceFilterType[];
-  setSheetNavStack: React.Dispatch<
-    React.SetStateAction<OuterChoiceFilterType[]>
-  >;
-  newListSheetModalRef?: React.RefObject<BottomSheetModal>;
-};
 
 type ListItemProps = {
   item: string;
@@ -174,7 +135,25 @@ const ListItem = ({
   );
 };
 
-function FilterSheet({
+type InnerFilterSheetProps = {
+  filterSheetModalRef: React.RefObject<BottomSheetModal>;
+  choices: FilterType;
+  outerChoice: OuterChoiceFilterType;
+  setOuterChoice?: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
+  resetFilter: () => void;
+  handleFilterSelection: (
+    filterType: OuterChoiceFilterType,
+    filterValue: string
+  ) => void;
+  filter: FilterType;
+  sheetNavStack: OuterChoiceFilterType[];
+  setSheetNavStack: React.Dispatch<
+    React.SetStateAction<OuterChoiceFilterType[]>
+  >;
+  newListSheetModalRef?: React.RefObject<BottomSheetModal>;
+};
+
+function InnerFilterSheet({
   outerChoice,
   setOuterChoice,
   choices,
@@ -185,7 +164,7 @@ function FilterSheet({
   sheetNavStack,
   setSheetNavStack,
   newListSheetModalRef,
-}: FilterSheetProps) {
+}: InnerFilterSheetProps) {
   const theme = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const relevantChoices = choices[outerChoice];
@@ -319,6 +298,24 @@ function FilterSheet({
   );
 }
 
+type AllListProps = {
+  filterSheetModalRef: React.RefObject<BottomSheetModal>;
+  choices: FilterType;
+  outerChoice: OuterChoiceFilterType;
+  setOuterChoice?: React.Dispatch<React.SetStateAction<OuterChoiceFilterType>>;
+  resetFilter: () => void;
+  handleFilterSelection: (
+    filterType: OuterChoiceFilterType,
+    filterValue: string
+  ) => void;
+  filter: FilterType;
+  sheetNavStack: OuterChoiceFilterType[];
+  setSheetNavStack: React.Dispatch<
+    React.SetStateAction<OuterChoiceFilterType[]>
+  >;
+  newListSheetModalRef?: React.RefObject<BottomSheetModal>;
+};
+
 function AllList({
   outerChoice,
   setOuterChoice,
@@ -329,7 +326,7 @@ function AllList({
   filterSheetModalRef,
   sheetNavStack,
   setSheetNavStack,
-}: FilterSheetProps) {
+}: AllListProps) {
   const renderListItem = useCallback(
     ({ item }: { item: string }) => {
       const isSelected = filter[outerChoice]?.includes(item);

@@ -21,6 +21,12 @@ DO NOT STOP UNTIL EVERY BUG IS GONE.
 
 ### TODO
 
+REFACTOR:
+
+- make stricter types (remove unused and optional stuff)
+- fix api
+- add error messages and stuff on the BE
+
 FRONTEND:
 
 - fix parsing for all sites we got that have schema.org integrated.

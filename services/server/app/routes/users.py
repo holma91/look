@@ -105,6 +105,12 @@ async def add_product_images(user_id: str, product_images: ProductImages) -> POS
 
     return result
 
+@router.delete("/{user_id}/products/images", status_code=204)
+async def delete_product_images(user_id: str, product_images: ProductImages):
+    result = await crud.delete_product_images(product_images)
+    if not result['success']:
+        raise HTTPException(status_code=409, detail=result["message"])
+
 @router.post("/{user_id}/likes", status_code=201, response_model=POSTResponse)
 async def add_likes(user_id: str, products: LikeProducts) -> POSTResponse:
     product = await crud.like_products(user_id, products)
