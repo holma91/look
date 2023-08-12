@@ -22,7 +22,7 @@ LogBox.ignoreLogs([
 
 const queryClient = new QueryClient();
 
-export default function App() {
+export default function RealApp() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   console.log('App:isDarkMode', isDarkMode);

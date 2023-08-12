@@ -9,6 +9,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'light',
+  plugins: [
+    '@react-native-firebase/app',
+    '@react-native-google-signin/google-signin',
+    [
+      'expo-build-properties',
+      {
+        ios: {
+          useFrameworks: 'static',
+        },
+      },
+    ],
+  ],
   splash: {
     image: './assets/splash.png',
     resizeMode: 'contain',
@@ -16,10 +28,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   assetBundlePatterns: ['**/*'],
   ios: {
+    googleServicesFile: './GoogleService-Info.plist',
     bundleIdentifier: 'com.anonymous.look', // added when doing npx expo prebuild
     supportsTablet: true,
   },
   android: {
+    googleServicesFile: './google-services.json',
     package: 'com.anonymous.look', // added when doing npx expo prebuild
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',

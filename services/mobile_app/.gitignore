@@ -26,3 +26,6 @@ assets/generations/demo
 ### native builds
 ios
 android
+
+google-services.json
+GoogleService-Info.plist

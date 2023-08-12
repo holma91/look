@@ -23,7 +23,7 @@ DO NOT STOP UNTIL EVERY BUG IS GONE.
 
 REFACTOR:
 
-- move useQueries to custom hooks
+- sync types on both ends
 - fix api
 - add error messages and stuff on the BE
 
