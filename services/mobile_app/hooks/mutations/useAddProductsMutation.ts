@@ -1,28 +1,28 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
 import { addToPlist } from '../../api';
 import { UserProduct } from '../../utils/types';
+import { useFirebaseUser } from '../useFirebaseUser';
 
 type AddProductsMutationProps = { products: UserProduct[]; listId: string };
 
 export const useAddProductsMutation = () => {
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
 
   const addProductsMutation = useMutation({
     mutationFn: async ({ products, listId }: AddProductsMutationProps) => {
-      await addToPlist(user!.id, listId!, products);
+      await addToPlist(user!.uid, listId!, products);
       return products;
     },
     onMutate: async ({ products, listId }: AddProductsMutationProps) => {
       await queryClient.cancelQueries([
         'products',
-        user?.id,
+        user?.uid,
         { list: [listId] },
       ]);
       const previousProducts = queryClient.getQueryData([
         'products',
-        user?.id,
+        user?.uid,
         { list: [listId] },
       ]);
 
@@ -41,13 +41,13 @@ export const useAddProductsMutation = () => {
     onError: (err, { products, listId }, context) => {
       console.log('error', err, products, context);
       queryClient.setQueryData(
-        ['products', user?.id, { list: [listId] }],
+        ['products', user?.uid, { list: [listId] }],
         context?.previousProducts
       );
     },
     onSettled: async (_, err, { products, listId }, context) => {
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.id, { list: [listId] }],
+        queryKey: ['products', user?.uid, { list: [listId] }],
       });
     },
   });

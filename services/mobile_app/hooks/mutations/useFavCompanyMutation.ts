@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
 import { Company } from '../../utils/types';
 import { URL } from '../../api/index';
+import { useFirebaseUser } from '../useFirebaseUser';
 
 async function favoriteCompany(userId: string, company: string) {
   const response = await fetch(`${URL}/users/${userId}/favorites`, {
@@ -28,23 +28,23 @@ async function unFavoriteCompany(userId: string, company: string) {
 export const useFavCompanyMutation = (
   setRenderToggle: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async (company: Company) => {
-      if (!user?.id) return;
+      if (!user?.uid) return;
 
       if (!company.favorited) {
-        return unFavoriteCompany(user.id, company.id);
+        return unFavoriteCompany(user.uid, company.id);
       } else {
-        return favoriteCompany(user.id, company.id);
+        return favoriteCompany(user.uid, company.id);
       }
     },
     onMutate: async (company: Company) => {
       company.favorited = !company.favorited;
 
-      await queryClient.cancelQueries({ queryKey: ['companies', user?.id] });
+      await queryClient.cancelQueries({ queryKey: ['companies', user?.uid] });
 
       const previousCompany = queryClient.getQueryData([
         'companies',
@@ -64,7 +64,7 @@ export const useFavCompanyMutation = (
     },
     onSettled: () => {
       setRenderToggle((prev) => !prev);
-      queryClient.invalidateQueries({ queryKey: ['companies', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['companies', user?.uid] });
     },
   });
 

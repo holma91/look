@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Company } from '../../utils/types';
 
 import { URL } from '../../api/index';
+import { useFirebaseUser } from '../useFirebaseUser';
 
 async function fetchCompanies(id: string): Promise<Company[]> {
   const completeUrl = `${URL}/users/${id}/companies`;
@@ -17,12 +18,12 @@ async function fetchCompanies(id: string): Promise<Company[]> {
 }
 
 export const useCompaniesQuery = () => {
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
 
   const companiesQuery = useQuery({
-    queryKey: ['companies', user?.id],
-    queryFn: () => fetchCompanies(user!.id as string),
-    enabled: !!user?.id,
+    queryKey: ['companies', user?.uid],
+    queryFn: () => fetchCompanies(user!.uid as string),
+    enabled: !!user?.uid,
     onError: (err) => {
       console.log('error fetching companies:', err);
     },

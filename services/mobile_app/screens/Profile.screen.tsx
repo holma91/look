@@ -1,17 +1,14 @@
 import { SafeAreaView, Switch } from 'react-native';
-import { useAuth, useUser } from '@clerk/clerk-expo';
-
+import auth from '@react-native-firebase/auth';
 import { Box, Text } from '../styling/RestylePrimitives';
 import { useContext } from 'react';
 import { DemoContext } from '../context/Demo';
 import { DarkModeContext } from '../context/DarkMode';
-import { clearHistory } from '../utils/storage/history';
-import { Button } from '../components/Buttons';
 import { PrimaryButton } from '../components/Button';
+import { useFirebaseUser } from '../hooks/useFirebaseUser';
 
 export default function Profile() {
-  const { user } = useUser();
-  const { isLoaded, signOut } = useAuth();
+  const { user } = useFirebaseUser();
   const { isDemo, setIsDemo } = useContext(DemoContext);
   const { isDarkMode, setIsDarkMode } = useContext(DarkModeContext);
 
@@ -30,17 +27,16 @@ export default function Profile() {
     },
   ];
 
-  console.log('isDarkMode', isDarkMode);
-
-  const handleClearCache = async () => {
-    try {
-      await clearHistory();
-      alert('Cache cleared successfully.');
-    } catch (e) {
-      console.error(e);
-      alert('Failed to clear cache.');
-    }
-  };
+  function handleSignOut() {
+    auth()
+      .signOut()
+      .then(() => {
+        console.log('User signed out!');
+      })
+      .catch((error) => {
+        console.error('Error signing out:', error);
+      });
+  }
 
   return (
     <Box backgroundColor="background" flex={1}>
@@ -53,7 +49,7 @@ export default function Profile() {
             paddingBottom="sm"
           >
             <Text variant="title">Account</Text>
-            <Text variant="body">{user?.emailAddresses[0].emailAddress}</Text>
+            <Text variant="body">{user?.email}</Text>
           </Box>
           <Box flex={1} justifyContent="space-between">
             <Box gap="m">
@@ -79,8 +75,7 @@ export default function Profile() {
               ))}
             </Box>
             <Box marginBottom="s">
-              {/* <Button title="Clear Cache" onPress={handleClearCache} /> */}
-              <PrimaryButton label="Sign out" onPress={() => signOut()} />
+              <PrimaryButton label="Sign out" onPress={handleSignOut} />
             </Box>
           </Box>
         </Box>

@@ -1,17 +1,17 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
 import { likeProducts, unlikeProducts } from '../../api';
 import { FilterType, UserProduct } from '../../utils/types';
+import { useFirebaseUser } from '../useFirebaseUser';
 
 export const useLikeProductMutation = (filter: FilterType) => {
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
 
   const likeProductMutation = useMutation({
     mutationFn: async (product: UserProduct) => {
       !product.liked
-        ? await unlikeProducts(user!.id, [product])
-        : await likeProducts(user!.id, [product]);
+        ? await unlikeProducts(user!.uid, [product])
+        : await likeProducts(user!.uid, [product]);
       return product;
     },
     onMutate: async (product: UserProduct) => {
@@ -45,11 +45,11 @@ export const useLikeProductMutation = (filter: FilterType) => {
         queryKey: ['product', product.url],
       });
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.id, filter],
+        queryKey: ['products', user?.uid, filter],
       });
       if (!filter?.list?.includes('likes')) {
         queryClient.invalidateQueries({
-          queryKey: ['products', user?.id, { list: ['likes'] }],
+          queryKey: ['products', user?.uid, { list: ['likes'] }],
         });
       }
     },

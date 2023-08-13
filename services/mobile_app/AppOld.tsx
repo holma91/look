@@ -2,10 +2,10 @@ import 'react-native-gesture-handler'; // might need to do more than this on and
 import React, { useContext, useEffect, useState } from 'react';
 import { LogBox } from 'react-native';
 import { ThemeProvider } from '@shopify/restyle';
+import { ClerkProvider } from '@clerk/clerk-expo';
 import Constants from 'expo-constants';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { HoldMenuProvider } from 'react-native-hold-menu';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { lightTheme, darkTheme } from './styling/theme';
@@ -22,28 +22,35 @@ LogBox.ignoreLogs([
 
 const queryClient = new QueryClient();
 
-export default function App() {
+export default function AppOld() {
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  console.log('App:isDarkMode', isDarkMode);
 
   return (
     <DarkModeContext.Provider value={{ isDarkMode, setIsDarkMode }}>
       <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
-        <ActionSheetProvider>
-          <HoldMenuProvider
-            theme={isDarkMode ? 'dark' : 'light'}
-            safeAreaInsets={{ top: 0, bottom: 0, left: 0, right: 0 }}
-          >
-            <QueryClientProvider client={queryClient}>
-              <BottomSheetModalProvider>
-                <DemoProvider>
-                  <TrainingProvider>
-                    <Navigation />
-                  </TrainingProvider>
-                </DemoProvider>
-              </BottomSheetModalProvider>
-            </QueryClientProvider>
-          </HoldMenuProvider>
-        </ActionSheetProvider>
+        <ClerkProvider
+          tokenCache={tokenCache}
+          publishableKey={Constants?.expoConfig?.extra?.clerkApiKey}
+        >
+          <ActionSheetProvider>
+            <HoldMenuProvider
+              theme={isDarkMode ? 'dark' : 'light'}
+              safeAreaInsets={{ top: 0, bottom: 0, left: 0, right: 0 }}
+            >
+              <QueryClientProvider client={queryClient}>
+                <BottomSheetModalProvider>
+                  <DemoProvider>
+                    <TrainingProvider>
+                      <Navigation />
+                    </TrainingProvider>
+                  </DemoProvider>
+                </BottomSheetModalProvider>
+              </QueryClientProvider>
+            </HoldMenuProvider>
+          </ActionSheetProvider>
+        </ClerkProvider>
       </ThemeProvider>
     </DarkModeContext.Provider>
   );

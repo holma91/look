@@ -2,33 +2,34 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
 import { likeProducts, unlikeProducts } from '../../api';
 import { FilterType, UserProduct } from '../../utils/types';
+import { useFirebaseUser } from '../useFirebaseUser';
 
 type LikeProductsMutationProps = { products: UserProduct[]; like: boolean };
 
 export const useLikeProductsMutation = (filter: FilterType) => {
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
 
   const likeProductsMutation = useMutation({
     mutationFn: async ({ products, like }: LikeProductsMutationProps) => {
       if (like) {
-        await likeProducts(user!.id, products);
+        await likeProducts(user!.uid, products);
       } else {
-        await unlikeProducts(user!.id, products);
+        await unlikeProducts(user!.uid, products);
       }
       return products;
     },
     onMutate: async ({ products, like }: LikeProductsMutationProps) => {
-      await queryClient.cancelQueries(['products', user?.id, filter]);
+      await queryClient.cancelQueries(['products', user?.uid, filter]);
       const previousProducts = queryClient.getQueryData([
         'products',
-        user?.id,
+        user?.uid,
         filter,
       ]);
 
       const productUrls = products.map((p) => p.url);
       queryClient.setQueryData(
-        ['products', user?.id, filter],
+        ['products', user?.uid, filter],
         (old: UserProduct[] | undefined) => {
           return old?.map((p) => {
             if (productUrls.includes(p.url)) {
@@ -44,17 +45,17 @@ export const useLikeProductsMutation = (filter: FilterType) => {
     onError: (err, { products, like }, context) => {
       console.log('error', err, products, context);
       queryClient.setQueryData(
-        ['products', user?.id, filter],
+        ['products', user?.uid, filter],
         context?.previousProducts
       );
     },
     onSettled: async () => {
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.id, filter],
+        queryKey: ['products', user?.uid, filter],
       });
       if (!filter?.list?.includes('likes')) {
         queryClient.invalidateQueries({
-          queryKey: ['products', user?.id, { list: ['likes'] }],
+          queryKey: ['products', user?.uid, { list: ['likes'] }],
         });
       }
     },

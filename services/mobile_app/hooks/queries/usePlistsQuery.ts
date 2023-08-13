@@ -2,6 +2,7 @@ import { useUser } from '@clerk/clerk-expo';
 import { useQuery } from '@tanstack/react-query';
 import { Plist } from '../../utils/types';
 import { URL } from '../../api/index';
+import { useFirebaseUser } from '../useFirebaseUser';
 
 async function fetchPlists(userId: string): Promise<Plist[]> {
   const completeUrl = `${URL}/users/${userId}/plists`;
@@ -16,12 +17,12 @@ async function fetchPlists(userId: string): Promise<Plist[]> {
 }
 
 export const usePlistsQuery = () => {
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
 
   const plistsQuery = useQuery({
-    queryKey: ['plists', user?.id],
-    queryFn: () => fetchPlists(user!.id as string),
-    enabled: !!user?.id,
+    queryKey: ['plists', user?.uid],
+    queryFn: () => fetchPlists(user!.uid as string),
+    enabled: !!user?.uid,
     onError: (err) => {
       console.log('error fetching plists:', err);
     },

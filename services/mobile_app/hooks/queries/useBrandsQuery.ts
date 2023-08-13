@@ -1,8 +1,8 @@
-import { useUser } from '@clerk/clerk-expo';
 import { useQuery } from '@tanstack/react-query';
 import { Brand } from '../../utils/types';
 
 import { URL } from '../../api/index';
+import { useFirebaseUser } from '../useFirebaseUser';
 
 async function fetchBrands(id: string): Promise<Brand[]> {
   const completeUrl = `${URL}/users/${id}/brands`;
@@ -17,12 +17,12 @@ async function fetchBrands(id: string): Promise<Brand[]> {
 }
 
 export const useBrandsQuery = () => {
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
 
   const brandsQuery = useQuery({
-    queryKey: ['brands', user?.id],
-    queryFn: () => fetchBrands(user!.id as string),
-    enabled: !!user?.id,
+    queryKey: ['brands', user?.uid],
+    queryFn: () => fetchBrands(user!.uid as string),
+    enabled: !!user?.uid,
     onError: (err) => {
       console.log('error fetching brands:', err);
     },

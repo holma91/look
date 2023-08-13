@@ -1,10 +1,9 @@
-import {
-  SignInWithApple,
-  SignInWithGoogle,
-} from '../components/SignInWithOAuth';
+import { SignInWithGoogle } from '../components/SignInWithOAuth';
 import { Box, Text } from '../styling/RestylePrimitives';
 import { Image as ExpoImage } from 'expo-image';
+import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 import { FlatList, Dimensions } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
@@ -43,6 +42,10 @@ const originalImages = [
     require('../assets/generations/demo/login_screen/adaysmarch1/10.png'),
   ],
 ];
+
+GoogleSignin.configure({
+  webClientId: Constants?.expoConfig?.extra?.googleClientId,
+});
 
 const intervals = [750, 750, 500];
 

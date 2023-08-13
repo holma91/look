@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
 import { UserProduct } from '../../utils/types';
+import { useFirebaseUser } from '../useFirebaseUser';
 
 export async function addProductImages(
   userId: string,
@@ -39,12 +39,12 @@ type AddImagesMutationProps = {
 };
 
 export const useAddImagesMutation = () => {
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
 
   const addImagesMutation = useMutation({
     mutationFn: async ({ product, images }: AddImagesMutationProps) => {
-      await addProductImages(user!.id, product.url, images);
+      await addProductImages(user!.uid, product.url, images);
       return product;
     },
     onError: (err, { product, images }, context) => {
@@ -52,7 +52,7 @@ export const useAddImagesMutation = () => {
     },
     onSettled: async (_, err, products, context) => {
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.id, { list: ['history'] }],
+        queryKey: ['products', user?.uid, { list: ['history'] }],
       });
     },
   });

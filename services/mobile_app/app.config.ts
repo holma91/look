@@ -11,6 +11,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   userInterfaceStyle: 'light',
   plugins: [
     '@react-native-firebase/app',
+    '@react-native-firebase/auth',
     '@react-native-google-signin/google-signin',
     [
       'expo-build-properties',
@@ -28,12 +29,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   assetBundlePatterns: ['**/*'],
   ios: {
-    googleServicesFile: './GoogleService-Info.plist',
+    googleServicesFile:
+      process.env.GOOGLE_SERVICE_INFO_PLIST ?? './GoogleService-Info.plist',
     bundleIdentifier: 'com.anonymous.look', // added when doing npx expo prebuild
     supportsTablet: true,
   },
   android: {
-    googleServicesFile: './google-services.json',
+    googleServicesFile:
+      process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
     package: 'com.anonymous.look', // added when doing npx expo prebuild
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
@@ -46,6 +49,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   extra: {
     clerkApiKey: process.env.CLERK_PUBLISHABLE_KEY,
     replicateApiKey: process.env.REPLICATE_API_TOKEN,
+    googleClientId: process.env.GOOGLE_CLIENT_ID,
     eas: {
       projectId: '8b699122-7a5d-4951-b108-046ab0b92a44',
     },

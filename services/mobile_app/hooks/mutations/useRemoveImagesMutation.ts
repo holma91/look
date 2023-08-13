@@ -1,7 +1,7 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
 import { UserProduct } from '../../utils/types';
 import { URL } from '../../api/index';
+import { useFirebaseUser } from '../useFirebaseUser';
 
 export async function removeProductImages(
   userId: string,
@@ -38,12 +38,12 @@ type RemoveImagesMutationProps = {
 };
 
 export const useRemoveImagesMutation = () => {
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
 
   const removeImagesMutation = useMutation({
     mutationFn: async ({ product, images }: RemoveImagesMutationProps) => {
-      await removeProductImages(user!.id, product.url, images);
+      await removeProductImages(user!.uid, product.url, images);
     },
     onMutate: async ({ product, images }: RemoveImagesMutationProps) => {
       await queryClient.cancelQueries(['product', product.url]);
@@ -73,7 +73,7 @@ export const useRemoveImagesMutation = () => {
     },
     onSettled: async (_, err, { product, images }, context) => {
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.id, { list: ['history'] }],
+        queryKey: ['products', user?.uid, { list: ['history'] }],
       });
       queryClient.invalidateQueries({
         queryKey: ['product', product.url],
