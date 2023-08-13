@@ -85,79 +85,6 @@ async def un_favorite(user_id: str, id: str) -> Optional[str]:
 
 ### PRODUCT INFO ###
 
-async def add_product(user_id: str, product: ProductExtended) -> bool:
-    # Adding a product from a user's perspective
-
-    async with get_db_connection() as conn:
-        # 1. add the actual product if it doesn't exist and it's images
-        check_query = """select * from product where url = $1;"""
-        check_result = await conn.execute_query_dict(check_query, [product.url])
-        if check_result:
-            return True
-        
-        # Insert product
-
-        query = """
-        insert into product (url, domain, brand, name, price, currency)
-        values ($1, $2, $3, $4, $5, $6) returning *;
-        """
-        result = await conn.execute_query_dict(query, [
-            product.url, product.domain, product.brand, product.name, product.price, product.currency
-        ])
-
-        # Insert images
-        query = """
-        insert into product_image (product_url, image_url)
-        values ($1, $2) returning *;
-        """
-        for image in product.images:
-            await conn.execute_query_dict(query, [product.url, image])
-    
-        # 3. add the user_product relationship
-        check_query = """select * from user_product where user_id = $1 and product_url = $2;"""
-        check_result = await conn.execute_query_dict(check_query, [user_id, product.url])
-        if check_result:
-            return True
-        
-        query = """
-        insert into user_product (user_id, product_url)
-        values ($1, $2);
-        """
-        await conn.execute_query_dict(query, [user_id, product.url])
-
-    return True
-
-async def add_product_image(product_image: ProductImage) -> dict:
-    try:
-        async with get_db_connection() as conn:
-            query = """insert into product_image (product_url, image_url) values ($1, $2);"""
-            result = await conn.execute_query_dict(query, [product_image.product_url, product_image.image_url])
-        
-        return {"success": True, "message": "Image added successfully"}
-    except Exception as e:
-        # todo: more specific error handling
-        return {"success": False, "message": "Image already exists"}
-    
-async def add_product_images(product_images: ProductImages) -> dict:
-    async with get_db_connection() as conn:
-        query = """insert into product_image (product_url, image_url) values ($1, $2);"""
-        for image_url in product_images.image_urls:
-            try:
-                await conn.execute_query_dict(query, [product_images.product_url, image_url])
-            except Exception as e:
-                print(e) # just a duplicate in the list, ignore it
-    
-    return {"success": True, "message": "Images added successfully"}
-
-async def delete_product_images(product_image: ProductImages) -> dict:
-    async with get_db_connection() as conn:
-        query = """delete from product_image where product_url = $1 and image_url = $2;"""
-        for image_url in product_image.image_urls:
-            await conn.execute_query_dict(query, [product_image.product_url, image_url])
-    
-    return {"success": True, "message": "Images deleted successfully"}
-
-
 async def get_products_from_list(user_id: str, filters: Optional[dict[str, str]] = None):
     async with get_db_connection() as conn:
         query = """
@@ -241,8 +168,82 @@ async def get_product(user_id: str, product_url: str) -> dict:
         rows = await conn.execute_query_dict(query, [user_id, product_url])
 
     products = process_product_rows(rows)
+    return products[0] if products else None
 
-    return products[0]
+
+async def add_product(user_id: str, product: ProductExtended) -> bool:
+    # Adding a product from a user's perspective
+
+    async with get_db_connection() as conn:
+        # 1. add the actual product if it doesn't exist and it's images
+        check_query = """select * from product where url = $1;"""
+        check_result = await conn.execute_query_dict(check_query, [product.url])
+        if check_result:
+            return True
+        
+        # Insert product
+
+        query = """
+        insert into product (url, domain, brand, name, price, currency)
+        values ($1, $2, $3, $4, $5, $6) returning *;
+        """
+        result = await conn.execute_query_dict(query, [
+            product.url, product.domain, product.brand, product.name, product.price, product.currency
+        ])
+
+        # Insert images
+        query = """
+        insert into product_image (product_url, image_url)
+        values ($1, $2) returning *;
+        """
+        for image in product.images:
+            await conn.execute_query_dict(query, [product.url, image])
+    
+        # 3. add the user_product relationship
+        check_query = """select * from user_product where user_id = $1 and product_url = $2;"""
+        check_result = await conn.execute_query_dict(check_query, [user_id, product.url])
+        if check_result:
+            return True
+        
+        query = """
+        insert into user_product (user_id, product_url)
+        values ($1, $2);
+        """
+        await conn.execute_query_dict(query, [user_id, product.url])
+
+    return True
+
+async def add_product_image(product_image: ProductImage) -> dict:
+    try:
+        async with get_db_connection() as conn:
+            query = """insert into product_image (product_url, image_url) values ($1, $2);"""
+            result = await conn.execute_query_dict(query, [product_image.product_url, product_image.image_url])
+        
+        return {"success": True, "message": "Image added successfully"}
+    except Exception as e:
+        # todo: more specific error handling
+        return {"success": False, "message": "Image already exists"}
+    
+async def add_product_images(product_images: ProductImages) -> dict:
+    async with get_db_connection() as conn:
+        query = """insert into product_image (product_url, image_url) values ($1, $2);"""
+        for image_url in product_images.image_urls:
+            try:
+                await conn.execute_query_dict(query, [product_images.product_url, image_url])
+            except Exception as e:
+                print(e) # just a duplicate in the list, ignore it
+    
+    return {"success": True, "message": "Images added successfully"}
+
+async def delete_product_images(product_image: ProductImages) -> dict:
+    async with get_db_connection() as conn:
+        query = """delete from product_image where product_url = $1 and image_url = $2;"""
+        for image_url in product_image.image_urls:
+            await conn.execute_query_dict(query, [product_image.product_url, image_url])
+    
+    return {"success": True, "message": "Images deleted successfully"}
+
+
 
 async def dislike_products(user_id: str, products: LikeProducts) -> Optional[str]:
     async with get_db_connection() as conn:

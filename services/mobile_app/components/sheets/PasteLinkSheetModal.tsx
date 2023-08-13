@@ -2,7 +2,6 @@ import { FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { Image as ExpoImage } from 'expo-image';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useUser } from '@clerk/clerk-expo';
 import { useState } from 'react';
 import React, { useMemo, useRef } from 'react';
 import { BottomSheetModal, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
@@ -16,6 +15,7 @@ import { parseProductData } from '../../utils/extraction/parsing';
 import { getInjectScripts } from '../../utils/extraction/inject';
 import { getDomain } from '../../utils/helpers';
 import { PrimaryButton } from '../Button';
+import { useFirebaseUser } from '../../hooks/useFirebaseUser';
 
 type PasteLinkSheetModalProps = {
   navigation: any;
@@ -51,7 +51,7 @@ export function PasteLinkSheetModal({
   const [invalidLink, setInvalidLink] = useState(false);
   const snapPoints = useMemo(() => ['56%'], []);
   const webViewRef = useRef<WebView>(null);
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
 
   const handleUpload = async () => {
@@ -93,6 +93,8 @@ export function PasteLinkSheetModal({
 
     let product;
     if (knownDomains.includes(domain)) {
+      // doesn't work with gucci, fix later
+
       product = parseProductData(event.nativeEvent.url, event.nativeEvent.data);
     } else {
       // call openai api
@@ -111,10 +113,10 @@ export function PasteLinkSheetModal({
     setCurrentProduct({ ...product, domain: domain, liked: false });
     setIsLoading(false);
     try {
-      await createProduct(user?.id, product, domain);
-      queryClient.invalidateQueries({ queryKey: ['brands', user?.id] });
+      await createProduct(user?.uid, product, domain);
+      queryClient.invalidateQueries({ queryKey: ['brands', user?.uid] });
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.id, { list: ['history'] }],
+        queryKey: ['products', user?.uid, { list: ['history'] }],
       });
     } catch (e) {
       console.error(e);

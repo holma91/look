@@ -1,10 +1,8 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
 import { likeProduct, unlikeProduct } from '../api';
 import { UserProduct } from '../utils/types';
 
 export const useLikeMutation = () => {
-  const { user } = useUser();
   const queryClient = useQueryClient();
 
   const likeMutation = useMutation({

@@ -1,4 +1,3 @@
-import { useUser } from '@clerk/clerk-expo';
 import { useQuery } from '@tanstack/react-query';
 
 import { FilterType, UserProduct } from '../../utils/types';
@@ -37,7 +36,6 @@ export async function fetchProducts(
 }
 
 export const useProductsQuery = (filter: FilterType) => {
-  // const { user } = useUser();
   const { user } = useFirebaseUser();
 
   const productsQuery = useQuery({

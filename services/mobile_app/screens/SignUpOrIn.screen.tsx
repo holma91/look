@@ -1,4 +1,4 @@
-import { SignInWithGoogle } from '../components/SignInWithOAuth';
+import { SignInWithGoogle } from '../hooks/SignInWithOAuth';
 import { Box, Text } from '../styling/RestylePrimitives';
 import { Image as ExpoImage } from 'expo-image';
 import Constants from 'expo-constants';

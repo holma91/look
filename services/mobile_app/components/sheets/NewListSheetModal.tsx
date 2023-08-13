@@ -8,7 +8,7 @@ import { Box, Text } from '../../styling/RestylePrimitives';
 import { OuterChoiceFilterType, UserProduct } from '../../utils/types';
 import { PrimaryButton } from '../Button';
 import { TextInput, TouchableOpacity } from 'react-native';
-import { useUser } from '@clerk/clerk-expo';
+import { useFirebaseUser } from '../../hooks/useFirebaseUser';
 import { createPlist } from '../../api';
 import { ProductSmall } from '../Product';
 import { useProductsQuery } from '../../hooks/queries/useProductsQuery';
@@ -29,7 +29,7 @@ export function NewListSheetModal({
 }: NewListSheetModalProps) {
   const [listName, setListName] = useState('New List');
   const [selectedProducts, setSelectedProducts] = useState<UserProduct[]>([]);
-  const { user } = useUser();
+  const { user } = useFirebaseUser();
 
   const { data: products } = useProductsQuery({ list: ['history'] });
 
@@ -55,7 +55,7 @@ export function NewListSheetModal({
   const handleCreateList = async () => {
     newListSheetModalRef?.current?.close();
     const listId = listName.toLowerCase();
-    const userId = user?.id;
+    const userId = user?.uid;
 
     if (!userId) return;
 

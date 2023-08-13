@@ -47,7 +47,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     favicon: './assets/favicon.png',
   },
   extra: {
-    clerkApiKey: process.env.CLERK_PUBLISHABLE_KEY,
     replicateApiKey: process.env.REPLICATE_API_TOKEN,
     googleClientId: process.env.GOOGLE_CLIENT_ID,
     eas: {

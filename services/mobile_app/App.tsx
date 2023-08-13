@@ -2,14 +2,11 @@ import 'react-native-gesture-handler'; // might need to do more than this on and
 import React, { useContext, useEffect, useState } from 'react';
 import { LogBox } from 'react-native';
 import { ThemeProvider } from '@shopify/restyle';
-import Constants from 'expo-constants';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { HoldMenuProvider } from 'react-native-hold-menu';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { lightTheme, darkTheme } from './styling/theme';
-import { tokenCache } from './utils/storage/tokenCache';
 import Navigation from './navigation';
 import { TrainingProvider } from './context/Training';
 import { DemoProvider } from './context/Demo';

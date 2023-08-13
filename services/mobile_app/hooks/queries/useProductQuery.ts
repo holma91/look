@@ -1,4 +1,3 @@
-import { useUser } from '@clerk/clerk-expo';
 import { useQuery } from '@tanstack/react-query';
 
 import { UserProduct } from '../../utils/types';

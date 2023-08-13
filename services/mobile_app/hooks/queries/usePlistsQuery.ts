@@ -1,4 +1,3 @@
-import { useUser } from '@clerk/clerk-expo';
 import { useQuery } from '@tanstack/react-query';
 import { Plist } from '../../utils/types';
 import { URL } from '../../api/index';

@@ -14,7 +14,7 @@ router = APIRouter()
 log = logging.getLogger("uvicorn")
 
 ### GET REQUESTS ###
-
+# create, read, update, delete vs add, get, change, remove
 ### USER INFO ###
 
 @router.get("/", response_model=list[UserBase])
@@ -31,8 +31,6 @@ async def read_user(id: str) -> UserExtended:
 
 ### PRODUCT INFO ###
 
-
-
 @router.get("/{user_id}/products", response_model=list[UserProduct])
 async def read_user_products(
     user_id: str, 
@@ -41,29 +39,18 @@ async def read_user_products(
     website: list[str] = Query(None)
 ) -> UserProduct:
     filters = {"list": list, "brand": brand, "website": website}
-    try:
-        if list in ["history", "likes"]:
-            products = await crud.get_products(user_id, filters)
-        else:
-            products = await crud.get_products_from_list(user_id, filters)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    if list in ["history", "likes"]:
+        products = await crud.get_products(user_id, filters)
+    else:
+        products = await crud.get_products_from_list(user_id, filters)
     return products
 
-@router.get("/{user_id}/products/{product_url}", response_model=UserProduct)
-async def read_user_product(user_id: str, product_url: str) -> UserProduct:
-    product = await crud.get_product(user_id, product_url)
-    if not product:
-        raise HTTPException(status_code=404, detail="User or Product not found!")
-
-    return product
 
 @router.get("/{user_id}/product", response_model=UserProduct)
 async def read_user_product(user_id: str, product_url: str = Query(None)) -> UserProduct:
-    print('product_url', product_url)
     product = await crud.get_product(user_id, product_url)
     if not product:
-        raise HTTPException(status_code=404, detail="User or Product not found!")
+        raise HTTPException(status_code=404, detail="Product not found!")
 
     return product
 
@@ -108,14 +95,6 @@ async def add_product(user_id: str, product: ProductExtended) -> POSTResponse:
         raise HTTPException(status_code=404, detail="User not found!")
 
     return SUCCESSFUL_POST_RESPONSE
-
-# @router.post("/{user_id}/products/images", status_code=201, response_model=POSTResponseAddImage)
-# async def add_product_image(user_id: str, product_image: ProductImage) -> POSTResponseAddImage:
-#     result = await crud.add_product_image(product_image)
-#     if not result['success']:
-#         raise HTTPException(status_code=409, detail=result["message"])
-
-#     return result
 
 @router.post("/{user_id}/products/images", status_code=201, response_model=POSTResponseAddImage)
 async def add_product_images(user_id: str, product_images: ProductImages) -> POSTResponseAddImage:

@@ -1,5 +1,4 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
 import { likeProducts, unlikeProducts } from '../../api';
 import { FilterType, UserProduct } from '../../utils/types';
 import { useFirebaseUser } from '../useFirebaseUser';
