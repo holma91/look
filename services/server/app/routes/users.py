@@ -17,6 +17,15 @@ log = logging.getLogger("uvicorn")
 # create, read, update, delete vs add, get, change, remove
 ### USER INFO ###
 
+@router.post("/", status_code=201, response_model=POSTResponse)
+async def create_user(user: UserBase) -> POSTResponse:
+    # verify the firebase token/id
+    result = await crud.create(user.id)
+    if result is None:
+        raise HTTPException(status_code=400, detail="User already exists!")
+
+    return SUCCESSFUL_POST_RESPONSE
+
 @router.get("/", response_model=list[UserBase])
 async def read_users() -> list[UserBase]:
     return await crud.get_all()

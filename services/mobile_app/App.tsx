@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler'; // might need to do more than this on android
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { LogBox } from 'react-native';
 import { ThemeProvider } from '@shopify/restyle';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
