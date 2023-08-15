@@ -145,7 +145,7 @@ The first step in using ORM lazy loading effectively is to test the application,
 
 - Explicit Join + Eager load
 - Raiseload
-  This option is used to completely block an application from having the N plus one problem at all by causing what would normally be a lazy load to raise an error instead
+  This option is used to completely block an application from having the N plus one problem at all by causing what would normally be a lazy load to raise an error instead. It then means that we always need to specify a loader strategy.
 
 ### Glossary
 

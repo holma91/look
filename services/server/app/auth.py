@@ -1,10 +1,25 @@
 from fastapi import Depends, HTTPException, status, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from firebase_admin import auth, credentials, initialize_app
+from pydantic import BaseModel
+
+class FirebaseUser(BaseModel):
+    name: str
+    picture: str
+    iss: str
+    aud: str
+    auth_time: int
+    user_id: str
+    sub: str
+    iat: int
+    exp: int
+    email: str
+    email_verified: bool
+    firebase: dict
+    uid: str
 
 credential = credentials.Certificate('./key.json')
 initialize_app(credential)
-
 
 def get_current_user(res: Response, token: HTTPAuthorizationCredentials=Depends(HTTPBearer(auto_error=False))):
     if token is None:
@@ -22,4 +37,4 @@ def get_current_user(res: Response, token: HTTPAuthorizationCredentials=Depends(
             headers={'WWW-Authenticate': 'Bearer error="invalid_token"'},
         )
     res.headers['WWW-Authenticate'] = 'Bearer realm="auth_required"'
-    return user
+    return (FirebaseUser(**user))
