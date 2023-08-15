@@ -10,6 +10,8 @@ def list_all(user: FirebaseUser, session):
         .all()
     )
 
+    
+
     return [Product(
         url=record.url,
         domain=record.domain,

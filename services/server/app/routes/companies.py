@@ -1,8 +1,10 @@
 import logging
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.crud import companies as crud
-from app.models.pydantic import CompanyBase
+from app.database import company_db
+from app.db import get_db_session
+# from app.models.pydantic import CompanyBase
+from app.pydantic.models import Company
 
 
 router = APIRouter()
@@ -10,6 +12,6 @@ router = APIRouter()
 log = logging.getLogger("uvicorn")
 
 
-@router.get("/", response_model=list[CompanyBase])
-async def read_all_companies() -> list[CompanyBase]:
-    return await crud.get_all()
+@router.get("/", response_model=list[Company])
+async def read_all_companies(session = Depends(get_db_session)) -> list[Company]:
+    return company_db.list_all(session)

@@ -26,9 +26,9 @@ app = create_application()
 def read_root():
     return {"Hello": "World"}
 
-@app.get("/user")
-def read_user(user = Depends(get_current_user)):
-    return user
+# @app.get("/user")
+# def read_user(user = Depends(get_current_user)):
+#     return user
 
 
 # @app.get('/products', status_code=200, response_model=dict[str, list[product.ProductModel]])

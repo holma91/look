@@ -13,3 +13,6 @@ class Product(BaseModel):
     currency: str
     price: float
     updated_at: datetime.datetime
+
+class Company(BaseModel):
+    id: str
