@@ -4,7 +4,7 @@ import { Box, Text } from '../styling/RestylePrimitives';
 import { useContext } from 'react';
 import { DemoContext } from '../context/Demo';
 import { DarkModeContext } from '../context/DarkMode';
-import { PrimaryButton } from '../components/Button';
+import { PrimaryButton, SecondaryButton } from '../components/Button';
 import { useFirebaseUser } from '../hooks/useFirebaseUser';
 
 export default function Profile() {
@@ -35,6 +35,17 @@ export default function Profile() {
       })
       .catch((error) => {
         console.error('Error signing out:', error);
+      });
+  }
+
+  function logToken() {
+    auth()
+      .currentUser?.getIdToken(true)
+      .then((idToken) => {
+        console.log(idToken);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
@@ -74,7 +85,8 @@ export default function Profile() {
                 </Box>
               ))}
             </Box>
-            <Box marginBottom="s">
+            <Box marginBottom="s" gap="s">
+              <SecondaryButton label="Log token" onPress={logToken} />
               <PrimaryButton label="Sign out" onPress={handleSignOut} />
             </Box>
           </Box>

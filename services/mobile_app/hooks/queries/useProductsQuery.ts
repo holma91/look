@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import auth from '@react-native-firebase/auth';
 
 import { FilterType, UserProduct } from '../../utils/types';
 
@@ -23,7 +24,12 @@ export async function fetchProducts(
     console.log('error:', e);
   }
 
-  const response = await fetch(completeUrl);
+  const token = await auth()?.currentUser?.getIdToken();
+  const response = await fetch(completeUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     console.log('response:', response);

@@ -27,8 +27,6 @@ export default function SignUpOrIn() {
             Unifying physical and digital shopping into one experience.
           </Text>
         </Box>
-
-        {/* <SignInWithApple /> */}
         <SignInWithGoogle />
       </Box>
     </Box>

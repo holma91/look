@@ -2,14 +2,30 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
-
 from fastapi import FastAPI
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
+
+from app.config import load_config
 from tortoise import Tortoise, run_async
 from tortoise.contrib.fastapi import register_tortoise
 
 
 log = logging.getLogger("uvicorn")
+
+app_config = load_config()
+
+
+def get_db_session():
+    engine = create_engine(app_config.SQLALCHEMY_DATABASE_URI, echo=False)
+    db = sessionmaker(bind=engine)()
+
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 
 TORTOISE_ORM = {

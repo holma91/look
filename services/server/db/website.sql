@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS "list_product" (
     UNIQUE(list_id, product_url)
 );
 
-insert into "user" (id) values ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1');
+insert into "user" (id) values ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1');
 
 INSERT INTO company (id)
 VALUES
@@ -109,26 +109,26 @@ VALUES
 
 INSERT INTO user_company (user_id, company_id, favorited)
 VALUES
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'zara', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'zalando', TRUE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'boozt', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'hm', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'softgoat', TRUE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'adaysmarch', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'sellpy', TRUE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'na-kd', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'careofcarl', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'loropiana', TRUE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'lululemon', TRUE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'moncler', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'gucci', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'ysl', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'louisvuitton', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1','farfetch', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1','hermes', TRUE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1','prada', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1','valentino', FALSE),
-    ('ZRjyOtn977STYR2Yq9XAGmt7Jwh1','mytheresa', FALSE);
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zara', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zalando', TRUE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'boozt', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'hm', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'softgoat', TRUE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'adaysmarch', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'sellpy', TRUE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'na-kd', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'careofcarl', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'loropiana', TRUE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'lululemon', TRUE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'moncler', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'gucci', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'ysl', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'louisvuitton', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','farfetch', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','hermes', TRUE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','prada', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','valentino', FALSE),
+    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','mytheresa', FALSE);
 
 
 INSERT INTO product (url, domain, brand, name, price, currency)
@@ -154,16 +154,16 @@ VALUES
 
 INSERT INTO user_product (user_id, product_url)
 VALUES
-('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey'),
-('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'https://softgoat.com/p/mens-fine-knit-t-shirt-white'),
-('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'https://softgoat.com/p/mens-waffle-knit-sea-foam'),
-('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'https://softgoat.com/p/mens-collar-navy'),
-('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'https://softgoat.com/p/boatneck-red'),
-('ZRjyOtn977STYR2Yq9XAGmt7Jwh1', 'https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html');
+('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey'),
+('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-fine-knit-t-shirt-white'),
+('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-waffle-knit-sea-foam'),
+('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-collar-navy'),
+('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/boatneck-red'),
+('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html');
 
 INSERT INTO p_list (id, user_id)
 VALUES
-('purchases', 'ZRjyOtn977STYR2Yq9XAGmt7Jwh1');
+('purchases', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1');
 
 
 INSERT INTO list_product (list_id, product_url)
@@ -172,10 +172,10 @@ VALUES
 ('purchases', 'https://softgoat.com/p/mens-waffle-knit-sea-foam');
 
 UPDATE user_product SET liked = TRUE
-WHERE user_id = 'ZRjyOtn977STYR2Yq9XAGmt7Jwh1' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey';
--- UPDATE user_product SET liked = TRUE
--- WHERE user_id = 'ZRjyOtn977STYR2Yq9XAGmt7Jwh1' AND product_url = 'https://softgoat.com/p/mens-collar-navy';
--- UPDATE user_product SET liked = TRUE
--- WHERE user_id = 'ZRjyOtn977STYR2Yq9XAGmt7Jwh1' AND product_url = 'https://softgoat.com/p/mens-waffle-knit-sea-foam';
--- UPDATE user_product SET liked = TRUE
--- WHERE user_id = 'ZRjyOtn977STYR2Yq9XAGmt7Jwh1' AND product_url = 'https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html';
+WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey';
+UPDATE user_product SET liked = TRUE
+WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://softgoat.com/p/mens-collar-navy';
+UPDATE user_product SET liked = TRUE
+WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://softgoat.com/p/mens-waffle-knit-sea-foam';
+UPDATE user_product SET liked = TRUE
+WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html';

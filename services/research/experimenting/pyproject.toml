@@ -21,6 +21,7 @@ pyyaml = "^6.0"
 tqdm = "^4.65.0"
 ultralytics = "^8.0.124"
 gitpython = "^3.1.31"
+sqlalchemy = "^2.0.19"
 
 
 [build-system]

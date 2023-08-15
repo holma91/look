@@ -8,6 +8,7 @@ from svix.webhooks import Webhook, WebhookVerificationError
 from app.crud import users as crud
 from app.models.pydantic import UserBase, UserCompany, UserBrand, ProductImages, UserProduct, ListBase, ListProducts, LikeProducts, FavoriteCompany, UserExtended, ProductExtended, POSTResponse, LikeProduct, WebsiteBase, ProductImage, POSTResponseAddImage
 from app.utils import SUCCESSFUL_POST_RESPONSE
+from app.auth import get_current_user
 
 router = APIRouter()
 
@@ -45,7 +46,8 @@ async def read_user_products(
     user_id: str, 
     list: str = "likes",
     brand: list[str] = Query(None),
-    website: list[str] = Query(None)
+    website: list[str] = Query(None),
+    user: dict = Depends(get_current_user),
 ) -> UserProduct:
     filters = {"list": list, "brand": brand, "website": website}
     if list in ["history", "likes"]:

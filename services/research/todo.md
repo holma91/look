@@ -19,3 +19,4 @@ Do grounding sam stuff. The following should be possible:
 **sqlalchemy**:
 https://docs.sqlalchemy.org/en/20/tutorial/index.html
 https://testdriven.io/courses/scalable-fastapi-aws/database-app-support/
+https://github.com/tiangolo/full-stack-fastapi-postgresql
