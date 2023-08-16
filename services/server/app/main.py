@@ -31,12 +31,6 @@ def read_root():
 #     return user
 
 
-# @app.get('/products', status_code=200, response_model=dict[str, list[product.ProductModel]])
-# def products(db_session=Depends(get_db_session)):
-#     return {
-#             "results": product.list_all(db_session)
-#     }
-
 
 @app.on_event("startup")
 async def startup_event():

@@ -6,3 +6,7 @@
 
 - start with products routes and stuff
   replace completely with sqlalchemy
+
+### thoughts
+
+only use Pydantic for RESPONSE/REQUEST objects?
