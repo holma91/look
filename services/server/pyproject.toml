@@ -19,6 +19,7 @@ sqlalchemy = "^2.0.19"
 boto3 = "^1.28.25"
 psycopg2-binary = "^2.9.7"
 firebase-admin = "^6.2.0"
+black = "^23.7.0"
 
 
 

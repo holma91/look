@@ -1,6 +1,15 @@
 from typing import Optional
-from app.models.pydantic import ProductExtended, ProductImages, LikeProducts, ProductImage,ListBase, ListProduct, ListProducts
+from app.models.pydantic import (
+    ProductExtended,
+    ProductImages,
+    LikeProducts,
+    ProductImage,
+    ListBase,
+    ListProduct,
+    ListProducts,
+)
 from app.db import get_db_connection
+
 
 async def get_all() -> list[dict]:
     async with get_db_connection() as conn:
@@ -10,6 +19,7 @@ async def get_all() -> list[dict]:
         users = await conn.execute_query_dict(query)
 
     return users
+
 
 async def get(id: str) -> dict:
     async with get_db_connection() as conn:
@@ -33,11 +43,13 @@ async def get(id: str) -> dict:
         """
         favorite_websites = await conn.execute_query_dict(website_query, [id])
 
-    user['likes'] = [product["product_url"] for product in liked_products]
-    user['favorites'] = [website["website_id"] for website in favorite_websites]
+    user["likes"] = [product["product_url"] for product in liked_products]
+    user["favorites"] = [website["website_id"] for website in favorite_websites]
     return user
 
+
 ### COMPANY INFO ###
+
 
 async def get_companies(user_id: str) -> list:
     async with get_db_connection() as conn:
@@ -51,18 +63,19 @@ async def get_companies(user_id: str) -> list:
 
     processed_data = {}
     for site in sites:
-        company_id = site['company_id']
+        company_id = site["company_id"]
 
         if company_id not in processed_data:
             processed_data[company_id] = {
                 "id": site["company_id"],
                 "favorited": site["favorited"],
-                "domains": []
+                "domains": [],
             }
 
         processed_data[company_id]["domains"].append(site["domain"])
 
     return list(processed_data.values())
+
 
 async def add_favorite(user_id: str, id: str) -> Optional[str]:
     async with get_db_connection() as conn:
@@ -72,6 +85,7 @@ async def add_favorite(user_id: str, id: str) -> Optional[str]:
         await conn.execute_query_dict(query, [user_id, id])
 
     return id
+
 
 async def un_favorite(user_id: str, id: str) -> Optional[str]:
     async with get_db_connection() as conn:
@@ -83,9 +97,13 @@ async def un_favorite(user_id: str, id: str) -> Optional[str]:
 
     return id
 
+
 ### PRODUCT INFO ###
 
-async def get_products_from_list(user_id: str, filters: Optional[dict[str, str]] = None):
+
+async def get_products_from_list(
+    user_id: str, filters: Optional[dict[str, str]] = None
+):
     async with get_db_connection() as conn:
         query = """
             select * from user_product up
@@ -95,22 +113,26 @@ async def get_products_from_list(user_id: str, filters: Optional[dict[str, str]]
             join website w on p.domain = w.domain
             where up.user_id = $1 and lp.list_id = $2"""
         query_params = [user_id, filters["list"]]
-        
+
         if filters:
             for key, value in filters.items():
                 if key == "brand":
                     if value:
-                        brand_placeholders = ', '.join(f"${i+len(query_params)+1}" for i in range(len(value)))
+                        brand_placeholders = ", ".join(
+                            f"${i+len(query_params)+1}" for i in range(len(value))
+                        )
                         query += f" and brand = ANY(ARRAY[{brand_placeholders}])"
                         query_params.extend(value)
                 elif key == "website":
                     if value:
-                        website_placeholders = ', '.join(f"${i+len(query_params)+1}" for i in range(len(value)))
+                        website_placeholders = ", ".join(
+                            f"${i+len(query_params)+1}" for i in range(len(value))
+                        )
                         query += f" and company_id = ANY(ARRAY[{website_placeholders}])"
                         query_params.extend(value)
                 elif key == "category":
-                    pass # category functionality is not yet implemented
-                
+                    pass  # category functionality is not yet implemented
+
         query += ";"
 
         rows = await conn.execute_query_dict(query, query_params)
@@ -118,6 +140,7 @@ async def get_products_from_list(user_id: str, filters: Optional[dict[str, str]]
     products = process_product_rows(rows)
 
     return products
+
 
 async def get_products(user_id: str, filters: Optional[dict[str, str]] = None):
     async with get_db_connection() as conn:
@@ -128,7 +151,7 @@ async def get_products(user_id: str, filters: Optional[dict[str, str]] = None):
             join website w on p.domain = w.domain
             where up.user_id = $1"""
         query_params = [user_id]
-        
+
         if filters:
             for key, value in filters.items():
                 if key == "list":
@@ -136,25 +159,29 @@ async def get_products(user_id: str, filters: Optional[dict[str, str]] = None):
                         query += " and liked = TRUE"
                 elif key == "brand":
                     if value:
-                        brand_placeholders = ', '.join(f"${i+len(query_params)+1}" for i in range(len(value)))
+                        brand_placeholders = ", ".join(
+                            f"${i+len(query_params)+1}" for i in range(len(value))
+                        )
                         query += f" and brand = ANY(ARRAY[{brand_placeholders}])"
                         query_params.extend(value)
                 elif key == "website":
                     if value:
-                        website_placeholders = ', '.join(f"${i+len(query_params)+1}" for i in range(len(value)))
+                        website_placeholders = ", ".join(
+                            f"${i+len(query_params)+1}" for i in range(len(value))
+                        )
                         query += f" and company_id = ANY(ARRAY[{website_placeholders}])"
                         query_params.extend(value)
                 elif key == "category":
-                    pass # category functionality is not yet implemented
-                
+                    pass  # category functionality is not yet implemented
+
         query += ";"
 
         rows = await conn.execute_query_dict(query, query_params)
 
     products = process_product_rows(rows)
 
-
     return products
+
 
 async def get_product(user_id: str, product_url: str) -> dict:
     async with get_db_connection() as conn:
@@ -180,16 +207,24 @@ async def add_product(user_id: str, product: ProductExtended) -> bool:
         check_result = await conn.execute_query_dict(check_query, [product.url])
         if check_result:
             return True
-        
+
         # Insert product
 
         query = """
         insert into product (url, domain, brand, name, price, currency)
         values ($1, $2, $3, $4, $5, $6) returning *;
         """
-        result = await conn.execute_query_dict(query, [
-            product.url, product.domain, product.brand, product.name, product.price, product.currency
-        ])
+        result = await conn.execute_query_dict(
+            query,
+            [
+                product.url,
+                product.domain,
+                product.brand,
+                product.name,
+                product.price,
+                product.currency,
+            ],
+        )
 
         # Insert images
         query = """
@@ -198,13 +233,17 @@ async def add_product(user_id: str, product: ProductExtended) -> bool:
         """
         for image in product.images:
             await conn.execute_query_dict(query, [product.url, image])
-    
+
         # 3. add the user_product relationship
-        check_query = """select * from user_product where user_id = $1 and product_url = $2;"""
-        check_result = await conn.execute_query_dict(check_query, [user_id, product.url])
+        check_query = (
+            """select * from user_product where user_id = $1 and product_url = $2;"""
+        )
+        check_result = await conn.execute_query_dict(
+            check_query, [user_id, product.url]
+        )
         if check_result:
             return True
-        
+
         query = """
         insert into user_product (user_id, product_url)
         values ($1, $2);
@@ -213,36 +252,46 @@ async def add_product(user_id: str, product: ProductExtended) -> bool:
 
     return True
 
+
 async def add_product_image(product_image: ProductImage) -> dict:
     try:
         async with get_db_connection() as conn:
             query = """insert into product_image (product_url, image_url) values ($1, $2);"""
-            result = await conn.execute_query_dict(query, [product_image.product_url, product_image.image_url])
-        
+            result = await conn.execute_query_dict(
+                query, [product_image.product_url, product_image.image_url]
+            )
+
         return {"success": True, "message": "Image added successfully"}
     except Exception as e:
         # todo: more specific error handling
         return {"success": False, "message": "Image already exists"}
-    
+
+
 async def add_product_images(product_images: ProductImages) -> dict:
     async with get_db_connection() as conn:
-        query = """insert into product_image (product_url, image_url) values ($1, $2);"""
+        query = (
+            """insert into product_image (product_url, image_url) values ($1, $2);"""
+        )
         for image_url in product_images.image_urls:
             try:
-                await conn.execute_query_dict(query, [product_images.product_url, image_url])
+                await conn.execute_query_dict(
+                    query, [product_images.product_url, image_url]
+                )
             except Exception as e:
-                print(e) # just a duplicate in the list, ignore it
-    
+                print(e)  # just a duplicate in the list, ignore it
+
     return {"success": True, "message": "Images added successfully"}
+
 
 async def delete_product_images(product_image: ProductImages) -> dict:
     async with get_db_connection() as conn:
-        query = """delete from product_image where product_url = $1 and image_url = $2;"""
+        query = (
+            """delete from product_image where product_url = $1 and image_url = $2;"""
+        )
         for image_url in product_image.image_urls:
             await conn.execute_query_dict(query, [product_image.product_url, image_url])
-    
-    return {"success": True, "message": "Images deleted successfully"}
 
+    return {"success": True, "message": "Images deleted successfully"}
 
 
 async def dislike_products(user_id: str, products: LikeProducts) -> Optional[str]:
@@ -255,6 +304,7 @@ async def dislike_products(user_id: str, products: LikeProducts) -> Optional[str
 
     return products.product_urls
 
+
 async def like_products(user_id: str, products: LikeProducts) -> Optional[str]:
     async with get_db_connection() as conn:
         query = """
@@ -265,7 +315,9 @@ async def like_products(user_id: str, products: LikeProducts) -> Optional[str]:
 
     return products.product_urls
 
+
 ### BRAND INFO ###
+
 
 async def get_brands(user_id: str) -> list:
     async with get_db_connection() as conn:
@@ -274,8 +326,9 @@ async def get_brands(user_id: str) -> list:
             join user_product up on up.product_url = product.url where up.user_id = $1;
         """
         brands = await conn.execute_query_dict(query, [user_id])
-    
+
     return brands
+
 
 ### LISTS ###
 async def get_p_lists(user_id: str) -> list:
@@ -286,6 +339,7 @@ async def get_p_lists(user_id: str) -> list:
         lists = await conn.execute_query_dict(query, [user_id])
 
     return lists
+
 
 async def create_p_list(user_id: str, p_list: ListProducts) -> str:
     async with get_db_connection() as conn:
@@ -303,6 +357,7 @@ async def create_p_list(user_id: str, p_list: ListProducts) -> str:
 
     return p_list.id
 
+
 async def delete_p_list(user_id: str, p_list: ListBase) -> str:
     async with get_db_connection() as conn:
         query = """
@@ -311,6 +366,7 @@ async def delete_p_list(user_id: str, p_list: ListBase) -> str:
         await conn.execute_query_dict(query, [p_list.id, user_id])
 
     return p_list.id
+
 
 async def add_products_to_p_list(user_id: str, list_products: ListProducts) -> str:
     # user id might be needed in the future
@@ -322,9 +378,10 @@ async def add_products_to_p_list(user_id: str, list_products: ListProducts) -> s
             try:
                 await conn.execute_query_dict(query, [list_products.id, product_url])
             except Exception as e:
-                print(e) # just a duplicate in the list, ignore it
+                print(e)  # just a duplicate in the list, ignore it
 
     return True
+
 
 async def delete_products_from_p_list(user_id: str, list_products: ListProducts) -> str:
     # user id might be needed in the future
@@ -336,7 +393,10 @@ async def delete_products_from_p_list(user_id: str, list_products: ListProducts)
             await conn.execute_query_dict(query, [list_products.id, product_url])
     return True
 
-async def delete_products_from_history(user_id: str, list_products: ListProducts) -> str:
+
+async def delete_products_from_history(
+    user_id: str, list_products: ListProducts
+) -> str:
     # user id might be needed in the future
     async with get_db_connection() as conn:
         query = """
@@ -346,7 +406,9 @@ async def delete_products_from_history(user_id: str, list_products: ListProducts
             await conn.execute_query_dict(query, [user_id, product_url])
     return True
 
+
 ### CLERK WEBHOOK FUNCTIONS ###
+
 
 async def create(id: str) -> int:
     async with get_db_connection() as conn:
@@ -357,8 +419,10 @@ async def create(id: str) -> int:
 
     return id
 
+
 async def update(id: str) -> int:
     return id
+
 
 async def delete(id: str) -> int:
     async with get_db_connection() as conn:
@@ -368,6 +432,7 @@ async def delete(id: str) -> int:
         await conn.execute_query_dict(query, [id])
 
     return id
+
 
 ### HELPER FUNCTIONS ###
 def process_product_rows(rows: list[dict]) -> list[dict]:
@@ -384,11 +449,11 @@ def process_product_rows(rows: list[dict]) -> list[dict]:
                 "price": row["price"],
                 "currency": row["currency"],
                 "liked": row["liked"],
-                "images": []
+                "images": [],
             }
             products_dict[product_url] = product
 
         # Add the image URL to the product's image list
         products_dict[product_url]["images"].append(row["image_url"])
-    
+
     return list(products_dict.values())
