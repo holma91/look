@@ -24,3 +24,40 @@ content-type: application/json
     "price": "449",
     "currency": "SEK"
 }
+
+### 
+POST http://localhost:8004/products HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjYzODBlZjEyZjk1ZjkxNmNhZDdhNGNlMzg4ZDJjMmMzYzIzMDJmZGUiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQWxleGFuZGVyIEhvbG1iZXJnIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FBY0hUdGNoRjRfYUlxYzdZeFFISjBFUFpPSWg1MHduVVZyRkJfc0t5UnZGeWlDaz1zOTYtYyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9sb29rLTk3YTg0IiwiYXVkIjoibG9vay05N2E4NCIsImF1dGhfdGltZSI6MTY5MjEyMTQ4NiwidXNlcl9pZCI6IkNvUkR6ZzRtdXpPSjVJVmZHT3R3U2pJUjhNbzEiLCJzdWIiOiJDb1JEemc0bXV6T0o1SVZmR090d1NqSVI4TW8xIiwiaWF0IjoxNjkyMTY2NzA5LCJleHAiOjE2OTIxNzAzMDksImVtYWlsIjoiYWxleGFuZGVyaG9sbWJlcmc5MUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJnb29nbGUuY29tIjpbIjExNzM5NjA1OTA4NDIwODc5MzE3MSJdLCJlbWFpbCI6WyJhbGV4YW5kZXJob2xtYmVyZzkxQGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.k5EhSqNhU5bsb0LY_-pZYe0EB128wyOHECcwQ7usT2aM9ub2RuABSzj3OUvDLxn1sfzpThk5ffxV6bDm0A-yJln5N8bDQVlz--QQjvo-pH_OlxpP7mk-ngUlYQfV4gaU_dp3YUpy39DTwrYAe2zMwvizqJdeKc-7p-FDYAcz_q1WsYsmIhZ7IaYBRpvMoi5vlTuomp42FnLrZI4TAje4I8YGPwVZNnx0fzzGYEwHFy36SBmWzGFL-It4BndjIKC7AGCsrI2n1NGhVWYZxUAMuPEu7U67DiyGklkAdH5v1xV3oPBQRLsFp68UFSKFtF51KDrs2lFNKw4A7tOq7Q6j9w
+
+
+{
+    "url": "https://www.zalando.se/libertine-libertine-cave-skjorta-white-liq22d039-a11.html",
+    "domain": "zalando.com",
+    "brand": "Nike",
+    "name": "BODYSUIT - Linne",
+    "price": "449",
+    "currency": "SEK",
+    "images": [
+        "https://img01.ztat.net/article/spp-media-p1/f696981b8c4d4ac2bf9f50426a92b53f/34c27414c3cc4f18a29a1c0aa752e800.jpg?imwidth=1800",
+        "https://img01.ztat.net/article/spp-media-p1/9d576e6377d34872adf4a16d9bda5d01/c828750a7c6f4499a8d3bfd82242e505.jpg?imwidth=1800"
+    ]
+}
+### 
+POST http://localhost:8004/products HTTP/1.1
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjYzODBlZjEyZjk1ZjkxNmNhZDdhNGNlMzg4ZDJjMmMzYzIzMDJmZGUiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQWxleGFuZGVyIEhvbG1iZXJnIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FBY0hUdGNoRjRfYUlxYzdZeFFISjBFUFpPSWg1MHduVVZyRkJfc0t5UnZGeWlDaz1zOTYtYyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9sb29rLTk3YTg0IiwiYXVkIjoibG9vay05N2E4NCIsImF1dGhfdGltZSI6MTY5MjEyMTQ4NiwidXNlcl9pZCI6IkNvUkR6ZzRtdXpPSjVJVmZHT3R3U2pJUjhNbzEiLCJzdWIiOiJDb1JEemc0bXV6T0o1SVZmR090d1NqSVI4TW8xIiwiaWF0IjoxNjkyMTc0MTY2LCJleHAiOjE2OTIxNzc3NjYsImVtYWlsIjoiYWxleGFuZGVyaG9sbWJlcmc5MUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJnb29nbGUuY29tIjpbIjExNzM5NjA1OTA4NDIwODc5MzE3MSJdLCJlbWFpbCI6WyJhbGV4YW5kZXJob2xtYmVyZzkxQGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.JHcOB5mRZwU7Gmyr5Ka9k1hx0G6QC3YcnIGprP8EqaNT9komf8KfpEeo2y-wtyGHtpAaIsAFfMMBXSBtiEftpSZJpUl-PR2cu7qr3YXb6nhq9fYB3wIjE4tCd4KXheVVihMKDJXnwchlV5LP5jzOSIAdjTcUApDpCOE4ThaSSj6YVqmFkmxmBVdzKfpXwT6ma-SHMsNei8sqka2Pmjo-5KHD_2FHNTRHcxh94cmRGB8uVec3YEDv2OMUF3C-YzCjpKrZJ90NZw72rEkk0nIN1bD3OWQb7tw91TV_t8cbsqtjMuT7ukmFPF3HenmJGLa46lXOyXnYDoZNn7QbaI55Rg
+
+
+{
+    "url": "https://www.zalando.se/filsdasdffasdfgdippa-k-douasdbasdfsle-breasted-kavsdfaj-french-navy-f1422a02v-k11.html",
+    "domain": "zalando.com",
+    "brand": "Nike",
+    "name": "BODYSUIT - Linne",
+    "price": "449",
+    "currency": "SEK",
+    "images": [
+        {"image_url": "https://img01.ztat.net/article/spp-media-p1/f1b4ed9dc4564ab7b99094eb1652c971/a3177e76d03448be8a23e228cf301ff7.jpg?imwidth=1800"},
+        {"image_url": "https://img01.ztat.net/article/spp-media-p1/9d576e6377d34872adf4a16d9bda5d01/c828750a7c6f4499a8d3bfd82242e505.jpg?imwidth=1800"}
+    ]
+}

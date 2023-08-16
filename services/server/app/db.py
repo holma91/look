@@ -18,7 +18,7 @@ app_config = load_config()
 
 
 def get_db_session():
-    engine = create_engine(app_config.SQLALCHEMY_DATABASE_URI, echo=False)
+    engine = create_engine(app_config.SQLALCHEMY_DATABASE_URI, echo=True)
     db = sessionmaker(bind=engine)()
 
     try:

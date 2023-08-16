@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS "product" (
     brand TEXT,
     name TEXT,
     price NUMERIC(12, 2),
-    currency CHAR(3),
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    currency CHAR(3)
 );
+-- updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 
 CREATE TABLE IF NOT EXISTS "product_image" (
     product_url TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,

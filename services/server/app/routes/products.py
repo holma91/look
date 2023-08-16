@@ -1,7 +1,7 @@
 import logging
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.models.pydantic import ProductExtended
+from sqlalchemy.orm import Session
 from app.auth import get_current_user, FirebaseUser
 from app.db import get_db_session
 from app.pydantic.models import Product
@@ -17,10 +17,8 @@ log = logging.getLogger("uvicorn")
 async def read_all_products(user: FirebaseUser = Depends(get_current_user), session = Depends(get_db_session)) -> list[Product]:
     return product_db.list_all(user, session)
 
-# @router.get("/{id}/", response_model=ProductExtended)
-# async def read_product(id: str) -> ProductExtended:
-#     product = await crud.get(id)
-#     if not product:
-#         raise HTTPException(status_code=404, detail="Product not found")
 
-#     return product
+@router.post("/", status_code=201, response_model=Product)
+async def add_product(product: Product, user: FirebaseUser = Depends(get_current_user), session: Session = Depends(get_db_session)) -> Product:
+    created_product = product_db.add_product(product, user.uid, session)
+    return created_product
