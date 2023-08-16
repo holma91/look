@@ -44,25 +44,25 @@ def add_product(product: ProductRequest, user_uid: str, session: Session):
       user.products.append(new_product)
 
       session.commit()
-      return {"success": True, "message": "Product added successfully!"}
+      return {"success": True, "detail": "Product added successfully!"}
     except IntegrityError:
-      return {"success": False, "message": "Product already exists!"}
+      return {"success": False, "detail": "Product already exists!"}
     
 
 
-def add_product_images(product_images: ProductImagesRequest, session: Session) -> dict:
+def add_product_images(product_images: ProductImagesRequest, session: Session):
     try:
       for image_url in product_images.image_urls:
           new_image = ProductImageModel(product_url=product_images.product_url, image_url=image_url)
           session.add(new_image)
     
       session.commit()
-      return {"success": True, "message": "Images added successfully"}
+      return {"success": True, "detail": "Images added successfully"}
     except IntegrityError: 
-      return {"success": False, "message": "Duplicate images or product URL not found"}
+      return {"success": False, "detail": "Duplicate images or product URL not found"}
 
 
-def delete_product_images(product_images: ProductImagesRequest, session: Session) -> dict:
+def delete_product_images(product_images: ProductImagesRequest, session: Session):
     try:
       images_to_delete = session.query(ProductImageModel) \
                           .filter(ProductImageModel.product_url == product_images.product_url) \
@@ -71,12 +71,12 @@ def delete_product_images(product_images: ProductImagesRequest, session: Session
       images_to_delete.delete(synchronize_session='fetch')
       
       session.commit()
-      return {"success": True, "message": "Images deleted successfully"}
+      return {"success": True, "detail": "Images deleted successfully"}
     except IntegrityError:
-      return {"success": False, "message": "Product URL or images URLs not found"}
+      return {"success": False, "detail": "Product URL or images URLs not found"}
     
 
-def like_products(like_products: LikeProductsRequest, user_uid: str, session: Session) -> dict:
+def like_products(like_products: LikeProductsRequest, user_uid: str, session: Session):
     try:
         for product_url in like_products.product_urls:
             session.query(user_product_association).filter(
@@ -88,12 +88,12 @@ def like_products(like_products: LikeProductsRequest, user_uid: str, session: Se
 
 
         session.commit()
-        return {"success": True, "message": "Products liked successfully!"}
+        return {"success": True, "detail": "Products liked successfully!"}
 
     except IntegrityError:
-        return {"success": False, "message": "Error liking product!"}
+        return {"success": False, "detail": "Error liking product!"}
 
-def unlike_products(unlike_products: LikeProductsRequest, user_uid: str, session: Session) -> dict:
+def unlike_products(unlike_products: LikeProductsRequest, user_uid: str, session: Session):
     try:
         for product_url in unlike_products.product_urls:
             session.query(user_product_association).filter(
@@ -105,7 +105,7 @@ def unlike_products(unlike_products: LikeProductsRequest, user_uid: str, session
 
 
         session.commit()
-        return {"success": True, "message": "Products unliked successfully!"}
+        return {"success": True, "detail": "Products unliked successfully!"}
 
     except IntegrityError:
-        return {"success": False, "message": "Error unliking product!"}
+        return {"success": False, "detail": "Error unliking product!"}
