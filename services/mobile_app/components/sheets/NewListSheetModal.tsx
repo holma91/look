@@ -69,8 +69,6 @@ export function NewListSheetModal({
     }
   };
 
-  console.log('selectedProducts:', selectedProducts.length);
-
   return (
     <BottomSheetModal
       ref={newListSheetModalRef}

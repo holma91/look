@@ -1,12 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
-
+import auth from '@react-native-firebase/auth';
 import { UserProduct } from '../../utils/types';
 import { URL } from '../../api/index';
 import { useFirebaseUser } from '../useFirebaseUser';
 
-async function fetchProduct(id: string, url: string) {
-  const completeUrl = `${URL}/users/${id}/product?product_url=${url}`;
-  const response = await fetch(completeUrl);
+async function fetchProduct(user: any, url: string) {
+  // const completeUrl = `${URL}/users/${id}/product?product_url=${url}`;
+  const completeUrl = `${URL}/products/product?product_url=${url}`;
+  const token = await auth()?.currentUser?.getIdToken();
+
+  const response = await fetch(completeUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error(
@@ -21,7 +28,7 @@ export const useProductQuery = (initialProduct: UserProduct) => {
 
   const productQuery = useQuery({
     queryKey: ['product', initialProduct.url],
-    queryFn: () => fetchProduct(user!.uid, initialProduct.url),
+    queryFn: () => fetchProduct(user, initialProduct.url),
     initialData: initialProduct,
     enabled: !!user?.uid,
     onError: (err) => {

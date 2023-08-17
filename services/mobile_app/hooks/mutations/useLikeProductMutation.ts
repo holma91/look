@@ -10,11 +10,13 @@ export const useLikeProductMutation = (filter: FilterType) => {
   const likeProductMutation = useMutation({
     mutationFn: async (product: UserProduct) => {
       !product.liked
-        ? await unlikeProducts(user!.uid, [product])
-        : await likeProducts(user!.uid, [product]);
+        ? await unlikeProducts([product])
+        : await likeProducts([product]);
       return product;
     },
     onMutate: async (product: UserProduct) => {
+      console.log('onMutate', product);
+
       await queryClient.cancelQueries(['product', product.url]);
       const previousProduct = queryClient.getQueryData([
         'product',
@@ -45,11 +47,11 @@ export const useLikeProductMutation = (filter: FilterType) => {
         queryKey: ['product', product.url],
       });
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.uid, filter],
+        queryKey: ['products', filter],
       });
       if (!filter?.list?.includes('likes')) {
         queryClient.invalidateQueries({
-          queryKey: ['products', user?.uid, { list: ['likes'] }],
+          queryKey: ['products', { list: ['likes'] }],
         });
       }
     },

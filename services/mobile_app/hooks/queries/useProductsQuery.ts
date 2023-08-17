@@ -7,7 +7,6 @@ import { URL } from '../../api/index';
 import { useFirebaseUser } from '../useFirebaseUser';
 
 export async function fetchProducts(
-  id: string,
   filter: FilterType
 ): Promise<UserProduct[]> {
   let completeUrl = '';
@@ -19,12 +18,13 @@ export async function fetchProducts(
         )
       )
       .join('&');
-    completeUrl = `${URL}/users/${id}/products?${queryString}`;
+    completeUrl = `${URL}/products?${queryString}`;
   } catch (e) {
     console.log('error:', e);
   }
 
   const token = await auth()?.currentUser?.getIdToken();
+
   const response = await fetch(completeUrl, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -45,8 +45,8 @@ export const useProductsQuery = (filter: FilterType) => {
   const { user } = useFirebaseUser();
 
   const productsQuery = useQuery({
-    queryKey: ['products', user?.uid, filter],
-    queryFn: () => fetchProducts(user?.uid as string, filter),
+    queryKey: ['products', filter],
+    queryFn: () => fetchProducts(filter),
     enabled: !!user?.uid,
     onError: (err) => {
       console.log('error fetching products:', err);

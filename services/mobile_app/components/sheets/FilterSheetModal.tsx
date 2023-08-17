@@ -73,7 +73,6 @@ export function FilterSheetModal({
       }}
       handleIndicatorStyle={{ backgroundColor: theme.colors.background }}
       onDismiss={() => {
-        console.log('dismissed');
         setSheetNavStack([]);
       }}
     >

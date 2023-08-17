@@ -1,7 +1,9 @@
 from app.pydantic.models import CustomBaseModel
 
+
 class BaseResponse(CustomBaseModel):
     detail: str
+
 
 class ProductResponse(CustomBaseModel):
     url: str
@@ -11,3 +13,5 @@ class ProductResponse(CustomBaseModel):
     price: float
     currency: str
     images: list[str]
+
+    liked: bool

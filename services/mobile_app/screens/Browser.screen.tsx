@@ -236,6 +236,7 @@ function Content({
 
   const handleProductMessage = (data: any, eventUrl: string) => {
     const product = parseProductData(eventUrl, data);
+
     if (currentProduct.url !== product.url) {
       if (
         !arraysAreEqual(currentProduct.images, product.images) ||

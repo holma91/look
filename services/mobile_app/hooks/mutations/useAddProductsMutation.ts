@@ -15,14 +15,9 @@ export const useAddProductsMutation = () => {
       return products;
     },
     onMutate: async ({ products, listId }: AddProductsMutationProps) => {
-      await queryClient.cancelQueries([
-        'products',
-        user?.uid,
-        { list: [listId] },
-      ]);
+      await queryClient.cancelQueries(['products', { list: [listId] }]);
       const previousProducts = queryClient.getQueryData([
         'products',
-        user?.uid,
         { list: [listId] },
       ]);
 
@@ -41,13 +36,13 @@ export const useAddProductsMutation = () => {
     onError: (err, { products, listId }, context) => {
       console.log('error', err, products, context);
       queryClient.setQueryData(
-        ['products', user?.uid, { list: [listId] }],
+        ['products', { list: [listId] }],
         context?.previousProducts
       );
     },
     onSettled: async (_, err, { products, listId }, context) => {
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.uid, { list: [listId] }],
+        queryKey: ['products', { list: [listId] }],
       });
     },
   });

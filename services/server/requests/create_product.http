@@ -44,20 +44,9 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjYzODBlZjEyZjk1ZjkxNmNhZDdhNG
     ]
 }
 ### 
-POST http://localhost:8004/products HTTP/1.1
+POST http://localhost:8004/products/ HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjYzODBlZjEyZjk1ZjkxNmNhZDdhNGNlMzg4ZDJjMmMzYzIzMDJmZGUiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQWxleGFuZGVyIEhvbG1iZXJnIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FBY0hUdGNoRjRfYUlxYzdZeFFISjBFUFpPSWg1MHduVVZyRkJfc0t5UnZGeWlDaz1zOTYtYyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9sb29rLTk3YTg0IiwiYXVkIjoibG9vay05N2E4NCIsImF1dGhfdGltZSI6MTY5MjEyMTQ4NiwidXNlcl9pZCI6IkNvUkR6ZzRtdXpPSjVJVmZHT3R3U2pJUjhNbzEiLCJzdWIiOiJDb1JEemc0bXV6T0o1SVZmR090d1NqSVI4TW8xIiwiaWF0IjoxNjkyMTgyNzk4LCJleHAiOjE2OTIxODYzOTgsImVtYWlsIjoiYWxleGFuZGVyaG9sbWJlcmc5MUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJnb29nbGUuY29tIjpbIjExNzM5NjA1OTA4NDIwODc5MzE3MSJdLCJlbWFpbCI6WyJhbGV4YW5kZXJob2xtYmVyZzkxQGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.O8qrzrYCEbT4ZB02azB9RuVddhiAfQKV5hFgvmDwdY-e68mQocm2IhVpnU3J_vlEn2WuyGJ_egg6CBwrkqTHQL1TXVzWSotSBrP2U35maQ3jBJMogumG0eHr4YdLoFPzSeOlzlbcp5DOfauw5jTw_aWjOUVKnIJmQE-y1W3Mch3c6fvPOHrzEFJXrWwPAbhgoBugrA8DWFdY20CgLR56e7VpCdnJ92mVDryWuc7GmEmfHFOHn3NfCRrFnD9g6IWce5Q9M6NwBn10o0bUAE8bbZRYE20vbocSY5UciGhvPigFfbp5UdV-jbhEpwrmODORwG942x1lo0rcAEgVIQV7Vg
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjYzODBlZjEyZjk1ZjkxNmNhZDdhNGNlMzg4ZDJjMmMzYzIzMDJmZGUiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQWxleGFuZGVyIEhvbG1iZXJnIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FBY0hUdGNoRjRfYUlxYzdZeFFISjBFUFpPSWg1MHduVVZyRkJfc0t5UnZGeWlDaz1zOTYtYyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9sb29rLTk3YTg0IiwiYXVkIjoibG9vay05N2E4NCIsImF1dGhfdGltZSI6MTY5MjI1NzAzMywidXNlcl9pZCI6IkNvUkR6ZzRtdXpPSjVJVmZHT3R3U2pJUjhNbzEiLCJzdWIiOiJDb1JEemc0bXV6T0o1SVZmR090d1NqSVI4TW8xIiwiaWF0IjoxNjkyMjU4MzcxLCJleHAiOjE2OTIyNjE5NzEsImVtYWlsIjoiYWxleGFuZGVyaG9sbWJlcmc5MUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJnb29nbGUuY29tIjpbIjExNzM5NjA1OTA4NDIwODc5MzE3MSJdLCJlbWFpbCI6WyJhbGV4YW5kZXJob2xtYmVyZzkxQGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.XqwQX7OUwrkem2R6SM_xSqAlNneOmDgofEvJY-JspuwtI3xXrjn1LrtyQ1OYiq0cObf6tQFBGsY3jU1kEkZBjGc01QxL0Yx9NcgPS0yEJxjNdAebr_eud4Pm56Eo9rbUScXQfdaZcVpcRC16JTwVfp-P816sWNRrF4tRK8-GUNj31_cPH7dmA3xrK7vGHfnulPZZGvYUcE9nMa_hrNaJU3TSMq7k_rKmxIX9jsN5SpUMyEYfLXn_hNUQEXkiA0RX7BUKTjl589pePhcy_P-rwUqQtA1-MYN9lj8b2dlByNzMQo7UCKos_YrQ6E9RDyZure60P9ArBs_meIBuBAmBTg
 
 
-{
-    "url": "https://www.zalando.se/filsdaasdsdffasdfgdiasdppa-k-douasdbasdfsle-breasted-kavsdfaj-french-navy-f1422a02v-k11.html",
-    "domain": "zalando.com",
-    "brand": "Nike",
-    "name": "BODYSUIT - Linne",
-    "price": "449",
-    "currency": "SEK",
-    "images": [
-        {"image_url": "https://img01.ztat.net/article/spp-media-p1/f1b4ed9dc4564ab7b99094eb1652c971/a3177e76d03448be8a23e228cf301ff7.jpg?imwidth=1800"},
-        {"image_url": "https://img01.ztat.net/article/spp-media-p1/9d576e6377d34872adf4a16d9bda5d01/c828750a7c6f4499a8d3bfd82242e505.jpg?imwidth=1800"}
-    ]
-}
+{"brand": "A Day's March", "currency": "SEK", "domain": "adaysmarch.com", "images": ["https://adaysmarch.centracdn.net/client/dynamic/images/7496_7c45fb0892-101645-60_100.jpg", "https://adaysmarch.centracdn.net/client/dynamic/images/7496_0f634e764d-101645-60-1.jpg", "https://adaysmarch.centracdn.net/client/dynamic/images/7496_e8cb6fa31a-101645-60-2.jpg", "https://adaysmarch.centracdn.net/client/dynamic/images/7496_dcea443692-101645-60-3.jpg", "https://adaysmarch.centracdn.net/client/dynamic/images/7496_f039e7ccd3-101645-60-4.jpg", "https://adaysmarch.centracdn.net/client/dynamic/images/7496_cdb38ffb44-101645-60_200.jpg"], "liked": false, "name": "Smart Trousers - Tencel", "price": 1195, "url": "https://www.adaysmarch.com/se/smart-trousers-tencel-olive"}

@@ -4,8 +4,9 @@
 
 ### todo
 
-- start with products routes and stuff
-  replace completely with sqlalchemy
+- change frontend to use ORM endpoints
+- complete the company schema change
+- implement schema endpoints
 
 ### thoughts
 

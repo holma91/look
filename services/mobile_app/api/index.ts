@@ -1,3 +1,4 @@
+import auth from '@react-native-firebase/auth';
 import { UserProduct } from '../utils/types';
 
 // api.ts
@@ -14,15 +15,22 @@ export const createProduct = async (
     domain: domain,
   };
 
-  const response = await fetch(`${URL}/users/${userId}/products`, {
+  const token = await auth()?.currentUser?.getIdToken();
+
+  const completeUrl = `${URL}/products`;
+
+  const response = await fetch(completeUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(backendProduct),
   });
 
   if (!response.ok) {
+    console.log('response:', response);
+
     throw new Error(
       `HTTP error! status: ${response.status}, error: ${response.statusText}`
     );
@@ -31,25 +39,27 @@ export const createProduct = async (
   return response.json();
 };
 
-export const likeProducts = async (userId: string, products: UserProduct[]) => {
-  const response = await fetch(`${URL}/users/${userId}/likes`, {
+export const likeProducts = async (products: UserProduct[]) => {
+  const token = await auth()?.currentUser?.getIdToken();
+
+  const response = await fetch(`${URL}/products/likes`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ productUrls: products.map((p) => p.url) }),
   });
   return response;
 };
 
-export const unlikeProducts = async (
-  userId: string,
-  products: UserProduct[]
-) => {
-  const response = await fetch(`${URL}/users/${userId}/likes`, {
+export const unlikeProducts = async (products: UserProduct[]) => {
+  const token = await auth()?.currentUser?.getIdToken();
+  const response = await fetch(`${URL}/products/likes`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ productUrls: products.map((p) => p.url) }),
   });

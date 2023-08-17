@@ -8,7 +8,8 @@ export function getDomain(url: string): string | null {
     }
     return hostname;
   } catch (error) {
-    // console.error('Invalid URL');
+    console.error('Invalid URL');
+    console.log(error);
     return null;
   }
 }

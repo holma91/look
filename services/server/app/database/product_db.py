@@ -1,9 +1,11 @@
 from sqlalchemy import and_
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import and_, or_
 
 from app.auth import FirebaseUser
 from app.pydantic.requests import (
+    GetProductRequest,
     ProductRequest,
     ProductImagesRequest,
     LikeProductsRequest,
@@ -17,24 +19,81 @@ from app.database.models import (
 )
 
 
-def read_all_products(user: FirebaseUser, session: Session):
-    records = (
-        session.query(ProductModel)
+def get_product(product_url: str, user: FirebaseUser, session: Session) -> dict:
+    # Querying both ProductModel and liked column
+    record = (
+        session.query(ProductModel, user_product_association.c.liked)
         .options(joinedload(ProductModel.images))
-        .join(user_product_association)
+        .join(
+            user_product_association,
+            user_product_association.c.product_url == ProductModel.url,
+        )
+        .filter(ProductModel.url == product_url)
         .filter(user_product_association.c.user_id == user.uid)
-        .all()
+        .first()
     )
+
+    if not record:
+        return {"success": False, "detail": "Product not found!"}
+
+    # Extracting both the ProductModel instance and liked status from the tuple
+    product, liked_status = record
+
+    product_response = ProductResponse(
+        url=product.url,
+        domain=product.domain,
+        brand=product.brand,
+        name=product.name,
+        currency=product.currency,
+        price=product.price,
+        liked=liked_status,  # Use the fetched liked status here
+        images=[img.image_url for img in product.images],
+    )
+
+    return {
+        "success": True,
+        "detail": "Product retrieved successfully!",
+        "data": product_response,
+    }
+
+
+def get_products(
+    filters: dict, user: FirebaseUser, session: Session
+) -> list[ProductResponse]:
+    base_query = (
+        session.query(ProductModel, user_product_association.c.liked)
+        .options(joinedload(ProductModel.images))
+        .join(
+            user_product_association,
+            user_product_association.c.product_url == ProductModel.url,
+        )
+        # .join(WebsiteModel, WebsiteModel.domain == ProductModel.domain)
+        .filter(user_product_association.c.user_id == user.uid)
+    )
+
+    # Apply filters based on the provided filters dictionary
+    if filters:
+        if filters.get("list") == "likes":
+            base_query = base_query.filter(user_product_association.c.liked == True)
+
+        if filters.get("brand"):
+            base_query = base_query.filter(ProductModel.brand.in_(filters["brand"]))
+
+        # if filters.get("website"):
+        # base_query = base_query.filter(WebsiteModel.domain.in_(filters["website"]))
+
+    records = base_query.all()
 
     return [
         ProductResponse(
-            url=record.url,
-            domain=record.domain,
-            brand=record.brand,
-            name=record.name,
-            currency=record.currency,
-            price=record.price,
-            images=[img.image_url for img in record.images],
+            url=record.ProductModel.url,
+            domain=record.ProductModel.domain,
+            brand=record.ProductModel.brand,
+            name=record.ProductModel.name,
+            currency=record.ProductModel.currency,
+            price=record.ProductModel.price,
+            liked=record.liked,
+            images=[img.image_url for img in record.ProductModel.images],
         )
         for record in records
     ]

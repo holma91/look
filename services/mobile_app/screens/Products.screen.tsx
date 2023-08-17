@@ -133,6 +133,8 @@ function Content({
     });
   };
 
+  // console.log('productsQuery', productsQuery.data);
+
   return (
     <Box flex={1} paddingHorizontal="xs">
       <FlatList

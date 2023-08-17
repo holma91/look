@@ -18,14 +18,13 @@ app_config = load_config()
 
 
 def get_db_session():
-    engine = create_engine(app_config.SQLALCHEMY_DATABASE_URI, echo=True)
+    engine = create_engine(app_config.SQLALCHEMY_DATABASE_URI, echo=False)
     db = sessionmaker(bind=engine)()
 
     try:
         yield db
     finally:
         db.close()
-
 
 
 TORTOISE_ORM = {
@@ -47,6 +46,7 @@ def init_db(app: FastAPI) -> None:
         generate_schemas=False,
         add_exception_handlers=True,
     )
+
 
 @asynccontextmanager
 async def get_db_connection():
