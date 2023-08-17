@@ -86,7 +86,7 @@ export default function Filter({
     return {
       all: ['list', 'brand', 'website'],
       list: ['likes', 'history'].concat(plists?.map((plist) => plist.id) || []),
-      brand: brands?.map((brand) => brand.brand) || [],
+      brand: brands ?? [],
       website: companies?.map((company) => company.id) || [],
     };
   }, [brands, companies, plists]);

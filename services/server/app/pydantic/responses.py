@@ -15,3 +15,12 @@ class ProductResponse(CustomBaseModel):
     images: list[str]
 
     liked: bool
+
+
+class CompanyResponse(CustomBaseModel):
+    id: str
+    websites: list[str]
+
+
+class PListResponse(CustomBaseModel):
+    id: str

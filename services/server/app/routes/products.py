@@ -10,8 +10,10 @@ from app.pydantic.requests import (
     ProductRequest,
     ProductImagesRequest,
     LikeProductsRequest,
+    PListCreateRequest,
+    PListDeleteRequest,
 )
-from app.pydantic.responses import ProductResponse, BaseResponse
+from app.pydantic.responses import ProductResponse, BaseResponse, PListResponse
 
 router = APIRouter()
 
@@ -99,3 +101,52 @@ async def unlike_products(
     result = product_db.unlike_products(like_products, user.uid, session)
     if not result["success"]:
         raise HTTPException(status_code=409, detail=result["message"])
+
+
+### PLISTS ###
+
+
+@router.get("/lists", response_model=list[PListResponse])
+async def get_lists(
+    user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_db_session),
+):
+    return product_db.get_lists(user, session)
+
+
+@router.post("/lists", status_code=200, response_model=BaseResponse)
+async def create_list(
+    request: PListCreateRequest,
+    user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_db_session),
+):
+    result = product_db.create_list(request, user, session)
+    if not result["success"]:
+        raise HTTPException(status_code=409, detail=result["detail"])
+
+    return BaseResponse(detail=result["detail"])
+
+
+@router.delete("/lists", status_code=204)
+async def delete_list(
+    request: PListDeleteRequest,
+    user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_db_session),
+):
+    result = product_db.delete_list(request, user, session)
+    if not result["success"]:
+        raise HTTPException(status_code=409, detail=result["message"])
+
+
+### MISC ###
+
+
+@router.get("/brands", response_model=list[str])
+async def get_brands(
+    user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_db_session),
+):
+    return product_db.get_brands(user, session)
+
+
+### implement get product/companies

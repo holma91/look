@@ -1,11 +1,18 @@
+from sqlalchemy.orm import joinedload
 
-from app.pydantic.models import Company  # Assuming you have a Pydantic model for Company
+from app.pydantic.responses import CompanyResponse
 from app.database.models import CompanyModel
 
 
-def list_all(session):
-    records = session.query(CompanyModel).all()
+def get_companies(session):
+    records = (
+        session.query(CompanyModel).options(joinedload(CompanyModel.websites)).all()
+    )
 
-    return [Company(
-        id=record.id,
-    ) for record in records]
+    return [
+        CompanyResponse(
+            id=record.id,
+            websites=[website.domain for website in record.websites],
+        )
+        for record in records
+    ]

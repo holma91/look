@@ -1,4 +1,4 @@
-from sqlalchemy import and_
+from sqlalchemy import and_, insert, distinct
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_, or_
@@ -9,18 +9,21 @@ from app.pydantic.requests import (
     ProductRequest,
     ProductImagesRequest,
     LikeProductsRequest,
+    PListCreateRequest,
+    PListDeleteRequest,
 )
-from app.pydantic.responses import ProductResponse
+from app.pydantic.responses import ProductResponse, PListResponse
 from app.database.models import (
     ProductModel,
     user_product_association,
+    list_product_association,
     ProductImageModel,
     UserModel,
+    PListModel,
 )
 
 
-def get_product(product_url: str, user: FirebaseUser, session: Session) -> dict:
-    # Querying both ProductModel and liked column
+def get_product(product_url: str, user: FirebaseUser, session: Session):
     record = (
         session.query(ProductModel, user_product_association.c.liked)
         .options(joinedload(ProductModel.images))
@@ -36,7 +39,6 @@ def get_product(product_url: str, user: FirebaseUser, session: Session) -> dict:
     if not record:
         return {"success": False, "detail": "Product not found!"}
 
-    # Extracting both the ProductModel instance and liked status from the tuple
     product, liked_status = record
 
     product_response = ProductResponse(
@@ -67,20 +69,25 @@ def get_products(
             user_product_association,
             user_product_association.c.product_url == ProductModel.url,
         )
-        # .join(WebsiteModel, WebsiteModel.domain == ProductModel.domain)
         .filter(user_product_association.c.user_id == user.uid)
     )
 
-    # Apply filters based on the provided filters dictionary
-    if filters:
-        if filters.get("list") == "likes":
-            base_query = base_query.filter(user_product_association.c.liked == True)
+    list_filter = filters.get("list")
+    if list_filter == "history":
+        pass
+    elif list_filter == "likes":
+        base_query = base_query.filter(user_product_association.c.liked == True)
+    elif list_filter:
+        base_query = base_query.join(
+            list_product_association,
+            list_product_association.c.product_url == ProductModel.url,
+        ).filter(list_product_association.c.list_id == list_filter)
 
-        if filters.get("brand"):
-            base_query = base_query.filter(ProductModel.brand.in_(filters["brand"]))
+    if filters.get("brand"):
+        base_query = base_query.filter(ProductModel.brand.in_(filters["brand"]))
 
-        # if filters.get("website"):
-        # base_query = base_query.filter(WebsiteModel.domain.in_(filters["website"]))
+    # if filters.get("website"):
+    #     base_query = base_query.filter(WebsiteModel.domain.in_(filters["website"]))
 
     records = base_query.all()
 
@@ -185,3 +192,63 @@ def unlike_products(
 
     except IntegrityError:
         return {"success": False, "detail": "Error unliking product!"}
+
+
+def get_lists(user: FirebaseUser, session: Session):
+    records = session.query(PListModel).filter(PListModel.user_id == user.uid).all()
+
+    return [PListResponse(id=record.id) for record in records]
+
+
+def create_list(request: PListCreateRequest, user: FirebaseUser, session: Session):
+    new_list = PListModel(id=request.id, user_id=user.uid)
+
+    session.add(new_list)
+    session.flush()
+
+    associations = [
+        {"list_id": new_list.id, "product_url": url} for url in request.product_urls
+    ]
+    if associations:
+        session.execute(insert(list_product_association).values(associations))
+
+    session.commit()
+
+    return {"success": True, "detail": "PList created successfully!"}
+
+
+def delete_list(request: PListDeleteRequest, user: FirebaseUser, session: Session):
+    # First, delete associations to ensure foreign key constraints are not violated
+    session.execute(
+        list_product_association.delete().where(
+            list_product_association.c.list_id == request.id
+        )
+    )
+
+    # Then, delete the PList
+    list_obj = (
+        session.query(PListModel)
+        .filter(PListModel.id == request.id, PListModel.user_id == user.uid)
+        .first()
+    )
+    if not list_obj:
+        return {"success": False, "message": "List not found"}
+
+    session.delete(list_obj)
+    session.commit()
+
+    return {"success": True, "detail": "List deleted successfully"}
+
+
+def get_brands(user: FirebaseUser, session: Session):
+    brands = (
+        session.query(distinct(ProductModel.brand))
+        .join(
+            user_product_association,
+            user_product_association.c.product_url == ProductModel.url,
+        )
+        .filter(user_product_association.c.user_id == user.uid)
+        .all()
+    )
+
+    return [brand[0] for brand in brands]

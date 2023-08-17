@@ -15,7 +15,9 @@ def create_application() -> FastAPI:
     application.include_router(ping.router)
     # application.include_router(users.router, prefix="/users", tags=["users"])
     application.include_router(products.router, prefix="/products", tags=["products"])
-    # application.include_router(companies.router, prefix="/companies", tags=["companies"])
+    application.include_router(
+        companies.router, prefix="/companies", tags=["companies"]
+    )
 
     return application
 

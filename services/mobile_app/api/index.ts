@@ -73,10 +73,13 @@ export const createPlist = async (
   selectedProducts: UserProduct[]
 ) => {
   // Create plist
-  const response = await fetch(`${URL}/users/${userId}/plists`, {
+  const completeUrl = `${URL}/products/lists`;
+  const token = await auth()?.currentUser?.getIdToken();
+  const response = await fetch(completeUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       id: listId,

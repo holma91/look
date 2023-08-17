@@ -14,6 +14,13 @@ user_product_association = Table(
     Column("liked", Boolean),
 )
 
+list_product_association = Table(
+    "list_product",
+    Base.metadata,
+    Column("list_id", String, ForeignKey("p_list.id")),
+    Column("product_url", String, ForeignKey("product.url")),
+)
+
 
 class UserModel(Base):
     __tablename__ = "user"
@@ -22,6 +29,10 @@ class UserModel(Base):
 
     products: Mapped[list["ProductModel"]] = relationship(
         "ProductModel", secondary=user_product_association, back_populates="users"
+    )
+
+    p_lists: Mapped[list["PListModel"]] = relationship(
+        "PListModel", back_populates="user"
     )
 
 
@@ -44,6 +55,9 @@ class ProductModel(Base):
     users: Mapped[list["UserModel"]] = relationship(
         "UserModel", secondary=user_product_association, back_populates="products"
     )
+    p_lists: Mapped[list["PListModel"]] = relationship(
+        "PListModel", secondary=list_product_association, back_populates="products"
+    )
 
 
 class ProductImageModel(Base):
@@ -56,6 +70,18 @@ class ProductImageModel(Base):
 
     product: Mapped["ProductModel"] = relationship(
         "ProductModel", back_populates="images"
+    )
+
+
+class PListModel(Base):
+    __tablename__ = "p_list"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    user_id: Mapped[str] = mapped_column(String, ForeignKey("user.id"))
+
+    user: Mapped[UserModel] = relationship("UserModel", back_populates="p_lists")
+    products: Mapped[list[ProductModel]] = relationship(
+        "ProductModel", secondary=list_product_association, back_populates="p_lists"
     )
 
 

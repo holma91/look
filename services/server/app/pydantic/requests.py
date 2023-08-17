@@ -22,3 +22,12 @@ class ProductImagesRequest(CustomBaseModel):
 
 class LikeProductsRequest(CustomBaseModel):
     product_urls: list[str]
+
+
+class PListCreateRequest(CustomBaseModel):
+    id: str
+    product_urls: list[str]
+
+
+class PListDeleteRequest(CustomBaseModel):
+    id: str
