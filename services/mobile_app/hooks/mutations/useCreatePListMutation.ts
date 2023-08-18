@@ -33,20 +33,24 @@ export const createPlist = async (
   return response.json();
 };
 
-type AddProductsMutationProps = { products: UserProduct[]; listId: string };
+type CreatePListMutationProps = { products: UserProduct[]; listId: string };
 
 export const useCreatePListMutation = () => {
   const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
 
   const createPListMutation = useMutation({
-    mutationFn: async ({ products, listId }: AddProductsMutationProps) => {
+    mutationFn: async ({ products, listId }: CreatePListMutationProps) => {
       await createPlist(user!.uid, listId!, products);
       return products;
     },
-    onMutate: async (_: AddProductsMutationProps) => {
+    onMutate: async ({ listId, products }: CreatePListMutationProps) => {
       await queryClient.cancelQueries(['plists']);
       const previousPLists = queryClient.getQueryData(['plists']);
+
+      // queryClient.setQueryData(['products', { list: [listId] }], () => {
+      //   return products;
+      // });
 
       return { previousPLists };
     },
@@ -54,9 +58,12 @@ export const useCreatePListMutation = () => {
       console.log('error', err, products, context);
       queryClient.setQueryData(['plists'], context?.previousPLists);
     },
-    onSettled: async (_, err, __, context) => {
+    onSettled: async (_, err, { listId, products }, context) => {
       queryClient.invalidateQueries({
         queryKey: ['plists'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['products', { list: [listId] }],
       });
     },
   });

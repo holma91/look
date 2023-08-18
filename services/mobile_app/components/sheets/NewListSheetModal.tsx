@@ -13,6 +13,7 @@ import { createPlist } from '../../api';
 import { ProductSmall } from '../Product';
 import { useProductsQuery } from '../../hooks/queries/useProductsQuery';
 import { useCreatePListMutation } from '../../hooks/mutations/useCreatePListMutation';
+import { set } from 'react-native-reanimated';
 
 type NewListSheetModalProps = {
   newListSheetModalRef: React.RefObject<BottomSheetModal>;
@@ -34,8 +35,6 @@ export function NewListSheetModal({
 
   const { data: products } = useProductsQuery({ list: ['history'] });
   const createPlistMutation = useCreatePListMutation();
-
-  const queryClient = useQueryClient();
 
   const handleProductSelection = (
     product: UserProduct,
@@ -70,6 +69,8 @@ export function NewListSheetModal({
       });
       handleFilterSelection('list', listId);
       filterSheetModalRef?.current?.dismiss();
+      setSelectedProducts([]);
+      setListName('New List');
     } catch (e) {
       console.error(e);
     }

@@ -144,7 +144,7 @@ async def delete_list(
         raise HTTPException(status_code=409, detail=result["message"])
 
 
-@router.post("lists/{list_id}", status_code=200, response_model=BaseResponse)
+@router.post("/lists/{list_id}", status_code=200, response_model=BaseResponse)
 async def add_to_list(
     list_id: str,
     request: PListAddProductRequest,
@@ -158,7 +158,7 @@ async def add_to_list(
     return BaseResponse(detail=result["detail"])
 
 
-@router.delete("lists/{list_id}", status_code=204)
+@router.delete("/lists/{list_id}", status_code=204)
 async def delete_from_list(
     user: FirebaseUser = Depends(get_current_user),
     session: Session = Depends(get_db_session),

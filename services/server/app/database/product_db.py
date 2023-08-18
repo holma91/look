@@ -1,4 +1,5 @@
 from sqlalchemy import and_, insert, distinct
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_, or_
@@ -258,7 +259,14 @@ def add_to_list(
 
     try:
         if associations:
-            session.execute(insert(list_product_association).values(associations))
+            insert_stmt = (
+                pg_insert(list_product_association)
+                .values(associations)
+                .on_conflict_do_nothing(
+                    index_elements=["list_id", "user_id", "product_url"]
+                )
+            )
+            session.execute(insert_stmt)
             session.commit()
         return {"success": True, "detail": "Products added to list successfully!"}
     except IntegrityError:
