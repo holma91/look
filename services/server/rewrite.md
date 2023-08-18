@@ -4,9 +4,11 @@
 
 ### todo
 
-- change frontend to use ORM endpoints
-- complete the company schema change
-- implement schema endpoints
+- finish plist endpoints
+- add/delete images from client ; check
+- do company schema change
+- finish company endpoints
+- change everything on the client to use the new endpoints
 
 ### thoughts
 

@@ -67,7 +67,7 @@ export default function Filter({
 }: FilterProps) {
   const theme = useTheme();
 
-  const { data: companies } = useCompaniesQuery();
+  const { data: companies } = useCompaniesQuery('visited');
   const { data: brands } = useBrandsQuery();
   const { data: plists } = usePlistsQuery();
 

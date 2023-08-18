@@ -12,6 +12,7 @@ import { useFirebaseUser } from '../../hooks/useFirebaseUser';
 import { createPlist } from '../../api';
 import { ProductSmall } from '../Product';
 import { useProductsQuery } from '../../hooks/queries/useProductsQuery';
+import { useCreatePListMutation } from '../../hooks/mutations/useCreatePListMutation';
 
 type NewListSheetModalProps = {
   newListSheetModalRef: React.RefObject<BottomSheetModal>;
@@ -32,6 +33,7 @@ export function NewListSheetModal({
   const { user } = useFirebaseUser();
 
   const { data: products } = useProductsQuery({ list: ['history'] });
+  const createPlistMutation = useCreatePListMutation();
 
   const queryClient = useQueryClient();
 
@@ -60,8 +62,12 @@ export function NewListSheetModal({
     if (!userId) return;
 
     try {
-      await createPlist(userId, listId, selectedProducts);
-      queryClient.invalidateQueries({ queryKey: ['plists', userId] });
+      // await createPlist(userId, listId, selectedProducts);
+      // queryClient.invalidateQueries({ queryKey: ['plists', userId] });
+      createPlistMutation.mutate({
+        listId: listId,
+        products: selectedProducts,
+      });
       handleFilterSelection('list', listId);
       filterSheetModalRef?.current?.dismiss();
     } catch (e) {

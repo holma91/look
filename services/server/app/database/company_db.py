@@ -12,7 +12,7 @@ def get_companies(session):
     return [
         CompanyResponse(
             id=record.id,
-            websites=[website.domain for website in record.websites],
+            domains=[website.domain for website in record.websites],
         )
         for record in records
     ]

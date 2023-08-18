@@ -43,15 +43,23 @@ CREATE TABLE IF NOT EXISTS "user_product" (
 );
 
 CREATE TABLE IF NOT EXISTS "p_list" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
-    UNIQUE(id, user_id)
+    PRIMARY KEY(id, user_id)
 );
 
+-- CREATE TABLE IF NOT EXISTS "list_product" (
+--     "list_id" TEXT NOT NULL REFERENCES "p_list" ("id") ON DELETE CASCADE,
+--     "product_url" TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,
+--     UNIQUE(list_id, product_url)
+-- );
+
 CREATE TABLE IF NOT EXISTS "list_product" (
-    "list_id" TEXT NOT NULL REFERENCES "p_list" ("id") ON DELETE CASCADE,
+    "list_id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
     "product_url" TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,
-    UNIQUE(list_id, product_url)
+    FOREIGN KEY (list_id, user_id) REFERENCES p_list(id, user_id) ON DELETE CASCADE,
+    UNIQUE(list_id, user_id, product_url)
 );
 
 insert into "user" (id) values ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1');
@@ -166,10 +174,10 @@ VALUES
 ('purchases', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1');
 
 
-INSERT INTO list_product (list_id, product_url)
+INSERT INTO list_product (list_id, user_id, product_url)
 VALUES
-('purchases', 'https://softgoat.com/p/mens-collar-navy'),
-('purchases', 'https://softgoat.com/p/mens-waffle-knit-sea-foam');
+('purchases', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-collar-navy'),
+('purchases','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-waffle-knit-sea-foam');
 
 UPDATE user_product SET liked = TRUE
 WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey';

@@ -16,7 +16,7 @@ async function fetchBrands(): Promise<string[]> {
 
   if (!response.ok) {
     throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
+      `HTTP error in useBrandsQuery!. Status code: ${response.status}`
     );
   }
   return response.json();
@@ -26,7 +26,7 @@ export const useBrandsQuery = () => {
   const { user } = useFirebaseUser();
 
   const brandsQuery = useQuery({
-    queryKey: ['brands', user?.uid],
+    queryKey: ['brands'],
     queryFn: () => fetchBrands(),
     enabled: !!user?.uid,
     onError: (err) => {

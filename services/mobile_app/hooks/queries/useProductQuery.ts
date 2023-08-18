@@ -17,7 +17,7 @@ async function fetchProduct(user: any, url: string) {
 
   if (!response.ok) {
     throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
+      `HTTP error in useProductQuery!. Status code: ${response.status}`
     );
   }
   return response.json();
@@ -30,7 +30,7 @@ export const useProductQuery = (initialProduct: UserProduct) => {
     queryKey: ['product', initialProduct.url],
     queryFn: () => fetchProduct(user, initialProduct.url),
     initialData: initialProduct,
-    enabled: !!user?.uid,
+    enabled: !!user?.uid && initialProduct.images.length > 0,
     onError: (err) => {
       console.log('error fetching individual product:', err);
     },

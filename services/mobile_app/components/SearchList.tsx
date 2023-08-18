@@ -15,7 +15,7 @@ export default function SearchList({
   searchText: string;
   setFocus: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const { data: companies } = useCompaniesQuery();
+  const { data: companies } = useCompaniesQuery('all');
 
   const filteredWebsites = companies?.filter((company) =>
     company.id.includes(searchText)

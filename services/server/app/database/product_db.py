@@ -11,8 +11,9 @@ from app.pydantic.requests import (
     LikeProductsRequest,
     PListCreateRequest,
     PListDeleteRequest,
+    PListAddProductRequest,
 )
-from app.pydantic.responses import ProductResponse, PListResponse
+from app.pydantic.responses import ProductResponse, PListResponse, CompanyResponse
 from app.database.models import (
     ProductModel,
     user_product_association,
@@ -20,6 +21,8 @@ from app.database.models import (
     ProductImageModel,
     UserModel,
     PListModel,
+    CompanyModel,
+    WebsiteModel,
 )
 
 
@@ -86,8 +89,12 @@ def get_products(
     if filters.get("brand"):
         base_query = base_query.filter(ProductModel.brand.in_(filters["brand"]))
 
-    # if filters.get("website"):
-    #     base_query = base_query.filter(WebsiteModel.domain.in_(filters["website"]))
+    if filters.get("website"):
+        base_query = (
+            base_query.join(WebsiteModel)
+            .join(CompanyModel)
+            .filter(CompanyModel.id.in_(filters["website"]))
+        )
 
     records = base_query.all()
 
@@ -207,7 +214,8 @@ def create_list(request: PListCreateRequest, user: FirebaseUser, session: Sessio
     session.flush()
 
     associations = [
-        {"list_id": new_list.id, "product_url": url} for url in request.product_urls
+        {"list_id": request.id, "user_id": user.uid, "product_url": url}
+        for url in request.product_urls
     ]
     if associations:
         session.execute(insert(list_product_association).values(associations))
@@ -240,6 +248,26 @@ def delete_list(request: PListDeleteRequest, user: FirebaseUser, session: Sessio
     return {"success": True, "detail": "List deleted successfully"}
 
 
+def add_to_list(
+    list_id: str, request: PListAddProductRequest, user: FirebaseUser, session: Session
+):
+    associations = [
+        {"list_id": list_id, "user_id": user.uid, "product_url": url}
+        for url in request.product_urls
+    ]
+
+    try:
+        if associations:
+            session.execute(insert(list_product_association).values(associations))
+            session.commit()
+        return {"success": True, "detail": "Products added to list successfully!"}
+    except IntegrityError:
+        return {
+            "success": False,
+            "detail": "Failed to add products. Ensure the list belongs to you.",
+        }
+
+
 def get_brands(user: FirebaseUser, session: Session):
     brands = (
         session.query(distinct(ProductModel.brand))
@@ -252,3 +280,48 @@ def get_brands(user: FirebaseUser, session: Session):
     )
 
     return [brand[0] for brand in brands]
+
+
+def get_companies(user: FirebaseUser, session: Session):
+    records = (
+        session.query(CompanyModel)
+        .join(WebsiteModel, WebsiteModel.company_id == CompanyModel.id)
+        .join(ProductModel, ProductModel.domain == WebsiteModel.domain)
+        .join(
+            user_product_association,
+            user_product_association.c.product_url == ProductModel.url,
+        )
+        .filter(user_product_association.c.user_id == user.uid)
+        .all()
+    )
+
+    return [
+        CompanyResponse(
+            id=record.id,
+            domains=[website.domain for website in record.websites],
+        )
+        for record in records
+    ]
+
+    # companies = (
+    #     session.query(distinct(CompanyModel.id))
+    #     .options(joinedload(CompanyModel.websites))
+    #     .join(
+    #         WebsiteModel,
+    #         WebsiteModel.company_id == CompanyModel.id,
+    #     )
+    #     .join(
+    #         ProductModel,
+    #         ProductModel.domain == WebsiteModel.domain,
+    #     )
+    #     .join(
+    #         user_product_association,
+    #         user_product_association.c.product_url == ProductModel.url,
+    #     )
+    #     .filter(user_product_association.c.user_id == user.uid)
+    #     .all()
+    # )
+
+    # print("companies", companies)
+
+    # return [company[0] for company in companies]

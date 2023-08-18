@@ -2,7 +2,7 @@ import auth from '@react-native-firebase/auth';
 import { UserProduct } from '../utils/types';
 
 // api.ts
-export const URL = 'https://77f8-85-230-9-36.ngrok-free.app';
+export const URL = 'https://1d00-85-230-9-36.ngrok-free.app';
 
 export const createProduct = async (
   userId: string,
@@ -32,7 +32,7 @@ export const createProduct = async (
     console.log('response:', response);
 
     throw new Error(
-      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+      `HTTP error in createProduct! status: ${response.status}, error: ${response.statusText}`
     );
   }
 
@@ -89,7 +89,7 @@ export const createPlist = async (
 
   if (!response.ok) {
     throw new Error(
-      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+      `HTTP error in createPlist! status: ${response.status}, error: ${response.statusText}`
     );
   }
 
@@ -117,7 +117,7 @@ export const deleteFromPlist = async (
 
   if (!response.ok) {
     throw new Error(
-      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+      `HTTP error in deleteFromPlist! status: ${response.status}, error: ${response.statusText}`
     );
   }
 
@@ -145,7 +145,7 @@ export const addToPlist = async (
 
   if (!response.ok) {
     throw new Error(
-      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+      `HTTP error in addToPlist! status: ${response.status}, error: ${response.statusText}`
     );
   }
 

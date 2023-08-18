@@ -24,7 +24,7 @@ export default function Shop({ navigation }: { navigation: any }) {
   const [searchText, setSearchText] = useState('');
   const [focus, setFocus] = useState(false);
 
-  const { data: companies } = useCompaniesQuery();
+  const { data: companies } = useCompaniesQuery('all');
 
   const navigateToSite = async (company: Company) => {
     await saveHistory(company.id);

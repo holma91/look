@@ -19,7 +19,7 @@ class ProductResponse(CustomBaseModel):
 
 class CompanyResponse(CustomBaseModel):
     id: str
-    websites: list[str]
+    domains: list[str]
 
 
 class PListResponse(CustomBaseModel):

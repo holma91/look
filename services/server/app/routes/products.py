@@ -6,14 +6,19 @@ from app.auth import get_current_user, FirebaseUser
 from app.db import get_db_session
 from app.database import product_db
 from app.pydantic.requests import (
-    GetProductRequest,
     ProductRequest,
     ProductImagesRequest,
     LikeProductsRequest,
     PListCreateRequest,
     PListDeleteRequest,
+    PListAddProductRequest,
 )
-from app.pydantic.responses import ProductResponse, BaseResponse, PListResponse
+from app.pydantic.responses import (
+    ProductResponse,
+    BaseResponse,
+    PListResponse,
+    CompanyResponse,
+)
 
 router = APIRouter()
 
@@ -65,7 +70,7 @@ def add_product_images(
 ):
     result = product_db.add_product_images(product_images, session)
     if not result["success"]:
-        raise HTTPException(status_code=409, detail=result["message"])
+        raise HTTPException(status_code=409, detail=result["detail"])
     return BaseResponse(detail=result["detail"])
 
 
@@ -75,9 +80,10 @@ def delete_product_images(
     _: FirebaseUser = Depends(get_current_user),
     session: Session = Depends(get_db_session),
 ):
+    print("delete_product_images: ", product_images)
     result = product_db.delete_product_images(product_images, session)
     if not result["success"]:
-        raise HTTPException(status_code=409, detail=result["message"])
+        raise HTTPException(status_code=409, detail=result["detail"])
 
 
 @router.post("/likes", status_code=200, response_model=BaseResponse)
@@ -138,6 +144,28 @@ async def delete_list(
         raise HTTPException(status_code=409, detail=result["message"])
 
 
+@router.post("lists/{list_id}", status_code=200, response_model=BaseResponse)
+async def add_to_list(
+    list_id: str,
+    request: PListAddProductRequest,
+    user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_db_session),
+):
+    result = product_db.add_to_list(list_id, request, user, session)
+    if not result["success"]:
+        raise HTTPException(status_code=409, detail=result["detail"])
+
+    return BaseResponse(detail=result["detail"])
+
+
+@router.delete("lists/{list_id}", status_code=204)
+async def delete_from_list(
+    user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_db_session),
+):
+    pass
+
+
 ### MISC ###
 
 
@@ -149,4 +177,9 @@ async def get_brands(
     return product_db.get_brands(user, session)
 
 
-### implement get product/companies
+@router.get("/companies", response_model=list[CompanyResponse])
+async def get_companies(
+    user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_db_session),
+):
+    return product_db.get_companies(user, session)

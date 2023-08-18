@@ -15,7 +15,7 @@ async function fetchPlists(): Promise<Plist[]> {
   });
   if (!response.ok) {
     throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
+      `HTTP error in usePlistsQuery!. Status code: ${response.status}`
     );
   }
   return response.json();

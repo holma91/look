@@ -23,9 +23,7 @@ DO NOT STOP UNTIL EVERY BUG IS GONE.
 
 REFACTOR:
 
-- sync types on both ends
-- fix api
-- add error messages and stuff on the BE
+- query invalidation is a little off
 
 FRONTEND:
 

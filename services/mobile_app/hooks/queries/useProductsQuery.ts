@@ -35,7 +35,7 @@ export async function fetchProducts(
     console.log('response:', response);
 
     throw new Error(
-      `Network response was not ok. Status code: ${response.status}`
+      `HTTP error in useProductsQuery!. Status code: ${response.status}`
     );
   }
   return response.json();

@@ -271,6 +271,8 @@ function Content({
         images: [data.data],
       });
     }
+    console.log('updatedProduct', updatedProduct);
+    console.log('updatedProduct.images.length', updatedProduct.images.length);
 
     setCurrentProduct(updatedProduct);
   };
@@ -302,6 +304,8 @@ function Content({
   };
 
   const handleMessage = (event: any) => {
+    console.log('got message:', event.nativeEvent.data);
+
     const data = JSON.parse(event.nativeEvent.data);
 
     switch (data.type) {
@@ -321,6 +325,8 @@ function Content({
         console.log('unknown message type:', data.type, data.data);
     }
   };
+
+  console.log('currentProduct', currentProduct);
 
   return (
     <Box flex={1}>

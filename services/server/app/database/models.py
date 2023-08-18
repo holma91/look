@@ -1,4 +1,12 @@
-from sqlalchemy import String, Column, ForeignKey, Table, Boolean, Float
+from sqlalchemy import (
+    String,
+    Column,
+    ForeignKey,
+    Table,
+    Boolean,
+    Float,
+    ForeignKeyConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 
 
@@ -17,8 +25,10 @@ user_product_association = Table(
 list_product_association = Table(
     "list_product",
     Base.metadata,
-    Column("list_id", String, ForeignKey("p_list.id")),
+    Column("list_id", String),
+    Column("user_id", String),
     Column("product_url", String, ForeignKey("product.url")),
+    ForeignKeyConstraint(["list_id", "user_id"], ["p_list.id", "p_list.user_id"]),
 )
 
 
@@ -31,8 +41,14 @@ class UserModel(Base):
         "ProductModel", secondary=user_product_association, back_populates="users"
     )
 
+    # p_lists: Mapped[list["PListModel"]] = relationship(
+    #     "PListModel", back_populates="user"
+    # )
+
     p_lists: Mapped[list["PListModel"]] = relationship(
-        "PListModel", back_populates="user"
+        "PListModel",
+        back_populates="user",
+        primaryjoin="and_(UserModel.id==PListModel.user_id)",
     )
 
 
@@ -77,7 +93,9 @@ class PListModel(Base):
     __tablename__ = "p_list"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
-    user_id: Mapped[str] = mapped_column(String, ForeignKey("user.id"))
+    user_id: Mapped[str] = mapped_column(
+        String, ForeignKey("user.id"), primary_key=True
+    )
 
     user: Mapped[UserModel] = relationship("UserModel", back_populates="p_lists")
     products: Mapped[list[ProductModel]] = relationship(
@@ -89,6 +107,8 @@ class CompanyModel(Base):
     __tablename__ = "company"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
+    # favorited: Mapped[bool] = mapped_column(Boolean)
+
     websites: Mapped[list["WebsiteModel"]] = relationship(
         "WebsiteModel", back_populates="company"
     )

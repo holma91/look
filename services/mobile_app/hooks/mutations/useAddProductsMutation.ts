@@ -1,7 +1,34 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { addToPlist } from '../../api';
+import auth from '@react-native-firebase/auth';
+import { URL } from '../../api/index';
 import { UserProduct } from '../../utils/types';
 import { useFirebaseUser } from '../useFirebaseUser';
+
+const addToPlist = async (
+  userId: string,
+  listId: string,
+  products: UserProduct[]
+) => {
+  const token = await auth()?.currentUser?.getIdToken();
+  const response = await fetch(`${URL}/products/lists/${listId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      productUrls: products.map((p) => p.url),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP error in addToPlist! status: ${response.status}, error: ${response.statusText}`
+    );
+  }
+
+  return response;
+};
 
 type AddProductsMutationProps = { products: UserProduct[]; listId: string };
 

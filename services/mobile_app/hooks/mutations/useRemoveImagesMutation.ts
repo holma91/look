@@ -1,10 +1,10 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
+import auth from '@react-native-firebase/auth';
 import { UserProduct } from '../../utils/types';
 import { URL } from '../../api/index';
 import { useFirebaseUser } from '../useFirebaseUser';
 
 export async function removeProductImages(
-  userId: string,
   productUrl: string,
   imageUrls: string[]
 ) {
@@ -13,19 +13,19 @@ export async function removeProductImages(
     imageUrls,
   };
 
-  console.log('JSON.stringify(imageProduct)', JSON.stringify(imageProduct));
-
-  const response = await fetch(`${URL}/users/${userId}/products/images`, {
+  const token = await auth()?.currentUser?.getIdToken();
+  const response = await fetch(`${URL}/products/images`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(imageProduct),
   });
 
   if (!response.ok) {
     throw new Error(
-      `HTTP error! status: ${response.status}, error: ${response.statusText}`
+      `HTTP error in useRemoveImagesMutation! status: ${response.status}, error: ${response.statusText}`
     );
   }
 
@@ -43,7 +43,7 @@ export const useRemoveImagesMutation = () => {
 
   const removeImagesMutation = useMutation({
     mutationFn: async ({ product, images }: RemoveImagesMutationProps) => {
-      await removeProductImages(user!.uid, product.url, images);
+      await removeProductImages(product.url, images);
     },
     onMutate: async ({ product, images }: RemoveImagesMutationProps) => {
       await queryClient.cancelQueries(['product', product.url]);
@@ -73,7 +73,7 @@ export const useRemoveImagesMutation = () => {
     },
     onSettled: async (_, err, { product, images }, context) => {
       queryClient.invalidateQueries({
-        queryKey: ['products', user?.uid, { list: ['history'] }],
+        queryKey: ['products', { list: ['history'] }],
       });
       queryClient.invalidateQueries({
         queryKey: ['product', product.url],
