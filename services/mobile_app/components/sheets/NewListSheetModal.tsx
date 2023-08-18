@@ -9,7 +9,6 @@ import { OuterChoiceFilterType, UserProduct } from '../../utils/types';
 import { PrimaryButton } from '../Button';
 import { TextInput, TouchableOpacity } from 'react-native';
 import { useFirebaseUser } from '../../hooks/useFirebaseUser';
-import { createPlist } from '../../api';
 import { ProductSmall } from '../Product';
 import { useProductsQuery } from '../../hooks/queries/useProductsQuery';
 import { useCreatePListMutation } from '../../hooks/mutations/useCreatePListMutation';
@@ -61,8 +60,6 @@ export function NewListSheetModal({
     if (!userId) return;
 
     try {
-      // await createPlist(userId, listId, selectedProducts);
-      // queryClient.invalidateQueries({ queryKey: ['plists', userId] });
       createPlistMutation.mutate({
         listId: listId,
         products: selectedProducts,

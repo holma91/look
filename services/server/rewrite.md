@@ -4,7 +4,7 @@
 
 ### todo
 
-- finish plist endpoints
+- finish plist endpoints ; check
 - add/delete images from client ; check
 - do company schema change
 - finish company endpoints

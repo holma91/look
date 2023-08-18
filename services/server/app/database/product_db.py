@@ -26,6 +26,8 @@ from app.database.models import (
     WebsiteModel,
 )
 
+### PRODUCTS ###
+
 
 def get_product(product_url: str, user: FirebaseUser, session: Session):
     record = (
@@ -202,6 +204,9 @@ def unlike_products(
         return {"success": False, "detail": "Error unliking product!"}
 
 
+### LISTS ###
+
+
 def get_lists(user: FirebaseUser, session: Session):
     records = session.query(PListModel).filter(PListModel.user_id == user.uid).all()
 
@@ -274,6 +279,31 @@ def add_to_list(
             "success": False,
             "detail": "Failed to add products. Ensure the list belongs to you.",
         }
+
+
+def delete_from_list(
+    list_id: str, request: PListAddProductRequest, user: FirebaseUser, session: Session
+):
+    try:
+        session.execute(
+            list_product_association.delete().where(
+                and_(
+                    list_product_association.c.list_id == list_id,
+                    list_product_association.c.user_id == user.uid,
+                    list_product_association.c.product_url.in_(request.product_urls),
+                )
+            )
+        )
+        session.commit()
+        return {"success": True, "detail": "Products deleted from list successfully!"}
+    except IntegrityError:
+        return {
+            "success": False,
+            "detail": "Failed to delete products. Ensure the list belongs to you.",
+        }
+
+
+### MISC ###
 
 
 def get_brands(user: FirebaseUser, session: Session):

@@ -11,12 +11,12 @@ CREATE TABLE IF NOT EXISTS "website" (
     "domain" TEXT NOT NULL PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS "user_company" (
-    "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
-    "company_id" TEXT NOT NULL REFERENCES "company" ("id") ON DELETE CASCADE,
-    "favorited" BOOL NOT NULL DEFAULT FALSE,
-    UNIQUE(user_id, company_id)
-);
+-- CREATE TABLE IF NOT EXISTS "user_company" (
+--     "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
+--     "company_id" TEXT NOT NULL REFERENCES "company" ("id") ON DELETE CASCADE,
+--     "favorited" BOOL NOT NULL DEFAULT FALSE,
+--     UNIQUE(user_id, company_id)
+-- );
 
 CREATE TABLE IF NOT EXISTS "product" (
     "url" TEXT NOT NULL PRIMARY KEY,
@@ -48,6 +48,12 @@ CREATE TABLE IF NOT EXISTS "p_list" (
     PRIMARY KEY(id, user_id)
 );
 
+CREATE TABLE IF NOT EXISTS "c_list" (
+    "id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL REFERENCES "user" ("id") ON DELETE CASCADE,
+    PRIMARY KEY(id, user_id)
+);
+
 -- CREATE TABLE IF NOT EXISTS "list_product" (
 --     "list_id" TEXT NOT NULL REFERENCES "p_list" ("id") ON DELETE CASCADE,
 --     "product_url" TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,
@@ -60,6 +66,14 @@ CREATE TABLE IF NOT EXISTS "list_product" (
     "product_url" TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,
     FOREIGN KEY (list_id, user_id) REFERENCES p_list(id, user_id) ON DELETE CASCADE,
     UNIQUE(list_id, user_id, product_url)
+);
+
+CREATE TABLE IF NOT EXISTS "list_company" (
+    "list_id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "company_id" TEXT NOT NULL REFERENCES "company" ("id") ON DELETE CASCADE,
+    FOREIGN KEY (list_id, user_id) REFERENCES c_list(id, user_id) ON DELETE CASCADE,
+    UNIQUE(list_id, user_id, company_id)
 );
 
 insert into "user" (id) values ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1');
@@ -115,28 +129,28 @@ VALUES
     ('valentino', 'valentino.com'),
     ('mytheresa', 'mytheresa.com');
 
-INSERT INTO user_company (user_id, company_id, favorited)
-VALUES
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zara', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zalando', TRUE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'boozt', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'hm', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'softgoat', TRUE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'adaysmarch', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'sellpy', TRUE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'na-kd', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'careofcarl', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'loropiana', TRUE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'lululemon', TRUE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'moncler', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'gucci', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'ysl', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'louisvuitton', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','farfetch', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','hermes', TRUE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','prada', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','valentino', FALSE),
-    ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','mytheresa', FALSE);
+-- INSERT INTO user_company (user_id, company_id, favorited)
+-- VALUES
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zara', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zalando', TRUE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'boozt', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'hm', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'softgoat', TRUE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'adaysmarch', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'sellpy', TRUE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'na-kd', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'careofcarl', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'loropiana', TRUE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'lululemon', TRUE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'moncler', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'gucci', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'ysl', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'louisvuitton', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','farfetch', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','hermes', TRUE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','prada', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','valentino', FALSE),
+--     ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1','mytheresa', FALSE);
 
 
 INSERT INTO product (url, domain, brand, name, price, currency)
@@ -173,11 +187,20 @@ INSERT INTO p_list (id, user_id)
 VALUES
 ('purchases', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1');
 
+INSERT INTO c_list (id, user_id)
+VALUES
+('favorites', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1');
+
 
 INSERT INTO list_product (list_id, user_id, product_url)
 VALUES
 ('purchases', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-collar-navy'),
 ('purchases','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-waffle-knit-sea-foam');
+
+INSERT INTO list_company (list_id, user_id, company_id)
+VALUES
+('favorites', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'softgoat'),
+('favorites','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zalando');
 
 UPDATE user_product SET liked = TRUE
 WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey';

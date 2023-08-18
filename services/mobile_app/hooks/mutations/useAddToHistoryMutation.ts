@@ -1,8 +1,44 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { createProduct } from '../../api';
+import auth from '@react-native-firebase/auth';
+import { URL } from '../../api/index';
 import { UserProduct } from '../../utils/types';
 import { getDomain } from '../../utils/helpers';
 import { useFirebaseUser } from '../useFirebaseUser';
+
+const createProduct = async (
+  userId: string,
+  product: UserProduct,
+  domain: string
+) => {
+  // fix the brand name here
+  const backendProduct = {
+    ...product,
+    domain: domain,
+  };
+
+  const token = await auth()?.currentUser?.getIdToken();
+
+  const completeUrl = `${URL}/products`;
+
+  const response = await fetch(completeUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(backendProduct),
+  });
+
+  if (!response.ok) {
+    console.log('response:', response);
+
+    throw new Error(
+      `HTTP error in createProduct! status: ${response.status}, error: ${response.statusText}`
+    );
+  }
+
+  return response.json();
+};
 
 export const useAddToHistoryMutation = () => {
   const { user } = useFirebaseUser();
@@ -10,7 +46,6 @@ export const useAddToHistoryMutation = () => {
 
   const addToHistoryMutation = useMutation({
     mutationFn: async (product: UserProduct) => {
-      // await addToPlist(user!.id, listId!, products);
       console.log('product', product);
 
       const domain = getDomain(product.url);
@@ -18,7 +53,7 @@ export const useAddToHistoryMutation = () => {
       return product;
     },
     onMutate: async (product: UserProduct) => {
-      console.log('onMutate');
+      console.log('onMutate product', product);
 
       await queryClient.cancelQueries(['products', { list: ['history'] }]);
       const previousProducts = queryClient.getQueryData([
@@ -26,8 +61,6 @@ export const useAddToHistoryMutation = () => {
         { list: ['history'] },
       ]);
 
-      // DO NOT NEED TO OPTIMISTICALLY UPDATE THE CACHE BECAUSE WE CHANGE THE FILTER AFTER ADDING
-      // optimistically update the cache
       queryClient.setQueryData(
         ['products', { list: ['history'] }],
         (old: UserProduct[] | undefined) => {
@@ -38,7 +71,7 @@ export const useAddToHistoryMutation = () => {
       return { previousProducts };
     },
     onError: (err, product, context) => {
-      console.log('error', err, product, context);
+      console.log('error', err);
       queryClient.setQueryData(
         ['products', { list: ['history'] }],
         context?.previousProducts

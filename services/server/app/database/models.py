@@ -31,6 +31,15 @@ list_product_association = Table(
     ForeignKeyConstraint(["list_id", "user_id"], ["p_list.id", "p_list.user_id"]),
 )
 
+list_company_association = Table(
+    "list_company",
+    Base.metadata,
+    Column("list_id", String),
+    Column("user_id", String),
+    Column("company_id", String, ForeignKey("company.id")),
+    ForeignKeyConstraint(["list_id", "user_id"], ["c_list.id", "c_list.user_id"]),
+)
+
 
 class UserModel(Base):
     __tablename__ = "user"
@@ -41,14 +50,16 @@ class UserModel(Base):
         "ProductModel", secondary=user_product_association, back_populates="users"
     )
 
-    # p_lists: Mapped[list["PListModel"]] = relationship(
-    #     "PListModel", back_populates="user"
-    # )
-
     p_lists: Mapped[list["PListModel"]] = relationship(
         "PListModel",
         back_populates="user",
         primaryjoin="and_(UserModel.id==PListModel.user_id)",
+    )
+
+    c_lists: Mapped[list["CListModel"]] = relationship(
+        "CListModel",
+        back_populates="user",
+        primaryjoin="and_(UserModel.id==CListModel.user_id)",
     )
 
 
@@ -107,10 +118,27 @@ class CompanyModel(Base):
     __tablename__ = "company"
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
-    # favorited: Mapped[bool] = mapped_column(Boolean)
 
     websites: Mapped[list["WebsiteModel"]] = relationship(
         "WebsiteModel", back_populates="company"
+    )
+
+    c_lists: Mapped[list["CListModel"]] = relationship(
+        "CListModel", secondary=list_company_association, back_populates="companies"
+    )
+
+
+class CListModel(Base):
+    __tablename__ = "c_list"
+
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        String, ForeignKey("user.id"), primary_key=True
+    )
+
+    user: Mapped[UserModel] = relationship("UserModel", back_populates="c_lists")
+    companies: Mapped[list[CompanyModel]] = relationship(
+        "CompanyModel", secondary=list_company_association, back_populates="c_lists"
     )
 
 

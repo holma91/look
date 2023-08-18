@@ -24,9 +24,11 @@ router = APIRouter()
 
 log = logging.getLogger("uvicorn")
 
+# get, add, delete
+
 
 @router.get("", response_model=list[ProductResponse])
-async def read_all_products(
+async def get_products(
     list: str = "likes",
     brand: list[str] = Query(None),
     website: list[str] = Query(None),
@@ -50,7 +52,7 @@ async def add_product(
 
 
 @router.get("/product", response_model=ProductResponse)
-async def read_product(
+async def get_product(
     product_url: str = Query(..., description="URL of the product to retrieve"),
     user: FirebaseUser = Depends(get_current_user),
     session: Session = Depends(get_db_session),
@@ -160,10 +162,14 @@ async def add_to_list(
 
 @router.delete("/lists/{list_id}", status_code=204)
 async def delete_from_list(
+    list_id: str,
+    request: PListAddProductRequest,
     user: FirebaseUser = Depends(get_current_user),
     session: Session = Depends(get_db_session),
 ):
-    pass
+    result = product_db.delete_from_list(list_id, request, user, session)
+    if not result["success"]:
+        raise HTTPException(status_code=409, detail=result["detail"])
 
 
 ### MISC ###

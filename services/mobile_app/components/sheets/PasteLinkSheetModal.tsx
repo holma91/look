@@ -8,7 +8,6 @@ import { BottomSheetModal, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { WebView } from 'react-native-webview';
 import * as Haptics from 'expo-haptics';
 
-import { createProduct } from '../../api';
 import { Box, Text, TextInput } from '../../styling/RestylePrimitives';
 import { UserProduct } from '../../utils/types';
 import { parseProductData } from '../../utils/extraction/parsing';
@@ -16,6 +15,7 @@ import { getInjectScripts } from '../../utils/extraction/inject';
 import { getDomain } from '../../utils/helpers';
 import { PrimaryButton } from '../Button';
 import { useFirebaseUser } from '../../hooks/useFirebaseUser';
+import { useAddToHistoryMutation } from '../../hooks/mutations/useAddToHistoryMutation';
 
 type PasteLinkSheetModalProps = {
   navigation: any;
@@ -52,7 +52,7 @@ export function PasteLinkSheetModal({
   const snapPoints = useMemo(() => ['56%'], []);
   const webViewRef = useRef<WebView>(null);
   const { user } = useFirebaseUser();
-  const queryClient = useQueryClient();
+  const addToHistoryMutation = useAddToHistoryMutation();
 
   const handleUpload = async () => {
     setUnsupportedDomain(null);
@@ -113,12 +113,9 @@ export function PasteLinkSheetModal({
     setCurrentProduct({ ...product, domain: domain, liked: false });
     setIsLoading(false);
     try {
-      await createProduct(user?.uid, product, domain);
-      queryClient.invalidateQueries({ queryKey: ['brands', user?.uid] });
-      queryClient.invalidateQueries({
-        queryKey: ['products', user?.uid, { list: ['history'] }],
-      });
+      addToHistoryMutation.mutate(product);
     } catch (e) {
+      console.log("addToHistoryMutation didn't work");
       console.error(e);
     }
   };

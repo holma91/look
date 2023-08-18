@@ -35,3 +35,8 @@ class PListDeleteRequest(CustomBaseModel):
 
 class PListAddProductRequest(CustomBaseModel):
     product_urls: list[str]
+
+
+class CListCreateRequest(CustomBaseModel):
+    id: str
+    company_ids: list[str]

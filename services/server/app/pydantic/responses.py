@@ -24,3 +24,7 @@ class CompanyResponse(CustomBaseModel):
 
 class PListResponse(CustomBaseModel):
     id: str
+
+
+class CListResponse(CustomBaseModel):
+    id: str
