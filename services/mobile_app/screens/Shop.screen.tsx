@@ -1,6 +1,7 @@
 import { FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import * as Haptics from 'expo-haptics';
+import { HoldItem } from 'react-native-hold-menu';
 
 import { Box, Text } from '../styling/RestylePrimitives';
 import { useEffect, useMemo, useState } from 'react';
@@ -18,6 +19,7 @@ import { useCompaniesQuery } from '../hooks/queries/useCompaniesQuery';
 import { useFavCompanyMutation } from '../hooks/mutations/useFavCompanyMutation';
 import { useClistsQuery } from '../hooks/queries/useClistsQuery';
 import { capitalizeFirstLetter } from '../utils/helpers';
+import { type } from 'os';
 
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -215,59 +217,99 @@ function CompanyList({
     }
 
     return clists.find((clist) => clist.id === selectedCategory)?.companies;
-  }, [selectedCategory]);
+  }, [companies, selectedCategory]);
 
   return (
     <FlatList<Company | CompanyNew>
       data={filteredSites ?? []}
       renderItem={({ item }) => (
-        <Box
-          flexDirection="row"
-          alignItems="center"
-          borderColor="grey"
-          paddingHorizontal="m"
-          paddingVertical="s"
-        >
-          <TouchableOpacity
-            onPress={async () => {
-              navigateToSite(item);
-            }}
-            style={{ flex: 1 }}
-          >
-            <Box flexDirection="row" alignItems="center" gap="l" flex={1}>
-              <ExpoImage
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: 40,
-                  width: 40,
-                }}
-                source={companyToInfo[item.id].icon}
-                contentFit="contain"
-              />
-              <Box gap="s">
-                <Text variant="body" fontWeight={'bold'}>
-                  {companyToInfo[item.id].name}
-                </Text>
-                <Text variant="body">{item.domains[0]}</Text>
-              </Box>
-            </Box>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              // favCompanyMutation.mutate(item);
-            }}
-          >
-            <ThemedIcon
-              name={false ? 'ios-star' : 'ios-star-outline'}
-              size={24}
-              color="text"
-            />
-          </TouchableOpacity>
-        </Box>
+        <CompanyBox item={item} navigateToSite={navigateToSite} />
       )}
       keyExtractor={(company) => company.id}
     />
+  );
+}
+
+type CompanyBoxProps = {
+  item: Company | CompanyNew;
+  navigateToSite: any;
+};
+
+function CompanyBox({ item, navigateToSite }: CompanyBoxProps) {
+  const CompanyMenu = [
+    {
+      text: 'Favorite', // + Math.floor(Math.random() * 1000).toString(),
+      icon: () => <ThemedIcon name="ios-star-outline" size={18} />,
+      onPress: () => {
+        console.log('upload!');
+      },
+      actionParams: {
+        key: item.id,
+      },
+    },
+    {
+      text: 'Add to list',
+      icon: () => <ThemedIcon name="add" size={18} />,
+      onPress: () => {},
+    },
+    {
+      text: 'Delete from list',
+      icon: () => <ThemedIcon name="remove" size={18} />,
+      onPress: () => {},
+      isDestructive: true,
+    },
+  ];
+
+  return (
+    <HoldItem items={CompanyMenu}>
+      <Box
+        flexDirection="row"
+        alignItems="center"
+        borderColor="grey"
+        paddingHorizontal="m"
+        // paddingVertical="s"
+        height={63}
+        backgroundColor="background"
+        // borderBottomWidth={2}
+      >
+        <TouchableOpacity
+          onPress={async () => {
+            navigateToSite(item);
+          }}
+          style={{ flex: 1 }}
+        >
+          <Box flexDirection="row" alignItems="center" gap="l" flex={1}>
+            <ExpoImage
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 40,
+                width: 40,
+              }}
+              source={companyToInfo[item.id].icon}
+              contentFit="contain"
+            />
+            <Box gap="s">
+              <Text variant="body" fontWeight={'bold'}>
+                {companyToInfo[item.id].name}
+              </Text>
+              <Text variant="body">{item.domains[0]}</Text>
+            </Box>
+          </Box>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            // favCompanyMutation.mutate(item);
+          }}
+        >
+          <ThemedIcon
+            name={false ? 'ios-star' : 'ios-star-outline'}
+            size={24}
+            color="text"
+          />
+        </TouchableOpacity>
+      </Box>
+    </HoldItem>
   );
 }

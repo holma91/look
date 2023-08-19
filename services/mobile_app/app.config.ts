@@ -19,6 +19,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         ios: {
           useFrameworks: 'static',
         },
+        android: {
+          // from zeego
+          // these values were tested with Expo SDK 48
+          compileSdkVersion: 33,
+          targetSdkVersion: 33,
+          minSdkVersion: 23,
+          buildToolsVersion: '33.0.0',
+          kotlinVersion: '1.6.20',
+        },
       },
     ],
   ],
