@@ -28,3 +28,4 @@ class PListResponse(CustomBaseModel):
 
 class CListResponse(CustomBaseModel):
     id: str
+    companies: list[CompanyResponse]

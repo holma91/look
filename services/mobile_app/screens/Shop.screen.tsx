@@ -6,7 +6,7 @@ import { Box, Text } from '../styling/RestylePrimitives';
 import { useEffect, useMemo, useState } from 'react';
 import { companyToInfo } from '../utils/info';
 import { SearchBar } from '../components/SearchBar';
-import { Company } from '../utils/types';
+import { Company, Clist, CompanyNew } from '../utils/types';
 import SearchList from '../components/SearchList';
 import {
   clearHistory,
@@ -16,6 +16,8 @@ import {
 import ThemedIcon from '../components/ThemedIcon';
 import { useCompaniesQuery } from '../hooks/queries/useCompaniesQuery';
 import { useFavCompanyMutation } from '../hooks/mutations/useFavCompanyMutation';
+import { useClistsQuery } from '../hooks/queries/useClistsQuery';
+import { capitalizeFirstLetter } from '../utils/helpers';
 
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -25,6 +27,14 @@ export default function Shop({ navigation }: { navigation: any }) {
   const [focus, setFocus] = useState(false);
 
   const { data: companies } = useCompaniesQuery('all');
+  const { data: clists } = useClistsQuery();
+
+  const clistIds = useMemo(() => {
+    if (clists) {
+      return clists.map((clist) => clist.id);
+    }
+    return [];
+  }, [clists]);
 
   const navigateToSite = async (company: Company) => {
     await saveHistory(company.id);
@@ -124,23 +134,25 @@ export default function Shop({ navigation }: { navigation: any }) {
                   style={{ flex: 1, gap: 10 }}
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  data={[
-                    { label: 'Favorites' },
-                    { label: 'All' },
-                    { label: 'High-end' },
-                    { label: 'Multi-brand' },
-                    { label: 'Second-hand' },
-                    { label: 'Other' },
-                  ]}
+                  data={
+                    ['All'].concat(clistIds)
+                    // [
+                    // { label: 'Favorites' },
+                    // { label: 'All' },
+                    // { label: 'High-end' },
+                    // { label: 'Multi-brand' },
+                    // { label: 'Second-hand' },
+                    // { label: 'Other' },
+                    // ]
+                  }
                   contentContainerStyle={{ paddingLeft: 18 }}
                   keyExtractor={(item, index) => `category-${index}`}
                   renderItem={({ item }) => (
                     <TouchableOpacity
-                      onPress={() => setSelectedCategory(item.label)}
+                      onPress={() => setSelectedCategory(item)}
                       style={{
                         marginRight: 16,
-                        borderBottomWidth:
-                          selectedCategory === item.label ? 2 : 0,
+                        borderBottomWidth: selectedCategory === item ? 2 : 0,
                         borderColor: 'black',
                       }}
                     >
@@ -148,11 +160,9 @@ export default function Shop({ navigation }: { navigation: any }) {
                         variant="body"
                         fontWeight={'bold'}
                         paddingBottom="s"
-                        color={
-                          selectedCategory === item.label ? 'text' : 'text'
-                        }
+                        color={selectedCategory === item ? 'text' : 'text'}
                       >
-                        {item.label}
+                        {capitalizeFirstLetter(item)}
                       </Text>
                     </TouchableOpacity>
                   )}
@@ -163,6 +173,7 @@ export default function Shop({ navigation }: { navigation: any }) {
                   navigateToSite={navigateToSite}
                   selectedCategory={selectedCategory}
                   companies={companies || []}
+                  clists={clists || []}
                 />
               </Box>
             </>
@@ -185,43 +196,31 @@ type CompanyListProps = {
   navigateToSite: any;
   selectedCategory: string;
   companies: Company[];
+  clists: Clist[];
 };
 
 function CompanyList({
   navigateToSite,
   selectedCategory,
   companies,
+  clists,
 }: CompanyListProps) {
   const [renderToggle, setRenderToggle] = useState(false);
 
-  const favCompanyMutation = useFavCompanyMutation(setRenderToggle);
+  // const favCompanyMutation = useFavCompanyMutation(setRenderToggle);
 
   const filteredSites = useMemo(() => {
-    let filtered;
-    if (selectedCategory === 'Favorites') {
-      filtered = companies.filter((company) => company.favorited);
-    } else if (selectedCategory === 'Multi-brand') {
-      filtered = companies.filter(
-        (company) => companyToInfo[company.id].multiBrand
-      );
-    } else if (selectedCategory === 'High-end') {
-      filtered = companies.filter(
-        (company) => companyToInfo[company.id].highEnd
-      );
-    } else if (selectedCategory === 'Second-hand') {
-      filtered = companies.filter(
-        (company) => companyToInfo[company.id].secondHand
-      );
-    } else {
-      filtered = companies;
+    if (selectedCategory === 'All') {
+      return companies;
     }
-    return filtered;
-  }, [selectedCategory, companies, renderToggle]);
+
+    return clists.find((clist) => clist.id === selectedCategory)?.companies;
+  }, [selectedCategory]);
 
   return (
-    <FlatList<Company>
-      data={filteredSites}
-      renderItem={({ item, index }) => (
+    <FlatList<Company | CompanyNew>
+      data={filteredSites ?? []}
+      renderItem={({ item }) => (
         <Box
           flexDirection="row"
           alignItems="center"
@@ -257,11 +256,11 @@ function CompanyList({
           <TouchableOpacity
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              favCompanyMutation.mutate(item);
+              // favCompanyMutation.mutate(item);
             }}
           >
             <ThemedIcon
-              name={item.favorited ? 'ios-star' : 'ios-star-outline'}
+              name={false ? 'ios-star' : 'ios-star-outline'}
               size={24}
               color="text"
             />

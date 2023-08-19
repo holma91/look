@@ -6,7 +6,7 @@
 
 - finish plist endpoints ; check
 - add/delete images from client ; check
-- do company schema change
+- do company schema change ; in progress
 - finish company endpoints
 - change everything on the client to use the new endpoints
 

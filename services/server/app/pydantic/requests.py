@@ -40,3 +40,7 @@ class PListAddProductRequest(CustomBaseModel):
 class CListCreateRequest(CustomBaseModel):
     id: str
     company_ids: list[str]
+
+
+class CListAddCompaniesRequest(CustomBaseModel):
+    company_ids: list[str]

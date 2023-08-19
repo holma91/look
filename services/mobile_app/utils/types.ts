@@ -24,6 +24,16 @@ export type Plist = {
   id: string;
 };
 
+export type CompanyNew = {
+  id: string;
+  domains: string[];
+};
+
+export type Clist = {
+  id: string;
+  companies: CompanyNew[];
+};
+
 export type FilterType = {
   all?: string[];
   list?: string[];
