@@ -16,24 +16,27 @@ import {
 } from '../utils/storage/history';
 import ThemedIcon from '../components/ThemedIcon';
 import { useCompaniesQuery } from '../hooks/queries/useCompaniesQuery';
-import { useFavCompanyMutation } from '../hooks/mutations/useFavCompanyMutation';
+// import { useFavCompanyMutation } from '../hooks/mutations/useFavCompanyMutation';
 import { useClistsQuery } from '../hooks/queries/useClistsQuery';
 import { capitalizeFirstLetter } from '../utils/helpers';
-import { type } from 'os';
+import { useAddCompaniesMutation } from '../hooks/mutations/companies/useAddCompaniesMutation';
+import { useDeleteCompaniesMutation } from '../hooks/mutations/companies/useDeleteCompaniesMutation';
 
 export default function Shop({ navigation }: { navigation: any }) {
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedClist, setSelectedClist] = useState('all');
   const [currentDomain, setCurrentDomain] = useState<string>('');
   const [history, setHistory] = useState<string[]>([]);
   const [searchText, setSearchText] = useState('');
   const [focus, setFocus] = useState(false);
 
-  const { data: companies } = useCompaniesQuery('all');
+  // fetch companies with a filter for the selected list
+  // all, viewed, and all clists
+  const { data: companies } = useCompaniesQuery(selectedClist);
   const { data: clists } = useClistsQuery();
 
   const clistIds = useMemo(() => {
     if (clists) {
-      return clists.map((clist) => clist.id);
+      return clists.map((clist) => clist.id).filter((id) => id !== 'favorites');
     }
     return [];
   }, [clists]);
@@ -136,25 +139,15 @@ export default function Shop({ navigation }: { navigation: any }) {
                   style={{ flex: 1, gap: 10 }}
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  data={
-                    ['All'].concat(clistIds)
-                    // [
-                    // { label: 'Favorites' },
-                    // { label: 'All' },
-                    // { label: 'High-end' },
-                    // { label: 'Multi-brand' },
-                    // { label: 'Second-hand' },
-                    // { label: 'Other' },
-                    // ]
-                  }
+                  data={['all', 'favorites'].concat(clistIds)}
                   contentContainerStyle={{ paddingLeft: 18 }}
                   keyExtractor={(item, index) => `category-${index}`}
                   renderItem={({ item }) => (
                     <TouchableOpacity
-                      onPress={() => setSelectedCategory(item)}
+                      onPress={() => setSelectedClist(item)}
                       style={{
                         marginRight: 16,
-                        borderBottomWidth: selectedCategory === item ? 2 : 0,
+                        borderBottomWidth: selectedClist === item ? 2 : 0,
                         borderColor: 'black',
                       }}
                     >
@@ -162,7 +155,7 @@ export default function Shop({ navigation }: { navigation: any }) {
                         variant="body"
                         fontWeight={'bold'}
                         paddingBottom="s"
-                        color={selectedCategory === item ? 'text' : 'text'}
+                        color={selectedClist === item ? 'text' : 'text'}
                       >
                         {capitalizeFirstLetter(item)}
                       </Text>
@@ -173,9 +166,9 @@ export default function Shop({ navigation }: { navigation: any }) {
               <Box flex={1}>
                 <CompanyList
                   navigateToSite={navigateToSite}
-                  selectedCategory={selectedCategory}
+                  selectedClist={selectedClist}
                   companies={companies || []}
-                  clists={clists || []}
+                  clistIds={clistIds}
                 />
               </Box>
             </>
@@ -196,34 +189,27 @@ export default function Shop({ navigation }: { navigation: any }) {
 
 type CompanyListProps = {
   navigateToSite: any;
-  selectedCategory: string;
+  selectedClist: string;
   companies: Company[];
-  clists: Clist[];
+  clistIds: string[];
 };
 
 function CompanyList({
   navigateToSite,
-  selectedCategory,
+  selectedClist,
   companies,
-  clists,
+  clistIds,
 }: CompanyListProps) {
-  const [renderToggle, setRenderToggle] = useState(false);
-
-  // const favCompanyMutation = useFavCompanyMutation(setRenderToggle);
-
-  const filteredSites = useMemo(() => {
-    if (selectedCategory === 'All') {
-      return companies;
-    }
-
-    return clists.find((clist) => clist.id === selectedCategory)?.companies;
-  }, [companies, selectedCategory]);
-
   return (
-    <FlatList<Company | CompanyNew>
-      data={filteredSites ?? []}
+    <FlatList<Company>
+      data={companies ?? []}
       renderItem={({ item }) => (
-        <CompanyBox item={item} navigateToSite={navigateToSite} />
+        <CompanyBox
+          item={item}
+          navigateToSite={navigateToSite}
+          selectedClist={selectedClist}
+          clistIds={clistIds}
+        />
       )}
       keyExtractor={(company) => company.id}
     />
@@ -231,31 +217,76 @@ function CompanyList({
 }
 
 type CompanyBoxProps = {
-  item: Company | CompanyNew;
+  item: Company;
   navigateToSite: any;
+  selectedClist: string;
+  clistIds: string[];
 };
 
-function CompanyBox({ item, navigateToSite }: CompanyBoxProps) {
+function CompanyBox({
+  item,
+  navigateToSite,
+  selectedClist,
+  clistIds,
+}: CompanyBoxProps) {
+  const addCompaniesMutation = useAddCompaniesMutation(selectedClist);
+  const deleteCompaniesMutation = useDeleteCompaniesMutation(selectedClist);
+
+  const AddToClistChoices = clistIds.map((clistId) => {
+    return {
+      text: `Add to ${capitalizeFirstLetter(clistId)}`,
+      icon: () => <ThemedIcon name="add" size={18} />,
+      onPress: () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        addCompaniesMutation.mutate({
+          listId: clistId,
+          companies: [item],
+        });
+      },
+      actionParams: {
+        key: clistId,
+      },
+    };
+  });
+
   const CompanyMenu = [
     {
-      text: 'Favorite', // + Math.floor(Math.random() * 1000).toString(),
-      icon: () => <ThemedIcon name="ios-star-outline" size={18} />,
+      text: item.favorited ? 'Unfavorite' : 'Favorite',
+      icon: () => (
+        <ThemedIcon
+          name={item.favorited ? 'ios-star' : 'ios-star-outline'}
+          size={18}
+        />
+      ),
       onPress: () => {
-        console.log('upload!');
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        if (item.favorited) {
+          deleteCompaniesMutation.mutate({
+            listId: 'favorites',
+            companies: [item],
+          });
+        } else {
+          addCompaniesMutation.mutate({
+            listId: 'favorites',
+            companies: [item],
+          });
+        }
       },
       actionParams: {
         key: item.id,
       },
     },
-    {
-      text: 'Add to list',
-      icon: () => <ThemedIcon name="add" size={18} />,
-      onPress: () => {},
-    },
+    ...AddToClistChoices,
     {
       text: 'Delete from list',
       icon: () => <ThemedIcon name="remove" size={18} />,
-      onPress: () => {},
+      onPress: () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        deleteCompaniesMutation.mutate({
+          listId: selectedClist,
+          companies: [item],
+        });
+      },
       isDestructive: true,
     },
   ];
@@ -267,10 +298,8 @@ function CompanyBox({ item, navigateToSite }: CompanyBoxProps) {
         alignItems="center"
         borderColor="grey"
         paddingHorizontal="m"
-        // paddingVertical="s"
         height={63}
         backgroundColor="background"
-        // borderBottomWidth={2}
       >
         <TouchableOpacity
           onPress={async () => {
@@ -300,11 +329,21 @@ function CompanyBox({ item, navigateToSite }: CompanyBoxProps) {
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            // favCompanyMutation.mutate(item);
+            if (item.favorited) {
+              deleteCompaniesMutation.mutate({
+                listId: 'favorites',
+                companies: [item],
+              });
+            } else {
+              addCompaniesMutation.mutate({
+                listId: 'favorites',
+                companies: [item],
+              });
+            }
           }}
         >
           <ThemedIcon
-            name={false ? 'ios-star' : 'ios-star-outline'}
+            name={item.favorited ? 'ios-star' : 'ios-star-outline'}
             size={24}
             color="text"
           />

@@ -15,7 +15,7 @@ import { getInjectScripts } from '../../utils/extraction/inject';
 import { getDomain } from '../../utils/helpers';
 import { PrimaryButton } from '../Button';
 import { useFirebaseUser } from '../../hooks/useFirebaseUser';
-import { useAddToHistoryMutation } from '../../hooks/mutations/useAddToHistoryMutation';
+import { useAddToHistoryMutation } from '../../hooks/mutations/products/useAddToHistoryMutation';
 
 type PasteLinkSheetModalProps = {
   navigation: any;

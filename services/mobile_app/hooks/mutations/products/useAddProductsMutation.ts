@@ -1,8 +1,8 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import auth from '@react-native-firebase/auth';
-import { URL } from '../../api/index';
-import { UserProduct } from '../../utils/types';
-import { useFirebaseUser } from '../useFirebaseUser';
+import { URL } from '../../../api/index';
+import { UserProduct } from '../../../utils/types';
+import { useFirebaseUser } from '../../useFirebaseUser';
 
 const addToPlist = async (
   userId: string,

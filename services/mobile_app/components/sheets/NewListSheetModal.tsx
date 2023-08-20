@@ -11,7 +11,7 @@ import { TextInput, TouchableOpacity } from 'react-native';
 import { useFirebaseUser } from '../../hooks/useFirebaseUser';
 import { ProductSmall } from '../Product';
 import { useProductsQuery } from '../../hooks/queries/useProductsQuery';
-import { useCreatePListMutation } from '../../hooks/mutations/useCreatePListMutation';
+import { useCreatePListMutation } from '../../hooks/mutations/products/useCreatePListMutation';
 import { set } from 'react-native-reanimated';
 
 type NewListSheetModalProps = {

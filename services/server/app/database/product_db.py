@@ -337,29 +337,7 @@ def get_companies(user: FirebaseUser, session: Session):
         CompanyResponse(
             id=record.id,
             domains=[website.domain for website in record.websites],
+            favorited=False,  # change
         )
         for record in records
     ]
-
-    # companies = (
-    #     session.query(distinct(CompanyModel.id))
-    #     .options(joinedload(CompanyModel.websites))
-    #     .join(
-    #         WebsiteModel,
-    #         WebsiteModel.company_id == CompanyModel.id,
-    #     )
-    #     .join(
-    #         ProductModel,
-    #         ProductModel.domain == WebsiteModel.domain,
-    #     )
-    #     .join(
-    #         user_product_association,
-    #         user_product_association.c.product_url == ProductModel.url,
-    #     )
-    #     .filter(user_product_association.c.user_id == user.uid)
-    #     .all()
-    # )
-
-    # print("companies", companies)
-
-    # return [company[0] for company in companies]

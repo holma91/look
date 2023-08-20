@@ -1,7 +1,8 @@
 import logging
+from typing import Optional
 
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.database import companies_db
 from app.auth import get_current_user, FirebaseUser
@@ -17,8 +18,12 @@ log = logging.getLogger("uvicorn")
 
 
 @router.get("", response_model=list[CompanyResponse])
-async def get_companies(session=Depends(get_db_session)):
-    return companies_db.get_companies(session)
+async def get_companies(
+    clist: str = Query(None),
+    user: FirebaseUser = Depends(get_current_user),
+    session: Session = Depends(get_db_session),
+):
+    return companies_db.get_companies(clist, user, session)
 
 
 @router.get("/lists", response_model=list[CListResponse])

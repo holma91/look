@@ -9,8 +9,8 @@ import {
   UserProduct,
 } from '../../utils/types';
 import { AddToListButton } from '../../components/Button';
-import { useAddProductsMutation } from '../../hooks/mutations/useAddProductsMutation';
-import { useLikeProductsMutation } from '../../hooks/mutations/useLikeProductsMutation';
+import { useAddProductsMutation } from '../../hooks/mutations/products/useAddProductsMutation';
+import { useLikeProductsMutation } from '../../hooks/mutations/products/useLikeProductsMutation';
 import ThemedIcon from '../../components/ThemedIcon';
 import { useTheme } from '@shopify/restyle';
 import { usePlistsQuery } from '../../hooks/queries/usePlistsQuery';

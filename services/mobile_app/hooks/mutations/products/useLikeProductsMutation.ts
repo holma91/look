@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { likeProducts, unlikeProducts } from '../../api';
-import { FilterType, UserProduct } from '../../utils/types';
+import { likeProducts, unlikeProducts } from '../../../api';
+import { FilterType, UserProduct } from '../../../utils/types';
 
 type LikeProductsMutationProps = { products: UserProduct[]; like: boolean };
 

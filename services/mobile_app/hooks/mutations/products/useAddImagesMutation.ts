@@ -1,8 +1,8 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import auth from '@react-native-firebase/auth';
-import { UserProduct } from '../../utils/types';
-import { URL } from '../../api/index';
-import { useFirebaseUser } from '../useFirebaseUser';
+import { UserProduct } from '../../../utils/types';
+import { URL } from '../../../api/index';
+import { useFirebaseUser } from '../../useFirebaseUser';
 
 export async function addProductImages(
   productUrl: string,

@@ -1,9 +1,9 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import auth from '@react-native-firebase/auth';
-import { URL } from '../../api/index';
-import { UserProduct } from '../../utils/types';
-import { getDomain } from '../../utils/helpers';
-import { useFirebaseUser } from '../useFirebaseUser';
+import { URL } from '../../../api/index';
+import { UserProduct } from '../../../utils/types';
+import { getDomain } from '../../../utils/helpers';
+import { useFirebaseUser } from '../../useFirebaseUser';
 
 const createProduct = async (
   userId: string,

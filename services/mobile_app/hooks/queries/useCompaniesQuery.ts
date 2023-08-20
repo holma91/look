@@ -5,8 +5,10 @@ import { Company } from '../../utils/types';
 import { URL } from '../../api/index';
 import { useFirebaseUser } from '../useFirebaseUser';
 
-async function fetchAllCompanies(): Promise<Company[]> {
-  const completeUrl = `${URL}/companies`;
+async function fetchCompanies(clist: string): Promise<Company[]> {
+  const completeUrl = `${URL}/companies?clist=${clist}`;
+  console.log('completeUrl:', completeUrl);
+
   const token = await auth()?.currentUser?.getIdToken();
   const response = await fetch(completeUrl, {
     headers: {
@@ -22,7 +24,7 @@ async function fetchAllCompanies(): Promise<Company[]> {
   return response.json();
 }
 
-async function fetchCompanies(): Promise<Company[]> {
+async function fetchVisitedCompanies(): Promise<Company[]> {
   const completeUrl = `${URL}/products/companies`;
   const token = await auth()?.currentUser?.getIdToken();
   const response = await fetch(completeUrl, {
@@ -39,12 +41,13 @@ async function fetchCompanies(): Promise<Company[]> {
   return response.json();
 }
 
-export const useCompaniesQuery = (type: 'all' | 'visited') => {
+export const useCompaniesQuery = (clist: string) => {
   const { user } = useFirebaseUser();
 
   const companiesQuery = useQuery({
-    queryKey: ['companies', type],
-    queryFn: () => (type === 'all' ? fetchAllCompanies() : fetchCompanies()),
+    queryKey: ['companies', clist],
+    queryFn: () =>
+      clist !== 'visited' ? fetchCompanies(clist) : fetchVisitedCompanies(),
     enabled: !!user?.uid,
     onError: (err) => {
       console.log('error fetching companies:', err);

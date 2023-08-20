@@ -10,7 +10,7 @@ import { PrimaryButton } from '../../components/Button';
 import ThemedIcon from '../../components/ThemedIcon';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../styling/theme';
-import { useRemoveImagesMutation } from '../../hooks/mutations/useRemoveImagesMutation';
+import { useRemoveImagesMutation } from '../../hooks/mutations/products/useRemoveImagesMutation';
 import Animated from 'react-native-reanimated';
 
 const defaultImage =

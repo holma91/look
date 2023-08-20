@@ -20,6 +20,7 @@ class ProductResponse(CustomBaseModel):
 class CompanyResponse(CustomBaseModel):
     id: str
     domains: list[str]
+    favorited: bool
 
 
 class PListResponse(CustomBaseModel):
@@ -28,4 +29,4 @@ class PListResponse(CustomBaseModel):
 
 class CListResponse(CustomBaseModel):
     id: str
-    companies: list[CompanyResponse]
+    # companies: list[CompanyResponse]

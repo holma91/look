@@ -5,8 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { HoldItem } from 'react-native-hold-menu';
 import { Box, Text } from '../styling/RestylePrimitives';
 import { FilterType, UserProduct } from '../utils/types';
-import { useDeleteProductsMutation } from '../hooks/mutations/useDeleteProductsMutation';
-import { useLikeProductsMutation } from '../hooks/mutations/useLikeProductsMutation';
+import { useDeleteProductsMutation } from '../hooks/mutations/products/useDeleteProductsMutation';
+import { useLikeProductsMutation } from '../hooks/mutations/products/useLikeProductsMutation';
 
 export function ProductBig({
   navigation,

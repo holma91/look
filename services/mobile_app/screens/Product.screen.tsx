@@ -17,7 +17,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { TrainingContext } from '../context/Training';
-import { useLikeProductMutation } from '../hooks/mutations/useLikeProductMutation';
+import { useLikeProductMutation } from '../hooks/mutations/products/useLikeProductMutation';
 import { PrimaryButton } from '../components/Button';
 import { useProductQuery } from '../hooks/queries/useProductQuery';
 
