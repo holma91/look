@@ -22,6 +22,7 @@ import { capitalizeFirstLetter } from '../utils/helpers';
 import { useAddCompaniesMutation } from '../hooks/mutations/companies/useAddCompaniesMutation';
 import { useDeleteCompaniesMutation } from '../hooks/mutations/companies/useDeleteCompaniesMutation';
 import { useTheme } from '@shopify/restyle';
+import { set } from 'react-native-reanimated';
 
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedClist, setSelectedClist] = useState('all');
@@ -42,7 +43,10 @@ export default function Shop({ navigation }: { navigation: any }) {
   }, [clists]);
 
   const navigateToSite = async (company: Company) => {
+    console.log('navigating to site', company);
+
     await saveHistory(company.id);
+    setSearchText('');
     const domain = company.domains[0];
     navigation.navigate('Browser', { url: domain });
     setCurrentDomain(domain);

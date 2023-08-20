@@ -3,6 +3,7 @@ import { TouchableOpacity, Keyboard } from 'react-native';
 import { Box, TextInput } from '../styling/RestylePrimitives';
 import ThemedIcon from './ThemedIcon';
 import { useTheme } from '@shopify/restyle';
+import { getDomain } from '../utils/helpers';
 
 function SearchBar({
   searchText,
@@ -18,7 +19,6 @@ function SearchBar({
   focus: boolean;
 }) {
   const theme = useTheme();
-  // Function to navigate to the SearchScreen
 
   return (
     <Box
@@ -70,6 +70,7 @@ function SearchBar({
           <TouchableOpacity
             onPress={() => {
               setFocus(false);
+              setSearchText('');
               Keyboard.dismiss();
             }}
           >
@@ -94,6 +95,7 @@ function WebviewSearchBar({
   handleSearch,
   setFocus,
   focus,
+  url,
 }: {
   navigation: any;
   webviewNavigation: any;
@@ -102,8 +104,11 @@ function WebviewSearchBar({
   handleSearch: () => void;
   setFocus: React.Dispatch<React.SetStateAction<boolean>>;
   focus: boolean;
+  url: string;
 }) {
   const theme = useTheme();
+  const domain = getDomain(url);
+  console.log('domain', domain);
 
   return (
     <Box
@@ -135,7 +140,7 @@ function WebviewSearchBar({
           inputMode="url"
           variant="secondary"
           selectTextOnFocus={true}
-          placeholder="Search and shop anywhere"
+          placeholder={domain ?? 'Search and shop anywhere'}
           placeholderTextColor={theme.colors.searchText}
         />
         <ThemedIcon

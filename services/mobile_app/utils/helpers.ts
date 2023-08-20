@@ -1,4 +1,7 @@
 export function getDomain(url: string): string | null {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url;
+  }
   try {
     let hostname = new URL(url).hostname;
     if (hostname.startsWith('www.')) {

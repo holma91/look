@@ -1,7 +1,6 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { likeProducts, unlikeProducts } from '../../../api';
 import { FilterType, UserProduct } from '../../../utils/types';
-import { useFirebaseUser } from '../../useFirebaseUser';
 
 export const useLikeProductMutation = (filter: FilterType) => {
   const queryClient = useQueryClient();

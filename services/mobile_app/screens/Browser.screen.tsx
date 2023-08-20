@@ -89,6 +89,8 @@ export default function Browser({ navigation, route }: BrowserProps) {
     setSelectMode((prevSelectMode) => !prevSelectMode);
   }, [selectMode, webviewRef]);
 
+  console.log('route.params', route.params);
+
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -100,6 +102,7 @@ export default function Browser({ navigation, route }: BrowserProps) {
           setSearchText={setSearchText}
           setSearchBarFocused={setSearchBarFocused}
           searchBarFocused={searchBarFocused}
+          url={route.params?.url}
         />
 
         <Content
@@ -111,6 +114,7 @@ export default function Browser({ navigation, route }: BrowserProps) {
           searchBarFocused={searchBarFocused}
           setSearchBarFocused={setSearchBarFocused}
           searchText={searchText}
+          setSearchText={setSearchText}
         />
         <NavBar
           expandedMenu={expandedMenu}
@@ -133,6 +137,7 @@ type HeaderProps = {
   setSearchText: React.Dispatch<React.SetStateAction<string>>;
   setSearchBarFocused: React.Dispatch<React.SetStateAction<boolean>>;
   searchBarFocused: boolean;
+  url: string;
 };
 
 function Header({
@@ -143,6 +148,7 @@ function Header({
   setSearchText,
   setSearchBarFocused,
   searchBarFocused,
+  url,
 }: HeaderProps) {
   if (selectMode) {
     return (
@@ -168,6 +174,7 @@ function Header({
       handleSearch={() => {}}
       setFocus={setSearchBarFocused}
       focus={searchBarFocused}
+      url={url}
     />
   );
 }
@@ -180,6 +187,7 @@ type ContentProps = {
   webviewRef: React.RefObject<WebView>;
   searchBarFocused: boolean;
   searchText: string;
+  setSearchText: React.Dispatch<React.SetStateAction<string>>;
   setSearchBarFocused: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -190,6 +198,7 @@ function Content({
   setCurrentProduct,
   webviewRef,
   searchText,
+  setSearchText,
   searchBarFocused,
   setSearchBarFocused,
 }: ContentProps) {
@@ -199,6 +208,8 @@ function Content({
 
   const navigateToSite = async (company: Company) => {
     await saveHistory(company.id);
+    setSearchText('');
+
     const domain = company.domains[0];
     navigation.navigate('Browser', { url: domain });
   };
@@ -325,8 +336,6 @@ function Content({
         console.log('unknown message type:', data.type, data.data);
     }
   };
-
-  console.log('currentProduct', currentProduct);
 
   return (
     <Box flex={1}>
