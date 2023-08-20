@@ -5,8 +5,8 @@ from typing import Optional, Any
 from fastapi import APIRouter, HTTPException, Request, Depends, Query
 from svix.webhooks import Webhook, WebhookVerificationError
 
-from app.crud import users as crud
-from app.models.pydantic import (
+from app.legacy import users as crud
+from legacy.pydantic import (
     UserBase,
     UserCompany,
     UserBrand,

@@ -4,8 +4,7 @@ import { UserProduct } from '../../utils/types';
 import { URL } from '../../api/index';
 import { useFirebaseUser } from '../useFirebaseUser';
 
-async function fetchProduct(user: any, url: string) {
-  // const completeUrl = `${URL}/users/${id}/product?product_url=${url}`;
+async function fetchProduct(url: string) {
   const completeUrl = `${URL}/products/product?product_url=${url}`;
   const token = await auth()?.currentUser?.getIdToken();
 
@@ -28,7 +27,7 @@ export const useProductQuery = (initialProduct: UserProduct) => {
 
   const productQuery = useQuery({
     queryKey: ['product', initialProduct.url],
-    queryFn: () => fetchProduct(user, initialProduct.url),
+    queryFn: () => fetchProduct(initialProduct.url),
     initialData: initialProduct,
     enabled: !!user?.uid && initialProduct.images.length > 0,
     onError: (err) => {

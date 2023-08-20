@@ -4,7 +4,6 @@ import { FilterType, UserProduct } from '../../../utils/types';
 import { useFirebaseUser } from '../../useFirebaseUser';
 
 export const useLikeProductMutation = (filter: FilterType) => {
-  const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
 
   const likeProductMutation = useMutation({

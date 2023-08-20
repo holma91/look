@@ -1,12 +1,11 @@
 import logging
-from typing import Optional
 
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.database import companies_db
+from app.crud import companies_db
 from app.auth import get_current_user, FirebaseUser
-from app.db import get_db_session
+from app.database.db import get_db_session
 
 from app.pydantic.responses import CompanyResponse, CListResponse, BaseResponse
 from app.pydantic.requests import CListCreateRequest, CListAddCompaniesRequest

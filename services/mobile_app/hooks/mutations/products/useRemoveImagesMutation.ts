@@ -2,7 +2,6 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import auth from '@react-native-firebase/auth';
 import { UserProduct } from '../../../utils/types';
 import { URL } from '../../../api/index';
-import { useFirebaseUser } from '../../useFirebaseUser';
 
 export async function removeProductImages(
   productUrl: string,
@@ -38,7 +37,6 @@ type RemoveImagesMutationProps = {
 };
 
 export const useRemoveImagesMutation = () => {
-  const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
 
   const removeImagesMutation = useMutation({

@@ -70,3 +70,64 @@ async def handle_user(request: Request) -> dict:
         raise HTTPException(status_code=400, detail="Invalid payload type")
 
     return {"message": "User with id {user_id} updated"}
+
+
+TORTOISE_ORM = {
+    "connections": {"default": os.environ.get("DATABASE_URL")},
+    "apps": {
+        "models": {
+            "models": ["aerich.models"],
+            "default_connection": "default",
+        },
+    },
+}
+
+
+def init_db(app: FastAPI) -> None:
+    register_tortoise(
+        app,
+        db_url=os.environ.get("DATABASE_URL"),
+        modules={"models": []},
+        generate_schemas=False,
+        add_exception_handlers=True,
+    )
+
+
+@asynccontextmanager
+async def get_db_connection():
+    conn = Tortoise.get_connection("default")
+    try:
+        yield conn
+    finally:
+        pass
+        # await conn.close(), apparently this is done by Tortoise?
+
+
+async def generate_schema() -> None:
+    log.info("Initializing Tortoise...")
+
+    await Tortoise.init(
+        db_url=os.environ.get("DATABASE_URL"),
+        # modules={"models": ["models.tortoise"]},
+    )
+    log.info("Generating database schema via Tortoise...")
+    await Tortoise.generate_schemas()
+    await Tortoise.close_connections()
+
+
+# if we run this file directly, then we want to generate the schema
+# maybe this is what we do in production?
+if __name__ == "__main__":
+    run_async(generate_schema())
+
+
+class Settings(BaseSettings):
+    environment: str = "dev"
+    testing: bool = 0
+    database_url: AnyUrl = None
+
+
+@lru_cache()
+def get_settings() -> BaseSettings:
+    log.info("Loading config settings from the environment...")
+    return Settings()

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from sqlalchemy import insert, and_
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy.dialects.postgresql import insert as pg_insert

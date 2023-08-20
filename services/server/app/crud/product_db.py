@@ -2,11 +2,10 @@ from sqlalchemy import and_, insert, distinct
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import joinedload, Session
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 
 from app.auth import FirebaseUser
 from app.pydantic.requests import (
-    GetProductRequest,
     ProductRequest,
     ProductImagesRequest,
     LikeProductsRequest,

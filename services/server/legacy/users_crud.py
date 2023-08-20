@@ -1,14 +1,14 @@
-from typing import Optional
-from app.models.pydantic import (
-    ProductExtended,
-    ProductImages,
-    LikeProducts,
-    ProductImage,
-    ListBase,
-    ListProduct,
-    ListProducts,
-)
-from app.db import get_db_connection
+# from typing import Optional
+# from app.models.pydantic import (
+#     ProductExtended,
+#     ProductImages,
+#     LikeProducts,
+#     ProductImage,
+#     ListBase,
+#     ListProduct,
+#     ListProducts,
+# )
+# from app.database.db import get_db_connection
 
 
 async def get_all() -> list[dict]:

@@ -7,7 +7,6 @@ import { useFirebaseUser } from '../useFirebaseUser';
 
 async function fetchCompanies(clist: string): Promise<Company[]> {
   const completeUrl = `${URL}/companies?clist=${clist}`;
-  console.log('completeUrl:', completeUrl);
 
   const token = await auth()?.currentUser?.getIdToken();
   const response = await fetch(completeUrl, {

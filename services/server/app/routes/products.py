@@ -3,8 +3,8 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.auth import get_current_user, FirebaseUser
-from app.db import get_db_session
-from app.database import product_db
+from app.database.db import get_db_session
+from app.crud import product_db
 from app.pydantic.requests import (
     ProductRequest,
     ProductImagesRequest,

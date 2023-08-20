@@ -237,8 +237,8 @@ function Header({
   ];
 
   const filterSheetModalRef = useRef<BottomSheetModal>(null);
-  const newListSheetModalRef = useRef<BottomSheetModal>(null);
   const pasteLinkSheetRef = useRef<BottomSheetModal>(null);
+  const newListSheetModalRef = useRef<BottomSheetModal>(null);
 
   const handlePresentPasteLinkSheetPress = useCallback(() => {
     pasteLinkSheetRef.current?.present();

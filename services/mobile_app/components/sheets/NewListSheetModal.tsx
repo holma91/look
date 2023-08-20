@@ -95,7 +95,7 @@ export function NewListSheetModal({
         >
           <Box flexDirection="row" gap="s">
             <TextInput
-              style={{ fontSize: 22, fontWeight: 'bold' }} // Replace this with your preferred styles
+              style={{ fontSize: 22, fontWeight: 'bold' }}
               onChangeText={(text) => setListName(text)}
               value={listName}
               selectTextOnFocus

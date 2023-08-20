@@ -1,5 +1,5 @@
-import { FlatList, TouchableOpacity } from 'react-native';
-import React, { useMemo } from 'react';
+import { FlatList, TextInput, TouchableOpacity } from 'react-native';
+import React, { useMemo, useState } from 'react';
 import { BottomSheetBackdrop, BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import { Box, Text } from '../../styling/RestylePrimitives';
@@ -14,6 +14,7 @@ import { useLikeProductsMutation } from '../../hooks/mutations/products/useLikeP
 import ThemedIcon from '../../components/ThemedIcon';
 import { useTheme } from '@shopify/restyle';
 import { usePlistsQuery } from '../../hooks/queries/usePlistsQuery';
+import { useCreatePListMutation } from '../../hooks/mutations/products/useCreatePListMutation';
 
 type AddProductsSheetModalProps = {
   addProductsSheetRef: React.RefObject<BottomSheetModal>;
@@ -33,11 +34,13 @@ export function AddProductsSheetModal({
   resetSelection,
   filter,
 }: AddProductsSheetModalProps) {
+  const [newListName, setNewListName] = useState('New List');
   const snapPoints = useMemo(() => ['85%'], []);
   const theme = useTheme();
 
   const addProductsMutation = useAddProductsMutation();
   const likeProductsMutation = useLikeProductsMutation(filter);
+  const createPlistMutation = useCreatePListMutation();
 
   const listId = filter?.list && filter.list[0];
 
@@ -57,7 +60,14 @@ export function AddProductsSheetModal({
 
   const handleCreateAndAddToList = async () => {
     console.log('create and add to list');
-    // just go to new list sheet
+    const listId = newListName.toLowerCase();
+    createPlistMutation.mutate({
+      listId,
+      products: selectedProducts,
+    });
+    addProductsSheetRef?.current?.close();
+    handleFilterSelection('list', listId);
+    resetSelection();
   };
 
   return (
@@ -117,7 +127,16 @@ export function AddProductsSheetModal({
               <Ionicons name="add" size={40} color="#8E8E93" />
             </TouchableOpacity>
           </Box>
-          <Text>New list...</Text>
+          {/* <Text>New list...</Text> */}
+          <Box flexDirection="row" gap="s">
+            <TextInput
+              style={{ fontSize: 18, fontWeight: 'bold' }}
+              onChangeText={(text) => setNewListName(text)}
+              value={newListName}
+              selectTextOnFocus
+            />
+            <Ionicons name="pencil" size={18} color="black" />
+          </Box>
         </Box>
         <Box paddingTop="xl" flex={1}>
           <Text variant="smallTitle" paddingBottom="m">

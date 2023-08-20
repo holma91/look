@@ -189,7 +189,8 @@ VALUES
 
 INSERT INTO c_list (id, user_id)
 VALUES
-('favorites', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1');
+('favorites', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1'),
+('testlist', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1');
 
 
 INSERT INTO list_product (list_id, user_id, product_url)
