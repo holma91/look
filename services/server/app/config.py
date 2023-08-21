@@ -18,12 +18,12 @@ def get_settings() -> Settings:
     log.info("Loading config settings from the environment...")
     env = os.getenv("ENVIRONMENT", "dev")
     if env == "prod":
-        SUPABASE_DB_URL = os.environ.get("SUPABASE_DB_URL", "")
+        DATABASE_URL = os.environ.get("DATABASE_PROD_URL", "")
         return Settings(
             environment="prod",
             testing=False,
-            database_url=SUPABASE_DB_URL,
+            database_url=DATABASE_URL,
         )
 
-    DATABASE_URL = os.environ.get("DATABASE_URL", "")
+    DATABASE_URL = os.environ.get("DATABASE_DEV_URL", "")
     return Settings(database_url=DATABASE_URL)

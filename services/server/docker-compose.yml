@@ -1,9 +1,9 @@
-version: '3.8' # Docker compose file version
+version: '3.8'
 
 services:
   web:
     build: ./
-    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000 # run command on container start
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
     volumes:
       - ./:/usr/src/app # mount code -> container, necessary to avoid image rebuilding on every change
     ports:
@@ -11,9 +11,9 @@ services:
     environment:
       - ENVIRONMENT=dev
       - TESTING=0
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_DEV_URL=${DATABASE_DEV_URL}
       - DATABASE_TEST_URL=${DATABASE_TEST_URL}
-      - SUPABASE_DB_URL=${SUPABASE_DB_URL}
+      - DATABASE_PROD_URL=${DATABASE_PROD_URL}
     depends_on:
       - web-db
 
