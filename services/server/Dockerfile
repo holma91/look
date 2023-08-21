@@ -5,34 +5,51 @@ WORKDIR /tmp
 
 RUN pip install poetry
 
-COPY ./pyproject.toml ./poetry.lock* ./key.json /tmp/
+COPY ./pyproject.toml ./poetry.lock* /tmp/
 
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 # pull official base image
 FROM python:3.11.2-slim-buster
 
-# set working directory
-WORKDIR /usr/src/app
+# create directory for the app user
+RUN mkdir -p /home/app
 
-# set environment variables, prevents Python from writing pyc files to disc and buffering stdout and stderr
+# create the app user
+RUN addgroup --system app && adduser --system --group app
+
+# create the appropriate directories
+ENV HOME=/home/app
+ENV APP_HOME=/home/app/web
+RUN mkdir $APP_HOME
+WORKDIR $APP_HOME
+
+# set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV ENVIRONMENT prod
+ENV TESTING 0
 
 # install system dependencies
 RUN apt-get update \
   && apt-get -y install netcat gcc postgresql \
   && apt-get clean
 
-COPY --from=requirements-stage /tmp/requirements.txt /usr/src/app/requirements.txt
+# Copy requirements.txt from the requirements-stage and install
+COPY --from=requirements-stage /tmp/requirements.txt .
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /usr/src/app/requirements.txt
+# use specific version of uvicorn to avoid issues with python 3.11 (?)
+RUN pip install "uvicorn[standard]==0.21.1"
 
-COPY ./app .
+# add app
+COPY . .
 
-# add entrypoint.sh
-COPY ./entrypoint.sh .
-RUN chmod +x /usr/src/app/entrypoint.sh
+# chown all the files to the app user
+RUN chown -R app:app $APP_HOME
 
-# run entrypoint.sh
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+# change to the app user
+USER app
+
+# run gunicorn
+CMD gunicorn --bind 0.0.0.0:$PORT app.main:app -k uvicorn.workers.UvicornWorker

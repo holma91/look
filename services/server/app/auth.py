@@ -1,3 +1,5 @@
+import os
+
 from fastapi import Depends, HTTPException, status, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from firebase_admin import auth, credentials, initialize_app
@@ -20,8 +22,10 @@ class FirebaseUser(BaseModel):
     uid: str
 
 
-credential = credentials.Certificate("./key.json")
-initialize_app(credential)
+# PATH_TO_CREDENTIALS = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "")
+# credential = credentials.Certificate(PATH_TO_CREDENTIALS)
+# initialize_app(credential)
+initialize_app()
 
 
 def get_current_user(
