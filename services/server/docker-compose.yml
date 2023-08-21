@@ -11,9 +11,9 @@ services:
     environment:
       - ENVIRONMENT=dev
       - TESTING=0
-      - DATABASE_URL=postgres://postgres:postgres@web-db:5432/web_dev
-      - DATABASE_TEST_URL=postgres://postgres:postgres@web-db:5432/web_test
-      - CLERK_WEBHOOK_SECRET=${CLERK_WEBHOOK_SECRET}
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_TEST_URL=${DATABASE_TEST_URL}
+      - SUPABASE_DB_URL=${SUPABASE_DB_URL}
     depends_on:
       - web-db
 
