@@ -7,3 +7,8 @@
 
 - play around with cloud run
 - check out the stuff at testdriven (set up github ci/cd)
+
+### Notes
+
+In dev, we use docker-compose to spin up two containers, one for the app and one for the db.
+In prod, we just spin up the app container, and use a managed DB.

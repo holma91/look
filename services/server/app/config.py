@@ -3,6 +3,17 @@ import logging
 log = logging.getLogger("uvicorn")
 
 
+class ProductionConfig:
+    DEBUG = False
+    TESTING = False
+    APP_ENVIRONMENT = "cloud"
+    _SQLALCHEMY_DATABASE_URI = None
+
+    @property
+    def SQLALCHEMY_DATABASE_URI(self):
+        return "<insert production database uri here>"
+
+
 class DevelopmentConfig:
     DEBUG = True
     TESTING = False
@@ -15,6 +26,7 @@ class DevelopmentConfig:
 
 
 CONFIGS = {
+    "production": ProductionConfig,
     "development": DevelopmentConfig,
 }
 
