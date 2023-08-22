@@ -108,7 +108,6 @@ function WebviewSearchBar({
 }) {
   const theme = useTheme();
   const domain = getDomain(url);
-  console.log('domain', domain);
 
   return (
     <Box

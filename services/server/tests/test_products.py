@@ -3,7 +3,7 @@ import json
 
 def test_get_product(test_app):
     response = test_app.get(
-        "/products/product?product_url=https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey"
+        "/products/product?product_url=https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey/"
     )
     print(response.content)
     assert response.status_code == 200
@@ -15,6 +15,7 @@ def test_add_product(test_app):
         content=json.dumps(
             {
                 "url": "https://www.zalando.se/nikesd-sporddtssweasr-bodysuitttr-linne-khaki-ni121t00p-n11.html",
+                "schemaUrl": "/prada-solglasoegon-black-p2451k03d-fasfq11.html",
                 "domain": "zalando.com",
                 "brand": "Nike",
                 "name": "BODYSUIT - Linne",

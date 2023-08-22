@@ -1,10 +1,11 @@
-import { FlatList, Keyboard, TouchableOpacity } from 'react-native';
+import { Keyboard, TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 
 import { Box, Text } from '../styling/RestylePrimitives';
 import { companyToInfo } from '../utils/info';
 import { Company } from '../utils/types';
 import { useCompaniesQuery } from '../hooks/queries/useCompaniesQuery';
+import { FlashList } from '@shopify/flash-list';
 
 export default function SearchList({
   navigateToSite,
@@ -23,10 +24,11 @@ export default function SearchList({
 
   return (
     <Box flex={1}>
-      <FlatList
+      <FlashList
         data={filteredWebsites}
         keyExtractor={(item) => item.id}
         keyboardShouldPersistTaps="handled"
+        estimatedItemSize={63}
         renderItem={({ item }) => (
           <Box
             flex={1}

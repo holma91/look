@@ -43,8 +43,6 @@ export default function Shop({ navigation }: { navigation: any }) {
   }, [clists]);
 
   const navigateToSite = async (company: Company) => {
-    console.log('navigating to site', company);
-
     await saveHistory(company);
     setSearchText('');
     const domain = company.domains[0];
@@ -150,7 +148,6 @@ export default function Shop({ navigation }: { navigation: any }) {
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       onPress={() => {
-                        console.log('setting selectedClist to', item);
                         setSelectedClist(item);
                       }}
                       style={{

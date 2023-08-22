@@ -82,7 +82,6 @@ def delete_product_images(
     _: FirebaseUser = Depends(get_current_user),
     session: Session = Depends(get_db_session),
 ):
-    print("delete_product_images: ", product_images)
     result = product_db.delete_product_images(product_images, session)
     if not result["success"]:
         raise HTTPException(status_code=409, detail=result["detail"])

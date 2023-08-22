@@ -1,4 +1,5 @@
 import { FlatList, TouchableOpacity } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import * as Haptics from 'expo-haptics';
 import Animated, {
   useSharedValue,

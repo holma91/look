@@ -67,6 +67,7 @@ class ProductModel(Base):
     __tablename__ = "product"
 
     url: Mapped[str] = mapped_column(String, primary_key=True, index=True)
+    schema_url: Mapped[str] = mapped_column(String)
     domain: Mapped[str] = mapped_column(String, ForeignKey("website.domain"))
     brand: Mapped[str] = mapped_column(String)
     name: Mapped[str] = mapped_column(String)

@@ -48,6 +48,7 @@ def get_product(product_url: str, user: FirebaseUser, session: Session):
 
     product_response = ProductResponse(
         url=product.url,
+        schema_url=product.schema_url,
         domain=product.domain,
         brand=product.brand,
         name=product.name,
@@ -103,6 +104,7 @@ def get_products(
     return [
         ProductResponse(
             url=record.ProductModel.url,
+            schema_url=record.ProductModel.schema_url,
             domain=record.ProductModel.domain,
             brand=record.ProductModel.brand,
             name=record.ProductModel.name,
@@ -117,8 +119,11 @@ def get_products(
 
 def add_product(product: ProductRequest, user_uid: str, session: Session):
     try:
+        if not product.images:
+            return {"success": False, "detail": "Product must have at least one image"}
         new_product = ProductModel(
             url=product.url,
+            schema_url=product.schema_url,
             domain=product.domain,
             brand=product.brand,
             name=product.name,

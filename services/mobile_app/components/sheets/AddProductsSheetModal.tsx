@@ -47,7 +47,6 @@ export function AddProductsSheetModal({
   const { data: plists } = usePlistsQuery();
 
   const handleAddToList = async (listId: string) => {
-    console.log('add to list', listId);
     if (listId === 'likes') {
       likeProductsMutation.mutate({ products: selectedProducts, like: true });
     } else {
@@ -59,7 +58,6 @@ export function AddProductsSheetModal({
   };
 
   const handleCreateAndAddToList = async () => {
-    console.log('create and add to list');
     const listId = newListName.toLowerCase();
     createPlistMutation.mutate({
       listId,

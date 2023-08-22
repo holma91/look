@@ -26,7 +26,7 @@ export const useProductQuery = (initialProduct: UserProduct) => {
   const { user } = useFirebaseUser();
 
   const productQuery = useQuery({
-    queryKey: ['product', initialProduct.url],
+    queryKey: ['product', initialProduct.schemaUrl],
     queryFn: () => fetchProduct(initialProduct.url),
     initialData: initialProduct,
     enabled: !!user?.uid && initialProduct.images.length > 0,

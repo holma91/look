@@ -7,6 +7,7 @@ class GetProductRequest(CustomBaseModel):
 
 class ProductRequest(CustomBaseModel):
     url: str
+    schema_url: str
     domain: str
     brand: str
     name: str

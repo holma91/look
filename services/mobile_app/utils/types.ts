@@ -8,6 +8,7 @@ export type UserProduct = {
   images: string[];
   domain: string;
   liked: boolean;
+  schemaUrl?: string;
 };
 
 export type Company = {

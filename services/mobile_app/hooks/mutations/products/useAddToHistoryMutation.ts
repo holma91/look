@@ -46,15 +46,11 @@ export const useAddToHistoryMutation = () => {
 
   const addToHistoryMutation = useMutation({
     mutationFn: async (product: UserProduct) => {
-      console.log('product', product);
-
       const domain = getDomain(product.url);
       await createProduct(user!.uid, product, domain!);
       return product;
     },
     onMutate: async (product: UserProduct) => {
-      console.log('onMutate product', product);
-
       await queryClient.cancelQueries(['products', { list: ['history'] }]);
       const previousProducts = queryClient.getQueryData([
         'products',

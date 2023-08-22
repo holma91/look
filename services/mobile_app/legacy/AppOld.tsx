@@ -25,8 +25,6 @@ const queryClient = new QueryClient();
 export default function AppOld() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  console.log('App:isDarkMode', isDarkMode);
-
   return (
     <DarkModeContext.Provider value={{ isDarkMode, setIsDarkMode }}>
       <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>

@@ -4,7 +4,7 @@ document.body.freezeEventHandler = function (event) {
   event.preventDefault();
 
   if (event.target.tagName.toLowerCase() === 'img') {
-    if (event.target.style.border === '5px solid red') {
+    if (event.target.style.border === '5px solid black') {
       event.target.style.border = '';
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
@@ -14,7 +14,7 @@ document.body.freezeEventHandler = function (event) {
         })
       );
     } else {
-      event.target.style.border = '5px solid red';
+      event.target.style.border = '5px solid black';
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
           type: 'imageAdd',

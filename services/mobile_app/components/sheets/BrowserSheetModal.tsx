@@ -12,6 +12,7 @@ import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../styling/theme';
 import { useRemoveImagesMutation } from '../../hooks/mutations/products/useRemoveImagesMutation';
 import Animated from 'react-native-reanimated';
+import { FlashList } from '@shopify/flash-list';
 
 const defaultImage =
   'https://i0.wp.com/roadmap-tech.com/wp-content/uploads/2019/04/placeholder-image.jpg?resize=400%2C400&ssl=1';
@@ -115,36 +116,40 @@ const BottomSheetContent = ({
 
   if (activeProduct.url === '') {
     return (
-      <Box justifyContent="center" alignItems="center" marginTop="l" gap="m">
-        <Text variant="title">We can't find a product!</Text>
-        <Text>Go to a product page, and you'll see it right here. </Text>
-        <Text>Or, you can go to some of your earlier viewed products:</Text>
-        <FlatList
-          style={{ gap: 10, marginTop: 20 }}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={products.slice().reverse()}
-          contentContainerStyle={{ paddingLeft: 5 }}
-          keyExtractor={(item, index) => `category-${index}`}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => {}}
-              style={{
-                marginRight: 6,
-              }}
-            >
-              <ExpoImage
+      <>
+        <Box justifyContent="center" alignItems="center" marginTop="l" gap="m">
+          <Text variant="title">We can't find a product!</Text>
+          <Text>Go to a product page, and you'll see it right here. </Text>
+          <Text>Or, you can go to some of your earlier viewed products:</Text>
+        </Box>
+        <Box marginTop="l">
+          <FlashList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={products.slice().reverse()}
+            contentContainerStyle={{ paddingLeft: 12 }}
+            keyExtractor={(item, index) => `category-${index}`}
+            estimatedItemSize={90}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => {}}
                 style={{
-                  height: 125,
-                  width: 90,
+                  marginRight: 6,
                 }}
-                source={item.images[0]}
-                contentFit="cover"
-              />
-            </TouchableOpacity>
-          )}
-        />
-      </Box>
+              >
+                <ExpoImage
+                  style={{
+                    height: 125,
+                    width: 90,
+                  }}
+                  source={item.images[0]}
+                  contentFit="cover"
+                />
+              </TouchableOpacity>
+            )}
+          />
+        </Box>
+      </>
     );
   }
 

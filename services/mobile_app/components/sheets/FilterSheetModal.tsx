@@ -334,8 +334,6 @@ function AllList({
           <FilterListButton
             label={item}
             onPress={() => {
-              console.log('setOuterChoice:', setOuterChoice);
-              console.log('item:', item);
               setOuterChoice?.(item as OuterChoiceFilterType);
               setSheetNavStack((prev) => [
                 ...prev,

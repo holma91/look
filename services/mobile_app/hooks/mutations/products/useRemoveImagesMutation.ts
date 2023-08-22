@@ -44,14 +44,14 @@ export const useRemoveImagesMutation = () => {
       await removeProductImages(product.url, images);
     },
     onMutate: async ({ product, images }: RemoveImagesMutationProps) => {
-      await queryClient.cancelQueries(['product', product.url]);
+      await queryClient.cancelQueries(['product', product.schemaUrl]);
       const previousProduct = queryClient.getQueryData([
         'product',
-        product.url,
+        product.schemaUrl,
       ]);
 
       queryClient.setQueryData(
-        ['product', product.url],
+        ['product', product.schemaUrl],
         (old: UserProduct | undefined) => {
           if (old) {
             old.images = old.images.filter((img) => !images.includes(img));
@@ -65,7 +65,7 @@ export const useRemoveImagesMutation = () => {
     onError: (err, { product, images }, context) => {
       console.log('error removing images:', err, product.url);
       queryClient.setQueryData(
-        ['product', product.url],
+        ['product', product.schemaUrl],
         context?.previousProduct
       );
     },
@@ -74,7 +74,7 @@ export const useRemoveImagesMutation = () => {
         queryKey: ['products', { list: ['history'] }],
       });
       queryClient.invalidateQueries({
-        queryKey: ['product', product.url],
+        queryKey: ['product', product.schemaUrl],
       });
     },
   });

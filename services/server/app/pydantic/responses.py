@@ -7,6 +7,7 @@ class BaseResponse(CustomBaseModel):
 
 class ProductResponse(CustomBaseModel):
     url: str
+    schema_url: str
     domain: str
     brand: str
     name: str

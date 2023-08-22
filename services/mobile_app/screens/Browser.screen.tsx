@@ -57,6 +57,7 @@ export default function Browser({ navigation, route }: BrowserProps) {
       images: [],
       domain: '',
       liked: false,
+      schemaUrl: '',
     }
   );
   const [selectMode, setSelectMode] = useState(false);
@@ -247,12 +248,20 @@ function Content({
 
   const handleProductMessage = (data: any, eventUrl: string) => {
     const product = parseProductData(eventUrl, data);
+    console.log('handleProductMessage');
 
-    if (currentProduct.url !== product.url) {
+    // if (currentProduct.url !== product.url) {
+    console.log('currentProduct.schemaUrl', currentProduct.schemaUrl);
+    console.log('product.schemaUrl', product.schemaUrl);
+    console.log('product.url (eventUrl)', product.url);
+
+    if (currentProduct.schemaUrl !== product.schemaUrl) {
+      // schema has finally changed (schemaUrl is like the uid)
       if (
         !arraysAreEqual(currentProduct.images, product.images) ||
         product.images.length === 0
       ) {
+        console.log('setting currentProduct:', product);
         setCurrentProduct(product);
 
         if (product.images.length > 0) {
@@ -263,7 +272,7 @@ function Content({
       }
     } else {
       // this is a refresh
-      setCurrentProduct(product);
+      // setCurrentProduct(product);
     }
   };
 
@@ -272,6 +281,8 @@ function Content({
       ...currentProduct,
       images: [...currentProduct.images, data.data],
     };
+    console.log('handleImageAddMessage: currentProduct', currentProduct);
+
     if (currentProduct.images.length === 0) {
       console.log('addHistoryMutation');
       addToHistoryMutation.mutate(updatedProduct);
@@ -315,15 +326,18 @@ function Content({
   };
 
   const handleMessage = (event: any) => {
-    console.log('got message:', event.nativeEvent.data);
+    // console.log('got message:', event.nativeEvent.data);
 
     const data = JSON.parse(event.nativeEvent.data);
 
     switch (data.type) {
       case 'product':
+        console.log("received 'product' message");
+
         handleProductMessage(event.nativeEvent.data, event.nativeEvent.url);
         break;
       case 'imageAdd':
+        console.log("received 'imageAdd' message");
         handleImageAddMessage(data);
         break;
       case 'imageRemove':
@@ -397,11 +411,15 @@ function NavBar({
   }, []);
 
   const handleLikeProduct = async () => {
+    console.log('activeProduct', activeProduct);
+
     if (activeProduct) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       likeProductMutation.mutate(activeProduct);
     }
   };
+
+  console.log('activeProduct', activeProduct);
 
   return (
     <Box zIndex={100}>
@@ -445,11 +463,15 @@ function NavBar({
           )}
         </Box>
         <Box flex={0} flexDirection="row" gap="m" alignItems="center">
-          <TouchableOpacity onPress={handleLikeProduct}>
+          <TouchableOpacity
+            onPress={
+              activeProduct?.images.length > 0 ? handleLikeProduct : () => {}
+            }
+          >
             <ThemedIcon
               name={activeProduct?.liked ? 'heart' : 'heart-outline'}
               size={24}
-              color="text"
+              color={activeProduct?.images.length > 0 ? 'text' : 'background'}
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleToggleSelectMode}>

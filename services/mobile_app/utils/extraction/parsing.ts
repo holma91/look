@@ -6,6 +6,7 @@ type IntermediaryProduct = {
   brand: string;
   price: string;
   currency: string;
+  schemaUrl?: string;
   images: string[];
 };
 
@@ -14,6 +15,7 @@ const baseParsers: {
 } = {
   type1: (productData: any) => {
     return {
+      schemaUrl: productData['offers']['url'],
       name: productData['name'],
       brand: productData['brand']['name'],
       price: productData['offers']['price'],
@@ -23,6 +25,7 @@ const baseParsers: {
   },
   type2: (productData: any) => {
     return {
+      schemaUrl: productData['offers']['url'],
       name: productData['name'],
       brand: productData['brand']['name'],
       price: productData['offers']['price'],
@@ -32,6 +35,7 @@ const baseParsers: {
   },
   type3: (productData: any) => {
     return {
+      schemaUrl: productData['offers'][0]['url'],
       name: productData['name'],
       brand: productData['brand']['name'],
       price: productData['offers'][0]['price'],
@@ -41,6 +45,7 @@ const baseParsers: {
   },
   type4: (productData: any) => {
     return {
+      schemaUrl: productData['offers'][0]['url'],
       name: productData['name'],
       brand: productData['brand']['name'],
       price: productData['offers'][0]['price'],
@@ -63,7 +68,9 @@ const domainSpecificParsers: {
     };
   },
   'shop.lululemon.com': (productData: any) => {
+    // we have problems here with the isReady lock
     return {
+      schemaUrl: productData['offers']['url'],
       name: productData['name'],
       brand: productData['brand'],
       price: '218', // unknown price
@@ -72,7 +79,7 @@ const domainSpecificParsers: {
     };
   },
   'mytheresa.com': (productData: any) => {
-    // we have a big with the isReady lock
+    // we have a big problem with the isReady lock
     return {
       name: productData['name'],
       brand: productData['brand']['name'],
@@ -156,9 +163,6 @@ export function parseProductData(url: string, rawData: string): UserProduct {
   } catch (e) {
     throw new Error(`Couldn't parse raw JSON data: ${e}`);
   }
-
-  // console.log('productData', productData);
-  // console.log('domain', domain);
 
   let product: IntermediaryProduct = {
     name: '',
