@@ -8,6 +8,8 @@ async function fetchProduct(url: string) {
   const completeUrl = `${URL}/products/product?product_url=${url}`;
   const token = await auth()?.currentUser?.getIdToken();
 
+  console.log('fetching product with url:', url);
+
   const response = await fetch(completeUrl, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -26,7 +28,7 @@ export const useProductQuery = (initialProduct: UserProduct) => {
   const { user } = useFirebaseUser();
 
   const productQuery = useQuery({
-    queryKey: ['product', initialProduct.schemaUrl],
+    queryKey: ['product', initialProduct.url],
     queryFn: () => fetchProduct(initialProduct.url),
     initialData: initialProduct,
     enabled: !!user?.uid && initialProduct.images.length > 0,

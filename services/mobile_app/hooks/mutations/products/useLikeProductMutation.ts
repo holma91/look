@@ -13,14 +13,14 @@ export const useLikeProductMutation = (filter: FilterType) => {
       return product;
     },
     onMutate: async (product: UserProduct) => {
-      await queryClient.cancelQueries(['product', product.schemaUrl]);
+      await queryClient.cancelQueries(['product', product.url]);
       const previousProduct = queryClient.getQueryData([
         'product',
-        product.schemaUrl,
+        product.url,
       ]);
 
       queryClient.setQueryData(
-        ['product', product.schemaUrl],
+        ['product', product.url],
         (old: UserProduct | undefined) => {
           if (old) {
             old.liked = !old.liked;
@@ -34,13 +34,13 @@ export const useLikeProductMutation = (filter: FilterType) => {
     onError: (err, product, context) => {
       console.log('error', err, product, context);
       queryClient.setQueryData(
-        ['product', product.schemaUrl],
+        ['product', product.url],
         context?.previousProduct
       );
     },
     onSettled: async (_, err, product, context) => {
       queryClient.invalidateQueries({
-        queryKey: ['product', product.schemaUrl],
+        queryKey: ['product', product.url],
       });
       queryClient.invalidateQueries({
         queryKey: ['products', filter],

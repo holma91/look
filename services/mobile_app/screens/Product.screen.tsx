@@ -187,7 +187,7 @@ function TextBox({ product, expanded, navigation, activeIndex }: TextBoxProps) {
     // send active image and active model to server
   };
 
-  console.log('product', product);
+  // console.log('product', product);
 
   return (
     <ScrollBox flex={1}>

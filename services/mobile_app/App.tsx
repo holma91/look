@@ -15,6 +15,7 @@ import { DarkModeContext } from './context/DarkMode';
 LogBox.ignoreLogs([
   'Did not receive response to shouldStartLoad in time, defaulting to YES', // https://github.com/react-native-webview/react-native-webview/issues/124
   'shouldStartLoad',
+  'startLoadWithResult invoked with invalid lockIdentifier',
 ]);
 
 const queryClient = new QueryClient();

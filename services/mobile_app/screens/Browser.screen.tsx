@@ -90,8 +90,6 @@ export default function Browser({ navigation, route }: BrowserProps) {
     setSelectMode((prevSelectMode) => !prevSelectMode);
   }, [selectMode, webviewRef]);
 
-  console.log('route.params', route.params);
-
   return (
     <Box backgroundColor="background" flex={1}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -223,16 +221,13 @@ function Content({
     }, 1000);
     setTimeout(() => {
       webviewRef?.current?.injectJavaScript(extractScriptV2);
-    }, 2500);
-    // setTimeout(() => {
-    //   webviewRef?.current?.injectJavaScript(extractScriptV2);
-    // }, 5000);
-    // setTimeout(() => {
-    //   webviewRef?.current?.injectJavaScript(extractScriptV2);
-    // }, 7500);
-    // setTimeout(() => {
-    //   webviewRef?.current?.injectJavaScript(extractScriptV2);
-    // }, 10000);
+    }, 3000);
+    setTimeout(() => {
+      webviewRef?.current?.injectJavaScript(extractScriptV2);
+    }, 5000);
+    setTimeout(() => {
+      webviewRef?.current?.injectJavaScript(extractScriptV2);
+    }, 7500);
   };
 
   const handleLoadEnd = (navState: any) => {
@@ -248,29 +243,47 @@ function Content({
 
   const handleProductMessage = (data: any, eventUrl: string) => {
     const product = parseProductData(eventUrl, data);
-    console.log('handleProductMessage');
+    const prevProduct = currentProduct;
 
-    // if (currentProduct.url !== product.url) {
-    console.log('currentProduct.schemaUrl', currentProduct.schemaUrl);
-    console.log('product.schemaUrl', product.schemaUrl);
-    console.log('product.url (eventUrl)', product.url);
+    // console.log('prevProduct.schemaUrl', prevProduct.schemaUrl);
+    // console.log('product.schemaUrl', product.schemaUrl);
+    // console.log('prevProduct.url', prevProduct.url);
+    // console.log('product.url (eventUrl)', product.url);
 
-    if (currentProduct.schemaUrl !== product.schemaUrl) {
-      // schema has finally changed (schemaUrl is like the uid)
+    let locked = true;
+
+    if (product.domain === 'shop.lululemon.com') {
+      if (prevProduct.url !== product.url) {
+        locked = false;
+      }
+    } else {
+      if (prevProduct.schemaUrl !== product.schemaUrl) {
+        locked = false;
+      }
+    }
+
+    if (!locked) {
+      // console.log('not locked');
+
       if (
-        !arraysAreEqual(currentProduct.images, product.images) ||
+        !arraysAreEqual(prevProduct.images, product.images) ||
         product.images.length === 0
       ) {
         console.log('setting currentProduct:', product);
         setCurrentProduct(product);
 
+        console.log('product.images.length', product.images.length);
+
         if (product.images.length > 0) {
+          console.log('calling addToHistoryMutation');
+
           addToHistoryMutation.mutate(product);
         }
       } else {
         // console.log('images do not differ');
       }
     } else {
+      // console.log('locked');
       // this is a refresh
       // setCurrentProduct(product);
     }
@@ -281,20 +294,15 @@ function Content({
       ...currentProduct,
       images: [...currentProduct.images, data.data],
     };
-    console.log('handleImageAddMessage: currentProduct', currentProduct);
 
     if (currentProduct.images.length === 0) {
-      console.log('addHistoryMutation');
       addToHistoryMutation.mutate(updatedProduct);
     } else {
-      console.log('addImagesMutation');
       addImagesMutation.mutate({
         product: currentProduct,
         images: [data.data],
       });
     }
-    console.log('updatedProduct', updatedProduct);
-    console.log('updatedProduct.images.length', updatedProduct.images.length);
 
     setCurrentProduct(updatedProduct);
   };
@@ -419,7 +427,7 @@ function NavBar({
     }
   };
 
-  console.log('activeProduct', activeProduct);
+  // console.log('activeProduct', activeProduct);
 
   return (
     <Box zIndex={100}>

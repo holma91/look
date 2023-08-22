@@ -53,11 +53,11 @@ export const useAddImagesMutation = () => {
     onMutate: async ({ product, images }: AddImagesMutationProps) => {
       const previousProduct = queryClient.getQueryData([
         'product',
-        product.schemaUrl,
+        product.url,
       ]);
 
       queryClient.setQueryData(
-        ['product', product.schemaUrl],
+        ['product', product.url],
         (old: UserProduct | undefined) => {
           if (!old) {
             return;
@@ -71,7 +71,7 @@ export const useAddImagesMutation = () => {
     onError: (err, { product, images }, context) => {
       console.log('error', err, product, context);
       queryClient.setQueryData(
-        ['product', product.schemaUrl],
+        ['product', product.url],
         context?.previousProduct
       );
     },
@@ -80,7 +80,7 @@ export const useAddImagesMutation = () => {
         queryKey: ['products', { list: ['history'] }],
       });
       queryClient.invalidateQueries({
-        queryKey: ['product', product.schemaUrl],
+        queryKey: ['product', product.url],
       });
     },
   });
