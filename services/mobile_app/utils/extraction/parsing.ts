@@ -88,6 +88,16 @@ const domainSpecificParsers: {
       images: [productData['image']],
     };
   },
+  'hermes.com': (productData: any) => {
+    return {
+      schemaUrl: productData['url'],
+      name: productData['name'],
+      brand: productData['brand']['name'],
+      price: productData['offers']['price'],
+      currency: productData['offers']['priceCurrency'],
+      images: productData['image'],
+    };
+  },
 };
 
 const postProcess: {
@@ -137,7 +147,9 @@ const type4Domains = ['hm.com'];
 
 function getParser(domain: string) {
   let parser;
-  if (type1Domains.includes(domain)) {
+  if (domainSpecificParsers[domain]) {
+    parser = domainSpecificParsers[domain];
+  } else if (type1Domains.includes(domain)) {
     parser = baseParsers['type1'];
   } else if (type2Domains.includes(domain)) {
     parser = baseParsers['type2'];
@@ -145,8 +157,6 @@ function getParser(domain: string) {
     parser = baseParsers['type3'];
   } else if (type4Domains.includes(domain)) {
     parser = baseParsers['type4'];
-  } else if (domainSpecificParsers[domain]) {
-    parser = domainSpecificParsers[domain];
   }
 
   return parser;
@@ -173,6 +183,7 @@ export function parseProductData(url: string, rawData: string): UserProduct {
   };
 
   let parse = getParser(domain);
+
   if (!parse) {
     throw new Error(`No parser available for domain: ${domain}`);
   }

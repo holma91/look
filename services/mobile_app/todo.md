@@ -1,6 +1,7 @@
 ### TODO rn
 
 - fix search bar ; done
+- fix so users can choose domain from a company ;
 - https://gorhom.github.io/react-native-bottom-sheet/react-navigation-integration for nav in sheet
 
 ## research todos

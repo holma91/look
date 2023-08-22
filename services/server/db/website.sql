@@ -100,7 +100,7 @@ VALUES
     ('sellpy', 'sellpy.com'),
     ('na-kd', 'na-kd.com'),
     ('careofcarl', 'careofcarl.se'),
-    ('careofcarl', 'careofcarl.com'),
+    -- ('careofcarl', 'careofcarl.com'),
     ('loropiana', 'se.loropiana.com'),
     ('loropiana', 'us.loropiana.com'),
     ('lululemon', 'shop.lululemon.com'),
@@ -153,6 +153,7 @@ VALUES
 INSERT INTO c_list (id, user_id)
 VALUES
 ('favorites', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1'),
+('working', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1'),
 ('testlist', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1');
 
 
@@ -164,7 +165,13 @@ VALUES
 INSERT INTO list_company (list_id, user_id, company_id)
 VALUES
 ('favorites', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'softgoat'),
-('favorites','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zalando');
+('favorites','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'lululemon'),
+('favorites','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'adaysmarch'),
+('working', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'farfetch'),
+('working','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zalando'),
+('working','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'gucci'),
+('working','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'hermes'),
+('working','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'adaysmarch');
 
 UPDATE user_product SET liked = TRUE
 WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey/';

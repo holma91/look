@@ -251,8 +251,17 @@ function Content({
     // console.log('product.url (eventUrl)', product.url);
 
     // so here is where we do different stuff depending on the domain
+    const schemaDomains = [
+      'softgoat.com',
+      'adaysmarch.com',
+      'us.loropiana.com',
+    ];
     let locked = true;
-    if (product.domain === 'shop.lululemon.com') {
+    if (schemaDomains.includes(product.domain)) {
+      if (prevProduct.schemaUrl !== product.schemaUrl) {
+        locked = false;
+      }
+    } else if (product.domain === 'shop.lululemon.com') {
       if (
         prevProduct.url !== product.url &&
         !arraysAreEqual(prevProduct.images, product.images)
@@ -260,7 +269,7 @@ function Content({
         locked = false;
       }
     } else {
-      if (prevProduct.schemaUrl !== product.schemaUrl) {
+      if (prevProduct.url !== product.url) {
         locked = false;
       }
     }

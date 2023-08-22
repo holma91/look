@@ -5,7 +5,9 @@ import { URL } from '../../api/index';
 import { useFirebaseUser } from '../useFirebaseUser';
 
 async function fetchProduct(url: string) {
-  const completeUrl = `${URL}/products/product?product_url=${url}`;
+  // need to encode the url here, then decode it on the backend
+  const encodedUrl = encodeURIComponent(url);
+  const completeUrl = `${URL}/products/product?product_url=${encodedUrl}`;
   const token = await auth()?.currentUser?.getIdToken();
 
   const response = await fetch(completeUrl, {
