@@ -250,10 +250,13 @@ function Content({
     // console.log('prevProduct.url', prevProduct.url);
     // console.log('product.url (eventUrl)', product.url);
 
+    // so here is where we do different stuff depending on the domain
     let locked = true;
-
     if (product.domain === 'shop.lululemon.com') {
-      if (prevProduct.url !== product.url) {
+      if (
+        prevProduct.url !== product.url &&
+        !arraysAreEqual(prevProduct.images, product.images)
+      ) {
         locked = false;
       }
     } else {
@@ -263,27 +266,15 @@ function Content({
     }
 
     if (!locked) {
-      // console.log('not locked');
+      console.log('not locked');
+      console.log('setting currentProduct:', product);
+      setCurrentProduct(product);
 
-      if (
-        !arraysAreEqual(prevProduct.images, product.images) ||
-        product.images.length === 0
-      ) {
-        console.log('setting currentProduct:', product);
-        setCurrentProduct(product);
-
-        console.log('product.images.length', product.images.length);
-
-        if (product.images.length > 0) {
-          console.log('calling addToHistoryMutation');
-
-          addToHistoryMutation.mutate(product);
-        }
-      } else {
-        // console.log('images do not differ');
+      if (product.images.length > 0) {
+        addToHistoryMutation.mutate(product);
       }
     } else {
-      // console.log('locked');
+      console.log('locked');
       // this is a refresh
       // setCurrentProduct(product);
     }
@@ -340,12 +331,9 @@ function Content({
 
     switch (data.type) {
       case 'product':
-        console.log("received 'product' message");
-
         handleProductMessage(event.nativeEvent.data, event.nativeEvent.url);
         break;
       case 'imageAdd':
-        console.log("received 'imageAdd' message");
         handleImageAddMessage(data);
         break;
       case 'imageRemove':
@@ -419,15 +407,11 @@ function NavBar({
   }, []);
 
   const handleLikeProduct = async () => {
-    console.log('activeProduct', activeProduct);
-
     if (activeProduct) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       likeProductMutation.mutate(activeProduct);
     }
   };
-
-  // console.log('activeProduct', activeProduct);
 
   return (
     <Box zIndex={100}>

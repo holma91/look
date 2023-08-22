@@ -21,6 +21,7 @@ import { useLikeProductsMutation } from '../hooks/mutations/products/useLikeProd
 import ThemedIcon from '../components/ThemedIcon';
 import { AddProductsSheetModal } from '../components/sheets/AddProductsSheetModal';
 import { useProductsQuery } from '../hooks/queries/useProductsQuery';
+import { FlashList } from '@shopify/flash-list';
 
 type ProductsProps = {
   navigation: any;
@@ -135,10 +136,11 @@ function Content({
 
   return (
     <Box flex={1} paddingHorizontal="xs">
-      <FlatList
+      <FlashList
         data={productsQuery.data?.slice().reverse() || []}
         numColumns={2}
         keyExtractor={(item) => item.url}
+        estimatedItemSize={333}
         renderItem={({ item }) => (
           <ProductBig
             navigation={navigation}

@@ -29,7 +29,9 @@ const createProduct = async (
     body: JSON.stringify(backendProduct),
   });
 
-  if (!response.ok) {
+  if (response.status === 409) {
+    console.log('duplicate');
+  } else if (!response.ok) {
     console.log('response:', response);
 
     throw new Error(

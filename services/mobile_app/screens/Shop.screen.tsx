@@ -22,7 +22,6 @@ import { capitalizeFirstLetter } from '../utils/helpers';
 import { useAddCompaniesMutation } from '../hooks/mutations/companies/useAddCompaniesMutation';
 import { useDeleteCompaniesMutation } from '../hooks/mutations/companies/useDeleteCompaniesMutation';
 import { useTheme } from '@shopify/restyle';
-import { set } from 'react-native-reanimated';
 
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedClist, setSelectedClist] = useState('all');

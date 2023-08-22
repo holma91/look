@@ -8,8 +8,6 @@ async function fetchProduct(url: string) {
   const completeUrl = `${URL}/products/product?product_url=${url}`;
   const token = await auth()?.currentUser?.getIdToken();
 
-  console.log('fetching product with url:', url);
-
   const response = await fetch(completeUrl, {
     headers: {
       Authorization: `Bearer ${token}`,
