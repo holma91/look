@@ -207,7 +207,7 @@ function Content({
   const removeImagesMutation = useRemoveImagesMutation();
 
   const navigateToSite = async (company: Company) => {
-    await saveHistory(company.id);
+    await saveHistory(company);
     setSearchText('');
 
     const domain = company.domains[0];

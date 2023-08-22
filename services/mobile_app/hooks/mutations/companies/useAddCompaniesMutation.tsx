@@ -48,6 +48,20 @@ export const useAddCompaniesMutation = (selectedClist: string) => {
         }
       }
 
+      queryClient.setQueryData(
+        ['companies', listId],
+        (old: Company[] | undefined) => {
+          if (!old) return;
+          const newCompanies = companies.filter(
+            (newCompany) =>
+              !old?.some((oldCompany) => oldCompany.id === newCompany.id)
+          );
+          return [...old, ...newCompanies].sort((a, b) =>
+            a.id.localeCompare(b.id)
+          );
+        }
+      );
+
       return { previousCompanies };
     },
     onError: (err, { companies, listId }, context) => {

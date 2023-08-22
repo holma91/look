@@ -27,7 +27,7 @@ import { set } from 'react-native-reanimated';
 export default function Shop({ navigation }: { navigation: any }) {
   const [selectedClist, setSelectedClist] = useState('all');
   const [currentDomain, setCurrentDomain] = useState<string>('');
-  const [history, setHistory] = useState<string[]>([]);
+  const [history, setHistory] = useState<Company[]>([]);
   const [searchText, setSearchText] = useState('');
   const [focus, setFocus] = useState(false);
 
@@ -45,7 +45,7 @@ export default function Shop({ navigation }: { navigation: any }) {
   const navigateToSite = async (company: Company) => {
     console.log('navigating to site', company);
 
-    await saveHistory(company.id);
+    await saveHistory(company);
     setSearchText('');
     const domain = company.domains[0];
     navigation.navigate('Browser', { url: domain });
@@ -111,11 +111,11 @@ export default function Shop({ navigation }: { navigation: any }) {
                     contentContainerStyle={{ paddingLeft: 18 }}
                     keyExtractor={(item, index) => `history-${index}`}
                     estimatedItemSize={149}
-                    renderItem={({ item }) => {
-                      const company = companies?.find((c) => c.id === item);
+                    renderItem={({ item: company }) => {
+                      // const company = companies?.find((c) => c.id === item);
                       return (
                         <TouchableOpacity
-                          onPress={() => navigateToSite(company as Company)}
+                          onPress={() => navigateToSite(company)}
                           style={{
                             paddingRight: 10,
                             justifyContent: 'center',
@@ -130,7 +130,7 @@ export default function Shop({ navigation }: { navigation: any }) {
                               height: 45,
                               width: 45,
                             }}
-                            source={companyToInfo[item].icon}
+                            source={companyToInfo[company.id].icon}
                             contentFit="contain"
                           />
                         </TouchableOpacity>

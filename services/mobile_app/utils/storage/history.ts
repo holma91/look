@@ -1,6 +1,31 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Company } from '../types';
 
-async function saveHistory(domain: string): Promise<void> {
+async function saveHistory(company: Company): Promise<void> {
+  try {
+    let rawHistory = await AsyncStorage.getItem('@history');
+    let history: Company[];
+    if (rawHistory !== null) {
+      history = JSON.parse(rawHistory);
+    } else {
+      history = [];
+    }
+
+    // Find the index of the company with the same id
+    const companyIndex = history.findIndex((c) => c.id === company.id);
+    if (companyIndex !== -1) {
+      history.splice(companyIndex, 1);
+    }
+
+    history.unshift(company);
+
+    await AsyncStorage.setItem('@history', JSON.stringify(history));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function saveHistoryOld(company: string): Promise<void> {
   try {
     let rawHistory = await AsyncStorage.getItem('@history');
     let history: string[];
@@ -10,12 +35,12 @@ async function saveHistory(domain: string): Promise<void> {
       history = [];
     }
 
-    const domainIndex = history.indexOf(domain);
+    const domainIndex = history.indexOf(company);
     if (domainIndex !== -1) {
       history.splice(domainIndex, 1);
     }
 
-    history.unshift(domain);
+    history.unshift(company);
 
     await AsyncStorage.setItem('@history', JSON.stringify(history));
   } catch (e) {
@@ -23,7 +48,7 @@ async function saveHistory(domain: string): Promise<void> {
   }
 }
 
-async function getHistory(): Promise<string[]> {
+async function getHistory(): Promise<Company[]> {
   try {
     const history = await AsyncStorage.getItem('@history');
     return history ? JSON.parse(history) : [];
