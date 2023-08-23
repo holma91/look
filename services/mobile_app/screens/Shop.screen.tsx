@@ -110,6 +110,8 @@ export default function Shop({ navigation }: { navigation: any }) {
                     estimatedItemSize={149}
                     renderItem={({ item: company }) => {
                       // const company = companies?.find((c) => c.id === item);
+                      console.log('company:', company);
+
                       return (
                         <TouchableOpacity
                           onPress={() => navigateToSite(company)}

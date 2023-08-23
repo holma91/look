@@ -14,14 +14,23 @@ def test_add_product(test_app):
         "/products",
         content=json.dumps(
             {
-                "url": "https://www.zalando.se/nikesd-sporddtssweasr-bodysuitttr-linne-khaki-ni121t00p-n11.html",
-                "schemaUrl": "/prada-solglasoegon-black-p2451k03d-fasfq11.html",
-                "domain": "zalando.com",
-                "brand": "Nike",
-                "name": "BODYSUIT - Linne",
-                "price": "449",
-                "currency": "SEK",
-                "images": [],
+                "brand": "Gucci",
+                "currency": "USD",
+                "domain": "gucci.com",
+                "images": [
+                    "https://media.gucci.com/style/DarkGray_Center_0_0_490x490/1685033125/760123_FACLK_1094_001_083_0000_Light-GG-Crystal-messenger-bag.jpg",
+                    "https://media.gucci.com/style/DarkGray_Center_0_0_490x490/1685033126/760123_FACLK_1094_002_083_0000_Light-GG-Crystal-messenger-bag.jpg",
+                    "https://media.gucci.com/style/DarkGray_Center_0_0_490x490/1685033127/760123_FACLK_1094_003_100_0000_Light-GG-Crystal-messenger-bag.jpg",
+                    "https://media.gucci.com/style/DarkGray_Center_0_0_490x490/1685033128/760123_FACLK_1094_009_083_0000_Light-GG-Crystal-messenger-bag.jpg",
+                    "https://media.gucci.com/style/DarkGray_Center_0_0_490x490/1685033129/760123_FACLK_1094_010_083_0000_Light-GG-Crystal-messenger-bag.jpg",
+                    "https://media.gucci.com/style/DarkGray_Center_0_0_490x490/1685033130/760123_FACLK_1094_012_083_0000_Light-GG-Crystal-messenger-bag.jpg",
+                    "https://media.gucci.com/style/DarkGray_Center_0_0_490x490/1685033130/760123_FACLK_1094_013_083_0000_Light-GG-Crystal-messenger-bag.jpg",
+                    "https://media.gucci.com/style/DarkGray_Center_0_0_490x490/1685033132/760123_FACLK_1094_015_083_0000_Light-GG-Crystal-messenger-bag.jpg",
+                ],
+                "name": "GG Crystal messenger bag",
+                "price": "1690.0",
+                "schemaUrl": "https://www.gucci.com/us/en/pr/men/bags-for-men/messengers-crossbody-bags-for-men/gg-crystal-messenger-bag-p-760123FACLK1094",
+                "url": "https://www.gucci.com/us/en/pr/men/bags-for-men/messengers-crossbody-bags-for-men/gg-messenger-bag-p-760123FACJN9765",
             }
         ),
     )

@@ -2,8 +2,8 @@ import auth from '@react-native-firebase/auth';
 import { UserProduct } from '../utils/types';
 
 // api.ts
-export const URL = 'https://1d00-85-230-9-36.ngrok-free.app';
-// export const URL = 'https://server-2mwi7ezx7q-uc.a.run.app';
+// export const URL = 'https://1d00-85-230-9-36.ngrok-free.app';
+export const URL = 'https://server-2mwi7ezx7q-uc.a.run.app';
 
 export const likeProducts = async (products: UserProduct[]) => {
   const token = await auth()?.currentUser?.getIdToken();
