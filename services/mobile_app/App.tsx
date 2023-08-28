@@ -11,6 +11,7 @@ import Navigation from './navigation';
 import { TrainingProvider } from './context/Training';
 import { DemoProvider } from './context/Demo';
 import { DarkModeContext } from './context/DarkMode';
+import { ExperimentingProvider } from './context/Experimenting';
 
 LogBox.ignoreLogs([
   'Did not receive response to shouldStartLoad in time, defaulting to YES', // https://github.com/react-native-webview/react-native-webview/issues/124
@@ -34,9 +35,11 @@ export default function App() {
             <QueryClientProvider client={queryClient}>
               <BottomSheetModalProvider>
                 <DemoProvider>
-                  <TrainingProvider>
-                    <Navigation />
-                  </TrainingProvider>
+                  <ExperimentingProvider>
+                    <TrainingProvider>
+                      <Navigation />
+                    </TrainingProvider>
+                  </ExperimentingProvider>
                 </DemoProvider>
               </BottomSheetModalProvider>
             </QueryClientProvider>

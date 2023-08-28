@@ -6,11 +6,14 @@ import { DemoContext } from '../context/Demo';
 import { DarkModeContext } from '../context/DarkMode';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
 import { useFirebaseUser } from '../hooks/useFirebaseUser';
+import { ExperimentingContext } from '../context/Experimenting';
 
 export default function Profile() {
   const { user } = useFirebaseUser();
-  const { isDemo, setIsDemo } = useContext(DemoContext);
   const { isDarkMode, setIsDarkMode } = useContext(DarkModeContext);
+  const { isDemo, setIsDemo } = useContext(DemoContext);
+  const { isExperimenting, setIsExperimenting } =
+    useContext(ExperimentingContext);
 
   const toggles = [
     {
@@ -24,6 +27,12 @@ export default function Profile() {
       description: 'Use the demo features of Look.',
       function: () => setIsDemo((previousState) => !previousState),
       value: isDemo,
+    },
+    {
+      title: 'Enable experimenting',
+      description: 'Use the experimental features of Look.',
+      function: () => setIsExperimenting((previousState) => !previousState),
+      value: isExperimenting,
     },
   ];
 

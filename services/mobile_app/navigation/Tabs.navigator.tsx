@@ -15,11 +15,13 @@ import { DemoContext } from '../context/Demo';
 import ProductsNavigator from './Products.navigator';
 import ThemedIcon from '../components/ThemedIcon';
 import { View } from 'react-native';
+import { ExperimentingContext } from '../context/Experimenting';
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
   const { isDemo } = useContext(DemoContext);
+  const { isExperimenting } = useContext(ExperimentingContext);
   const activeTheme = useTheme();
 
   return (
@@ -42,15 +44,7 @@ export default function TabNavigator() {
             return <Ionicons name={iconName} size={size * 1.1} color={color} />;
           } else if (route.name === 'ProductsNavigator') {
             iconName = focused ? 'heart' : 'heart-outline';
-            return (
-              // <MaterialCommunityIcons
-              //   name={iconName}
-              //   size={size}
-              //   color={color}
-              // />
-              <ThemedIcon name={iconName} size={size} />
-              // <Ionicons name={iconName} size={size} color={color} />
-            );
+            return <ThemedIcon name={iconName} size={size} />;
           } else if (route.name === 'Profile') {
             iconName = focused ? 'ios-person' : 'ios-person-outline';
             return <ThemedIcon name={iconName} size={size} />;
@@ -58,7 +52,7 @@ export default function TabNavigator() {
             iconName = focused ? 'compass' : 'compass-outline';
             return <ThemedIcon name={iconName} size={size * 1.1} />;
           } else if (route.name === 'Testing') {
-            iconName = focused ? 'compass' : 'compass-outline';
+            iconName = focused ? 'build' : 'build-outline';
             return <ThemedIcon name={iconName} size={size} />;
           }
         },
@@ -73,6 +67,35 @@ export default function TabNavigator() {
         ),
       })}
     >
+      {isExperimenting ? (
+        <>
+          <Tab.Screen name="Testing" component={Testing} />
+          <Tab.Screen name="Profile" component={Profile} />
+        </>
+      ) : isDemo ? (
+        <>
+          <Tab.Screen name="Shop" component={Shop} />
+          <Tab.Screen name="ExploreNavigator" component={ExploreNavigator} />
+          <Tab.Screen name="ModelPicker" component={ModelPickerV2} />
+          <Tab.Screen name="ProductsNavigator" component={ProductsNavigator} />
+          <Tab.Screen name="Profile" component={Profile} />
+        </>
+      ) : (
+        <>
+          <Tab.Screen name="Shop" component={Shop} />
+          <Tab.Screen name="ProductsNavigator" component={ProductsNavigator} />
+          <Tab.Screen name="Profile" component={Profile} />
+        </>
+      )}
+    </Tab.Navigator>
+  );
+}
+
+const Tabs = () => {
+  const { isDemo } = useContext(DemoContext);
+
+  return (
+    <>
       <Tab.Screen name="Shop" component={Shop} />
       {isDemo ? (
         <>
@@ -83,6 +106,6 @@ export default function TabNavigator() {
       <Tab.Screen name="ProductsNavigator" component={ProductsNavigator} />
       <Tab.Screen name="Profile" component={Profile} />
       {/* <Tab.Screen name="Testing" component={Testing} /> */}
-    </Tab.Navigator>
+    </>
   );
-}
+};
