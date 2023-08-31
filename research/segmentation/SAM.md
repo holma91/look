@@ -71,4 +71,11 @@ Since SAM can efficiently process prompts, masks for the entire image can be gen
 
 SamAutomaticMaskGenerator implements this capability by sampling single-point input prompts in a grid over the image (SAM predicts a mask from each one of them). Masks are then filtered for quality and stuff. Seems like we can do some postprocessing here? "post-processing can remove stray pixels and holes".
 
+### Hardware
+
+From Meta's web demo we can see that:
+
+- The computation of embeddings is done server side (probably with a GPU)
+- The mask predictions are then done client side
+
 ### Conclusion
