@@ -37,6 +37,7 @@ export default function Testing() {
   const [isReady, setIsReady] = useState(false);
   const [isDoingPositivePoints, setIsDoingPositivePoints] = useState(true);
   const [points, setPoints] = useState<Point[]>([]);
+  const [uid, setUid] = useState(null);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -72,6 +73,92 @@ export default function Testing() {
     description: 'Use Look with a dark interface.',
     function: () => setIsDoingPositivePoints((previousState) => !previousState),
     value: isDoingPositivePoints,
+  };
+
+  const getEmbedding2 = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('image', {
+        uri: image,
+        name: 'image.jpg',
+        type: 'image/jpg',
+      });
+
+      const response = await fetch(
+        'http://localhost:8080/predictions/sam_embeddings/1.0',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.uid) {
+        setUid(data.uid); // Set the uid in state
+        console.log(`Received UID: ${data.uid}`);
+      }
+    } catch (error) {
+      console.error(`Error during embedding: ${error}`);
+    }
+  };
+
+  const getEmbedding = async () => {
+    try {
+      // Convert the local image URI to a Blob
+      const imageBlob = await fetch(image).then((r) => r.blob());
+
+      const formData = new FormData();
+      formData.append('image', imageBlob, 'image.jpg');
+
+      // Make the request
+      const response = await fetch(
+        'http://localhost:8080/predictions/sam_embeddings/1.0',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      // Handle the response
+      if (data.uid) {
+        setUid(data.uid); // Set the uid in state
+        console.log(`Received UID: ${data.uid}`);
+      }
+    } catch (error) {
+      console.error(`Error during embedding: ${error}`);
+    }
+  };
+
+  const getMask = async () => {
+    try {
+      const pointCoords = points.map((p) => [p.x, p.y]);
+      const pointLabels = points.map((p) => (p.type === 'positive' ? 1 : 0));
+
+      const response = await fetch(
+        'http://localhost:8080/predictions/sam_masks/1.0',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            uid,
+            point_coords: pointCoords,
+            point_labels: pointLabels,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      // Do something with the received mask, like displaying it
+      console.log('Received mask:', data);
+    } catch (error) {
+      console.error(`Error during mask prediction: ${error}`);
+    }
   };
 
   return (
@@ -122,10 +209,16 @@ export default function Testing() {
             value={toggle.value}
           />
         </Box>
-        <SecondaryButton label="Reset points" onPress={resetPoints} />
-        <PrimaryButton label="Pick an image" onPress={pickImage} />
-
-        <Button title="Pick an image from camera roll" onPress={pickImage} />
+        <Box flexDirection="row" gap="m">
+          <Box gap="sm">
+            <SecondaryButton label="Reset points" onPress={resetPoints} />
+            <PrimaryButton label="Pick an image" onPress={pickImage} />
+          </Box>
+          <Box gap="sm">
+            <SecondaryButton label="Get embedding" onPress={getEmbedding} />
+            <PrimaryButton label="Get mask" onPress={getMask} />
+          </Box>
+        </Box>
       </Box>
     </Box>
   );
