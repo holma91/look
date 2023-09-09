@@ -75,14 +75,14 @@ export default function Testing() {
     value: isDoingPositivePoints,
   };
 
-  const getEmbedding2 = async () => {
+  const getEmbedding = async () => {
     try {
       const formData = new FormData();
       formData.append('image', {
         uri: image,
         name: 'image.jpg',
         type: 'image/jpg',
-      });
+      } as any);
 
       const response = await fetch(
         'http://localhost:8080/predictions/sam_embeddings/1.0',
@@ -94,38 +94,11 @@ export default function Testing() {
 
       const data = await response.json();
 
-      if (data.uid) {
-        setUid(data.uid); // Set the uid in state
-        console.log(`Received UID: ${data.uid}`);
-      }
-    } catch (error) {
-      console.error(`Error during embedding: ${error}`);
-    }
-  };
+      console.log('Received embedding:', data);
 
-  const getEmbedding = async () => {
-    try {
-      // Convert the local image URI to a Blob
-      const imageBlob = await fetch(image).then((r) => r.blob());
-
-      const formData = new FormData();
-      formData.append('image', imageBlob, 'image.jpg');
-
-      // Make the request
-      const response = await fetch(
-        'http://localhost:8080/predictions/sam_embeddings/1.0',
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
-
-      const data = await response.json();
-
-      // Handle the response
-      if (data.uid) {
-        setUid(data.uid); // Set the uid in state
-        console.log(`Received UID: ${data.uid}`);
+      if (data[0]) {
+        setUid(data[0]); // Set the uid in state
+        console.log(`Received UID: ${data[0]}`);
       }
     } catch (error) {
       console.error(`Error during embedding: ${error}`);
@@ -136,6 +109,8 @@ export default function Testing() {
     try {
       const pointCoords = points.map((p) => [p.x, p.y]);
       const pointLabels = points.map((p) => (p.type === 'positive' ? 1 : 0));
+
+      // we have a size problem, what we get back seems to big
 
       const response = await fetch(
         'http://localhost:8080/predictions/sam_masks/1.0',
@@ -156,6 +131,8 @@ export default function Testing() {
 
       // Do something with the received mask, like displaying it
       console.log('Received mask:', data);
+      console.log('Received mask shape:', data.shape);
+      console.log('Received mask data[0][0][0]:', data[0][0][0]);
     } catch (error) {
       console.error(`Error during mask prediction: ${error}`);
     }
