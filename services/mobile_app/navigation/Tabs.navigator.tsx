@@ -16,6 +16,7 @@ import ProductsNavigator from './Products.navigator';
 import ThemedIcon from '../components/ThemedIcon';
 import { View } from 'react-native';
 import { ExperimentingContext } from '../context/Experimenting';
+import SkiaTesting from '../screens/SkiaTesting.screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -54,6 +55,9 @@ export default function TabNavigator() {
           } else if (route.name === 'Testing') {
             iconName = focused ? 'build' : 'build-outline';
             return <ThemedIcon name={iconName} size={size} />;
+          } else if (route.name === 'SkiaTesting') {
+            iconName = focused ? 'book' : 'book-outline';
+            return <ThemedIcon name={iconName} size={size} />;
           }
         },
         tabBarActiveTintColor: activeTheme.colors.text,
@@ -69,6 +73,7 @@ export default function TabNavigator() {
     >
       {isExperimenting ? (
         <>
+          <Tab.Screen name="SkiaTesting" component={SkiaTesting} />
           <Tab.Screen name="Testing" component={Testing} />
           <Tab.Screen name="Profile" component={Profile} />
         </>
@@ -105,7 +110,7 @@ const Tabs = () => {
       ) : null}
       <Tab.Screen name="ProductsNavigator" component={ProductsNavigator} />
       <Tab.Screen name="Profile" component={Profile} />
-      {/* <Tab.Screen name="Testing" component={Testing} /> */}
+      <Tab.Screen name="Testing" component={Testing} />
     </>
   );
 };
