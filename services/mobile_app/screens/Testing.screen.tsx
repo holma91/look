@@ -12,7 +12,7 @@ CLIENT
 2. send point on click to server
 */
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Button,
@@ -23,8 +23,10 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
+
 import { Box, Text } from '../styling/RestylePrimitives';
 import { PrimaryButton, SecondaryButton } from '../components/Button';
+import { set } from 'react-native-reanimated';
 
 type Point = {
   x: number;
@@ -38,6 +40,9 @@ export default function Testing() {
   const [isDoingPositivePoints, setIsDoingPositivePoints] = useState(true);
   const [points, setPoints] = useState<Point[]>([]);
   const [uid, setUid] = useState(null);
+  const [imgWidth, setImgWidth] = useState(0);
+  const [imgHeight, setImgHeight] = useState(0);
+  const [maskData, setMaskData] = useState(null);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -129,10 +134,9 @@ export default function Testing() {
 
       const data = await response.json();
 
-      // Do something with the received mask, like displaying it
-      console.log('Received mask:', data);
       console.log('Received mask shape:', data.shape);
-      console.log('Received mask data[0][0][0]:', data[0][0][0]);
+      console.log('Received mask data[0]:', data[0]);
+      setMaskData(data[0]); // now just iterate over the pixel values and set them if maskData[i][j] === true
     } catch (error) {
       console.error(`Error during mask prediction: ${error}`);
     }
@@ -154,7 +158,17 @@ export default function Testing() {
           source={{ uri: image }}
           style={{ width: '100%', height: '100%' }}
           contentFit="contain"
+          onLoad={(e) => {
+            const { width, height } = e.source;
+            console.log(
+              `Image loaded with width: ${width} and height: ${height}`
+            );
+            setImgWidth(width);
+            setImgHeight(height);
+            // Update the state variables or any other logic here
+          }}
         />
+
         {points.map((point, index) => (
           <View
             key={index}

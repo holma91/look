@@ -315,3 +315,41 @@ const demoImages: { [key: string]: any } = {
     require('../assets/generations/demo/villa.png'),
   ],
 };
+
+const handleCanvas = (canvas: any) => {
+  if (!canvas || !maskData) return;
+  canvas.width = imgWidth; // Set the canvas dimensions
+  canvas.height = imgHeight;
+
+  const ctx = canvas.getContext('2d');
+
+  // Clear the canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the original image
+  const scale = 1;
+  const img = new CanvasImage();
+  img.src = image;
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, img.width * scale, img.height * scale);
+
+    // Draw the mask overlay
+    const maskImage = ctx.createImageData(img.width, img.height);
+
+    for (let y = 0; y < img.height; y++) {
+      for (let x = 0; x < img.width; x++) {
+        const index = y * img.width + x;
+        const maskValue = maskData[y][x];
+
+        if (maskValue) {
+          maskImage.data[index * 4] = 0; // R value
+          maskImage.data[index * 4 + 1] = 0; // G value
+          maskImage.data[index * 4 + 2] = 255; // B value
+          maskImage.data[index * 4 + 3] = 128; // A value
+        }
+      }
+    }
+
+    ctx.putImageData(maskImage, 0, 0);
+  };
+};

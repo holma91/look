@@ -1,3 +1,5 @@
+# MVP
+
 I see a road to a mvp!
 
 Choose a few sites that work, e.g zalando.
@@ -6,6 +8,14 @@ Choose a few sites that work, e.g zalando.
 2. send image -> embeddings are computed
 3. send points -> masks are predicted
 
-### get image to server
+## Overlay mask on the image
 
-https://docs.expo.dev/versions/latest/sdk/filesystem/
+### Canvas-based rendering
+
+### Semi-Transparent View
+
+### SVG Overlay
+
+### Pre-Generated Mask Image on the server
+
+Doesn't really feel extensible.
