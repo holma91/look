@@ -16,7 +16,7 @@ export const ExperimentingProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [isExperimenting, setIsExperimenting] = useState(false);
+  const [isExperimenting, setIsExperimenting] = useState(true);
 
   return (
     <ExperimentingContext.Provider
