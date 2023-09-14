@@ -17,6 +17,7 @@ import ThemedIcon from '../components/ThemedIcon';
 import { View } from 'react-native';
 import { ExperimentingContext } from '../context/Experimenting';
 import SkiaTesting from '../screens/SkiaTesting.screen';
+import TestingV2 from '../screens/TestingV2.screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -52,7 +53,7 @@ export default function TabNavigator() {
           } else if (route.name === 'ExploreNavigator') {
             iconName = focused ? 'compass' : 'compass-outline';
             return <ThemedIcon name={iconName} size={size * 1.1} />;
-          } else if (route.name === 'Testing') {
+          } else if (route.name === 'Testing' || route.name === 'TestingV2') {
             iconName = focused ? 'build' : 'build-outline';
             return <ThemedIcon name={iconName} size={size} />;
           } else if (route.name === 'SkiaTesting') {
@@ -74,6 +75,7 @@ export default function TabNavigator() {
       {isExperimenting ? (
         <>
           <Tab.Screen name="SkiaTesting" component={SkiaTesting} />
+          <Tab.Screen name="TestingV2" component={TestingV2} />
           <Tab.Screen name="Testing" component={Testing} />
           <Tab.Screen name="Profile" component={Profile} />
         </>

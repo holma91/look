@@ -18,4 +18,4 @@ Choose a few sites that work, e.g zalando.
 
 ### Pre-Generated Mask Image on the server
 
-Doesn't really feel extensible.
+Generate image mask on the server, send it back to the client.

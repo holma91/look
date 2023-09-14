@@ -15,6 +15,8 @@ import {
 } from '@shopify/react-native-skia';
 import { Box } from '../styling/RestylePrimitives';
 import { Dimensions } from 'react-native';
+import { Stickers } from '../tutorials/Stickers';
+import { DEFAULT_PROCESSED_MASK } from '../utils/mask';
 
 const { width, height } = Dimensions.get('window');
 
@@ -43,7 +45,7 @@ export default function SkiaTesting() {
       edges={['right', 'top', 'left']}
       style={{ flex: 1, backgroundColor: 'lightgrey' }}
     >
-      <FittingExample />
+      <MaskExample />
     </SafeAreaView>
   );
 }
@@ -65,49 +67,90 @@ const FittingExample = () => {
   const BLACK_AND_WHITE = [
     0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0,
   ];
+  // og image is 1024x1369
+  const originalWidth = 1024;
+  const originalHeight = 1369;
+  const aspect_ratio = originalHeight / originalWidth;
 
-  const imgWidth = width;
-  const imgHeight = 512;
+  const imgWidth = 390;
+  const imgHeight = imgWidth * aspect_ratio;
+
+  console.log('screen width: ', width);
+  console.log('screen height: ', height);
 
   const maskArray = generateMaskArray(imgWidth, imgHeight);
 
   return (
-    <Canvas style={{ flex: 1 }}>
-      <Image
-        image={image}
-        x={0}
-        y={0}
-        width={imgWidth}
-        height={imgHeight}
-        fit="cover"
-      />
-      <Group>
-        {maskArray.map((row, y) =>
-          row.map((isMasked, x) =>
-            isMasked ? (
-              <Rect x={x} y={y} width={1} height={1} color={'red'} />
-            ) : null
-          )
-        )}
-      </Group>
-    </Canvas>
+    <Box flex={1}>
+      <Canvas style={{ flex: 1 }}>
+        <Image
+          image={image}
+          x={0}
+          y={0}
+          width={imgWidth}
+          height={imgHeight}
+          fit="cover"
+        />
+        <Group>
+          {maskArray.map((row, y) =>
+            row.map((isMasked, x) =>
+              isMasked ? (
+                <Rect
+                  key={x * y}
+                  x={x}
+                  y={y}
+                  width={1}
+                  height={1}
+                  color={'red'}
+                />
+              ) : null
+            )
+          )}
+        </Group>
+      </Canvas>
+      <Box></Box>
+    </Box>
   );
 };
 
-const MaskExample = () => (
-  <Canvas style={{ width: 256, height: 256 }}>
-    <Mask
-      mask={
-        <Group>
-          <Circle cx={128} cy={128} r={128} opacity={0.5} />
-          <Circle cx={128} cy={128} r={64} />
-        </Group>
-      }
-    >
-      <Rect x={0} y={0} width={256} height={256} color="lightblue" />
-    </Mask>
-  </Canvas>
-);
+const MaskExample = () => {
+  const image = useImage(require('../assets/defaultwoman.jpeg'));
+  const maskImage = useImage(DEFAULT_PROCESSED_MASK);
+  const imgWidth = 390;
+  const imgHeight = 521;
+  return (
+    <Canvas style={{ width: 390, height: 844 }}>
+      <Mask
+        mode="luminance"
+        mask={
+          <Group>
+            {/* <Circle cx={128} cy={128} r={128} opacity={0.5} /> */}
+            {/* <Circle cx={128} cy={128} r={64} /> */}
+            {/* <Rect x={0} y={0} width={256} height={256} color="green" opacity={0.5} /> */}
+            <Image
+              image={maskImage}
+              fit="cover"
+              x={0}
+              y={0}
+              width={imgWidth}
+              height={imgHeight}
+            />
+          </Group>
+        }
+      >
+        <Image
+          image={image}
+          fit="cover"
+          x={0}
+          y={0}
+          width={imgWidth}
+          height={imgHeight}
+        />
+      </Mask>
+      {/* <Rect x={0} y={0} width={256} height={256} color="lightblue" /> */}
+    </Canvas>
+  );
+};
 
 const BackdropExample = () => {
   const BLACK_AND_WHITE = [

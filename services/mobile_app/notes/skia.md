@@ -4,6 +4,10 @@ The Canvas component is the root of our Skia drawing. We can treat it as a regul
 
 ## ColorMatrix
 
+### TODO
+
+Instead of returning an array of booleans, have the server create an image from the mask and return it.
+
 ### Expo Issue
 
 ````md
