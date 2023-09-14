@@ -38,11 +38,15 @@ type Point = {
 
 export default function TestingV2() {
   const [image, setImage] = useState('');
-  const [isReady, setIsReady] = useState(false);
   const [isDoingPositivePoints, setIsDoingPositivePoints] = useState(true);
   const [points, setPoints] = useState<Point[]>([]);
-  const [uid, setUid] = useState(null);
+  const [uid, setUid] = useState('');
   const [mask, setMask] = useState('');
+
+  // og image is 1024x1369
+  const originalWidth = 1024;
+  const originalHeight = 1369;
+  const aspectRatio = originalHeight / originalWidth;
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -61,9 +65,8 @@ export default function TestingV2() {
   const uploadImage = async (uri: string) => {
     // TODO: upload the image to the server
     console.log(`Uploading image from URI: ${uri}`);
-    resetPoints();
-    setMask('');
-    setIsReady(true);
+    resetJob();
+    getEmbedding(uri);
   };
 
   const handleCanvasPress = (e: GestureResponderEvent) => {
@@ -73,14 +76,13 @@ export default function TestingV2() {
   };
 
   const resetAll = () => {
-    resetPoints();
-    setIsReady(false);
+    resetJob();
     setImage('');
-    setMask('');
   };
 
-  const resetPoints = () => {
+  const resetJob = () => {
     setPoints([]);
+    setMask('');
   };
 
   const toggle = {
@@ -90,11 +92,11 @@ export default function TestingV2() {
     value: isDoingPositivePoints,
   };
 
-  const getEmbedding = async () => {
+  const getEmbedding = async (uri: string) => {
     try {
       const formData = new FormData();
       formData.append('image', {
-        uri: image,
+        uri: uri,
         name: 'image.jpg',
         type: 'image/jpg',
       } as any);
@@ -122,8 +124,16 @@ export default function TestingV2() {
 
   const getMask = async () => {
     try {
-      const pointCoords = points.map((p) => [p.x, p.y]);
-      const pointLabels = points.map((p) => (p.type === 'positive' ? 1 : 0));
+      let pointCoords = points.map((p) => [p.x, p.y]);
+      let pointLabels = points.map((p) => (p.type === 'positive' ? 1 : 0));
+
+      pointCoords = pointCoords.map((p) => [
+        p[0] * (originalWidth / 390),
+        p[1] * (originalHeight / (390 * aspectRatio)),
+      ]);
+
+      console.log('pointCoords:', pointCoords);
+      console.log('pointLabels:', pointLabels);
 
       const response = await fetch(
         'http://localhost:8080/predictions/sam_masks/1.0',
@@ -151,26 +161,20 @@ export default function TestingV2() {
 
   console.log('image:', image);
 
+  const getMaskReady = uid !== '' && points.length > 0;
+
   return (
-    <SafeAreaView
-      edges={['right', 'top', 'left']}
-      style={{ flex: 1, backgroundColor: 'lightgrey' }}
-    >
+    <SafeAreaView edges={['right', 'top', 'left']} style={{ flex: 1 }}>
       <Box flex={1}>
         <FittingExample
           currentImage={image}
+          aspectRatio={aspectRatio}
           isDoingPositivePoints={isDoingPositivePoints}
           handleCanvasPress={handleCanvasPress}
           points={points}
           mask={mask}
         />
-        <Box
-          gap="m"
-          justifyContent="center"
-          alignItems="center"
-          paddingBottom="m"
-          paddingTop="s"
-        >
+        <Box gap="m" alignItems="center" paddingBottom="m" paddingTop="s">
           <Box
             flexDirection="row"
             key={toggle.title}
@@ -187,14 +191,19 @@ export default function TestingV2() {
               value={toggle.value}
             />
           </Box>
-          <Box flexDirection="row" gap="m">
+          <Box flexDirection="row" gap="m" justifyContent="space-evenly">
             <Box gap="sm">
               <SecondaryButton label="Reset all" onPress={resetAll} />
               <PrimaryButton label="Pick an image" onPress={pickImage} />
             </Box>
             <Box gap="sm">
-              <SecondaryButton label="Get embedding" onPress={getEmbedding} />
-              <PrimaryButton label="Get mask" onPress={getMask} />
+              <SecondaryButton label="Reset job" onPress={resetJob} />
+              <PrimaryButton
+                label="Get mask"
+                onPress={getMask}
+                disabled={!getMaskReady}
+                opacity={!getMaskReady ? 0.5 : 1}
+              />
             </Box>
           </Box>
         </Box>
@@ -205,6 +214,7 @@ export default function TestingV2() {
 
 type FittingExampleProps = {
   currentImage: string;
+  aspectRatio: number;
   isDoingPositivePoints: boolean;
   handleCanvasPress: (e: GestureResponderEvent) => void;
   points: Point[];
@@ -213,6 +223,7 @@ type FittingExampleProps = {
 
 const FittingExample = ({
   currentImage,
+  aspectRatio,
   isDoingPositivePoints,
   handleCanvasPress,
   points,
@@ -221,13 +232,8 @@ const FittingExample = ({
   const image = useImage(currentImage);
   const maskImage = Skia.Image.MakeImageFromEncoded(Skia.Data.fromBase64(mask));
 
-  // og image is 1024x1369
-  const originalWidth = 1024;
-  const originalHeight = 1369;
-  const aspect_ratio = originalHeight / originalWidth;
-
-  const imgWidth = 390;
-  const imgHeight = Math.floor(imgWidth * aspect_ratio);
+  const imgWidth = 390; // width / 390
+  const imgHeight = Math.floor(imgWidth * aspectRatio);
 
   console.log('screen width: ', width);
   console.log('screen height: ', height);
