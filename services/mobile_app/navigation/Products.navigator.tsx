@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Product from '../screens/Product.screen';
+import ProductV2 from '../screens/ProductV2.screen';
 import Products from '../screens/Products.screen';
 import { useLayoutEffect, useState } from 'react';
 import {
@@ -54,7 +55,7 @@ export default function ProductsNavigator({
         )}
       </ShopStack.Screen>
 
-      <ShopStack.Screen name="Product" component={Product} />
+      <ShopStack.Screen name="ProductV2" component={ProductV2} />
     </ShopStack.Navigator>
   );
 }
