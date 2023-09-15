@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS "product" (
 
 CREATE TABLE IF NOT EXISTS "product_image" (
     product_url TEXT NOT NULL REFERENCES "product" ("url") ON DELETE CASCADE,
+    -- product_url TEXT NOT NULL REFERENCES "user_product" ("product_url") ON DELETE CASCADE,
     image_url TEXT NOT NULL,
     UNIQUE(product_url, image_url)
 );
@@ -100,7 +101,6 @@ VALUES
     ('sellpy', 'sellpy.com'),
     ('na-kd', 'na-kd.com'),
     ('careofcarl', 'careofcarl.se'),
-    -- ('careofcarl', 'careofcarl.com'),
     ('loropiana', 'se.loropiana.com'),
     ('loropiana', 'us.loropiana.com'),
     ('lululemon', 'shop.lululemon.com'),
@@ -118,20 +118,16 @@ VALUES
 
 INSERT INTO product (url, schema_url, domain, brand, name, price, currency)
 VALUES 
-('https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey/', 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey', 'softgoat.com', 'Soft Goat Men', 'Men''s Fine Knit T-shirt', 1695.00, 'SEK'),
-('https://softgoat.com/p/mens-fine-knit-t-shirt-white/', 'https://softgoat.com/p/mens-fine-knit-t-shirt-white', 'softgoat.com', 'Soft Goat Men', 'Men''s Fine Knit T-shirt', 1695.00, 'SEK'),
-('https://softgoat.com/p/mens-waffle-knit-sea-foam/', 'https://softgoat.com/p/mens-waffle-knit-sea-foam', 'softgoat.com', 'Soft Goat Men', 'Men''s Waffle Knit', 2027.00, 'SEK'),
-('https://softgoat.com/p/mens-collar-navy/', 'https://softgoat.com/p/mens-collar-navy', 'softgoat.com', 'Soft Goat Men', 'Men''s Collar', 2027.00, 'SEK'),
-('https://softgoat.com/p/boatneck-red/', 'https://softgoat.com/p/boatneck-red', 'softgoat.com', 'Soft Goat Women', 'Boatneck', 2797.00, 'SEK'),
+('https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html', '/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html', 'zalando.se', 'Holzweiler', 'OCEANIC ZIP HOODIE - Tröja med dragkedja', 3725.00, 'SEK'),
 ('https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html', '/prada-solglasoegon-black-p2451k03d-q11.html', 'zalando.se','Prada','UNISEX - Solglasögon - black', 3555,'SEK');
 
 INSERT INTO product_image (product_url, image_url)
 VALUES
-('https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey/', 'https://softgoat.centracdn.net/client/dynamic/images/2196_d9c41cfa31-softgoat-ss23-ss1703-mens-t-shirt-navy-1695-2-size1024.jpg'),
-('https://softgoat.com/p/mens-fine-knit-t-shirt-white/', 'https://softgoat.centracdn.net/client/dynamic/images/2196_58f2100716-softgoat-ss23-ss1701-mens-t-shirt-white-1695-2-size1600.jpg'),
-('https://softgoat.com/p/mens-waffle-knit-sea-foam/', 'https://softgoat.centracdn.net/client/dynamic/images/2177_49b9783922-3-size1024.jpg'),
-('https://softgoat.com/p/mens-collar-navy/', 'https://softgoat.centracdn.net/client/dynamic/images/2202_8ee99fa254-softgoat-ss23-25030-mens-collar-navy-2895-2-size1024.jpg'),
-('https://softgoat.com/p/boatneck-red/', 'https://softgoat.centracdn.net/client/dynamic/images/2216_7d95b8536f-2-size1024.jpg'),
+('https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html', 'https://img01.ztat.net/article/spp-media-p1/e821827b5b3e4af3900008c9050696a8/a7ee6fbed5764b85839ed9c05ec2eeaa.jpg'),
+('https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html', 'https://img01.ztat.net/article/spp-media-p1/3c6c70ef26804275b82b0b0814a08317/84a7df03e65e419297acc827847fe28a.jpg'),
+('https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html', 'https://img01.ztat.net/article/spp-media-p1/0e36a35018d64ace8104794b4b93e909/e75ddafe5ce647a0aff95dbdc1b605dc.jpg'),
+('https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html', 'https://img01.ztat.net/article/spp-media-p1/ef6d4f19d80442e0add96dc2bf82672a/c40f4e82ba6546f69b76a9e3dc7641a1.jpg'),
+('https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html', 'https://img01.ztat.net/article/spp-media-p1/e03c271f870649a58f7e6f96b94e9a9b/0202ecddfb4d4af29c47eb2fd20f7498.jpg'),
 ('https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html', 'https://img01.ztat.net/article/spp-media-p1/f8baacffcfee40d69c1bf0667023c112/c56d781b37bf42dbbf0b5d07070598de.jpg'),
 ('https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html', 'https://img01.ztat.net/article/spp-media-p1/74dc1f4906e2432d9d2d9e461d91636a/f78b98bfcdf74f0fa90cf40ccabcc798.jpg'),
 ('https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html', 'https://img01.ztat.net/article/spp-media-p1/52d0541ee0c94af89270f9f1834db20f/85819b7eb0b24f049b3a1500150f5271.jpg'),
@@ -139,11 +135,7 @@ VALUES
 
 INSERT INTO user_product (user_id, product_url)
 VALUES
-('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey/'),
-('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-fine-knit-t-shirt-white/'),
-('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-waffle-knit-sea-foam/'),
-('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-collar-navy/'),
-('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/boatneck-red/'),
+('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html'),
 ('CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html');
 
 INSERT INTO p_list (id, user_id)
@@ -159,14 +151,11 @@ VALUES
 
 INSERT INTO list_product (list_id, user_id, product_url)
 VALUES
-('purchases', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-collar-navy/'),
-('purchases','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://softgoat.com/p/mens-waffle-knit-sea-foam/');
+('purchases', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html');
 
 INSERT INTO list_company (list_id, user_id, company_id)
 VALUES
-('favorites', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'softgoat'),
-('favorites','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'lululemon'),
-('favorites','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'adaysmarch'),
+('favorites', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zalando'),
 ('working', 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'farfetch'),
 ('working','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'zalando'),
 ('working','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'gucci'),
@@ -174,10 +163,6 @@ VALUES
 ('working','CoRDzg4muzOJ5IVfGOtwSjIR8Mo1', 'adaysmarch');
 
 UPDATE user_product SET liked = TRUE
-WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey/';
-UPDATE user_product SET liked = TRUE
-WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://softgoat.com/p/mens-collar-navy/';
-UPDATE user_product SET liked = TRUE
-WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://softgoat.com/p/mens-waffle-knit-sea-foam/';
+WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html';
 UPDATE user_product SET liked = TRUE
 WHERE user_id = 'CoRDzg4muzOJ5IVfGOtwSjIR8Mo1' AND product_url = 'https://www.zalando.se/prada-solglasoegon-black-p2451k03d-q11.html/';

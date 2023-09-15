@@ -6,6 +6,7 @@ from sqlalchemy import (
     Boolean,
     Float,
     ForeignKeyConstraint,
+    PrimaryKeyConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 
@@ -20,6 +21,7 @@ user_product_association = Table(
     Column("user_id", String, ForeignKey("user.id")),
     Column("product_url", String, ForeignKey("product.url")),
     Column("liked", Boolean),
+    # PrimaryKeyConstraint("user_id", "product_url")
 )
 
 list_product_association = Table(

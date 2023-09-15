@@ -1,12 +1,74 @@
 import json
+import logging
+import pytest
+from app.pydantic.requests import ProductImagesRequest
+
+BASE_PRODUCT = {
+    "url": "https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html",
+}
 
 
-def test_get_product(test_app):
-    response = test_app.get(
-        "/products/product?product_url=https://softgoat.com/p/mens-fine-knit-t-shirt-light-grey/"
-    )
-    print(response.content)
+# test_app.post(
+#     "/products",
+#     content=json.dumps(
+#         {
+#             "brand": "Zalando",
+#             "currency": "SEK",
+#             "domain": "zalando.se",
+#             "images": [
+#                 "https://img01.ztat.net/article/spp-media-p1/e821827b5b3e4af3900008c9050696a8/a7ee6fbed5764b85839ed9c05ec2eeaa.jpg",
+#                 "https://img01.ztat.net/article/spp-media-p1/3c6c70ef26804275b82b0b0814a08317/84a7df03e65e419297acc827847fe28a.jpg",
+#                 "https://img01.ztat.net/article/spp-media-p1/0e36a35018d64ace8104794b4b93e909/e75ddafe5ce647a0aff95dbdc1b605dc.jpg",
+#                 "https://img01.ztat.net/article/spp-media-p1/ef6d4f19d80442e0add96dc2bf82672a/c40f4e82ba6546f69b76a9e3dc7641a1.jpg",
+#                 "https://img01.ztat.net/article/spp-media-p1/e03c271f870649a58f7e6f96b94e9a9b/0202ecddfb4d4af29c47eb2fd20f7498.jpg",
+#             ],
+#             "name": "OCEANIC ZIP HOODIE - Tröja med dragkedja",
+#             "price": "3725",
+#             "schemaUrl": "/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html",
+#             "url": "https://www.zalando.se/holzweiler-oceanic-zip-hoodie-luvtroeja-dk-grey-ho021000u-c11.html",
+#         }
+#     ),
+# )
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+### GET
+
+
+def test_get_product_match(test_app):
+    response = test_app.get(f"/products/product?product_url={BASE_PRODUCT['url']}")
     assert response.status_code == 200
+
+
+def test_get_product_no_match(test_app):
+    response = test_app.get(f"/products/product?product_url=zzz{BASE_PRODUCT['url']}")
+    assert response.status_code == 404
+
+
+def test_get_products_match(test_app):
+    response = test_app.get(
+        "/products",
+        params={
+            "list": "history",
+            "website": ["zalando", "softgoat"],  # maybe change "website" to "company"
+        },
+    )
+
+    assert response.status_code == 200
+    assert len(response.json()) > 0
+
+
+def test_get_products_no_match(test_app):
+    response = test_app.get(
+        "/products", params={"list": "likes", "brand": ["NonExistentBrand"]}
+    )
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+# ### POST
 
 
 def test_add_product(test_app):
@@ -42,8 +104,20 @@ def test_add_product_invalid_json(test_app):
     response = test_app.post(
         "/products",
         content=json.dumps({}),
-        headers={
-            "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjYzODBlZjEyZjk1ZjkxNmNhZDdhNGNlMzg4ZDJjMmMzYzIzMDJmZGUiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiQWxleGFuZGVyIEhvbG1iZXJnIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FBY0hUdGNoRjRfYUlxYzdZeFFISjBFUFpPSWg1MHduVVZyRkJfc0t5UnZGeWlDaz1zOTYtYyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9sb29rLTk3YTg0IiwiYXVkIjoibG9vay05N2E4NCIsImF1dGhfdGltZSI6MTY5MjM0MDcwOCwidXNlcl9pZCI6IkNvUkR6ZzRtdXpPSjVJVmZHT3R3U2pJUjhNbzEiLCJzdWIiOiJDb1JEemc0bXV6T0o1SVZmR090d1NqSVI4TW8xIiwiaWF0IjoxNjkyNjI1MDIwLCJleHAiOjE2OTI2Mjg2MjAsImVtYWlsIjoiYWxleGFuZGVyaG9sbWJlcmc5MUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJnb29nbGUuY29tIjpbIjExNzM5NjA1OTA4NDIwODc5MzE3MSJdLCJlbWFpbCI6WyJhbGV4YW5kZXJob2xtYmVyZzkxQGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.FZoT5HfvSw6L2DtVwlGJ910llVDcbA9p4cfYErb4Y-9XrTNfmdx8Uvos3TdqYNqV3Alq4JEtKdImzaVc-CDlUuFnXtRuE-YDGY-ofc79NaEfdcUk_uP7Cf6uy3PxVm5vvo7wImqDfr_3YSZ80UwpA8gBi_vwaDw7RKt-enEtOWis9-aIpiE3x0M7vXnq9dNX-spjMVy3QMKruxMT2ahU3Thfi2zAC8MWye_10F8L3mSGqtPgw2rXwY-vpMzu3uas-41o7Eac3-nosH37AOaphoaLyVXqAWYHGoJv5bToKGD7aJW3CXCYgdzgYRWYzmuTYo9QNt6lzpwehZde8MzkaQ",
-        },
     )
     assert response.status_code == 422
+
+
+# def test_add_product_images_basic(test_app):
+#     # Assuming that a product with this URL already exists in the test database
+#     image_urls = [
+#         "https://www.example.com/image/1.jpg",
+#         "https://www.example.com/image/2.jpg",
+#     ]
+#     response = test_app.post(
+#         "/products/images",
+#         json=ProductImagesRequest(
+#             product_url=BASE_PRODUCT["url"], image_urls=image_urls
+#         ).dict(),
+#     )
+#     assert response.status_code == 201

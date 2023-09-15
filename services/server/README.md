@@ -36,3 +36,15 @@ http --json POST http://localhost:8004/summaries/ url=http://testdriven.io
 ## API Design
 
 /users, /users/id, /users/id/favorites, users/id/likes,
+
+## Tests
+
+```zsh
+docker-compose exec web python -m pytest
+docker-compose exec web python -m pytest path/to/test_file.py::test_function_name
+
+```
+
+```zsh
+docker-compose exec web python -m pytest tests/test_products.py::test_get_products_match
+```

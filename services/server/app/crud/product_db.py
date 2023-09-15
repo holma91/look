@@ -41,8 +41,6 @@ def get_product(product_url: str, user: FirebaseUser, session: Session):
         .first()
     )
 
-    print("record", record)
-
     if not record:
         return {"success": False, "detail": "Product not found!"}
 

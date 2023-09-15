@@ -18,12 +18,21 @@ def get_settings() -> Settings:
     log.info("Loading config settings from the environment...")
     env = os.getenv("ENVIRONMENT", "dev")
     if env == "prod":
+        log.info("Loading PROD settings...")
         DATABASE_URL = os.environ.get("DATABASE_PROD_URL", "")
         return Settings(
             environment="prod",
             testing=False,
             database_url=DATABASE_URL,
         )
-
+    elif env == "test":
+        log.info("Loading TEST settings...")
+        DATABASE_URL = os.environ.get("DATABASE_TEST_URL", "")
+        return Settings(
+            environment="test",
+            testing=True,
+            database_url=DATABASE_URL,
+        )
+    log.info("Loading DEV settings...")
     DATABASE_URL = os.environ.get("DATABASE_DEV_URL", "")
     return Settings(database_url=DATABASE_URL)
