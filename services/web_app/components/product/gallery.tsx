@@ -32,46 +32,9 @@ export function Gallery({
     'h-full px-6 transition-all ease-in-out hover:scale-110 hover:text-black dark:hover:text-white flex items-center justify-center';
 
   return (
-    <>
-      <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden">
-        {images[imageIndex] && (
-          <Image
-            className="h-full w-full object-contain"
-            fill
-            sizes="(min-width: 1024px) 66vw, 100vw"
-            alt={images[imageIndex]?.altText as string}
-            src={images[imageIndex]?.src as string}
-            priority={true}
-          />
-        )}
-
-        {images.length > 1 ? (
-          <div className="absolute bottom-[15%] flex w-full justify-center">
-            <div className="mx-auto flex h-11 items-center rounded-full border border-white bg-neutral-50/80 text-neutral-500 backdrop-blur dark:border-black dark:bg-neutral-900/80">
-              <Link
-                aria-label="Previous product image"
-                href={previousUrl}
-                className={buttonClassName}
-                scroll={false}
-              >
-                <ArrowLeftIcon className="h-5" />
-              </Link>
-              <div className="mx-1 h-6 w-px bg-neutral-500"></div>
-              <Link
-                aria-label="Next product image"
-                href={nextUrl}
-                className={buttonClassName}
-                scroll={false}
-              >
-                <ArrowRightIcon className="h-5" />
-              </Link>
-            </div>
-          </div>
-        ) : null}
-      </div>
-
+    <div className="flex flex-col lg:flex-row lg:gap-2">
       {images.length > 1 ? (
-        <ul className="my-12 flex items-center justify-center gap-2 overflow-auto py-1 lg:mb-0">
+        <ul className="order-2 lg:order-1 my-6 lg:my-0 flex lg:flex-col lg:w-24  items-center justify-center gap-2 overflow-auto py-1 lg:mb-0">
           {images.map((image, index) => {
             const isActive = index === imageIndex;
             const imageSearchParams = new URLSearchParams(
@@ -101,6 +64,42 @@ export function Gallery({
           })}
         </ul>
       ) : null}
-    </>
+      <div className="order-1 lg:order-2 flex relative aspect-square h-full max-h-[690px] w-full overflow-hidden">
+        {images[imageIndex] && (
+          <Image
+            className="h-full w-full object-contain"
+            fill
+            sizes="(min-width: 1024px) 66vw, 100vw"
+            alt={images[imageIndex]?.altText as string}
+            src={images[imageIndex]?.src as string}
+            priority={true}
+          />
+        )}
+
+        {images.length > 1 ? (
+          <div className="absolute bottom-[5%] flex w-full justify-center">
+            <div className="mx-auto flex h-11 items-center rounded-full border border-white bg-neutral-50/80 text-neutral-500 backdrop-blur dark:border-black dark:bg-neutral-900/80">
+              <Link
+                aria-label="Previous product image"
+                href={previousUrl}
+                className={buttonClassName}
+                scroll={false}
+              >
+                <ArrowLeftIcon className="h-5" />
+              </Link>
+              <div className="mx-1 h-6 w-px bg-neutral-500"></div>
+              <Link
+                aria-label="Next product image"
+                href={nextUrl}
+                className={buttonClassName}
+                scroll={false}
+              >
+                <ArrowRightIcon className="h-5" />
+              </Link>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }

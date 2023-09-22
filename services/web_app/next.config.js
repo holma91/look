@@ -6,6 +6,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'demo.vercel.store',
       },
+      {
+        protocol: 'https',
+        hostname: 'softgoat.centracdn.net',
+      },
     ],
   },
 };

@@ -108,7 +108,7 @@ export function VariantSelector({
                 }
               )}
             >
-              {value}
+              {value + 'hey'}
             </button>
           );
         })}
