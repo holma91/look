@@ -108,16 +108,31 @@ def test_add_product_invalid_json(test_app):
     assert response.status_code == 422
 
 
-# def test_add_product_images_basic(test_app):
-#     # Assuming that a product with this URL already exists in the test database
-#     image_urls = [
-#         "https://www.example.com/image/1.jpg",
-#         "https://www.example.com/image/2.jpg",
-#     ]
-#     response = test_app.post(
-#         "/products/images",
-#         json=ProductImagesRequest(
-#             product_url=BASE_PRODUCT["url"], image_urls=image_urls
-#         ).dict(),
-#     )
-#     assert response.status_code == 201
+def test_add_product_images_valid(test_app):
+    # Assuming that a product with this URL already exists in the test database
+    image_urls = [
+        "https://www.example.com/image/1.jpg",
+        "https://www.example.com/image/2.jpg",
+    ]
+    response = test_app.post(
+        "/products/images",
+        json=ProductImagesRequest(
+            product_url=BASE_PRODUCT["url"], image_urls=image_urls
+        ).dict(),
+    )
+    assert response.status_code == 201 or response.status_code == 409
+
+
+def test_add_product_images_invalid(test_app):
+    # Assuming that a product with this URL already exists in the test database
+    image_urls = [
+        "https://www.example.com/image/1.jpg",
+        "https://www.example.com/image/2.jpg",
+    ]
+    response = test_app.post(
+        "/products/images",
+        json=ProductImagesRequest(
+            product_url=BASE_PRODUCT["url"] + "chars", image_urls=image_urls
+        ).dict(),
+    )
+    assert response.status_code == 409

@@ -9,14 +9,20 @@ export default async function Navbar() {
         <div className="flex w-full md:w-1/3">
           <Link
             href="/"
-            className="mr-2 flex w-full items-center justify-center md:w-auto lg:mr-6"
+            className="mr-2 flex w-full items-center justify-center md:w-auto lg:mr-6 cursor-pointer hover:text-blue-600"
           >
             Klader
           </Link>
         </div>
         <div className="hidden justify-center md:flex md:w-1/3">
-          <Search />
+          {/* <Search /> */}
         </div>
+        <Link
+          href="/product"
+          className="hidden justify-end md:flex md:w-1/3 cursor-pointer hover:text-blue-600"
+        >
+          Products
+        </Link>
       </div>
     </nav>
   );

@@ -3,7 +3,6 @@ import {
   Dimensions,
   TouchableOpacity,
   SafeAreaView,
-  View,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -89,7 +88,6 @@ export default function ProductV2({ navigation, route }: ProductProps) {
   const handleVerticalViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: any }) => {
       if (viewableItems.length > 0) {
-        // setActiveCategory(viewableItems[0].item);
         setActiveCategoryIndex(viewableItems[0].index);
         setActiveImageIndex(0);
       }
@@ -211,13 +209,17 @@ export default function ProductV2({ navigation, route }: ProductProps) {
           </Box>
           {!fittingMode ? (
             <>
-              <VerticalCarousel
-                images={Object.keys(images)}
+              <Carousel
+                choices={Object.keys(images)}
                 activeIndex={activeCategoryIndex}
+                type="vertical"
+                imageHeight={imageHeight.value}
               />
               <Carousel
-                images={images[activeCategory]}
+                choices={images[activeCategory]}
                 activeIndex={activeImageIndex}
+                type="horizontal"
+                imageHeight={imageHeight.value}
               />
             </>
           ) : null}
@@ -327,56 +329,52 @@ function TextBox({
 }
 
 function Carousel({
-  images,
+  choices,
   activeIndex,
+  type,
+  imageHeight,
 }: {
-  images: any[];
+  choices: any[];
   activeIndex: number;
+  type: 'horizontal' | 'vertical';
+  imageHeight: number;
 }) {
-  if (images.length <= 1) return null;
+  if (choices.length <= 1) return null;
+
+  if (type === 'horizontal') {
+    return (
+      <Box
+        flexDirection="row"
+        justifyContent="center"
+        position="absolute"
+        bottom={17}
+        width="100%"
+        zIndex={0}
+      >
+        {choices.map((_, i) => (
+          <Box
+            key={i}
+            width={7}
+            height={7}
+            borderRadius={40}
+            backgroundColor={i === activeIndex ? 'text' : 'background'}
+            marginHorizontal="s"
+          />
+        ))}
+      </Box>
+    );
+  }
 
   return (
     <Box
-      flexDirection="row"
-      justifyContent="center"
-      position="absolute"
-      bottom={17}
-      width="100%"
-      zIndex={0}
-    >
-      {images.map((_, i) => (
-        <Box
-          key={i}
-          width={7}
-          height={7}
-          borderRadius={40}
-          backgroundColor={i === activeIndex ? 'text' : 'background'}
-          marginHorizontal="s"
-        />
-      ))}
-    </Box>
-  );
-}
-function VerticalCarousel({
-  images,
-  activeIndex,
-}: {
-  images: any[];
-  activeIndex: number;
-}) {
-  if (images.length <= 1) return null;
-
-  return (
-    <Box
-      // alignItems="center"
       position="absolute"
       gap="sm"
       left={12}
-      top={240}
+      top={imageHeight / 2.25}
       width="100%"
       zIndex={0}
     >
-      {images.map((_, i) => (
+      {choices.map((_, i) => (
         <Box
           key={i}
           width={7}

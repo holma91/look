@@ -1,5 +1,4 @@
 import os
-import json
 import logging
 
 import pytest
@@ -49,7 +48,8 @@ def get_settings_override():
 def get_db_session_override():
     DATABASE_URL = os.environ.get("DATABASE_TEST_URL", "")
     engine = create_engine(DATABASE_URL, echo=False)
-    db = sessionmaker(bind=engine)()
+    SessionLocal = sessionmaker(bind=engine)
+    db = SessionLocal()
 
     try:
         yield db
