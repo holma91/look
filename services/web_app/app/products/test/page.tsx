@@ -54,7 +54,7 @@ export default function ProductPage({
 
   return (
     <div className="mx-auto max-w-screen-2xl px-4">
-      <div className="flex flex-col gap-4 md:flex-row md:gap-8 p-8 md:p-12 rounded-md border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-black">
+      <div className="flex flex-col gap-4 md:flex-row items md:gap-8 p-8 md:p-12 rounded-md border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-black">
         <div className="md:basis-4/7 lg:basis-4/6">
           <GalleryCanvas
             images={product.files.map((file: File | string) => ({

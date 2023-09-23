@@ -38,10 +38,10 @@ export function GalleryCanvas({
   }, [images, imageIndex]);
 
   return (
-    <div className="flex flex-col lg:flex-row justify-between gap-4 lg:justify-center h-full">
+    <div className="flex flex-col justify-between lg:flex-row lg:justify-start gap-4 h-full">
       <div className="flex order-2 lg:order-1 items-center">
         {images.length > 1 ? (
-          <ul className="mt-1 lg:my-0 flex flex-row lg:flex-col lg:w-24 items-end justify-end gap-2 overflow-auto pt-1 lg:mb-0">
+          <ul className="mt-1 lg:my-0 flex flex-row lg:flex-col lg:w-24 items-start justify-end gap-2 overflow-auto pt-1 lg:mb-0">
             {images.map((image, index) => {
               const isActive = index === imageIndex;
               const imageSearchParams = new URLSearchParams(
