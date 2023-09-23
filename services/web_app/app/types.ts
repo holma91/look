@@ -4,5 +4,5 @@ type ManualProduct = {
   brand: string;
   price: number;
   currency: string;
-  files: File[];
+  files: (File | string)[];
 };

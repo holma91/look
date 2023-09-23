@@ -44,7 +44,7 @@ export function Gallery({
             imageSearchParams.set('image', index.toString());
 
             return (
-              <li key={image.src} className="h-20 w-20">
+              <li key={image.src} className="h-16 w-16">
                 <Link
                   aria-label="Enlarge product image"
                   href={createUrl(pathname, imageSearchParams)}
@@ -77,7 +77,7 @@ export function Gallery({
         )}
 
         {images.length > 1 ? (
-          <div className="absolute bottom-[5%] flex w-full justify-center">
+          <div className="absolute bottom-[2.5%] flex w-full justify-center">
             <div className="mx-auto flex h-11 items-center rounded-full border border-white bg-neutral-50/80 text-neutral-500 backdrop-blur dark:border-black dark:bg-neutral-900/80">
               <Link
                 aria-label="Previous product image"

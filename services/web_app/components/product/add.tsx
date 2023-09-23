@@ -213,7 +213,7 @@ function ManualAdd() {
           aria-label="Add item to cart"
           disabled={false}
           title="Add product"
-          className="relative flex w-full items-center justify-center rounded-md bg-blue-600 p-4 tracking-wide text-white hover:opacity-90"
+          className="relative flex w-full items-center justify-center rounded-md bg-blue-600 p-3 tracking-wide text-white hover:opacity-90"
         >
           <div className="absolute left-0 ml-4">
             <PlusIcon className="h-5" />
@@ -230,11 +230,7 @@ function LinkAdd() {
   const handleLinkAdd = () => {
     console.log('link add');
     // do some behind the scenes scraping
-    // add link to zustand, generate uid for the url path
-    // router.push('/products/uid');
-    router.push('/product');
-
-    // retrieve from zustand
+    router.push('/product'); // retrieve from zustand
   };
 
   return (
@@ -259,7 +255,7 @@ function LinkAdd() {
           aria-label="Add item to cart"
           disabled={false}
           title="Add product"
-          className="relative flex w-full items-center justify-center rounded-md bg-blue-600 p-4 tracking-wide text-white hover:opacity-90"
+          className="relative flex w-full items-center justify-center rounded-md bg-blue-600 p-3 tracking-wide text-white hover:opacity-90"
         >
           <div className="absolute left-0 ml-4">
             <PlusIcon className="h-5" />
