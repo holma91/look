@@ -3,6 +3,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ReactNode, Suspense } from 'react';
+import { ProductProvider } from '@/context/Product';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -26,7 +27,9 @@ export default async function RootLayout({
       <body className="bg-neutral-50 text-black selection:bg-teal-300 dark:bg-black dark:text-white dark:selection:bg-pink-500 dark:selection:text-white min-h-screen">
         <Navbar />
         <Suspense>
-          <main>{children}</main>
+          <ProductProvider>
+            <main>{children}</main>
+          </ProductProvider>
         </Suspense>
       </body>
     </html>

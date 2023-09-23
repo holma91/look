@@ -26,7 +26,7 @@ const environments = [
 
 const numberOfImagesChoices = [1, 2, 3, 4, 5, 6];
 
-export function ProductDescription({ product }: { product: ManualProduct }) {
+export function ProductDescriptionOld({ product }: { product: Product }) {
   const [activeModel, setActiveModel] = useState('base model');
   const [activeEnvironment, setActiveEnvironment] = useState('studio');
   const [numberOfImages, setNumberOfImages] = useState(1);
@@ -43,8 +43,8 @@ export function ProductDescription({ product }: { product: ManualProduct }) {
         <h1 className="mb-2 text-5xl font-medium">{product.title}</h1>
         <div className="mr-auto w-auto rounded-md bg-blue-600 p-2 text-sm text-white">
           <Price
-            amount={product.price.toString()}
-            currencyCode={product.currency}
+            amount={product.priceRange.maxVariantPrice.amount}
+            currencyCode={product.priceRange.maxVariantPrice.currencyCode}
           />
         </div>
       </div>
