@@ -3,7 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
 export default function Sam() {
-  const [uid, setUid] = useState<string>('');
+  const [image, setImage] = useState(
+    'https://softgoat.centracdn.net/client/dynamic/images/2244_cdca5aecf6-11421w23bl_2-size1024.jpg'
+  );
+  const [uid, setUid] = useState('');
   const [mask, setMask] = useState('');
   const [dots, setDots] = useState<{ x: number; y: number; value: number }[]>(
     []
@@ -31,6 +34,7 @@ export default function Sam() {
   const reset = () => {
     // 1. Reset the dots state
     setDots([]);
+    setMask('');
 
     // 2. Clear the canvas and redraw the original image
     const canvas = canvasRef.current;
@@ -100,13 +104,18 @@ export default function Sam() {
       );
 
       const data = await response.json();
-      setMask(data[0]); // Assuming the mask data is in the first index
-      console.log('mask', data[0]);
+      setMask(data[0]);
       const maskDataURL = `data:image/png;base64,${data[0]}`;
       renderImageWithMask(maskDataURL);
     } catch (error) {
       console.error(`Error during mask prediction: ${error}`);
     }
+  };
+
+  const handleGenerate = async () => {
+    console.log('mask', mask);
+    console.log('image', image);
+    // we have mask and image, send to stable diffusion server. should be able to find a api?
   };
 
   const renderImageWithMask = (maskDataURL: string) => {
@@ -128,8 +137,7 @@ export default function Sam() {
 
   useEffect(() => {
     const img = new Image();
-    img.src =
-      'https://softgoat.centracdn.net/client/dynamic/images/2244_cdca5aecf6-11421w23bl_2-size1024.jpg';
+    img.src = image;
 
     img.onload = async () => {
       const canvas = canvasRef.current;
@@ -176,36 +184,51 @@ export default function Sam() {
       <div className="flex flex-col items-center justify-center h-full w-full">
         <canvas
           ref={canvasRef}
-          className="w-[450px]"
+          className="w-[400px]"
           onClick={handleSingleClick}
           onContextMenu={handleRightClick}
         ></canvas>
       </div>
-      <div className="flex flex-col gap-3 pt-4 w-[450px]">
+      <div className="flex flex-col gap-3 pt-4 w-[400px]">
         <p className="text-center">uid: {uid}</p>
         <button
-          aria-label="Add item to cart"
-          title={'Test product'}
+          aria-label="Reset"
+          title={'Reset configuration'}
           className="relative flex w-full items-center justify-center rounded-md p-3 tracking-wide bg-black border border-white text-white hover:opacity-90"
           onClick={reset}
         >
           <span>Reset</span>
         </button>
         <button
-          aria-label="Add item to cart"
-          disabled={uid === '' || dots.length === 0}
-          title={'Test product'}
+          aria-label="Segment"
+          disabled={uid === '' || dots.length === 0 || mask !== ''}
+          title={'Segment image'}
           className={clsx(
             'relative flex w-full items-center justify-center rounded-md p-3 tracking-wide text-white hover:opacity-90',
             {
-              'bg-blue-600': uid !== '' && dots.length !== 0,
+              'bg-blue-600': uid !== '' && dots.length !== 0 && mask === '',
               'bg-blue-300 cursor-not-allowed opacity-70':
-                uid === '' || dots.length === 0,
+                uid === '' || dots.length === 0 || mask !== '',
             }
           )}
           onClick={handleSegment}
         >
           <span>Segment</span>
+        </button>
+        <button
+          aria-label="Generate"
+          disabled={uid === '' || dots.length === 0}
+          title={'Generate image'}
+          className={clsx(
+            'relative flex w-full items-center justify-center rounded-md p-3 tracking-wide text-white hover:opacity-90',
+            {
+              'bg-blue-600': mask !== '',
+              'bg-blue-300 cursor-not-allowed opacity-70': mask === '',
+            }
+          )}
+          onClick={handleGenerate}
+        >
+          <span>Generate</span>
         </button>
       </div>
     </div>

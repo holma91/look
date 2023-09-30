@@ -15,3 +15,8 @@ if the current viewed image is a person, show the segmentation, and enable the g
 1. Click try
 
 ### TODO
+
+- figure out how to run my own model with replicate
+- run torchserve with better model
+
+### SD api
