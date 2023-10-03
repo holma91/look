@@ -16,7 +16,12 @@ if the current viewed image is a person, show the segmentation, and enable the g
 
 ### TODO
 
-- figure out how to run my own model with replicate
 - run torchserve with better model
+
+https://twitter.com/yacineMTB/status/1680949563325071361
+
+the model will have to take a bunch of special settings as input. only thing I've seen that accepts all those options is auto1111. because of that, we probably have to reverse engineer it.
+
+if I have auto1111 api running at a endpoint, we can just use it from our frontend. Boom!
 
 ### SD api

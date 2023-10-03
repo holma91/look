@@ -2,15 +2,42 @@
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
+const WEBUI_URL = 'https://cc2683d0tndekl-3001.proxy.runpod.net';
+
+const IMG2IMG_URL = `${WEBUI_URL}/sdapi/v1/img2img`;
+const MASKS_URL = 'http://localhost:8080/predictions/sam_masks/1.0';
+const EMBEDDINGS_URL = 'http://localhost:8080/predictions/sam_embeddings/1.0';
+
+const BASE_PROMPT =
+  'RAW photo, photo of black man, 8k uhd, dslr, soft lighting, high quality, film grain, Fujifilm XT3';
+const BASE_NEGATIVE_PROMPT =
+  '(deformed iris, deformed pupils, semi-realistic, cgi, 3d, render, sketch, cartoon, drawing, anime), text, cropped, out of frame, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck';
+
+const convertImageURLToBase64 = async (url: string): Promise<string> => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result as string);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
 export default function Sam() {
   const [image, setImage] = useState(
     'https://softgoat.centracdn.net/client/dynamic/images/2244_cdca5aecf6-11421w23bl_2-size1024.jpg'
   );
+  const [prompt, setPrompt] = useState(BASE_PROMPT);
   const [uid, setUid] = useState('');
   const [mask, setMask] = useState('');
   const [dots, setDots] = useState<{ x: number; y: number; value: number }[]>(
     []
   );
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const drawDot = (x: number, y: number, value: number) => {
@@ -35,6 +62,7 @@ export default function Sam() {
     // 1. Reset the dots state
     setDots([]);
     setMask('');
+    setGeneratedImages([]);
 
     // 2. Clear the canvas and redraw the original image
     const canvas = canvasRef.current;
@@ -46,8 +74,7 @@ export default function Sam() {
     ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
 
     const img = new Image();
-    img.src =
-      'https://softgoat.centracdn.net/client/dynamic/images/2244_cdca5aecf6-11421w23bl_2-size1024.jpg';
+    img.src = image;
 
     img.onload = () => {
       ctx.drawImage(img, 0, 0); // Draw the original image
@@ -69,14 +96,13 @@ export default function Sam() {
 
   const handleSegment = async () => {
     try {
-      // Extract point coordinates and labels from dots
       const pointCoords = dots.map((dot) => [dot.x, dot.y]);
       const pointLabels = dots.map((dot) => dot.value);
 
-      // Adjust scaling based on canvas dimensions
       const canvas = canvasRef.current;
       if (!canvas) return;
 
+      // Adjust scaling based on canvas dimensions
       const scaleFactorWidth = canvas.width / canvas.offsetWidth;
       const scaleFactorHeight = canvas.height / canvas.offsetHeight;
 
@@ -85,23 +111,17 @@ export default function Sam() {
         p[1] * scaleFactorHeight,
       ]);
 
-      console.log('pointCoords:', scaledPointCoords);
-      console.log('pointLabels:', pointLabels);
-
-      const response = await fetch(
-        'http://localhost:8080/predictions/sam_masks/1.0',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            uid,
-            point_coords: scaledPointCoords,
-            point_labels: pointLabels,
-          }),
-        }
-      );
+      const response = await fetch(MASKS_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          uid,
+          point_coords: scaledPointCoords,
+          point_labels: pointLabels,
+        }),
+      });
 
       const data = await response.json();
       setMask(data[0]);
@@ -113,9 +133,37 @@ export default function Sam() {
   };
 
   const handleGenerate = async () => {
-    console.log('mask', mask);
-    console.log('image', image);
-    // we have mask and image, send to stable diffusion server. should be able to find a api?
+    let base64Image = '';
+    try {
+      base64Image = await convertImageURLToBase64(image);
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+      return;
+    }
+    const payload = {
+      prompt,
+      negative_prompt: BASE_NEGATIVE_PROMPT,
+      sampler: 'DPM++ 2M Karras',
+      steps: 25,
+      init_images: [base64Image],
+      mask: mask,
+      width: 1024,
+      height: 1369,
+      inpaint_full_res: true,
+      inpaint_full_res_padding: 32,
+      inpainting_fill: 1,
+    };
+    const response = await fetch(IMG2IMG_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    console.log('data', data);
+    setGeneratedImages(data.images);
   };
 
   const renderImageWithMask = (maskDataURL: string) => {
@@ -158,13 +206,10 @@ export default function Sam() {
         const formData = new FormData();
         formData.append('image', blob);
 
-        const response = await fetch(
-          'http://localhost:8080/predictions/sam_embeddings/1.0',
-          {
-            method: 'POST',
-            body: formData,
-          }
-        );
+        const response = await fetch(EMBEDDINGS_URL, {
+          method: 'POST',
+          body: formData,
+        });
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -177,20 +222,45 @@ export default function Sam() {
         console.error('There was a problem with the fetch operation:', error);
       }
     };
-  }, []);
+    img.onerror = () => {
+      console.error('Failed to load the image from the provided URL.');
+      // You can handle further actions here if needed, for now, it just logs an error
+    };
+  }, [image]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full px-48">
-      <div className="flex flex-col items-center justify-center h-full w-full">
+    <div className="flex flex-col items-center justify-center h-full">
+      {/* <p className="text-center mb-3">uid: {uid}</p> */}
+      <div className="mt-1 mb-3 w-[350px]">
+        <input
+          type="text"
+          name="title"
+          id="title"
+          className="block w-full rounded-md py-1.5 text-white ring-1 ring-neutral-800 placeholder:text-gray-400 outline-none focus:ring-2  focus:ring-white sm:text-sm sm:leading-6 px-3 bg-transparent"
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
+        />
+      </div>
+
+      <div className="flex items-center justify-center h-full w-full">
         <canvas
           ref={canvasRef}
-          className="w-[400px]"
+          className="w-[350px]"
           onClick={handleSingleClick}
           onContextMenu={handleRightClick}
         ></canvas>
+        <div>
+          {generatedImages.map((base64Img, index) => (
+            <img
+              key={index}
+              src={`data:image/jpeg;base64,${base64Img}`}
+              alt={`Generated ${index}`}
+              className="w-[350px]"
+            />
+          ))}
+        </div>
       </div>
-      <div className="flex flex-col gap-3 pt-4 w-[400px]">
-        <p className="text-center">uid: {uid}</p>
+      <div className="flex flex-col gap-3 pt-4 w-[350px]">
         <button
           aria-label="Reset"
           title={'Reset configuration'}
@@ -215,6 +285,19 @@ export default function Sam() {
         >
           <span>Segment</span>
         </button>
+        <label htmlFor="title" className="block text-sm font-medium leading-6">
+          Prompt
+        </label>
+        <div className="mt-1">
+          <input
+            type="text"
+            name="title"
+            id="title"
+            className="block w-full rounded-md py-1.5 text-white ring-1 ring-neutral-800 placeholder:text-gray-400 outline-none focus:ring-2  focus:ring-white sm:text-sm sm:leading-6 px-3 bg-transparent"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+          />
+        </div>
         <button
           aria-label="Generate"
           disabled={uid === '' || dots.length === 0}
