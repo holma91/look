@@ -4,9 +4,9 @@ import io
 import base64
 from PIL import Image
 
-URL = "https://1dxi3jiqbumkmr-3001.proxy.runpod.net"
+from settings import URL
 
-payload = {"prompt": "cavapoo puppy", "steps": 15}
+payload = {"prompt": "photo of a person, outside restaurant", "steps": 20}
 
 response = requests.post(url=f"{URL}/sdapi/v1/txt2img", json=payload)
 r = response.json()
