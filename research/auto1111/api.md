@@ -6,7 +6,10 @@ Via GUI:
 
 ### Inpainting
 
-inpainting_fill: fill, original, latent noise, latent nothing (0, 1, 2, 3)
+**inpainting_fill**:
+fill, original, latent noise, latent nothing (0, 1, 2, 3)
+**inpaint_full_res**:
+True, False. I think True <=> Masked Content Only.
 
 ### notes
 

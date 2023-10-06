@@ -1,2 +1,8 @@
 TEST/
 segmentation
+fine-tuning/kohya/data
+experimenting/images
+experimenting/data
+*.pt
+*.pth
+yolo5vx.py

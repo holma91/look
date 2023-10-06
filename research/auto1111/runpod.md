@@ -9,3 +9,8 @@ To kill the webui:
 
 To start it from the CLI:
 `python relauncher.py`
+
+### ComfyUI
+
+Use same venv as sd-webui. Run `python main.py --listen 0.0.0.0 --port 3005` to start ComfyUI.
+More info and workflows: https://github.com/FurkanGozukara/Stable-Diffusion/blob/main/Tutorials/How-To-Use-ComfyUI-On-Your-PC-On-RunPod-On-Colab-With-SDXL.md

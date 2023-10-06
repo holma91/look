@@ -14,9 +14,17 @@ Do grounding sam stuff. The following should be possible:
 2. generate mask with SAM
 3. inpaint with SD
 
-### Backend TODO
+### catch up
 
-**sqlalchemy**:
-https://docs.sqlalchemy.org/en/20/tutorial/index.html
-https://testdriven.io/courses/scalable-fastapi-aws/database-app-support/
-https://github.com/tiangolo/full-stack-fastapi-postgresql
+- scott detweiler
+  swapping face into images
+  XY plot in comfy
+
+### resource backlog
+
+fine-tuning SAM: https://www.youtube.com/watch?v=83tnWs_YBRQ&ab_channel=DigitalSreeni
+A1111 tips: https://www.youtube.com/watch?v=BKHWJ_b3h-s&ab_channel=OlivioSarikas
+
+### conclusion
+
+honestly, just get into fine-tuning.

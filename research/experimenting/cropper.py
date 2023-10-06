@@ -3,14 +3,14 @@ import torch
 from PIL import Image
 import os
 
-# make a new venv, use python 3.10.x e.g. 3.10.9 
+# make a new venv, use python 3.10.x e.g. 3.10.9
 # full venv python tutorial very useful : https://youtu.be/B5U7LJOvH6g
 # activate venv and always work with activated venv
 
 # python -m venv venv
 # cd venv
 # cd scripts
-# activate 
+# activate
 # cd..
 # cd..
 # pip install -r requirements.txt
@@ -19,11 +19,22 @@ import os
 # python cropper.py
 
 # Load the pre-trained YOLOv5 model
-model = torch.hub.load('ultralytics/yolov5', 'yolov5x')
+model = torch.hub.load("ultralytics/yolov5", "yolov5x", force_reload=True)
 
 # Aspect ratios to consider
 # aspect_ratios = [(512, 512)]
-aspect_ratios = [(512, 512), (512, 768), (768, 512),(768,768), (640, 960), (960, 640), (768, 1024), (1024, 768)]
+aspect_ratios = [
+    # (512, 512),
+    # (512, 768),
+    # (768, 512),
+    # (768, 768),
+    # (640, 960),
+    # (960, 640),
+    # (768, 1024),
+    # (1024, 768),
+    (1024, 1024),
+]
+
 
 def auto_zoom(input_dir, output_base_dir):
     # loop over all files in the input directory
@@ -52,12 +63,12 @@ def auto_zoom(input_dir, output_base_dir):
 
         # Crop the image to the bounding box of the human
         x1, y1, x2, y2 = map(int, human[:4])
-        orgx1,orgx2,orgy1,orgy2=  x1, y1, x2, y2
+        orgx1, orgx2, orgy1, orgy2 = x1, y1, x2, y2
         orig_width, orig_height = x2 - x1, y2 - y1
 
         for ratio in aspect_ratios:
             width, height = ratio
-            x1, y1, x2, y2 = orgx1,orgx2,orgy1,orgy2
+            x1, y1, x2, y2 = orgx1, orgx2, orgy1, orgy2
             target_ratio = width / height
             print(target_ratio)
             current_width = x2 - x1
@@ -70,14 +81,14 @@ def auto_zoom(input_dir, output_base_dir):
             ratio_threshold = 0.9997
             while True:
                 loop_counter = 0
-                desired_ratio=current_ratio/target_ratio
-                if(current_ratio>target_ratio):
-                    desired_ratio=target_ratio/current_ratio
-                if(desired_ratio>ratio_threshold):
-                    break;
+                desired_ratio = current_ratio / target_ratio
+                if current_ratio > target_ratio:
+                    desired_ratio = target_ratio / current_ratio
+                if desired_ratio > ratio_threshold:
+                    break
                 while desired_ratio < ratio_threshold:
-                    if(desired_ratio>=ratio_threshold):
-                        break;
+                    if desired_ratio >= ratio_threshold:
+                        break
                     if loop_counter > 2000:
                         break
                     loop_counter += 1
@@ -96,22 +107,23 @@ def auto_zoom(input_dir, output_base_dir):
                     current_width = x2 - x1
                     current_height = y2 - y1
                     current_ratio = current_width / current_height
-                    desired_ratio=current_ratio/target_ratio
-                    if(current_ratio>target_ratio):
-                        desired_ratio=target_ratio/current_ratio
+                    desired_ratio = current_ratio / target_ratio
+                    if current_ratio > target_ratio:
+                        desired_ratio = target_ratio / current_ratio
 
                 if within_bounds(x1, y1, x2, y2) and loop_counter <= 2000:
                     break
 
                 ratio_threshold -= 0.005
-                #x1, y1, x2, y2 = orgx1,orgx2,orgy1,orgy2
+                # x1, y1, x2, y2 = orgx1,orgx2,orgy1,orgy2
                 if ratio_threshold < 0:
-                    x1, y1, x2, y2 = orgx1,orgx2,orgy1,orgy2
+                    x1, y1, x2, y2 = orgx1, orgx2, orgy1, orgy2
                     break
 
-
             x1, y1, x2, y2 = map(int, (x1, y1, x2, y2))
-            print(f"Final coords: {(x1, y1, x2, y2)}, Final ratio: {current_ratio}, Loops: {loop_counter}")
+            print(
+                f"Final coords: {(x1, y1, x2, y2)}, Final ratio: {current_ratio}, Loops: {loop_counter}"
+            )
 
             # Crop the image
             cropped_img = img[y1:y2, x1:x2]
@@ -130,7 +142,8 @@ def auto_zoom(input_dir, output_base_dir):
             output_path = os.path.join(output_dir, filename)
             result_img.save(output_path)
 
-raw_dir = "./images/alex/raw"
-processed_dir = "./images/alex/processed"
+
+raw_dir = "./images/tony/raw"
+processed_dir = "./images/tony/processed"
 # usage
 auto_zoom(raw_dir, processed_dir)
