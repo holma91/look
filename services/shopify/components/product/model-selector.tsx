@@ -11,7 +11,9 @@ type Combination = {
   [key: string]: string | boolean; // ie. { color: 'Red', size: 'Large', ... }
 };
 
-export function VariantSelector({
+const option = {name: "Model", values: ['white', 'black', 'asian', 'latino', 'indian']}
+
+export function ModelSelector({
   options,
   variants
 }: {
@@ -37,10 +39,13 @@ export function VariantSelector({
       {}
     )
   }));
+
+  // console.log('options:', options);
+  
   
 
-  return options.map((option) => (
-    <dl className="mb-8" key={option.id}>
+  return (
+    <dl className="mb-8" >
       <dt className="mb-4 text-sm uppercase tracking-wide">{option.name}</dt>
       <dd className="flex flex-wrap gap-3">
         {option.values.map((value) => {
@@ -103,5 +108,5 @@ export function VariantSelector({
         })}
       </dd>
     </dl>
-  ));
+  )
 }
