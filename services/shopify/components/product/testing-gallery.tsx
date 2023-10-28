@@ -7,11 +7,58 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-type Props = {
-  images: { src: string; altText: string }[];
+const db: { [productName: string]: { [modelName: string]: string[] } } = {
+  'pique-oversized-fit-t-shirt': {
+    base: ['ahh', 'baaa'],
+    white: [
+      'https://softgoat.centracdn.net/client/dynamic/images/2244_3c40f59723-mens_zip_hoodie_navy_325_2-size1024.jpg',
+      'https://softgoat.centracdn.net/client/dynamic/images/2244_3d9811cdfc-mens_zip_hoodie_navy_2595_front-size1600.jpg',
+      'https://softgoat.centracdn.net/client/dynamic/images/2244_17d78740ee-mens_zip_hoodie_navy_325_4-size1600.jpg',
+    ],
+    black: [],
+    asian: [],
+    latino: [],
+    indian: [],
+  },
+  'metal-vent-tech-short-sleeve-shirt': {
+    base: [],
+    white: [],
+    black: [],
+    asian: [],
+    latino: [],
+    indian: [],
+  },
+  'balancer-short-sleeve-shirt': {
+    base: [],
+    white: [],
+    black: [],
+    asian: [],
+    latino: [],
+    indian: [],
+  },
 };
 
-export function Gallery({ images }: Props) {
+type Props = {
+  baseImages: { src: string; altText: string }[];
+  currentModel: string;
+  productId: string;
+};
+
+export function TestingGallery({ baseImages, currentModel, productId }: Props) {
+  const getImages = () => {
+    if (currentModel === 'base') {
+      return baseImages;
+    }
+
+    return (
+      db[productId]?.[currentModel]?.map((src) => ({
+        src,
+        altText: 'some alt text',
+      })) ?? []
+    );
+  };
+  const images = getImages();
+
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const imageSearchParam = searchParams.get('image');
@@ -30,6 +77,8 @@ export function Gallery({ images }: Props) {
 
   const buttonClassName =
     'h-full px-6 transition-all ease-in-out hover:scale-110 hover:text-black dark:hover:text-white flex items-center justify-center';
+
+  console.log('images', images);
 
   return (
     <>

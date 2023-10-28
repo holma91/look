@@ -4,19 +4,13 @@ import clsx from 'clsx';
 import { ProductOption } from 'lib/shopify/types';
 import { createUrl } from 'lib/utils';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Dispatch, SetStateAction } from 'react';
 
-type Props = {
-  option: ProductOption;
-  currentModel: string;
-  setCurrentModel: Dispatch<SetStateAction<string>>;
+const option = {
+  name: 'Model',
+  values: ['base', 'white', 'black', 'asian', 'latino', 'indian'],
 };
 
-export function ModelSelector({
-  option,
-  currentModel,
-  setCurrentModel,
-}: Props) {
+export function BasicSelector({ option }: { option: ProductOption }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -37,14 +31,13 @@ export function ModelSelector({
 
           const isActive = searchParams.get(optionNameLowerCase) === value;
 
-          const isAvailableForSale = value !== 'me';
+          const isAvailableForSale = true;
 
           return (
             <button
               key={value}
               onClick={() => {
                 router.replace(optionUrl, { scroll: false });
-                setCurrentModel(value);
               }}
               title={`${option.name} ${value}`}
               className={clsx(

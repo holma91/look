@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Gallery } from './gallery';
 import { ProductDescription } from './product-description';
 import { TestingDescription } from './testing-description';
+import { TestingGallery } from './testing-gallery';
 
 export function Product({ product }: { product: Product }) {
   const [currentMode, setCurrentMode] = useState('Buying');
@@ -65,19 +66,32 @@ function BuyingMode({ product }: { product: Product }) {
 }
 
 function TestingMode({ product }: { product: Product }) {
+  const [currentModel, setCurrentModel] = useState('base');
+  console.log('product.images', product.images);
+  console.log('product', product);
+
+  // maybe move Gallery and Description to one component
+  // reason being, they are sharing a bunch of state
+
   return (
     <>
       <div className="h-full w-full basis-full lg:basis-4/6">
-        <Gallery
-          images={product.images.map((image: Image) => ({
+        <TestingGallery
+          baseImages={product.images.map((image: Image) => ({
             src: image.url,
             altText: image.altText,
           }))}
+          currentModel={currentModel}
+          productId={product.handle}
         />
       </div>
 
       <div className="basis-full lg:basis-2/6">
-        <TestingDescription product={product} />
+        <TestingDescription
+          product={product}
+          currentModel={currentModel}
+          setCurrentModel={setCurrentModel}
+        />
       </div>
     </>
   );
