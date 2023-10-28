@@ -35,7 +35,7 @@ export function ModelSelector({
           optionSearchParams.set(optionNameLowerCase, value);
           const optionUrl = createUrl(pathname, optionSearchParams);
 
-          const isActive = searchParams.get(optionNameLowerCase) === value;
+          const isActive = currentModel === value;
 
           const isAvailableForSale = value !== 'me';
 

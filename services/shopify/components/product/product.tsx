@@ -3,6 +3,7 @@ import { Image, Product } from 'lib/shopify/types';
 import { useState } from 'react';
 import { Gallery } from './gallery';
 import { ProductDescription } from './product-description';
+import { Testing } from './testing';
 import { TestingDescription } from './testing-description';
 import { TestingGallery } from './testing-gallery';
 
@@ -39,7 +40,8 @@ export function Product({ product }: { product: Product }) {
         {currentMode === 'Buying' ? (
           <BuyingMode product={product} />
         ) : (
-          <TestingMode product={product} />
+          // <TestingMode product={product} />
+          <Testing product={product} />
         )}
       </div>
     </>
