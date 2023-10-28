@@ -4,41 +4,46 @@ import clsx from 'clsx';
 import { ProductOption } from 'lib/shopify/types';
 import { createUrl } from 'lib/utils';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Dispatch, SetStateAction } from 'react';
 
-const option = {
-  name: 'Model',
-  values: ['base', 'white', 'black', 'asian', 'latino', 'indian'],
+type Props = {
+  option: ProductOption;
+  currentOption: string;
+  setCurrentOption: Dispatch<SetStateAction<string>>;
 };
 
-export function BasicSelector({ option }: { option: ProductOption }) {
+export function BasicSelector({
+  option,
+  currentOption,
+  setCurrentOption,
+}: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const handleOptionChange = (value: string) => {
+    const optionSearchParams = new URLSearchParams(searchParams.toString());
+
+    optionSearchParams.set(option.id.toLowerCase(), value);
+    const optionUrl = createUrl(pathname, optionSearchParams);
+    router.replace(optionUrl, { scroll: false });
+
+    setCurrentOption(value);
+  };
 
   return (
     <dl className="mb-8">
       <dt className="mb-4 text-sm uppercase tracking-wide">{option.name}</dt>
       <dd className="flex flex-wrap gap-3">
         {option.values.map((value) => {
-          const optionNameLowerCase = option.name.toLowerCase();
-
-          const optionSearchParams = new URLSearchParams(
-            searchParams.toString()
-          );
-
-          optionSearchParams.set(optionNameLowerCase, value);
-          const optionUrl = createUrl(pathname, optionSearchParams);
-
-          const isActive = searchParams.get(optionNameLowerCase) === value;
+          const isActive = currentOption === value;
 
           const isAvailableForSale = true;
 
           return (
             <button
               key={value}
-              onClick={() => {
-                router.replace(optionUrl, { scroll: false });
-              }}
+              onClick={() => handleOptionChange(value)}
               title={`${option.name} ${value}`}
               className={clsx(
                 'flex min-w-[48px] items-center justify-center rounded-full border bg-neutral-100 px-2 py-1 text-sm dark:border-neutral-800 dark:bg-neutral-900',
