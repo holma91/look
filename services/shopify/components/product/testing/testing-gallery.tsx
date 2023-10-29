@@ -10,9 +10,17 @@ type Props = {
   images: { src: string; altText: string }[];
   imgIndex: number;
   setImgIndex: Dispatch<SetStateAction<number>>;
+  currentModel: string;
+  currentEnv: string;
 };
 
-export function TestingGallery({ images, imgIndex, setImgIndex }: Props) {
+export function TestingGallery({
+  images,
+  imgIndex,
+  setImgIndex,
+  currentModel,
+  currentEnv,
+}: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
