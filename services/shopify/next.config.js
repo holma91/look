@@ -16,6 +16,10 @@ module.exports = {
         protocol: 'https',
         hostname: 'softgoat.centracdn.net',
       },
+      {
+        protocol: 'https',
+        hostname: 'pub-ce5c32cd75ef4b74a46d6307c3207f15.r2.dev',
+      },
     ],
   },
   async redirects() {

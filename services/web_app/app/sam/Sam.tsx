@@ -1,31 +1,14 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
-
-const WEBUI_URL = 'https://cc2683d0tndekl-3001.proxy.runpod.net';
-
-const IMG2IMG_URL = `${WEBUI_URL}/sdapi/v1/img2img`;
-const MASKS_URL = 'http://localhost:8080/predictions/sam_masks/1.0';
-const EMBEDDINGS_URL = 'http://localhost:8080/predictions/sam_embeddings/1.0';
-
-const BASE_PROMPT =
-  'RAW photo, photo of black man, 8k uhd, dslr, soft lighting, high quality, film grain, Fujifilm XT3';
-const BASE_NEGATIVE_PROMPT =
-  '(deformed iris, deformed pupils, semi-realistic, cgi, 3d, render, sketch, cartoon, drawing, anime), text, cropped, out of frame, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck';
-
-const convertImageURLToBase64 = async (url: string): Promise<string> => {
-  const response = await fetch(url);
-  const blob = await response.blob();
-
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      resolve(reader.result as string);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
+import {
+  BASE_PROMPT,
+  MASKS_URL,
+  convertImageURLToBase64,
+  BASE_NEGATIVE_PROMPT,
+  IMG2IMG_URL,
+  EMBEDDINGS_URL,
+} from './page';
 
 export default function Sam() {
   const [image, setImage] = useState(
@@ -37,7 +20,6 @@ export default function Sam() {
   const [dots, setDots] = useState<{ x: number; y: number; value: number }[]>(
     []
   );
-
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -180,7 +162,7 @@ export default function Sam() {
     maskImg.onload = () => {
       ctx.globalAlpha = 0.5; // Set opacity to 0.5 for the mask
       ctx.drawImage(maskImg, 0, 0, canvas.width, canvas.height); // Draw mask over the existing image
-      ctx.globalAlpha = 1.0; // Reset opacity back to default
+      ctx.globalAlpha = 1; // Reset opacity back to default
     };
   };
 

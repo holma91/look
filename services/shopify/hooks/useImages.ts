@@ -68,7 +68,7 @@ const db: DbType = {
       villa: [],
     },
     asian: {
-      base: ['/asian2.png'],
+      base: ['https://pub-ce5c32cd75ef4b74a46d6307c3207f15.r2.dev/asian2.png'],
       restaurant: ['/asian-restaurant2.png'],
       park: [],
       city: [],
