@@ -17,6 +17,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       if (session) {
         console.log(`Deleting session for ${shop}`);
         await db.session.deleteMany({ where: { shop } });
+        console.log(`Deleting shop for ${shop}`);
+        await db.shop.deleteMany({ where: { domain: shop } });
       }
 
       break;
