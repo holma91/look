@@ -1,7 +1,12 @@
 import { useEffect } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useActionData, useNavigation, useSubmit } from "@remix-run/react";
+import {
+  useActionData,
+  useLoaderData,
+  useNavigation,
+  useSubmit,
+} from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -15,12 +20,13 @@ import {
   InlineStack,
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
+import { getShop } from "~/models/Shop.server";
+import { Introduction } from "~/components/Introduction";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const authInfo = await authenticate.admin(request);
-  console.log("authInfo", Object.keys(authInfo)); // admin, billing, session, cors
-
-  return null;
+  const { admin, session } = await authenticate.admin(request);
+  const shop = await getShop(session.shop);
+  return json(shop);
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -68,6 +74,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function Index() {
   const nav = useNavigation();
+  const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const submit = useSubmit();
   const isLoading =
@@ -83,6 +90,12 @@ export default function Index() {
     }
   }, [productId]);
   const generateProduct = () => submit({}, { replace: true, method: "POST" });
+
+  console.log("loaderData", loaderData);
+
+  if (!loaderData?.onboardingCompleted) {
+    return <Introduction />;
+  }
 
   return (
     <Page>

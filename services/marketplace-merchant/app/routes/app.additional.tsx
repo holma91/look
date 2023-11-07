@@ -1,3 +1,4 @@
+import { LoaderFunctionArgs } from "@remix-run/node";
 import {
   Box,
   Card,
@@ -8,6 +9,20 @@ import {
   Text,
   BlockStack,
 } from "@shopify/polaris";
+import { getShop } from "~/models/Shop.server";
+import { authenticate } from "~/shopify.server";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { admin, session } = await authenticate.admin(request);
+  console.log("HEYYYYYYYY");
+  console.log("admin", admin);
+  console.log("session.shop", session.shop);
+  // get store data here
+
+  // const shop = await getShop();
+
+  return null;
+};
 
 export default function AdditionalPage() {
   return (
