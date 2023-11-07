@@ -8,8 +8,9 @@ import {
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import { restResources } from "@shopify/shopify-api/rest/admin/2023-10";
 import prisma from "./db.server";
-import { getShopDetails } from "./queries/get-shop-details";
-import { getOrCreateStorefrontAccessToken } from "./helper.server";
+import { getShopDetails } from "./handlers/queries/get-shop-details";
+import { getOrCreateStorefrontAccessToken } from "./handlers/helper";
+import { Session } from "@shopify/shopify-api";
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
@@ -28,40 +29,7 @@ const shopify = shopifyApp({
     },
   },
   hooks: {
-    afterAuth: async ({ session }) => {
-      console.log("afterAuth HOOK, session:", session);
-      const { id, shop, accessToken } = session;
-      const { name, country } = await getShopDetails(
-        shop,
-        accessToken as string
-      );
-      // we need to get storefront access token
-      const storefrontAccessToken = await getOrCreateStorefrontAccessToken(
-        shop,
-        accessToken as string
-      );
-      // insert entry into Shop table in db
-
-      const shopData = {
-        domain: shop,
-        storefrontAccessToken,
-        name,
-        country,
-      };
-
-      try {
-        await prisma.shop.upsert({
-          where: { domain: shop },
-          update: shopData,
-          create: shopData,
-        });
-        console.log(`Shop data for ${shop} upserted successfully.`);
-      } catch (error) {
-        console.log("Failed to add shop to db:", error);
-      }
-
-      shopify.registerWebhooks({ session });
-    },
+    afterAuth: afterAuthHook,
   },
   future: {
     v3_webhookAdminContext: true,
@@ -80,3 +48,32 @@ export const unauthenticated = shopify.unauthenticated;
 export const login = shopify.login;
 export const registerWebhooks = shopify.registerWebhooks;
 export const sessionStorage = shopify.sessionStorage;
+
+async function afterAuthHook({ session }: { session: Session }) {
+  const { id, shop, accessToken } = session;
+  const { name, country } = await getShopDetails(shop, accessToken as string);
+  const storefrontAccessToken = await getOrCreateStorefrontAccessToken(
+    shop,
+    accessToken as string
+  );
+
+  const shopData = {
+    domain: shop,
+    storefrontAccessToken,
+    name,
+    country,
+  };
+
+  try {
+    await prisma.shop.upsert({
+      where: { domain: shop },
+      update: shopData,
+      create: shopData,
+    });
+    console.log(`Shop data for ${shop} upserted successfully.`);
+  } catch (error) {
+    console.log("Failed to add shop to db:", error);
+  }
+
+  shopify.registerWebhooks({ session });
+}

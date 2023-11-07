@@ -2,7 +2,7 @@
 
 name = "marketplace-merchant"
 client_id = "9830f64fe92253bf0e35ad60e901d3bc"
-application_url = "https://petroleum-sacrifice-therefore-calm.trycloudflare.com"
+application_url = "https://syndication-latitude-enquiry-w.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -12,10 +12,10 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://petroleum-sacrifice-therefore-calm.trycloudflare.com/auth/callback",
-  "https://petroleum-sacrifice-therefore-calm.trycloudflare.com/auth/shopify/callback",
-  "https://petroleum-sacrifice-therefore-calm.trycloudflare.com/api/auth/callback",
-  "https://petroleum-sacrifice-therefore-calm.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://syndication-latitude-enquiry-w.trycloudflare.com/auth/callback",
+  "https://syndication-latitude-enquiry-w.trycloudflare.com/auth/shopify/callback",
+  "https://syndication-latitude-enquiry-w.trycloudflare.com/api/auth/callback",
+  "https://syndication-latitude-enquiry-w.trycloudflare.com/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]
@@ -26,4 +26,4 @@ embedded = false
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "nice-hoodie-store.myshopify.com"
+dev_store_url = "lasse-test-store.myshopify.com"

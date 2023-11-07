@@ -17,7 +17,8 @@ import {
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
+  const authInfo = await authenticate.admin(request);
+  console.log("authInfo", Object.keys(authInfo)); // admin, billing, session, cors
 
   return null;
 };
