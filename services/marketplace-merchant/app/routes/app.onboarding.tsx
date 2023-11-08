@@ -11,9 +11,7 @@ import { authenticate } from "~/shopify.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { session } = await authenticate.admin(request);
-  const shop = await finishOnboarding(session.shop);
-  console.log("shop", shop);
-
+  await finishOnboarding(session.shop);
   return redirect("/app");
 };
 

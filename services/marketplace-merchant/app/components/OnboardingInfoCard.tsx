@@ -1,23 +1,14 @@
 import {
   Card,
-  Page,
   Text,
-  Box,
   BlockStack,
   Icon,
-  InlineGrid,
   InlineStack,
   Button,
   Collapsible,
-  TextContainer,
   Checkbox,
 } from "@shopify/polaris";
-import {
-  AddMajor,
-  CheckoutMajor,
-  ChevronDownMinor,
-  CircleTickMajor,
-} from "@shopify/polaris-icons";
+import { ChevronDownMinor, CircleTickMajor } from "@shopify/polaris-icons";
 import { useCallback, useState } from "react";
 
 type Props1 = {
