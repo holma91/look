@@ -1,5 +1,5 @@
 import { GridTileImage } from 'components/grid/tile';
-import { getCollectionProducts } from 'lib/shopify';
+import { getProducts } from 'lib/shopify/mystuff';
 import type { Product, Shop } from 'lib/shopify/types';
 import Link from 'next/link';
 
@@ -12,6 +12,8 @@ function ThreeItemGridItem({
   size: 'full' | 'half';
   priority?: boolean;
 }) {
+  console.log('item', item);
+
   return (
     <div
       className={
@@ -49,23 +51,32 @@ function ThreeItemGridItem({
 export async function ThreeItemGrid({ shop }: { shop: Shop }) {
   // now every instance of this is for a shop
   // Collections that start with `hidden-*` are hidden from the search page.
-  const homepageItems = await getCollectionProducts({
-    collection: 'hidden-homepage-featured-items',
-  });
 
-  if (!homepageItems[0] || !homepageItems[1] || !homepageItems[2]) return null;
+  const products = await getProducts({
+    domain: shop.domain,
+    key: shop.storefrontAccessToken,
+  }); // this now works with configurable domain and key
 
-  const [firstProduct, secondProduct, thirdProduct] = homepageItems;
+  if (!products[0]) return null;
 
-  console.log('shop.storefrontAccessToken', shop.storefrontAccessToken);
+  const [firstProduct, secondProduct, thirdProduct] = products;
 
   return (
     <>
-      <h1 className="mb-4 px-6 text-3xl font-medium">{shop.domain}</h1>
-      <section className="mx-auto grid max-w-screen-2xl gap-4 px-4 pb-4 md:grid-cols-6 md:grid-rows-2">
+      <Link
+        href={`/shop/${shop.name.replaceAll(' ', '-')}`}
+        className="mb-4 px-6 text-3xl font-medium"
+      >
+        {shop.name.replaceAll(' ', '-')}
+      </Link>
+      <section className="mt-4 mx-auto grid max-w-screen-2xl gap-4 px-4 pb-4 md:grid-cols-6 md:grid-rows-2">
         <ThreeItemGridItem size="full" item={firstProduct} priority={true} />
-        <ThreeItemGridItem size="half" item={secondProduct} priority={true} />
-        <ThreeItemGridItem size="half" item={thirdProduct} />
+        {products[1] ? (
+          <ThreeItemGridItem size="half" item={secondProduct!} />
+        ) : null}
+        {products[2] ? (
+          <ThreeItemGridItem size="half" item={thirdProduct!} />
+        ) : null}
       </section>
     </>
   );

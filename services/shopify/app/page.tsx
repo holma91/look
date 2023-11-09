@@ -14,8 +14,9 @@ export const metadata = {
 };
 
 // get the shops here
-const salesChannelDomain = process.env.SALES_CHANNEL_DOMAIN + '/api/shops';
 async function getShops(): Promise<Shop[]> {
+  // should we a also get 3 products here?
+  const salesChannelDomain = process.env.SALES_CHANNEL_DOMAIN + '/api/shops';
   const result = await fetch(salesChannelDomain!, {
     method: 'GET',
     headers: {
@@ -33,7 +34,8 @@ async function getShops(): Promise<Shop[]> {
 }
 
 export default async function HomePage() {
-  const shops = await getShops();
+  let shops = await getShops();
+  // shops = [shops[0]!];
 
   return (
     <>
