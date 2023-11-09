@@ -6,6 +6,12 @@ export async function getShop(domain: string) {
   return shop;
 }
 
+export async function getShops() {
+  const shops = await db.shop.findMany();
+
+  return shops;
+}
+
 export async function finishOnboarding(domain: string) {
   const shop = await db.shop.update({
     where: { domain: domain },

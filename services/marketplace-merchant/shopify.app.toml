@@ -2,7 +2,7 @@
 
 name = "marketplace-merchant"
 client_id = "9830f64fe92253bf0e35ad60e901d3bc"
-application_url = "https://boat-september-dubai-supplied.trycloudflare.com"
+application_url = "https://whale-ample-tightly.ngrok-free.app"
 embedded = true
 
 [access_scopes]
@@ -12,10 +12,10 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://boat-september-dubai-supplied.trycloudflare.com/auth/callback",
-  "https://boat-september-dubai-supplied.trycloudflare.com/auth/shopify/callback",
-  "https://boat-september-dubai-supplied.trycloudflare.com/api/auth/callback",
-  "https://boat-september-dubai-supplied.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://whale-ample-tightly.ngrok-free.app/auth/callback",
+  "https://whale-ample-tightly.ngrok-free.app/auth/shopify/callback",
+  "https://whale-ample-tightly.ngrok-free.app/api/auth/callback",
+  "https://whale-ample-tightly.ngrok-free.app/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]
@@ -26,4 +26,4 @@ embedded = false
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "quickstart-69180d58.myshopify.com"
+dev_store_url = "lasse-test-store.myshopify.com"
