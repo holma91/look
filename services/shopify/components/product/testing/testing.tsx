@@ -26,8 +26,6 @@ export function Testing({ product }: { product: Product }) {
           images={images ?? []}
           imgIndex={imgIndex}
           setImgIndex={setImgIndex}
-          currentModel={currentModel}
-          currentEnv={currentEnv}
         />
       </div>
 

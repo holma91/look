@@ -10,12 +10,14 @@ type Props = {
   option: ProductOption;
   currentOption: string;
   setCurrentOption: Dispatch<SetStateAction<string>>;
+  setImgIndex: Dispatch<SetStateAction<number>>;
 };
 
 export function BasicSelector({
   option,
   currentOption,
   setCurrentOption,
+  setImgIndex,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -29,6 +31,7 @@ export function BasicSelector({
     router.replace(optionUrl, { scroll: false });
 
     setCurrentOption(value);
+    setImgIndex(0);
   };
 
   return (

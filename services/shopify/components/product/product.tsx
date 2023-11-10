@@ -1,9 +1,10 @@
 'use client';
-import { Image, Product } from 'lib/shopify/types';
+import { useImages } from 'hooks/useImages';
+import { Product } from 'lib/shopify/types';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { Gallery } from './gallery';
 import { ProductDescription } from './product-description';
+import { TestingGallery } from './testing/testing-gallery';
 
 export function Product({ product }: { product: Product }) {
   const [currentModel, setCurrentModel] = useState(
@@ -12,14 +13,19 @@ export function Product({ product }: { product: Product }) {
   const [currentEnv, setCurrentEnv] = useState(
     useSearchParams().get('env') ?? 'base'
   );
+  const [imgIndex, setImgIndex] = useState(
+    parseInt(useSearchParams().get('image') ?? '0')
+  );
+
+  let { data: images } = useImages(product, currentModel, currentEnv);
+
   return (
     <>
       <div className="h-full w-full basis-full lg:basis-4/6">
-        <Gallery
-          images={product.images.map((image: Image) => ({
-            src: image.url,
-            altText: image.altText,
-          }))}
+        <TestingGallery
+          images={images ?? []}
+          imgIndex={imgIndex}
+          setImgIndex={setImgIndex}
         />
       </div>
 
@@ -30,6 +36,7 @@ export function Product({ product }: { product: Product }) {
           setCurrentModel={setCurrentModel}
           currentEnv={currentEnv}
           setCurrentEnv={setCurrentEnv}
+          setImgIndex={setImgIndex}
         />
       </div>
     </>

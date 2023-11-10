@@ -26,6 +26,7 @@ type Props = {
   setCurrentModel: Dispatch<SetStateAction<string>>;
   currentEnv: string;
   setCurrentEnv: Dispatch<SetStateAction<string>>;
+  setImgIndex: Dispatch<SetStateAction<number>>;
 };
 
 export function ProductDescription({
@@ -34,6 +35,7 @@ export function ProductDescription({
   setCurrentModel,
   currentEnv,
   setCurrentEnv,
+  setImgIndex,
 }: Props) {
   const [virtualFitting, setVirtualFitting] = useState(false);
 
@@ -62,11 +64,13 @@ export function ProductDescription({
               option={modelOption}
               currentModel={currentModel}
               setCurrentModel={setCurrentModel}
+              setImgIndex={setImgIndex}
             />
             <BasicSelector
               option={environmentOption}
               currentOption={currentEnv}
               setCurrentOption={setCurrentEnv}
+              setImgIndex={setImgIndex}
             />
           </>
         ) : null}

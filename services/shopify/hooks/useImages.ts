@@ -9,7 +9,7 @@ type DbType = {
   };
 };
 
-type ImageReturnType = {
+export type ImageReturnType = {
   src: string;
   altText: string;
 }[];
@@ -140,7 +140,9 @@ const getImages = (
     }));
   }
 
-  const modelImages = db[product.handle]?.[currentModel]?.[currentEnv] ?? [];
+  const fakeHandle = 'metal-vent-tech-short-sleeve-shirt';
+
+  const modelImages = db[fakeHandle]?.[currentModel]?.[currentEnv] ?? [];
 
   return modelImages.map((src: any) => ({
     src,

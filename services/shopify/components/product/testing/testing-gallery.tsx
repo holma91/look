@@ -10,17 +10,9 @@ type Props = {
   images: { src: string; altText: string }[];
   imgIndex: number;
   setImgIndex: Dispatch<SetStateAction<number>>;
-  currentModel: string;
-  currentEnv: string;
 };
 
-export function TestingGallery({
-  images,
-  imgIndex,
-  setImgIndex,
-  currentModel,
-  currentEnv,
-}: Props) {
+export function TestingGallery({ images, imgIndex, setImgIndex }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -36,6 +28,8 @@ export function TestingGallery({
 
   const buttonClassName =
     'h-full px-6 transition-all ease-in-out hover:scale-110 hover:text-black dark:hover:text-white flex items-center justify-center';
+
+  console.log('images[imgIndex]', images[imgIndex]);
 
   return (
     <>
