@@ -1,19 +1,19 @@
 import { GridTileImage } from 'components/grid/tile';
 import { getProducts } from 'lib/shopify/mystuff';
-import type { Product, Shop } from 'lib/shopify/types';
+import type { Product } from 'lib/shopify/types';
 import Link from 'next/link';
 
 function ThreeItemGridItem({
+  domain,
   item,
   size,
   priority,
 }: {
+  domain: string;
   item: Product;
   size: 'full' | 'half';
   priority?: boolean;
 }) {
-  // console.log('item', item);
-
   return (
     <div
       className={
@@ -24,7 +24,7 @@ function ThreeItemGridItem({
     >
       <Link
         className="relative block aspect-square h-full w-full"
-        href={`/product/${item.handle}`}
+        href={`/shops/${domain}/${item.handle}`}
       >
         <GridTileImage
           src={item.featuredImage.url}
@@ -48,14 +48,11 @@ function ThreeItemGridItem({
   );
 }
 
-export async function ThreeItemGrid({ shop }: { shop: Shop }) {
-  // now every instance of this is for a shop
-  // Collections that start with `hidden-*` are hidden from the search page.
-
+export async function ThreeItemGrid({ domain }: { domain: string }) {
+  // should probably configure this to only get the first 3 products (from a collection)
   const products = await getProducts({
-    domain: shop.domain,
-    key: shop.storefrontAccessToken,
-  }); // this now works with configurable domain and key
+    domain: domain,
+  });
 
   if (!products[0]) return null;
 
@@ -64,18 +61,27 @@ export async function ThreeItemGrid({ shop }: { shop: Shop }) {
   return (
     <>
       <Link
-        href={`/shop/${shop.domain}`}
+        href={`/shops/${domain}`}
         className="mb-4 px-6 text-3xl font-medium"
       >
-        {shop.domain}
+        {domain}
       </Link>
       <section className="mt-4 mx-auto grid max-w-screen-2xl gap-4 px-4 pb-4 md:grid-cols-6 md:grid-rows-2">
-        <ThreeItemGridItem size="full" item={firstProduct} priority={true} />
+        <ThreeItemGridItem
+          size="full"
+          domain={domain}
+          item={firstProduct}
+          priority={true}
+        />
         {products[1] ? (
-          <ThreeItemGridItem size="half" item={secondProduct!} />
+          <ThreeItemGridItem
+            size="half"
+            domain={domain}
+            item={secondProduct!}
+          />
         ) : null}
         {products[2] ? (
-          <ThreeItemGridItem size="half" item={thirdProduct!} />
+          <ThreeItemGridItem size="half" domain={domain} item={thirdProduct!} />
         ) : null}
       </section>
     </>
