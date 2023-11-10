@@ -20,6 +20,7 @@ export async function getShops(): Promise<Shop[]> {
     headers: {
       'Content-Type': 'application/json',
     },
+    cache: 'no-cache',
   });
 
   const body = await result.json();
@@ -40,10 +41,7 @@ export default async function HomePage() {
         <ThreeItemGrid key={shop.domain} domain={shop.domain} />
       ))}
       <Suspense>
-        {/* <Carousel /> */}
-        <Suspense>
-          <Footer />
-        </Suspense>
+        <Footer />
       </Suspense>
     </>
   );

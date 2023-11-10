@@ -54,36 +54,38 @@ export async function ThreeItemGrid({ domain }: { domain: string }) {
     domain: domain,
   });
 
-  if (!products[0]) return null;
+  if (!products[0] || !products[1] || !products[2]) return null;
 
   const [firstProduct, secondProduct, thirdProduct] = products;
 
   return (
-    <>
+    <div className="mt-4 mx-auto max-w-screen-2xl px-4 pb-4 ">
       <Link
         href={`/shops/${domain}`}
         className="mb-4 px-6 text-3xl font-medium"
       >
         {domain}
       </Link>
-      <section className="mt-4 mx-auto grid max-w-screen-2xl gap-4 px-4 pb-4 md:grid-cols-6 md:grid-rows-2">
+      <section className="mt-4 grid gap-4 md:grid-cols-6 md:grid-rows-1">
         <ThreeItemGridItem
-          size="full"
+          size="half"
           domain={domain}
           item={firstProduct}
           priority={true}
         />
-        {products[1] ? (
-          <ThreeItemGridItem
-            size="half"
-            domain={domain}
-            item={secondProduct!}
-          />
-        ) : null}
-        {products[2] ? (
-          <ThreeItemGridItem size="half" domain={domain} item={thirdProduct!} />
-        ) : null}
+        <ThreeItemGridItem
+          size="half"
+          domain={domain}
+          item={secondProduct}
+          priority={true}
+        />
+        <ThreeItemGridItem
+          size="half"
+          domain={domain}
+          item={thirdProduct}
+          priority={true}
+        />
       </section>
-    </>
+    </div>
   );
 }

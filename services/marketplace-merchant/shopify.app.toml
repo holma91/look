@@ -26,4 +26,4 @@ embedded = false
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "lasse-test-store.myshopify.com"
+dev_store_url = "nice-t-shirt-store.myshopify.com"

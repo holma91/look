@@ -55,8 +55,6 @@ export default async function ProductPage({
 }: {
   params: { domain: string; handle: string };
 }) {
-  console.log('ProductPage', params);
-
   const product = await getProduct(params.domain, params.handle);
 
   if (!product) return notFound();
@@ -87,10 +85,9 @@ export default async function ProductPage({
         }}
       />
       <div className="mx-auto max-w-screen-2xl px-4">
-        <Product product={product} />
-        {/* <Suspense>
-          <RelatedProducts id={product.id} />
-        </Suspense> */}
+        <div className="flex flex-col rounded-lg border border-neutral-200 bg-white p-8 dark:border-neutral-800 dark:bg-black md:p-12 lg:flex-row lg:gap-8">
+          <Product product={product} />
+        </div>
       </div>
       <Suspense>
         <Footer />
