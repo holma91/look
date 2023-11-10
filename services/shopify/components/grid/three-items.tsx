@@ -12,7 +12,7 @@ function ThreeItemGridItem({
   size: 'full' | 'half';
   priority?: boolean;
 }) {
-  console.log('item', item);
+  // console.log('item', item);
 
   return (
     <div
@@ -64,10 +64,10 @@ export async function ThreeItemGrid({ shop }: { shop: Shop }) {
   return (
     <>
       <Link
-        href={`/shop/${shop.name.replaceAll(' ', '-')}`}
+        href={`/shop/${shop.domain}`}
         className="mb-4 px-6 text-3xl font-medium"
       >
-        {shop.name.replaceAll(' ', '-')}
+        {shop.domain}
       </Link>
       <section className="mt-4 mx-auto grid max-w-screen-2xl gap-4 px-4 pb-4 md:grid-cols-6 md:grid-rows-2">
         <ThreeItemGridItem size="full" item={firstProduct} priority={true} />

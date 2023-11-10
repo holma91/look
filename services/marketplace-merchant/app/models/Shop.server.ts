@@ -1,4 +1,6 @@
+import { json } from "@remix-run/node";
 import db from "../db.server";
+import { log } from "console";
 
 export async function getShop(domain: string) {
   const shop = await db.shop.findFirst({ where: { domain: domain } });
